@@ -33,10 +33,11 @@ read_citations <- function(files, databases = files, search_ids = "", tag_naming
     check_unique_dbs(files, ref_list)
   }
   
-  ref_list <- mapply(function(ref, database, search_id) {
+  ref_list <- mapply(function(ref, database, search_id, filename) {
     ref$cs__db <- database
     ref$cs__search_id <- search_id
-  }, ref_list, databases, search_ids)
+    ref$cs__filename <- filename
+  }, ref_list, databases, search_ids, filename)
   
   ref_tibble <- do.call(rbind, ref_list) %>% tibble::as_tibble()
   
