@@ -1,6 +1,7 @@
 library(shiny)
 library(synthesisr)
 library(dplyr)
+library(DT)
 
 # Define UI for data upload app ----
 ui <- navbarPage("CiteSource", id = "tabs",
@@ -31,8 +32,11 @@ ui <- navbarPage("CiteSource", id = "tabs",
             # Input: Select a file ----
             fileInput("file", 
                       "Upload", 
-                      multiple = TRUE, 
-                      accept = c('.ris', '.txt'))
+                      multiple = FALSE, 
+                      accept = c('.ris', '.txt')),
+            textInput('source', 'Where did you file come from?', placeholder = 'e.g. Scopus'),
+            textInput('tag', 'Tag your file with a name/label', placeholder = 'e.g. search string 1.3'),
+            actionButton('upload', 'Upload file')
         ),
         
         # Main panel for displaying outputs ----
@@ -50,27 +54,49 @@ ui <- navbarPage("CiteSource", id = "tabs",
 
 # Define server logic to read selected file ----
 server <- function(input, output) {
-    lst1 <- reactive({
+    
+    rv <- reactiveValues()
+    
+    observeEvent(input$upload,{
         validate(need(input$file != "", "Select your bibliographic file to upload..."))
         
         if (is.null(input$file)) {
             return(NULL)
         } else {
             
-            path_list <- as.list(input$file$datapath)
-            tbl_list <- lapply(input$file$datapath, synthesisr::read_refs)
-            tbl_length <- unlist(lapply(tbl_list, nrow))
-            
-            df <- data.frame(input$file[1], tbl_length, row.names = NULL)
-            colnames(df) <- c('file', 'records')
-            #df <- do.call(dplyr::bind_rows, tbl_list)
-            return(df)
+            #upload files one-by-one
+            path_list <- input$file$datapath
+            upload <- synthesisr::read_refs(input$file$datapath)
+            source <- input$source
+            tag <- input$tag
+            upload_list <- list(records = upload,
+                                source = source,
+                                tag = tag)
+            upload_length <- nrow(upload)
+            #create a dataframe summarising inputs
+            df <- data.frame('file' = input$file[1], 
+                             'records' = upload_length,
+                             'source' = source,
+                             'tag' = tag)
+            #save the df to a reactive value and store the upload and its source-tag data in a list
+            if(is.null(rv$df) == TRUE){
+                rv$uploads_list <- list()
+                rv$uploads_list <- c(rv$uploads_list, upload_list)
+                rv$df <- df
+            } else {
+                rv$df <- dplyr::bind_rows(rv$df, df)
+                rv$uploads_list <- c(rv$uploads_list, upload_list)
+            }
+
         }
     })
     
     output$tbl_out <- renderDataTable({
-        lst1()
-    }, options = list(paging = FALSE, searching = FALSE))
+        DT::datatable(rv$df, 
+                      options = list(paging = FALSE, 
+                                     searching = FALSE),
+                      rownames = FALSE)
+    })
     
 }
 
