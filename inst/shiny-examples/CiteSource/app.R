@@ -84,7 +84,7 @@ server <- function(input, output) {
                              'source' = source,
                              'tag' = tag)
             #save the df to a reactive value and store the upload and its source-tag data in a list
-            if(is.null(rv$df) == TRUE){
+            if(is.null(rv$df) == TRUE){ 
                 rv$df <- df
                 rvupload_df <- upload_df
             } else {
@@ -93,24 +93,21 @@ server <- function(input, output) {
             }
 
         }
-        
-        output$tbl_out <- renderDataTable({
-            DT::datatable(rv$df, 
-                          options = list(paging = FALSE, 
-                                         searching = FALSE),
-                          rownames = FALSE)
-        })
-        
-        output$refs_df <- renderDataTable({
-            DT::datatable(rv$upload_df, 
-                          options = list(paging = FALSE, 
-                                         searching = FALSE),
-                          rownames = FALSE)
-        })
-        
     })
     
+    output$tbl_out <- renderDataTable({
+        DT::datatable(rv$df, 
+                      options = list(paging = FALSE, 
+                                     searching = FALSE),
+                      rownames = FALSE)
+    })
     
+    output$refs_df <- renderDataTable({
+        DT::datatable(rv$upload_df, 
+                      options = list(paging = FALSE, 
+                                     searching = FALSE),
+                      rownames = FALSE)
+    })
     
 }
 
