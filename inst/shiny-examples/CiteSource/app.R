@@ -2,9 +2,24 @@ library(shiny)
 library(synthesisr)
 library(dplyr)
 library(DT)
+library(shinyWidgets)
 
 # Define UI for data upload app ----
 ui <- navbarPage("CiteSource", id = "tabs",
+                 
+                 # Set background colour
+                 shinyWidgets::setBackgroundColor(
+                     color = c("#F7FBFF")),
+                 tags$head(tags$style(
+                     HTML('
+                     #sidebar {
+                        background-color: #dec4de;
+                    }
+            
+                    body, label, input, button, select { 
+                      font-family: "Arial";
+                    }'))),
+                 
                  
                  # Home tab
                  tabPanel('Home/About',
@@ -44,11 +59,7 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                              dataTableOutput("tbl_out")
                                              
                                          )
-                                     ),
-                                     fluidRow(
-                                         column(12,
-                                                dataTableOutput('refs_df'))
-                                         )
+                                     )
                                      )
                               )
                           ),
@@ -63,7 +74,12 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                                 sidebarLayout(
                                                     
                                                     # Sidebar panel for inputs ----
-                                                    sidebarPanel(),
+                                                    sidebarPanel(id="sidebar",
+                                                                 'Select sources',
+                                                                 uiOutput('checkbox1'),
+                                                                 hr(),
+                                                                 'Select tags',
+                                                                 uiOutput('checkbox2')),
                                                     
                                                     mainPanel('Your visualisations will appear here')
                                                     )
@@ -86,10 +102,15 @@ ui <- navbarPage("CiteSource", id = "tabs",
 )
 
 # Define server logic to read selected file ----
-server <- function(input, output) {
+server <- function(input, output, session) {
     
     rv <- reactiveValues()
     
+    rv$df <- data.frame()
+    rv$upload_df <- data.frame()
+    
+    #### Upload files tab section ####
+    #upload on click
     observeEvent(input$upload,{
         validate(need(input$file != "", "Select your bibliographic file to upload..."))
         
@@ -99,6 +120,8 @@ server <- function(input, output) {
             
             #upload files one-by-one
             path_list <- input$file$datapath
+            rv$upload_number <- 0
+            rv$upload_number <- rv$upload_number + 1
             upload <- synthesisr::read_refs(input$file$datapath)
             source <- input$source
             tag <- input$tag
@@ -112,17 +135,13 @@ server <- function(input, output) {
                              'source' = source,
                              'tag' = tag)
             #save the df to a reactive value and store the upload and its source-tag data in a list
-            if(is.null(rv$df) == TRUE){ 
-                rv$df <- df
-                rvupload_df <- upload_df
-            } else {
-                rv$df <- dplyr::bind_rows(rv$df, df)
-                rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
-            }
+            rv$df <- dplyr::bind_rows(rv$df, df)
+            rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
 
         }
     })
     
+    # display summary input table
     output$tbl_out <- renderDataTable({
         DT::datatable(rv$df, 
                       options = list(paging = FALSE, 
@@ -130,12 +149,33 @@ server <- function(input, output) {
                       rownames = FALSE)
     })
     
+    # display summary of bound dfs
     output$refs_df <- renderDataTable({
         DT::datatable(rv$upload_df, 
                       options = list(paging = FALSE, 
                                      searching = FALSE),
                       rownames = FALSE)
     })
+    #### end section ####
+    
+    
+    
+    #### Visualise section ####
+    #render check box ui based on uploaded sources and tags
+    output$checkbox1 <- renderUI({
+        checkboxGroupInput('source_check', 'Sources', unique(rv$df$source))
+    })
+    output$checkbox2 <- renderUI({
+        checkboxGroupInput('tag_check', 'Tags', unique(rv$df$tag))
+    })
+    
+    
+    #### end section ####
+    
+    
+    #### Export section ####
+    
+    #### end section ####
     
 }
 
