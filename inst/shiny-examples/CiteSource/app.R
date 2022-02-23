@@ -8,12 +8,10 @@ library(shinyWidgets)
 ui <- navbarPage("CiteSource", id = "tabs",
                  
                  # Set background colour
-                 shinyWidgets::setBackgroundColor(
-                     color = c("#F7FBFF")),
                  tags$head(tags$style(
                      HTML('
                      #sidebar {
-                        background-color: #dec4de;
+                        background-color: #ffffff;
                     }
             
                     body, label, input, button, select { 
@@ -25,10 +23,13 @@ ui <- navbarPage("CiteSource", id = "tabs",
                  tabPanel('Home/About',
                           navlistPanel(
                               tabPanel(title = 'Use cases',
-                                       'Use case text'
+                                       includeMarkdown('www/useCases.md')
                                        ),
                               tabPanel(title = 'Instructions',
-                                       'instructions text'
+                                       column(9,
+                                              'instructions text'),
+                                       column(1,
+                                              tags$img(height=150,src='https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png'))
                                        )
                           )
                  ),
