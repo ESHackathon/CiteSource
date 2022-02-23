@@ -6,13 +6,15 @@ library(dplyr)
 ui <- navbarPage("CiteSource", id = "tabs",
                  
                  # Home tab
-                 tabPanel("Home",
-                          fluidRow(
-                              column(12,
-                                     h1('Welcome to CiteSource'),
-                                     'Explanatory text'
-                                     )
-                              )
+                 tabPanel('Home/About',
+                          navlistPanel(
+                              tabPanel(title = 'Use cases',
+                                       'Use case text'
+                                       ),
+                              tabPanel(title = 'Instructions',
+                                       'instructions text'
+                                       )
+                          )
                  ),
                  
                  # File upload tab
@@ -27,7 +29,10 @@ ui <- navbarPage("CiteSource", id = "tabs",
         sidebarPanel(
             
             # Input: Select a file ----
-            fileInput("files", "Upload", multiple = TRUE, accept = c(".xls"))
+            fileInput("files", 
+                      "Upload", 
+                      multiple = TRUE, 
+                      accept = c('.ris', '.txt'))
         ),
         
         # Main panel for displaying outputs ----
@@ -65,7 +70,7 @@ server <- function(input, output) {
     
     output$tbl_out <- renderDataTable({
         lst1()
-    }, rownames= FALSE, options = list(paging = FALSE, searching = FALSE))
+    }, options = list(paging = FALSE, searching = FALSE))
     
 }
 
