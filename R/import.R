@@ -30,6 +30,9 @@ check_unique_search_meta <- function(files, ref_list) {
 #' @param search_json Optional JSON containing search history
 #' information in line with the search history standard.
 #' If a vector is provided, it must be the same length as the list of files.
+#' @param search_json_field Optional field code / name that contains the
+#' JSON metadata in line with the search history standard. If specified
+#' search_json is ignored.
 #' @param tag_naming Specifies how tags should be renamed.
 #' Passed to and documented in \code{\link[synthesisr]{read_ref}}
 #' @return A tibble with one row per citation
@@ -45,21 +48,30 @@ check_unique_search_meta <- function(files, ref_list) {
 
 read_citations <- function(files,
                             search_json = NA,
-                            tag_naming = "best_guess") {
+                            search_json_field = NA,
+                            tag_naming = "none") {
   # Need to import files separately to
   # check whether they contain unique databases
   ref_list <- lapply(files,
                      synthesisr::read_refs,
                      tag_naming = tag_naming)
+  if (search_json_field != NA) {
+    ref_list <- mapply(function(ref, json, search_json_field) {
+      json <- get(paste0("ref$", search_json_field))
+    }, ref_list, search_json, moreArgs = c(search_json_field))
+  }
   if (length(search_json) == 1) {
+    jsonlite::validate(search_json)
     search_json <- rep(search_json, length(files))
-  } else if (length(search_json) != length(files)) {
+  } else if (length(search_json) == length(files)) {
+    mapply()
+  } else {
     stop(paste0("Length of search_json must be 1 or equal to length of files"))
   }
   ref_list <- mapply(function(ref, file, json) {
     ref$cs__filename <- basename(file)
     return(ref)
-  }, ref_list, files)
+  }, ref_list, files, search_json)
  if (databases == files) {
     check_unique_search_meta(files, ref_list)
   }
