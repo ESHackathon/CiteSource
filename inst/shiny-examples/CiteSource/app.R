@@ -45,7 +45,12 @@ ui <- navbarPage("CiteSource", id = "tabs",
             dataTableOutput("tbl_out")
             
         )
-    )
+    ),
+    fluidRow(
+        column(12,
+               dataTableOutput('refs_df')
+               )
+        )
                               )
                           )
         
@@ -69,10 +74,10 @@ server <- function(input, output) {
             upload <- synthesisr::read_refs(input$file$datapath)
             source <- input$source
             tag <- input$tag
-            upload_list <- list(records = upload,
-                                source = source,
-                                tag = tag)
-            upload_length <- nrow(upload)
+            upload_df <- data.frame(upload,
+                           'source' = source,
+                           'tag' = tag)
+            upload_length <- nrow(upload_df)
             #create a dataframe summarising inputs
             df <- data.frame('file' = input$file[1], 
                              'records' = upload_length,
@@ -80,23 +85,32 @@ server <- function(input, output) {
                              'tag' = tag)
             #save the df to a reactive value and store the upload and its source-tag data in a list
             if(is.null(rv$df) == TRUE){
-                rv$uploads_list <- list()
-                rv$uploads_list <- c(rv$uploads_list, upload_list)
                 rv$df <- df
+                rvupload_df <- upload_df
             } else {
                 rv$df <- dplyr::bind_rows(rv$df, df)
-                rv$uploads_list <- c(rv$uploads_list, upload_list)
+                rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
             }
 
         }
+        
+        output$tbl_out <- renderDataTable({
+            DT::datatable(rv$df, 
+                          options = list(paging = FALSE, 
+                                         searching = FALSE),
+                          rownames = FALSE)
+        })
+        
+        output$refs_df <- renderDataTable({
+            DT::datatable(rv$upload_df, 
+                          options = list(paging = FALSE, 
+                                         searching = FALSE),
+                          rownames = FALSE)
+        })
+        
     })
     
-    output$tbl_out <- renderDataTable({
-        DT::datatable(rv$df, 
-                      options = list(paging = FALSE, 
-                                     searching = FALSE),
-                      rownames = FALSE)
-    })
+    
     
 }
 
