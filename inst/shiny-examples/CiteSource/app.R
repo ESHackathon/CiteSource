@@ -22,39 +22,67 @@ ui <- navbarPage("CiteSource", id = "tabs",
                  tabPanel("File upload",
                           fluidRow(
                               column(12,
-    
-    # Sidebar layout with input and output definitions ----
-    sidebarLayout(
-        
-        # Sidebar panel for inputs ----
-        sidebarPanel(
-            
-            # Input: Select a file ----
-            fileInput("file", 
-                      "Upload", 
-                      multiple = FALSE, 
-                      accept = c('.ris', '.txt')),
-            textInput('source', 'Where did you file come from?', placeholder = 'e.g. Scopus'),
-            textInput('tag', 'Tag your file with a name/label', placeholder = 'e.g. search string 1.3'),
-            actionButton('upload', 'Upload file')
-        ),
-        
-        # Main panel for displaying outputs ----
-        mainPanel(
-            # Output: Data file ----
-            dataTableOutput("tbl_out")
-            
-        )
-    ),
-    fluidRow(
-        column(12,
-               dataTableOutput('refs_df')
-               )
-        )
+                                     # Sidebar layout with input and output definitions ----
+                                     sidebarLayout(
+                                         
+                                         # Sidebar panel for inputs ----
+                                         sidebarPanel(
+                                             
+                                             # Input: Select a file ----
+                                             fileInput("file", 
+                                                       "Upload", 
+                                                       multiple = FALSE, 
+                                                       accept = c('.ris', '.txt')),
+                                             textInput('source', 'Where did you file come from?', placeholder = 'e.g. Scopus'),
+                                             textInput('tag', 'Tag your file with a name/label', placeholder = 'e.g. search string 1.3'),
+                                             actionButton('upload', 'Upload file')
+                                         ),
+                                         
+                                         # Main panel for displaying outputs ----
+                                         mainPanel(
+                                             # Output: Data file ----
+                                             dataTableOutput("tbl_out")
+                                             
+                                         )
+                                     ),
+                                     fluidRow(
+                                         column(12,
+                                                dataTableOutput('refs_df'))
+                                         )
+                                     )
                               )
+                          ),
+                 
+                 # Visualise tab
+                 tabPanel("Visualise",
+                          fluidRow(
+                              column(12,
+                                     fluidRow(
+                                         column(12,
+                                                # Sidebar layout with input and output definitions ----
+                                                sidebarLayout(
+                                                    
+                                                    # Sidebar panel for inputs ----
+                                                    sidebarPanel(),
+                                                    
+                                                    mainPanel('Your visualisations will appear here')
+                                                    )
+                                                )
+                                         )
+                                     )
+                              )
+                          ),
+                 
+                 
+                 # Export tab
+                 tabPanel("Export",
+                          fluidRow(
+                              column(12,
+                                     'Export your data in various formats here.')
                           )
-        
-    )
+                 )
+                          
+                 
 )
 
 # Define server logic to read selected file ----
