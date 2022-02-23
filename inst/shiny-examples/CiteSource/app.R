@@ -29,7 +29,7 @@ ui <- navbarPage("CiteSource", id = "tabs",
         sidebarPanel(
             
             # Input: Select a file ----
-            fileInput("files", 
+            fileInput("file", 
                       "Upload", 
                       multiple = TRUE, 
                       accept = c('.ris', '.txt'))
@@ -51,17 +51,17 @@ ui <- navbarPage("CiteSource", id = "tabs",
 # Define server logic to read selected file ----
 server <- function(input, output) {
     lst1 <- reactive({
-        validate(need(input$files != "", "Select your bibliographic files to upload..."))
+        validate(need(input$file != "", "Select your bibliographic file to upload..."))
         
-        if (is.null(input$files)) {
+        if (is.null(input$file)) {
             return(NULL)
         } else {
             
-            path_list <- as.list(input$files$datapath)
-            tbl_list <- lapply(input$files$datapath, synthesisr::read_refs)
+            path_list <- as.list(input$file$datapath)
+            tbl_list <- lapply(input$file$datapath, synthesisr::read_refs)
             tbl_length <- unlist(lapply(tbl_list, nrow))
             
-            df <- data.frame(input$files[1], tbl_length, row.names = NULL)
+            df <- data.frame(input$file[1], tbl_length, row.names = NULL)
             colnames(df) <- c('file', 'records')
             #df <- do.call(dplyr::bind_rows, tbl_list)
             return(df)
