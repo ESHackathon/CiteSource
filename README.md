@@ -1,4 +1,5 @@
 # CiteSource
+<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="200px" align="right">
 
 This package would have multiple benefits in analyzing the efficacy of specific databases. While there are many tools that allow for deduplication of citations (ASySD, revtools, synthesisr, EndNote, etc), no tool exists that can deduplicate citations while maintaining source metadata related to each of the deduplicated records. 
 
