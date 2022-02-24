@@ -3,27 +3,29 @@ library(synthesisr)
 library(dplyr)
 library(DT)
 library(shinyWidgets)
+library(htmltools)
+library(markdown)
 
-# Define UI for data upload app ----
-ui <- navbarPage("CiteSource", id = "tabs",
-                 
-                 # Set background colour
-                 tags$head(tags$style(
-                     HTML('
+# Set background colour
+tags$head(tags$style(
+    HTML('
                      #sidebar {
                         background-color: #ffffff;
                     }
             
                     body, label, input, button, select { 
                       font-family: "Arial";
-                    }'))),
-                 
-                 
+                    }')))
+
+
+# Define UI for data upload app ----
+ui <- navbarPage("CiteSource", id = "tabs",
+
                  # Home tab
                  tabPanel('Home/About',
                           navlistPanel(
                               tabPanel(title = 'Use cases',
-                                       includeMarkdown('www/useCases.md')
+                                       htmltools::includeMarkdown('www/useCases.md')
                                        ),
                               tabPanel(title = 'Instructions',
                                        column(9,
