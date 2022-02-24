@@ -85,12 +85,8 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                                                  uiOutput('checkbox2')),
                                                     
                                                     mainPanel('Your visualisations will appear here')
-                                                    )
-                                                )
-                                         )
-                                     )
-                              )
-                          ),
+                                            )))
+                                     ))),
                  
                  
                  # Export tab
@@ -130,7 +126,7 @@ server <- function(input, output, session) {
             tag <- input$tag
             upload_df <- data.frame(upload,
                            'source' = source,
-                           'tag' = tag)
+                           'tag' = tag) #CAN DELETE - this is just a placeholder for visualisation, we can read in the dfs using our own import based on the filepaths, sources and tags
             upload_length <- nrow(upload_df)
             #create a dataframe summarising inputs
             df <- data.frame('file' = input$file[1], 
@@ -139,7 +135,7 @@ server <- function(input, output, session) {
                              'tag' = tag)
             #save the df to a reactive value and store the upload and its source-tag data in a list
             rv$df <- dplyr::bind_rows(rv$df, df)
-            rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
+            rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df) #CAN DELETE - this is just a placeholder for visualisation, we can read in the dfs using our own import based on the filepaths, sources and tags
 
         }
     })
