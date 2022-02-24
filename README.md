@@ -5,14 +5,6 @@ CiteSource is an R package and Shiny app that is currently in development. Work 
 
 CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains eac duplicate record while merging metadata into a single master record. This master record maintains user-customized metadata in two fields, "Source" and "Tag". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the master record. 
 
-**Ideas behind CiteSource Creation**
-
-
-
-
-As the community continues to apply this analysis to resources, this information would be extremely valuable to researchers and librarians. From the library's perspective this tool could have a substantial impact on collection development decisions and resource recommendations. 
-
-
 
 **USE CASE TYPES & EXAMPLES**
 
@@ -55,3 +47,12 @@ Basic logic for metadata selection (Filled/Empty + Length)
 **IF** metadata from one record’s DOI field contains text and the others’ do not **THEN** the metadata from the record with text will be used for the merge record
 
 **IF** metadata from one record’s ABSTRACT field contains more text and the other records with ABSTRACT text **THEN** the metadata from the record with more text will be used for the merge record
+
+**Library Collection Development**
+
+As the community continues to apply this analysis to resources, this information would be extremely valuable to researchers and librarians outside of teh Evidence Synthesis community. From the library's perspective this tool could have a substantial impact on collection development decisions and resource recommendations. 
+
+Examples:
+
+Database Coverage: Compare coverage of databases on specific research topics - What percent of results are duplicated in current subscriptions? What percent are unique? 
+
