@@ -123,9 +123,17 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
 #' )
 #' 
 #' plot_source_overlap_upset(data)
+#' 
+#' # To start with the records shared among the greatest number of sources,
+#' # use
+#' 
+#' plot_source_overlap_upset(data, decreasing = c(TRUE, TRUE))
 
 
-plot_source_overlap_upset <- function(data, sets.x.label = "Number of records", 
+plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.label = "Number of records", 
                                       mainbar.y.label = "Overlapping record count", order.by = c("freq", "degree"), ...) {
-  data[-1] %>% UpSetR::upset(order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
+
+  if (nsets > 5) message("Plotting a large number of sources. Consider reducing nset or sub-setting the data.") 
+  
+    data[-1] %>% UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
