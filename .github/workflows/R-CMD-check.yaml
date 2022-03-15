@@ -1,0 +1,37 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: R-CMD-check
+
+jobs:
+  document-and-dispatch:
+    name: document
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-pandoc@v1
+      - name: system dependencies
+        run: sudo apt-get install libcurl4-openssl-dev libnode-dev
+        
+      - uses: r-lib/actions/setup-r-dependencies@v1
+        with:
+          extra-packages: rcmdcheck roxygen2
+          
+      - name: Document
+        run: Rscript -e 'roxygen2::roxygenise()'
+      - name: commit
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add -A
+          git commit -m 'Documentation' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
+      - uses: r-lib/actions/check-r-package@v1
