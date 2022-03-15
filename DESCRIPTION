@@ -15,4 +15,7 @@ Config/testthat/edition: 3
 Imports: 
     dplyr,
     synthesisr,
-    ggplot2
+    ggplot2,
+    UpSetR,
+    purrr,
+    tidyr
