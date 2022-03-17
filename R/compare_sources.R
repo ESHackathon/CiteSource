@@ -1,5 +1,6 @@
 #' Compare duplicate citations across sources
 #' 
+#' @export
 #' @param unique_data from ASySD, merged unqiue rows with duplicate IDs
 #' @return dataframe with indicators of where a citation appears, with source as column
 
