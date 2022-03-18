@@ -2,4 +2,5 @@
 
 export(plot_source_overlap_heatmap)
 export(plot_source_overlap_upset)
+export(source_comparison)
 importFrom(magrittr,"%>%")
