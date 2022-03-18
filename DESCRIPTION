@@ -6,6 +6,8 @@ Authors@R:
            comment = c(ORCID = "0000-0003-2121-5177"))
     person("Sarah", "Young", , "sarahy@andrew.cmu.edu", role = ("aut"), 
            comment = c(ORCID = "0000-0002-8301-5106")) 
+      person("Kaitlyn", "Hair", , "kaitlyn.hair@ed.ac.uk", role = c("aut", "cre"),
+      comment = c(ORCID = "0000-0003-0180-7343"))
 Description: What the package does (one paragraph).
 License: GPL (>= 3) + file LICENSE
 Encoding: UTF-8
