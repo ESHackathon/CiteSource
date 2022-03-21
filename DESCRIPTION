@@ -2,12 +2,12 @@ Package: CiteSource
 Title: Identify where records for evidence aggregation came from, by deduplicating results and comparing sources
 Version: 0.0.0.9000
 Authors@R: 
-    person("Lukas", "Wallrich", , "lukas.wallrich@gmail.com", role = c("aut", "cre"),
+    c(person("Lukas", "Wallrich", email = "lukas.wallrich@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2121-5177")),
-    person("Sarah", "Young", , "sarahy@andrew.cmu.edu", role = ("aut"), 
+      person("Sarah", "Young", email = "sarahy@andrew.cmu.edu", role = ("aut"), 
            comment = c(ORCID = "0000-0002-8301-5106")),
-      person("Kaitlyn", "Hair", , "kaitlyn.hair@ed.ac.uk", role = c("aut", "cre"),
-      comment = c(ORCID = "0000-0003-0180-7343"))
+      person("Kaitlyn", "Hair", email = "kaitlyn.hair@ed.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0180-7343")))
 Description: What the package does (one paragraph).
 License: GPL (>= 3) + file LICENSE
 Encoding: UTF-8
@@ -22,4 +22,5 @@ Imports:
     ggplot2,
     UpSetR,
     purrr,
+    magrittr,
     tidyr
