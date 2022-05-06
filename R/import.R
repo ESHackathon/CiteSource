@@ -33,7 +33,7 @@ check_unique_search_meta <- function(files, ref_list) {
 #' @param search_json_field Optional field code / name that contains the
 #' JSON metadata in line with the search history standard. If specified
 #' search_json is ignored.
-#' @param tag_naming Specifies how tags should be renamed.
+#' @param tag_naming passes this directly to synthesisr::read_refs
 #' Passed to and documented in \code{\link[synthesisr]{read_ref}}
 #' @return A tibble with one row per citation
 #' @examples
@@ -45,36 +45,37 @@ check_unique_search_meta <- function(files, ref_list) {
 #'  search_ids = c("Search1", "Search2"))
 #'  }
 #' @export
-
 read_citations <- function(files,
-                            search_json = NA,
-                            search_json_field = NA,
-                            tag_naming = "none") {
-  # Need to import files separately to
-  # check whether they contain unique databases
+                            database,
+                            platform = NA,
+                            search_ids = NA,
+                            tag_naming = "best_guess") {
+  if (length(files) != length(database)) {
+    stop("Files and databases must be of equal length")
+  }
+  if (!is.na(platform)) {
+    if (length(database) != length(platform)) {
+      stop("databases and platforms must be of equal length")
+    }
+  }
+  if (!is.na(search_ids)) {
+    if (length(database) != length(search_ids)) {
+      stop("databases and search_ids must be of equal length")
+    }
+  }
+  # Need to import files separately to add database, platform, and searches
   ref_list <- lapply(files,
                      synthesisr::read_refs,
                      tag_naming = tag_naming)
-  if (search_json_field != NA) {
-    ref_list <- mapply(function(ref, json, search_json_field) {
-      json <- get(paste0("ref$", search_json_field))
-    }, ref_list, search_json, moreArgs = c(search_json_field))
+  for (index in seq_len(length(files))) {
+    ref_list[[index]]$database <- database[[index]]
+    if (!is.na(platform)) {
+      ref_list[[index]]$platform <- platform[[index]]
+    }
+    if (!is.na(search_ids)) {
+      ref_list[[index]]$search_id <- search_ids[[index]]
+    }
   }
-  if (length(search_json) == 1) {
-    jsonlite::validate(search_json)
-    search_json <- rep(search_json, length(files))
-  } else if (length(search_json) == length(files)) {
-    mapply()
-  } else {
-    stop(paste0("Length of search_json must be 1 or equal to length of files"))
-  }
-  ref_list <- mapply(function(ref, file, json) {
-    ref$cs__filename <- basename(file)
-    return(ref)
-  }, ref_list, files, search_json)
- if (databases == files) {
-    check_unique_search_meta(files, ref_list)
-  }
-  ref_tibble <- do.call(dplyr::bind_rows, ref_list) %>% tibble::as_tibble()
-  return(ref_tibble)
+  dpylr::bind_rows(ref_list)
+  return(ref_list)
 }
