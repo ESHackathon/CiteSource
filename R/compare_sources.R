@@ -11,8 +11,8 @@ source_comparison <- function(unique_data){
     separate_rows(database, convert = TRUE) %>%
     unique() %>%
     pivot_wider(id_col = duplicate_id, names_from=database, values_from=c(record_id),
-                values_fn =  function(x) paste("x"),
-                values_fill = "")
+                values_fn =  function(x) TRUE,
+                values_fill = FALSE)
   
   
   unique_data$author <- gsub(",.*", "", unique_data$author)
