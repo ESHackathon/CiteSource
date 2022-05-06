@@ -85,11 +85,11 @@ Show records found in specific sets of sources to identify the unique
 \examples{
 data <- data.frame(
   article_id = 1:500,
-  source1 = rbinom(500, 1, .5),
-  source2 = rbinom(500, 1, .2),
-  source3 = rbinom(500, 1, .1),
-  source4 = rbinom(500, 1, .6),
-  source5 = rbinom(500, 1, .7)
+  source1 = rbinom(500, 1, .5) == 1,
+  source2 = rbinom(500, 1, .2) == 1,
+  source3 = rbinom(500, 1, .1) == 1,
+  source4 = rbinom(500, 1, .6) == 1,
+  source5 = rbinom(500, 1, .7) == 1
 )
 
 plot_source_overlap_upset(data)
