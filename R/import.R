@@ -27,48 +27,52 @@ check_unique_search_meta <- function(files, ref_list) {
 #'
 #' @param files One or multiple RIS or Bibtex files with citations.
 #' Should be .bib or .ris files
+#' @param origin The origin of the .ris files (e.g. "Scopus", "WOS", "Medline")
+#' @param platform Optional the platform from which the origin was searched
+#' @param tag_naming passes this directly to synthesisr::read_refs
+#' Passed to and documented in \code{\link[synthesisr]{read_ref}}
 #' @param search_json Optional JSON containing search history
 #' information in line with the search history standard.
 #' If a vector is provided, it must be the same length as the list of files.
 #' @param search_json_field Optional field code / name that contains the
 #' JSON metadata in line with the search history standard. If specified
 #' search_json is ignored.
-#' @param tag_naming passes this directly to synthesisr::read_refs
-#' Passed to and documented in \code{\link[synthesisr]{read_ref}}
 #' @return A tibble with one row per citation
 #' @examples
 #' \dontrun{
-#'  read_citations(c("DB1.ris", "DB1.bib"))
 #'  read_citations(c("res.ris", "res.bib"),
-#'  database = c("CINAHL", "MEDLINE"),
+#'  origin= c("CINAHL", "MEDLINE"),
 #'  plaform = c("WOS", "EBSCO"),
 #'  search_ids = c("Search1", "Search2"))
 #'  }
 #' @export
 read_citations <- function(files,
-                            database,
+                            origin,
                             platform = NA,
                             search_ids = NA,
-                            tag_naming = "best_guess") {
-  if (length(files) != length(database)) {
-    stop("Files and databases must be of equal length")
+                            tag_naming = "best_guess"#,
+                           #search_json=NA , #to be added?
+                           #search_json_field #to be added?
+                           ) {
+  if (length(files) != length(origin)) {
+    stop("Files and origins must be of equal length")
   }
   if (!is.na(platform)) {
-    if (length(database) != length(platform)) {
-      stop("databases and platforms must be of equal length")
+    if (length(origin) != length(platform)) {
+      stop("origins and platforms must be of equal length")
     }
   }
   if (!is.na(search_ids)) {
-    if (length(database) != length(search_ids)) {
-      stop("databases and search_ids must be of equal length")
+    if (length(origin) != length(search_ids)) {
+      stop("origins and search_ids must be of equal length")
     }
   }
-  # Need to import files separately to add database, platform, and searches
+  # Need to import files separately to add origin, platform, and searches
   ref_list <- lapply(files,
                      synthesisr::read_refs,
                      tag_naming = tag_naming)
   for (index in seq_len(length(files))) {
-    ref_list[[index]]$database <- database[[index]]
+    ref_list[[index]]$origin <- origin[[index]]
     if (!is.na(platform)) {
       ref_list[[index]]$platform <- platform[[index]]
     }
@@ -76,6 +80,9 @@ read_citations <- function(files,
       ref_list[[index]]$search_id <- search_ids[[index]]
     }
   }
-  dpylr::bind_rows(ref_list)
+ ref_list=ref_list %>% 
+   purrr::map(as_tibble) %>% 
+   purrr::reduce(bind_rows)
+   
   return(ref_list)
 }
