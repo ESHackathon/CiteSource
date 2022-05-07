@@ -80,9 +80,8 @@ read_citations <- function(files,
       ref_list[[index]]$search_id <- search_ids[[index]]
     }
   }
- ref_list=ref_list %>% 
-   purrr::map(as_tibble) %>% 
-   purrr::reduce(bind_rows)
-   
+ ref_list <- ref_list %>%
+   purrr::map(tibble::as_tibble) %>%
+   purrr::reduce(dplyr::bind_rows)
   return(ref_list)
 }
