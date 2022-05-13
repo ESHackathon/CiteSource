@@ -28,4 +28,5 @@ Imports:
     magrittr,
     tidyr,
     tibble,
+    purrr,
     jsonlite
