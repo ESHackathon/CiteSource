@@ -80,7 +80,8 @@ in the following format: c(intersection size title, intersection size tick label
   }}
 }
 \description{
-Show records found in specific sets of sources to identify the unique
+Show records found in specific sets of sources to identify the unique contribution
+of each source and of any subsets
 }
 \examples{
 data <- data.frame(
