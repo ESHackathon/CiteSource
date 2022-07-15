@@ -6,9 +6,9 @@
 \usage{
 read_citations(
   files,
-  origin,
-  platform = NA,
-  search_ids = NA,
+  cite_sources = NA,
+  cite_strings = NA,
+  cite_labels = NA,
   tag_naming = "best_guess"
 )
 }
@@ -16,20 +16,13 @@ read_citations(
 \item{files}{One or multiple RIS or Bibtex files with citations.
 Should be .bib or .ris files}
 
-\item{origin}{The origin of the .ris files (e.g. "Scopus", "WOS", "Medline")}
+\item{cite_sources}{The origin of the citation files (e.g. "Scopus", "WOS", "Medline") - vector with one value per file, defaults to file names.}
 
-\item{platform}{Optional the platform from which the origin was searched}
+\item{cite_strings}{Optional. The search string used (or another grouping to analyse) - vector with one value per file}
 
-\item{tag_naming}{passes this directly to synthesisr::read_refs
-Passed to and documented in \code{\link[synthesisr]{read_ref}}}
+\item{cite_labels}{Optional. An additional label per file, for instance the stage of search - vector with one value per file}
 
-\item{search_json}{Optional JSON containing search history
-information in line with the search history standard.
-If a vector is provided, it must be the same length as the list of files.}
-
-\item{search_json_field}{Optional field code / name that contains the
-JSON metadata in line with the search history standard. If specified
-search_json is ignored.}
+\item{tag_naming}{Either a length-1 character stating how should ris tags be replaced (see details for a list of options), or an object inheriting from class \code{data.frame} containing user-defined replacement tags.}
 }
 \value{
 A tibble with one row per citation
@@ -41,8 +34,8 @@ into one long tibble with one record per line.
 \examples{
 \dontrun{
  read_citations(c("res.ris", "res.bib"),
- origin= c("CINAHL", "MEDLINE"),
- plaform = c("WOS", "EBSCO"),
- search_ids = c("Search1", "Search2"))
+ cite_sources = c("CINAHL", "MEDLINE"),
+ cite_strings = c("Search1", "Search2"),
+ cite_labels = c("raw", "screened"),
  }
 }

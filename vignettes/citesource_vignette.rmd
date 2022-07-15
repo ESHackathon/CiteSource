@@ -11,13 +11,21 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+<! -- 
+
+Currently none of the code here is run - one the vignette is ready, remove eval = FALSE below.
+
+--> 
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   warning = FALSE,
   fig.width = 6,
-  fig.height = 6
+  fig.height = 6,
+  eval = FALSE
 )
 ```
 
@@ -26,8 +34,12 @@ knitr::opts_chunk$set(
 CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in two fields, "Source" and "Tag". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
 
 ## Installation
-Use the following code to install CiteSource.
+
+For now, CiteSource is only available on GitHub - so you need the following code to install it.
+
 ```{r}
+install.packages("remotes")
+remotes::install_github("ESHackathon/CiteSource")
 
 ```
 
@@ -37,7 +49,7 @@ Use the following code to install CiteSource.
 Currently, users can import multiple RIS files into CiteSource, which will be labelled with source information such as database, platform, and a search ID. The latter can be used to specify search parameters. 
 
 ```{r}
-
+library(CiteSource)
 my_records <- read_citations(c("asfa.ris", "econlit.ris", "greenfile.ris"),
                              database = c("ASFA", "EconLit", "GreenFILE"),
                              plaform = c("ProQuest", "EBSCO", "EBSCO"),

@@ -7,7 +7,8 @@
 plot_source_overlap_heatmap(
   data,
   plot_type = c("counts", "percentages"),
-  sort_sources = TRUE
+  sort_sources = TRUE,
+  interactive = FALSE
 )
 }
 \arguments{
@@ -19,10 +20,13 @@ per source indicating whether the record was found in that source.}
 
 \item{sort_sources}{Should sources be shown based on the number of records they
 contained? If FALSE, order of data is retained.}
+
+\item{interactive}{Should returned plot be interactive and enable user to export
+records underlying each field?}
 }
 \value{
-The requested plot as a \code{ggplot2} object, which can then be
-further formatted or saved using \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}
+The requested plot as a either a \code{ggplot2} object (when interactive = FALSE), which can then be
+further formatted or saved using \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}, or a \code{plotly} object when \code{interactive = TRUE}
 }
 \description{
 Show overlap between different record sources, either by showing the
@@ -38,6 +42,6 @@ data <- data.frame(
   source5 = rbinom(500, 1, .7) == 1
 )
 
-plot_source_overlap(data)
-plot_source_overlap(data, plot_type = "percentages")
+plot_source_overlap_heatmap(data)
+plot_source_overlap_heatmap(data, plot_type = "percentages")
 }

@@ -80,7 +80,8 @@ in the following format: c(intersection size title, intersection size tick label
   }}
 }
 \description{
-Show records found in specific sets of sources to identify the unique
+Show records found in specific sets of sources to identify the unique contribution
+of each source and of any subsets
 }
 \examples{
 data <- data.frame(
@@ -100,5 +101,5 @@ plot_source_overlap_upset(data)
 plot_source_overlap_upset(data, decreasing = c(TRUE, TRUE))
 }
 \references{
-\link{Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.}
+Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.
 }

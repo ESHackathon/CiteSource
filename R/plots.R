@@ -24,8 +24,8 @@
 #'   source5 = rbinom(500, 1, .7) == 1
 #' )
 #' 
-#' plot_source_overlap(data)
-#' plot_source_overlap(data, plot_type = "percentages")
+#' plot_source_overlap_heatmap(data)
+#' plot_source_overlap_heatmap(data, plot_type = "percentages")
 
 plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentages"), sort_sources = TRUE, interactive = FALSE) {
 
@@ -33,7 +33,7 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
   if(!plot_type %in% c("counts", "percentages")) 
     stop("plot_type must be counts or percentages")
   
-  data <- data %>% dplyr::select(where(is.logical))
+  data <- data %>% dplyr::select(tidyselect::vars_select_helpers$where(is.logical))
   
   
   source_sizes <- colSums(data)
@@ -46,7 +46,7 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
     sources_order <- names(data)
   }
   
-  data <- data %>% select(sources_order)
+  data <- data %>% dplyr::select(dplyr::all_of(sources_order))
   
   cooc_mat <- purrr::map_dfr(names(data), function (source) {
     data[data[source] == 1,] %>% colSums()
@@ -59,13 +59,13 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
     cooc_mat_plot[upper.tri(cooc_mat_plot)] <- NA
     
     cooc_mat_plot %>% dplyr::as_tibble() %>% dplyr::mutate(DB1 = names(data)) %>%
-      tidyr::pivot_longer(-DB1, names_to = "DB2", values_to = "records") %>%
-      arrange(DB1) %>%
+      tidyr::pivot_longer(-.data$DB1, names_to = "DB2", values_to = "records") %>%
+      dplyr::arrange(.data$DB1) %>%
       ggplot2::remove_missing(na.rm = TRUE) %>%
-      ggplot2::ggplot(ggplot2::aes(DB1, DB2, fill = records)) +
+      ggplot2::ggplot(ggplot2::aes(.data$DB1, .data$DB2, fill = .data$records)) +
       ggplot2::geom_tile() +
       ggplot2::scale_fill_gradient(low="white") +
-      ggplot2::geom_text(ggplot2::aes(label=records)) +
+      ggplot2::geom_text(ggplot2::aes(label=.data$records)) +
       ggplot2::theme_minimal() +
       ggplot2::scale_x_discrete(limits = rev(sources_order), guide = ggplot2::guide_axis(angle = 45)) +
       ggplot2::scale_y_discrete(limits = sources_order) +
@@ -81,16 +81,16 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
     diag(labels_matrix) <- diag(cooc_mat)
     
     labels_df <- labels_matrix %>% tibble::as_tibble() %>% dplyr::mutate(DB1 = names(data)) %>%
-      tidyr::pivot_longer(-DB1, names_to = "DB2", values_to = "label")
+      tidyr::pivot_longer(-.data$DB1, names_to = "DB2", values_to = "label")
     
     diag(overlap_matrix) <- NA
     
     overlap_matrix %>% tibble::as_tibble() %>% dplyr::mutate(DB1 = names(data)) %>%
-      tidyr::pivot_longer(-DB1, names_to = "DB2", values_to = "records") %>%
-      ggplot2::ggplot(ggplot2::aes(DB1, DB2, fill = records)) +
+      tidyr::pivot_longer(-.data$DB1, names_to = "DB2", values_to = "records") %>%
+      ggplot2::ggplot(ggplot2::aes(.data$DB1, .data$DB2, fill = .data$records)) +
       ggplot2::geom_tile(height = .9) +
       ggplot2::scale_fill_gradient(low="white", labels = scales::percent, limits = c(0, 1)) +
-      ggplot2::geom_text(data = labels_df, ggplot2::aes(label=label, fill = NULL)) +
+      ggplot2::geom_text(data = labels_df, ggplot2::aes(label=.data$label, fill = NULL)) +
       ggplot2::labs(x="", y="", fill = "Overlap", 
            caption = "Note: Percentages indicate share of records in row also found in column, 
        number of results in each database is shown on the diagonal") +
@@ -111,7 +111,7 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
 #' @inheritParams UpSetR::upset
 #' @inheritDotParams UpSetR::upset -sets.x.label -mainbar.y.label -order.by
 #' @export
-#' @references [Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.]
+#' @references Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.
 
 #' @examples 
 #' data <- data.frame(
@@ -136,5 +136,6 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
 
   if (nsets > 5) message("Plotting a large number of sources. Consider reducing nset or sub-setting the data.") 
   
-    data %>% dplyr::select(where(is.logical)) %>% UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
+    data %>% dplyr::transmute(dplyr::across(tidyselect::vars_select_helpers$where(is.logical), as.numeric)) %>%
+      UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
