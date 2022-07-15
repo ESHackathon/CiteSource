@@ -1,0 +1,108 @@
+---
+title: "CiteSource"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CiteSource}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+## About the package 
+
+CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in two fields, "Source" and "Tag". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
+
+## Installation
+Use the following code to install CiteSource.
+```{r}
+
+```
+
+
+## Import files from multiple sources
+
+Currently, users can import multiple RIS files into CiteSource, which will be labelled with source information such as database, platform, and a search ID. The latter can be used to specify search parameters. 
+
+```{r}
+
+my_records <- read_citations(c("asfa.ris", "econlit.ris", "greenfile.ris"),
+                             database = c("ASFA", "EconLit", "GreenFILE"),
+                             plaform = c("ProQuest", "EBSCO", "EBSCO"),
+                             search_ids = c("Search1", "Search2", "Search3"))
+
+```
+
+
+## Deduplicate while maintaining source information
+
+CiteSource allows users to merge duplicates while maintaining information ...
+
+```{r}
+
+unique_citations <- dedup_citations(my_records)
+
+data_sources <- source_comparison(unique_citations)
+
+```
+
+## Source or method analysis
+
+When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
+
+### Plot overlap as a heatmap matrix
+
+```{r}
+
+my_heatmap <- plot_source_overlap(data_sources, 
+                                  plot_type = "percentages")
+my_heatmap 
+
+```
+
+
+### Plot overlap as an upset plot
+
+```{r}
+
+my_upset_plot <- plot_source_overlap_upset(data_sources)
+my_upset_plot
+
+```
+
+## Review stage analysis
+
+Once the title and absract screening has been complete OR once the final papers the final literature has been selected, users can analyze the contributions of each Source/Method to better understand its impact on the review. By using the "Source" data along with the "Tag" data, users can analyze the number of overlapping/unique records from each source or method.
+
+### Assess contribution of sources by review stage
+
+```{r}
+
+```
+
+## Documentation and output
+
+### Generate a search summary table
+
+```{r}
+
+```
+
+### Export deduplicated files
+
+```{r}
+
+```
+

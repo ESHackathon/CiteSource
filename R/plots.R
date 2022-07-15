@@ -17,11 +17,11 @@
 #' @examples 
 #' data <- data.frame(
 #'   article_id = 1:500,
-#'   source1 = rbinom(500, 1, .5),
-#'   source2 = rbinom(500, 1, .2),
-#'   source3 = rbinom(500, 1, .1),
-#'   source4 = rbinom(500, 1, .6),
-#'   source5 = rbinom(500, 1, .7)
+#'   source1 = rbinom(500, 1, .5) == 1,
+#'   source2 = rbinom(500, 1, .2) == 1,
+#'   source3 = rbinom(500, 1, .1) == 1,
+#'   source4 = rbinom(500, 1, .6) == 1,
+#'   source5 = rbinom(500, 1, .7) == 1
 #' )
 #' 
 #' plot_source_overlap(data)
@@ -33,7 +33,7 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
   if(!plot_type %in% c("counts", "percentages")) 
     stop("plot_type must be counts or percentages")
   
-  data <- data[-1]  
+  data <- data %>% dplyr::select(where(is.logical))
   
   
   source_sizes <- colSums(data)
@@ -116,11 +116,11 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
 #' @examples 
 #' data <- data.frame(
 #'   article_id = 1:500,
-#'   source1 = rbinom(500, 1, .5),
-#'   source2 = rbinom(500, 1, .2),
-#'   source3 = rbinom(500, 1, .1),
-#'   source4 = rbinom(500, 1, .6),
-#'   source5 = rbinom(500, 1, .7)
+#'   source1 = rbinom(500, 1, .5) == 1,
+#'   source2 = rbinom(500, 1, .2) == 1,
+#'   source3 = rbinom(500, 1, .1) == 1,
+#'   source4 = rbinom(500, 1, .6) == 1,
+#'   source5 = rbinom(500, 1, .7) == 1
 #' )
 #' 
 #' plot_source_overlap_upset(data)
@@ -136,5 +136,5 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
 
   if (nsets > 5) message("Plotting a large number of sources. Consider reducing nset or sub-setting the data.") 
   
-    data[-1] %>% UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
+    data %>% dplyr::select(where(is.logical)) %>% UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
