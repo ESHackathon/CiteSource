@@ -2,6 +2,7 @@
 
 export(plot_source_overlap_heatmap)
 export(plot_source_overlap_upset)
+export(read_citations)
 export(source_comparison)
 importFrom(magrittr,"%>%")
-export(read_citations)
+importFrom(magrittr,`%>%`)

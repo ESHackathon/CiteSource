@@ -4,17 +4,32 @@
 \alias{read_citations}
 \title{Import citations from file}
 \usage{
-read_citations(files, search_json = NA, tag_naming = "best_guess")
+read_citations(
+  files,
+  origin,
+  platform = NA,
+  search_ids = NA,
+  tag_naming = "best_guess"
+)
 }
 \arguments{
 \item{files}{One or multiple RIS or Bibtex files with citations.
 Should be .bib or .ris files}
 
-\item{search_json}{Optional JSON containing search history information in line with the
-search history standard. If a vector is provided, it must be the same length as the list of files.}
+\item{origin}{The origin of the .ris files (e.g. "Scopus", "WOS", "Medline")}
 
-\item{tag_naming}{Specifies how tags should be renamed.
+\item{platform}{Optional the platform from which the origin was searched}
+
+\item{tag_naming}{passes this directly to synthesisr::read_refs
 Passed to and documented in \code{\link[synthesisr]{read_ref}}}
+
+\item{search_json}{Optional JSON containing search history
+information in line with the search history standard.
+If a vector is provided, it must be the same length as the list of files.}
+
+\item{search_json_field}{Optional field code / name that contains the
+JSON metadata in line with the search history standard. If specified
+search_json is ignored.}
 }
 \value{
 A tibble with one row per citation
@@ -25,9 +40,8 @@ into one long tibble with one record per line.
 }
 \examples{
 \dontrun{
- read_citations(c("DB1.ris", "DB1.bib"))
  read_citations(c("res.ris", "res.bib"),
- database = c("CINAHL", "MEDLINE"),
+ origin= c("CINAHL", "MEDLINE"),
  plaform = c("WOS", "EBSCO"),
  search_ids = c("Search1", "Search2"))
  }
