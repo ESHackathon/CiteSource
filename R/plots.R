@@ -9,8 +9,10 @@
 #' (share of overlapping records).
 #' @param sort_sources Should sources be shown based on the number of records they
 #' contained? If FALSE, order of data is retained.
-#' @return The requested plot as a `ggplot2` object, which can then be 
-#' further formatted or saved using [ggplot2::ggsave()]
+#' @param interactive Should returned plot be interactive and enable user to export
+#' records underlying each field?
+#' @return The requested plot as a either a `ggplot2` object (when interactive = FALSE), which can then be 
+#' further formatted or saved using [ggplot2::ggsave()], or a `plotly` object when `interactive = TRUE`
 #' @export
 #' @examples 
 #' data <- data.frame(
@@ -25,9 +27,7 @@
 #' plot_source_overlap(data)
 #' plot_source_overlap(data, plot_type = "percentages")
 
-#' @importFrom magrittr %>%
-
-plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentages"), sort_sources = TRUE) {
+plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentages"), sort_sources = TRUE, interactive = FALSE) {
 
   plot_type <- plot_type[1]
   if(!plot_type %in% c("counts", "percentages")) 
@@ -103,7 +103,8 @@ plot_source_overlap_heatmap <- function(data, plot_type = c("counts", "percentag
 
 #' Create an UpSetR upset plot showing the overlap between sources
 #' 
-#' Show records found in specific sets of sources to identify the unique 
+#' Show records found in specific sets of sources to identify the unique contribution
+#' of each source and of any subsets
 #' 
 #' @param data A tibble with one record per row, an id column and then one column
 #' per source indicating whether the record was found in that source.

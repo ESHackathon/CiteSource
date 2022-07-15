@@ -18,4 +18,5 @@ Imports:
     ggplot2,
     UpSetR,
     purrr,
-    tidyr
+    tidyr,
+    plotly
