@@ -22,12 +22,12 @@ tags$head(tags$style(
 ui <- navbarPage("CiteSource", id = "tabs",
 
                  # Home tab
-                 tabPanel('Home/About',
+                 tabPanel('Home',
                           navlistPanel(
-                              tabPanel(title = 'Use cases',
-                                       htmltools::includeMarkdown('www/useCases.md')
+                              tabPanel(title = 'About',
+                                       htmltools::includeMarkdown('www/about.md')
                                        ),
-                              tabPanel(title = 'Instructions',
+                              tabPanel(title = 'Use Cases',
                                        column(9,
                                               'instructions text'),
                                        column(1,
@@ -51,8 +51,9 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                                        "Upload", 
                                                        multiple = FALSE, 
                                                        accept = c('.ris', '.txt')),
-                                             textInput('source', 'Where did you file come from?', placeholder = 'e.g. Scopus'),
-                                             textInput('tag', 'Tag your file with a name/label', placeholder = 'e.g. search string 1.3'),
+                                             textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
+                                             textInput('tag', 'Citestring', placeholder = 'e.g. search string 1.3'),
+                                             textInput('tag', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen')
                                              actionButton('upload', 'Upload file')
                                          ),
                                          
