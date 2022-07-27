@@ -39,14 +39,16 @@ compare_labels <- function(unique_data){
                        values_fill = FALSE)
   
 }
-  unique_data$author <- gsub(",.*", "", unique_data$author)
-  
-  #TODO: does this need to be made unique? It seems that there can be multiple records with same author-year?
-  pub_id <- unique_data %>%
-    dplyr::select(.data$author, .data$year, .data$duplicate_id) %>%
-    dplyr::mutate(pub_id = paste0(.data$author, "-", .data$year)) %>%
-    dplyr::select(-.data$author, -.data$year, .data$pub_id, dplyr::everything())
-  
-  db_comparison <-  dplyr::left_join(db_comparison, pub_id, by="duplicate_id")
-}
-  
+
+
+#   unique_data$author <- gsub(",.*", "", unique_data$author)
+#   
+#   #TODO: does this need to be made unique? It seems that there can be multiple records with same author-year?
+#   pub_id <- unique_data %>%
+#     dplyr::select(.data$author, .data$year, .data$duplicate_id) %>%
+#     dplyr::mutate(pub_id = paste0(.data$author, "-", .data$year)) %>%
+#     dplyr::select(-.data$author, -.data$year, .data$pub_id, dplyr::everything())
+#   
+#   db_comparison <-  dplyr::left_join(db_comparison, pub_id, by="duplicate_id")
+# }
+#   

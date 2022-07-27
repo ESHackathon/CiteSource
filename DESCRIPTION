@@ -39,4 +39,9 @@ Imports:
     tibble,
     scales,
     tidyselect,
-    rlang
+    rlang,
+    RecordLinkage,
+    parallel,
+    snakecase,
+    utf8,
+    stringr
