@@ -1,3 +1,18 @@
+#' Count number of unique and non-unique citations from different sources, labels, and strings
+#' @export
+#' @param unique_data from ASySD, merged unique rows with duplicate IDs
+#' @return dataframe with indicators of where a citation appears, with source/label/string as column
+
+count_unique <- function(unique_data){
+  dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
+    tidyr::separate_rows(.data$cite_source, convert = T) %>%
+    tidyr::separate_rows(.data$cite_label, convert = T) %>%
+    tidyr::separate_rows(.data$cite_string, convert = T) %>%
+    group_by(duplicate_id) %>%
+    mutate(unique = ifelse(length(unique(cite_source))==1, TRUE, FALSE)) %>%
+    ungroup()
+}
+
 #' Compare duplicate citations across sources, labels, and strings
 #' 
 #' @export
