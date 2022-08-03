@@ -2,9 +2,14 @@
 #' 
 #' @export
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
+#' @param comp_type argument to specify comparison of strings, sources, or labels?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
-compare_sources <- function(unique_data){
+compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labels")){
+  
+  comp_type <- match.arg(comp_type)
+  
+  if(comp_type == "sources"){
   
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$record_ids) %>%
@@ -13,32 +18,33 @@ compare_sources <- function(unique_data){
     tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_source, values_from=c(.data$record_ids),
                 values_fn =  function(x) TRUE,
                 values_fill = FALSE)
+  }
   
-}
-
-compare_strings <- function(unique_data){
+  else if(comp_type == "strings"){
   
-  string_comparison <- unique_data %>%
+  source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_string, .data$record_ids) %>%
     tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
     unique() %>%
-    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="string_", names_from = .data$cite_string, values_from=c(.data$record_ids),
+    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_string, values_from=c(.data$record_ids),
                        values_fn =  function(x) TRUE,
                        values_fill = FALSE)
+  }
   
+  else{
+    
+    source_comparison <- unique_data %>%
+      dplyr::select(.data$duplicate_id, .data$cite_label, .data$record_ids) %>%
+      tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
+      unique() %>%
+      tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_label, values_from=c(.data$record_ids),
+                         values_fn =  function(x) TRUE,
+                         values_fill = FALSE)
+  }
+  
+  return(source_comparison)
 }
 
-compare_labels <- function(unique_data){
-  
-  label_comparison <- unique_data %>%
-    dplyr::select(.data$duplicate_id, .data$cite_label, .data$record_ids) %>%
-    tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
-    unique() %>%
-    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="label_", names_from = .data$cite_label, values_from=c(.data$record_ids),
-                       values_fn =  function(x) TRUE,
-                       values_fill = FALSE)
-  
-}
 
 
 #   unique_data$author <- gsub(",.*", "", unique_data$author)
