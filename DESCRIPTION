@@ -13,7 +13,9 @@ Authors@R:
       person("Trevor", "Riley", email = "trevor.riley@noaa.gov", role =c("aut", "cre"), 
            comment = c(ORCID = "0000-0002-6834-9802")),
       person("Matthew", "Grainger", email="matthewjamesgrainger@gmail.com", role=c("aut"), 
-           comment=c(ORCID ="0000-0001-8426-6495"))     
+           comment=c(ORCID ="0000-0001-8426-6495")),
+      person("Neal", "Haddaway", email="nealhaddaway@gmail.com", role=c("aut"), 
+           comment=c(ORCID ="0000-0003-3902-2234")) 
            )
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
