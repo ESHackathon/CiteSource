@@ -4,13 +4,14 @@
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
 count_unique <- function(unique_data){
-  dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
+  count_unique <- unique_citations %>%
+    dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
     tidyr::separate_rows(.data$cite_source, convert = T) %>%
     tidyr::separate_rows(.data$cite_label, convert = T) %>%
     tidyr::separate_rows(.data$cite_string, convert = T) %>%
-    group_by(duplicate_id) %>%
-    mutate(unique = ifelse(length(unique(cite_source))==1, TRUE, FALSE)) %>%
-    ungroup()
+    group_by(.data$duplicate_id) %>%
+    mutate(unique = ifelse(length(unique(.data$cite_source))==1, TRUE, FALSE)) %>%
+    dplyr::ungroup()
 }
 
 #' Compare duplicate citations across sources, labels, and strings
@@ -57,7 +58,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
                          values_fill = FALSE)
   }
   
-  return(source_comparison)
+  return(as.data.frame(source_comparison))
 }
 
 
