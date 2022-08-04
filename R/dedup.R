@@ -86,8 +86,8 @@ add_id_citations <- function(raw_citations){
   names(raw_citations)  <- snakecase::to_any_case(names(raw_citations), case = c("snake"))
   
   raw_citations_with_id <- raw_citations %>%
-    mutate(record_id = ifelse(is.na(record_id), as.character(row_number()+1000), paste(record_id))) %>%
-    mutate(record_id = ifelse(record_id=="", as.character(row_number()+1000), paste(record_id)))
+    mutate(record_id = ifelse(is.na(record_id), as.cha-racter(dplyr::row_number()+1000), paste(record_id))) %>%
+    mutate(record_id = ifelse(record_id=="", as.character(dplyr::row_number()+1000), paste(record_id)))
 
 }
 
@@ -471,7 +471,7 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   
   metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id, by="record_id")
   metadata_with_duplicate_id <- metadata_with_duplicate_id %>%
-    select(record_id, duplicate_id, cite_source, cite_string, cite_label)
+    dplyr::select(record_id, duplicate_id, cite_source, cite_string, cite_label)
   
   # summarise cite_sources for each dup id
   # citations_with_dup_id_merged <- metadata_with_duplicate_id %>%
@@ -518,9 +518,9 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   
     all_metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id, by="record_id") %>%
     group_by(duplicate_id) %>% 
-    select(-cite_source, -cite_label, -cite_string) %>%
+    dplyr::select(-cite_source, -cite_label, -cite_string) %>%
     slice(which.max(nchar(as.character(abstract)))) %>%
-    ungroup()
+    dplyr::ungroup()
     
     # identify and remove empty columns
     empty_columns <- sapply(all_metadata_with_duplicate_id, function(x) all(is.na(x) | x == ""))
