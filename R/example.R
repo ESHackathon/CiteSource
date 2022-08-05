@@ -1,6 +1,9 @@
 # example workflow
 
-devtools::load_all() # load CiteSource package
+source('R/import.R')
+source('R/dedup.R')
+source('R/compare.R')
+source('R/plots.R')
 library(dplyr)
 library(ggplot2)
 
@@ -89,7 +92,7 @@ ggplot(n_unique, aes(fill=cite_source, x=cite_label)) +
   xlab("") + ylab("Number of citations")
 
 # heatmap of sources
-plot_source_overlap_heatmap(data2)
+plot_source_overlap_heatmap(source_comparison)
 
 # upset plot of sources
 plot_source_overlap_upset(source_comparison)
