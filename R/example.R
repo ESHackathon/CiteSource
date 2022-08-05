@@ -7,7 +7,7 @@ library(ggplot2)
 # step 1: bring in RIS files-----
 
 # listRIS citation files in folder
-citation_files <- list.files(path= "tests/testthat/data/new2", pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path= "tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
 
 # print to console
 citation_files
