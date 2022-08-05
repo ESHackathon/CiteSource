@@ -1,6 +1,9 @@
 # example workflow
 
-devtools::load_all() # load CiteSource package
+source('R/import.R')
+source('R/dedup.R')
+source('R/compare.R')
+source('R/plots.R')
 library(dplyr)
 library(ggplot2)
 
@@ -37,6 +40,7 @@ unique_citations <- dedup_results$unique
 
 # classify unique citations across difference sources/ labels/ strings
 n_unique <- count_unique(unique_citations)
+n_unique <- unique(n_unique)
 
 # for each unique citation, which sources are present
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
@@ -48,21 +52,25 @@ label_comparison <- compare_sources(unique_citations, comp_type = "labels")
 n_unique$cite_label = factor(n_unique$cite_label, levels=c('search','screen','final'))
 
 # bar plot unique labels PER database
-ggplot(n_unique, aes(fill=unique, x=cite_label)) + 
+n_unique %>%
+  select(cite_label, cite_source, unique, duplicate_id) %>%
+  ggplot(aes(fill=unique, x=cite_label)) + 
   geom_bar(position="stack", stat="count") +
   facet_grid(vars(cite_source)) +
   xlab("") + ylab("Number of citations")
 
 # bar plot unique labels PER database (flipped)
-ggplot(n_unique, aes(fill=unique, x=cite_label)) + 
+n_unique %>%
+  select(cite_label, cite_source, unique, duplicate_id) %>%
+  ggplot(aes(fill=unique, x=cite_label)) + 
   geom_bar(position="stack", stat="count") +
   facet_grid(~cite_source) +
   xlab("") + ylab("Number of citations")
 
 # bar plot unique citations PER database as PERCENTAGE
 n_unique %>% 
-  select(cite_source, duplicate_id, unique) %>%
-  unique() %>%
+  select(cite_source, duplicate_id, unique) %>% #remove label /other cols to prevent duplicated rows
+  unique() %>% 
   group_by(cite_source, unique) %>%
   count(unique, cite_source) %>%
   group_by(cite_source) %>%
@@ -72,24 +80,30 @@ n_unique %>%
   xlab("") + ylab("Number of citations")
 
 # bar plot database PER label
-ggplot(n_unique, aes(fill=unique, x=cite_source)) + 
+n_unique %>%
+  select(cite_label, cite_source, unique, duplicate_id) %>% 
+  ggplot(aes(fill=unique, x=cite_source)) + 
   geom_bar(position="stack", stat="count") +
   facet_grid(~cite_label) +
   xlab("") + ylab("Number of citations")
 
 
 # stacked bar labels PER database
-ggplot(n_unique, aes(fill=cite_label, x=cite_source)) + 
+n_unique %>%
+  select(cite_label, cite_source, unique, duplicate_id) %>%
+  ggplot(aes(fill=cite_label, x=cite_source)) + 
   geom_bar(position="stack", stat="count") +
   xlab("") + ylab("Number of citations")
 
 # stacked bar database PER label
-ggplot(n_unique, aes(fill=cite_source, x=cite_label)) + 
+n_unique %>%
+  select(cite_label, cite_source, unique, duplicate_id) %>%
+  ggplot(aes(fill=cite_source, x=cite_label)) + 
   geom_bar(position="stack", stat="count") +
   xlab("") + ylab("Number of citations")
 
 # heatmap of sources
-plot_source_overlap_heatmap(data2)
+plot_source_overlap_heatmap(source_comparison)
 
 # upset plot of sources
 plot_source_overlap_upset(source_comparison)
