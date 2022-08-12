@@ -36,11 +36,11 @@ check_unique_search_meta <- function(files, ref_list) {
 #' @inheritParams synthesisr::read_refs
 #' @return A tibble with one row per citation
 #' @examples
-#' \dontrun{
+#' if (interactive()) {
 #'  read_citations(c("res.ris", "res.bib"),
 #'  cite_sources = c("CINAHL", "MEDLINE"),
 #'  cite_strings = c("Search1", "Search2"),
-#'  cite_labels = c("raw", "screened"),
+#'  cite_labels = c("raw", "screened"))
 #'  }
 #' @export
 #' 

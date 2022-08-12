@@ -140,6 +140,9 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
       UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
 
+# Hack to suppress check warning re default values below
+facets <- bars <- color <- NULL
+
 #' Create a bar chart that compares source contributions over stages
 #' 
 #' Create a faceted plot that shows unique contributions and duplicated records across
@@ -152,7 +155,6 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
 #' @param color Color used to fill bars. Default to `unique`
 #' @param center Logical. Should one color be above and one below the axis?
 #' @export
-
 #' @examples 
 #' data <- data.frame(
 #'   article_id = 1:100,
@@ -162,9 +164,6 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
 #' )
 #' 
 #' plot_contributions(data, center = TRUE)
-
-# Hack to suppress check warning re default values
-facets <- bars <- color <- NULL
 
 plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE) {
   facets <- rlang::enquo(facets)
