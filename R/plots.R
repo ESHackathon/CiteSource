@@ -139,3 +139,59 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
     data %>% dplyr::transmute(dplyr::across(tidyselect::vars_select_helpers$where(is.logical), as.numeric)) %>%
       UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
+
+#' Create a bar chart that compares source contributions over stages
+#' 
+#' Create a faceted plot that shows unique contributions and duplicated records across
+#' two metadata dimensions. Most typical use-case might be to show the contributions of each source
+#' across different screening stages.
+#' 
+#' @param data A tibble with one hit per row, with variables indicating meta-data of interest.
+#' @param facets Variable in data used for facets (i.e. sub-plots). Defaults to source (i.e. cite_source)
+#' @param bars Variable in data used for bars. Defaults to label (i.e. cite_label)
+#' @param color Color used to fill bars. Default to `unique`
+#' @param center Logical. Should one color be above and one below the axis?
+#' @export
+
+#' @examples 
+#' data <- data.frame(
+#'   article_id = 1:100,
+#'   cite_source = sample(c("DB 1", "DB 2", "DB 3"), 100, replace = TRUE),
+#'   cite_label = sample(c("2020", "2021", "2022"), 100, replace = TRUE),
+#'   type = c("unique", "duplicated")[rbinom(100, 1, .7) + 1]
+#' )
+#' 
+#' plot_contributions(data, center = TRUE)
+
+# Hack to suppress check warning re default values
+facets <- bars <- color <- NULL
+
+plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE) {
+  facets <- rlang::enquo(facets)
+  bars <- rlang::enquo(bars)
+  color <- rlang::enquo(color)
+  
+  if (!rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data." )
+  if (!rlang::as_name(bars) %in% colnames(data)) stop("Column ", rlang::as_name(bars), " not found in data." )
+  if (!rlang::as_name(color) %in% colnames(data)) stop("Column ", rlang::as_name(color), " not found in data." )
+  
+  if (!center) {
+  
+    ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + ggplot2::geom_bar() + 
+           ggplot2::facet_grid(ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations")
+  } else {
+    vals <- unique(data %>% dplyr::select(!!color) %>% dplyr::pull())
+    if(length(vals) != 2) stop("center is only implemented for two colors")
+    
+    data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% dplyr::summarise(n = n())
+    
+    ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
+      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
+      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
+      ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations") + 
+      scale_y_continuous(labels = abs)
+    
+  }
+  
+}
+
