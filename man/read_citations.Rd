@@ -6,9 +6,9 @@
 \usage{
 read_citations(
   files,
-  cite_sources = NA,
-  cite_strings = NA,
-  cite_labels = NA,
+  cite_sources = NULL,
+  cite_strings = NULL,
+  cite_labels = NULL,
   tag_naming = "best_guess"
 )
 }
