@@ -1,9 +1,8 @@
-#TODO use smaller file
 
 test_that("ris import works", {
-  x <- read_citations(testthat::test_path("data", "0_Ovid_search_results_1_to_1000.ris"))
-  expect_equal(nrow(x), 1000)
-  expect_equal(x$cite_source[1], "0_Ovid_search_results_1_to_1000")
+  x <- read_citations(testthat::test_path("data", "1_WoS.ris"))
+  expect_equal(nrow(x), 219)
+  expect_equal(x$cite_source[1], "1_WoS")
 })
 
 litsearchr <- c(
