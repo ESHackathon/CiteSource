@@ -6,7 +6,7 @@ author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource}
+  %\VignetteIndexEntry{CiteSource-Example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 
 
 ```{r}
-# step 1: bring in RIS files-----
+library(CiteSource)
 
 # listRIS citation files in folder
 citation_files <- list.files(path= "../tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
