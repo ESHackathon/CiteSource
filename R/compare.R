@@ -4,7 +4,7 @@
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
 count_unique <- function(unique_data){
-  count_unique <- unique_citations %>%
+  count_unique <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
     tidyr::separate_rows(.data$cite_source, convert = T) %>%
     tidyr::separate_rows(.data$cite_label, convert = T) %>%

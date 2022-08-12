@@ -13,7 +13,7 @@ dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=
   message("formatting data...")
   raw_citations <- add_cols(raw_citations, c("record_id", "cite_label","cite_source","cite_string"))
   
-  # rename colulmns
+  # rename columns
   raw_citations$record_id <- raw_citations$record_id <- ""
   raw_citations$journal <- raw_citations$source
   raw_citations$number <- raw_citations$issue
@@ -84,8 +84,7 @@ add_id_citations <- function(raw_citations){
   names(raw_citations)  <- snakecase::to_any_case(names(raw_citations), case = c("snake"))
   
   raw_citations_with_id <- raw_citations %>%
-    mutate(record_id = ifelse(is.na(record_id), as.cha-racter(dplyr::row_number()+1000), paste(record_id))) %>%
-    mutate(record_id = ifelse(record_id=="", as.character(dplyr::row_number()+1000), paste(record_id)))
+    mutate(record_id = ifelse(is.na(.data$record_id) | .data$record_id=="", as.character(dplyr::row_number()+1000), paste(.data$record_id)))
 
 }
 
@@ -101,20 +100,20 @@ format_citations <- function(raw_citations_with_id){
   
   # arrange by Year and presence of an Abstract - we want to keep newer records and records with an abstract preferentially
   formatted_citations <- raw_citations_with_id %>%
-    arrange(desc(year), abstract)
+    dplyr::arrange(dplyr::desc(.data$year), .data$abstract)
   
   # select relevant columns
   formatted_citations <- formatted_citations  %>%
-    dplyr::select(author, title, year, journal, abstract, doi, number, pages, volume, isbn, record_id, cite_label, cite_source, cite_string)
+    dplyr::select(.data$author, .data$title, .data$year, .data$journal, .data$abstract, 
+                  .data$doi, .data$number, .data$pages, .data$volume, .data$isbn, .data$record_id, .data$cite_label, .data$cite_source, 
+                  .data$cite_string)
   
   # make sure author is a character
   formatted_citations$author <- as.character(formatted_citations$author)
   
   # Fix author formatting so similar
   formatted_citations <- formatted_citations %>%
-    mutate(author = ifelse(author=="", "Unknown", author)) %>%
-    mutate(author = ifelse(is.na(author), "Unknown", author)) %>%
-    mutate(author = ifelse(author=="Anonymous", "Unknown", author))
+    mutate(author = ifelse(is.na(.data$author) | .data$author=="" | .data$author=="Anonymous", "Unknown", .data$author))
   
   # Make all upper case
   formatted_citations <- as.data.frame(sapply(formatted_citations, toupper))
@@ -138,23 +137,19 @@ format_citations <- function(raw_citations_with_id){
   formatted_citations["isbn"] <- as.data.frame(sapply(formatted_citations["isbn"], function(x) gsub("[[:space:]]\\(ELECTRONIC\\).*", "", x)))
   
   formatted_citations<-formatted_citations %>%
-    dplyr::filter(!is.na(record_id))
+    dplyr::filter(!is.na(.data$record_id))
   
   # sort out NA / missing data formatting for optimal matching
   formatted_citations <- formatted_citations %>%
-    mutate(author = ifelse(author=="NA", NA, paste(author))) %>%
-    mutate(year = ifelse(year=="NA", NA, paste(year))) %>%
-    mutate(title = ifelse(title=="NA", NA, paste(title))) %>%
-    mutate(number = ifelse(number=="NA", NA, paste(number))) %>%
-    mutate(volume = ifelse(volume=="NA", NA, paste(volume))) %>%
-    mutate(pages = ifelse(pages=="NA", NA, paste(pages))) %>%
-    mutate(abstract = ifelse(abstract=="NA", NA, paste(abstract))) %>%
-    mutate(doi = ifelse(doi=="NA", NA, paste(doi))) %>%
-    mutate(journal = ifelse(journal=="NA", NA, paste(journal))) %>%
-    mutate(isbn = ifelse(isbn=="", NA, paste(isbn)))
+    dplyr::mutate(dplyr::across(c(.data$author, .data$year, .data$title, .data$number, 
+                           .data$volume, .data$pages, .data$abstract, .data$doi, 
+                           .data$journal, .data$isbn), 
+                         ~ifelse(.x == "NA", NA, paste(.x))))
   
   formatted_citations<- formatted_citations %>%
-    dplyr::select(author, title, year, journal, abstract, doi, number, pages, volume, isbn, record_id, cite_source, cite_label, cite_string)
+    dplyr::select(.data$author, .data$title, .data$year, .data$journal, .data$abstract, 
+                  .data$doi, .data$number, .data$pages, .data$volume, .data$isbn, 
+                  .data$record_id, .data$cite_source, .data$cite_label, .data$cite_string)
   
   return(formatted_citations)
   
@@ -203,40 +198,47 @@ match_citations <- function(formatted_citations){
   
   # Obtain metadata for matching pairs
   pairs <- pairs  %>%
-    mutate(author1 =formatted_citations$author[id1]) %>%
-    mutate(author2 =formatted_citations$author[id2]) %>%
-    mutate(title1 =formatted_citations$title[id1]) %>%
-    mutate(title2 =formatted_citations$title[id2]) %>%
-    mutate(abstract1 =formatted_citations$abstract[id1]) %>%
-    mutate(abstract2 =formatted_citations$abstract[id2]) %>%
-    mutate(doi1= formatted_citations$doi[id1]) %>%
-    mutate(doi2 =formatted_citations$doi[id2]) %>%
-    mutate(year1=formatted_citations$year[id1]) %>%
-    mutate(year2=formatted_citations$year[id2]) %>%
-    mutate(number1 =formatted_citations$number[id1]) %>%
-    mutate(number2 =formatted_citations$number[id2]) %>%
-    mutate(pages1 =formatted_citations$pages[id1]) %>%
-    mutate(pages2 =formatted_citations$pages[id2]) %>%
-    mutate(volume1 =formatted_citations$volume[id1]) %>%
-    mutate(volume2 =formatted_citations$volume[id2]) %>%
-    mutate(journal1 =formatted_citations$journal[id1]) %>%
-    mutate(journal2 =formatted_citations$journal[id2]) %>%
-    mutate(isbn1 =formatted_citations$isbn[id1]) %>%
-    mutate(isbn2 =formatted_citations$isbn[id2]) %>%
-    mutate(record_id1=formatted_citations$record_id[id1]) %>%
-    mutate(record_id2 =formatted_citations$record_id[id2]) %>%
-    mutate(cite_labels1 =formatted_citations$cite_label[id1]) %>%
-    mutate(cite_labels2 =formatted_citations$cite_label[id2]) %>%
-    mutate(cite_sources1 =formatted_citations$cite_source[id1]) %>%
-    mutate(cite_sources2 =formatted_citations$cite_source[id2]) %>%
-    mutate(cite_strings1 =formatted_citations$cite_string[id1]) %>%
-    mutate(cite_strings2 =formatted_citations$cite_string[id2])
+    dplyr::mutate(author2 =formatted_citations$author[.data$id2]) %>%
+    dplyr::mutate(author1 =formatted_citations$author[.data$id1]) %>%
+    dplyr::mutate(title1 =formatted_citations$title[.data$id1]) %>%
+    dplyr::mutate(title2 =formatted_citations$title[.data$id2]) %>%
+    dplyr::mutate(abstract1 =formatted_citations$abstract[.data$id1]) %>%
+    dplyr::mutate(abstract2 =formatted_citations$abstract[.data$id2]) %>%
+    dplyr::mutate(doi1= formatted_citations$doi[.data$id1]) %>%
+    dplyr::mutate(doi2 =formatted_citations$doi[.data$id2]) %>%
+    dplyr::mutate(year1=formatted_citations$year[.data$id1]) %>%
+    dplyr::mutate(year2=formatted_citations$year[.data$id2]) %>%
+    dplyr::mutate(number1 =formatted_citations$number[.data$id1]) %>%
+    dplyr::mutate(number2 =formatted_citations$number[.data$id2]) %>%
+    dplyr::mutate(pages1 =formatted_citations$pages[.data$id1]) %>%
+    dplyr::mutate(pages2 =formatted_citations$pages[.data$id2]) %>%
+    dplyr::mutate(volume1 =formatted_citations$volume[.data$id1]) %>%
+    dplyr::mutate(volume2 =formatted_citations$volume[.data$id2]) %>%
+    dplyr::mutate(journal1 =formatted_citations$journal[.data$id1]) %>%
+    dplyr::mutate(journal2 =formatted_citations$journal[.data$id2]) %>%
+    dplyr::mutate(isbn1 =formatted_citations$isbn[.data$id1]) %>%
+    dplyr::mutate(isbn2 =formatted_citations$isbn[.data$id2]) %>%
+    dplyr::mutate(record_id1=formatted_citations$record_id[.data$id1]) %>%
+    dplyr::mutate(record_id2 =formatted_citations$record_id[.data$id2]) %>%
+    dplyr::mutate(cite_labels1 =formatted_citations$cite_label[.data$id1]) %>%
+    dplyr::mutate(cite_labels2 =formatted_citations$cite_label[.data$id2]) %>%
+    dplyr::mutate(cite_sources1 =formatted_citations$cite_source[.data$id1]) %>%
+    dplyr::mutate(cite_sources2 =formatted_citations$cite_source[.data$id2]) %>%
+    dplyr::mutate(cite_strings1 =formatted_citations$cite_string[.data$id1]) %>%
+    dplyr::mutate(cite_strings2 =formatted_citations$cite_string[.data$id2])
   
+  selected_vars <- c("id1", "id2", "author1", "author2", "author", "title1", 
+                     "title2", "title", "abstract1", "abstract2", "abstract", 
+                     "year1", "year2", "year", "number1", "number2", "number", 
+                     "pages1", "pages2", "pages", "volume1", "volume2", "volume", 
+                     "journal1", "journal2", "journal", "isbn", "isbn1", "isbn2", 
+                     "doi1", "doi2", "doi", "record_id1", "record_id2", "cite_labels1", 
+                     "cite_labels2", "cite_sources1", "cite_sources2", "cite_strings1", "cite_strings2")
+
   pairs <- pairs %>%
-    dplyr::select(id1, id2, author1, author2, author, title1, title2, title, abstract1, abstract2, abstract, year1, year2, year, number1, number2, number, pages1, pages2, pages, volume1, volume2, volume, journal1, journal2, journal, isbn, isbn1, isbn2, doi1, doi2, doi, record_id1, record_id2, cite_labels1, cite_labels2, cite_sources1, cite_sources2, cite_strings1, cite_strings2)
+    dplyr::select(dplyr::all_of(selected_vars))
   
   numCores <- parallel::detectCores()
-  numCores
   
   try(pairs$author <- mapply(RecordLinkage::jarowinkler, pairs$author1, pairs$author2), silent = TRUE)
   try(pairs$title <- mapply(RecordLinkage::jarowinkler, pairs$title1, pairs$title2), silent = TRUE)
@@ -249,12 +251,12 @@ match_citations <- function(formatted_citations){
   try(pairs$doi <- mapply(RecordLinkage::jarowinkler, pairs$doi1, pairs$doi2), silent = TRUE)
   
   pairs <- pairs %>%
-    mutate(abstract = ifelse(is.na(abstract1) & is.na(abstract2), 0, abstract)) %>%
-    mutate(pages = ifelse(is.na(pages1) & is.na(pages2), 1, pages)) %>%
-    mutate(volume = ifelse(is.na(volume1) & is.na(volume2), 1, volume)) %>%
-    mutate(number = ifelse(is.na(number1) & is.na(number2), 1, number)) %>%
-    mutate(doi = ifelse(is.na(doi1) & is.na(doi2), 0, doi)) %>%
-    mutate(isbn = ifelse(is.na(isbn1) & is.na(isbn2), 0, isbn))
+    dplyr::mutate(abstract = ifelse(is.na(.data$abstract1) & is.na(.data$abstract2), 0, .data$abstract)) %>%
+    dplyr::mutate(pages = ifelse(is.na(.data$pages1) & is.na(.data$pages2), 1, .data$pages)) %>%
+    dplyr::mutate(volume = ifelse(is.na(.data$volume1) & is.na(.data$volume2), 1, .data$volume)) %>%
+    dplyr::mutate(number = ifelse(is.na(.data$number1) & is.na(.data$number2), 1, .data$number)) %>%
+    dplyr::mutate(doi = ifelse(is.na(.data$doi1) & is.na(.data$doi2), 0, .data$doi)) %>%
+    dplyr::mutate(isbn = ifelse(is.na(.data$isbn1) & is.na(.data$isbn2), 0, .data$isbn))
 }
 
 
@@ -267,49 +269,49 @@ identify_true_matches <- function(pairs){
   ####------ Filter matching pairs - retain correct matches ------ ####
   true_pairs <- pairs %>%
     dplyr::filter(
-      (pages>0.8 & volume>0.8 & title>0.90 & abstract>0.90 & author>0.50 & isbn>0.99) |
-        (pages>0.8 & volume>0.8 & title>0.90 & abstract>0.90 & author>0.50 & journal>0.6) |
-        (pages>0.8 & number>0.8 & title>0.90 & abstract>0.90 & author>0.50 & journal>0.6) |
-        (volume >0.8 & number>0.8 & title>0.90 & abstract>0.90 & author>0.50  & journal>0.6) |
+      (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.90 & .data$abstract>0.90 & .data$author>0.50 & .data$isbn>0.99) |
+        (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.90 & .data$abstract>0.90 & .data$author>0.50 & .data$journal>0.6) |
+        (.data$pages>0.8 & .data$number>0.8 & .data$title>0.90 & .data$abstract>0.90 & .data$author>0.50 & .data$journal>0.6) |
+        (.data$volume >0.8 & .data$number>0.8 & .data$title>0.90 & .data$abstract>0.90 & .data$author>0.50  & .data$journal>0.6) |
         
-        (volume >0.8 & number>0.8 & title>0.90 & abstract>0.90 & author>0.8) |
-        (volume>0.8 & pages>0.8 & title>0.90 & abstract>0.9 & author>0.8) |
-        (pages>0.8 & number>0.8 & title>0.90 & abstract>0.9 & author>0.8) |
+        (.data$volume >0.8 & .data$number>0.8 & .data$title>0.90 & .data$abstract>0.90 & .data$author>0.8) |
+        (.data$volume>0.8 & .data$pages>0.8 & .data$title>0.90 & .data$abstract>0.9 & .data$author>0.8) |
+        (.data$pages>0.8 & .data$number>0.8 & .data$title>0.90 & .data$abstract>0.9 & .data$author>0.8) |
         
-        (doi>0.95 & author>0.75 & title>0.9) |
+        (.data$doi>0.95 & .data$author>0.75 & .data$title>0.9) |
         
-        (title>0.80 & abstract>0.90 & volume>0.85 & journal>0.65 & author>0.9) |
-        (title>0.90 & abstract>0.80 & volume>0.85 & journal>0.65 & author>0.9)|
+        (.data$title>0.80 & .data$abstract>0.90 & .data$volume>0.85 & .data$journal>0.65 & .data$author>0.9) |
+        (.data$title>0.90 & .data$abstract>0.80 & .data$volume>0.85 & .data$journal>0.65 & .data$author>0.9)|
         
-        (pages>0.8 & volume>0.8 & title>0.90 & abstract>0.8 & author>0.9 & journal>0.75) |
-        (pages>0.8 & number>0.8 & title>0.90 & abstract>0.80 & author>0.9 & journal>0.75) |
-        (volume>0.8 & number>0.8 & title>0.90 & abstract>0.8 & author>0.9  & journal>0.75) |
+        (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.90 & .data$abstract>0.8 & .data$author>0.9 & .data$journal>0.75) |
+        (.data$pages>0.8 & .data$number>0.8 & .data$title>0.90 & .data$abstract>0.80 & .data$author>0.9 & .data$journal>0.75) |
+        (.data$volume>0.8 & .data$number>0.8 & .data$title>0.90 & .data$abstract>0.8 & .data$author>0.9  & .data$journal>0.75) |
         
-        (title>0.9 & author>0.9 & abstract>0.9 & journal >0.7)|
-        (title>0.9 & author>0.9 & abstract>0.9 & isbn >0.99)|
+        (.data$title>0.9 & .data$author>0.9 & .data$abstract>0.9 & .data$journal >0.7)|
+        (.data$title>0.9 & .data$author>0.9 & .data$abstract>0.9 & .data$isbn >0.99)|
         
-        (pages>0.9 & number>0.9 & title>0.90 & author>0.80 & journal>0.6) |
-        (number>0.9 & volume>0.9 & title>0.90 & author>0.90 & journal>0.6) |
-        (pages>0.9 & volume>0.9 & title>0.90 & author>0.80 & journal>0.6) |
-        (pages>0.9 & number>0.9 & title>0.90 & author>0.80 & isbn>0.99) |
-        (pages>0.9 & number>0.9 & title>0.90 & author>0.80 & isbn>0.99) |
-        (pages>0.9 & number>0.9 & title>0.90 & author>0.80 & isbn>0.99) |
+        (.data$pages>0.9 & .data$number>0.9 & .data$title>0.90 & .data$author>0.80 & .data$journal>0.6) |
+        (.data$number>0.9 & .data$volume>0.9 & .data$title>0.90 & .data$author>0.90 & .data$journal>0.6) |
+        (.data$pages>0.9 & .data$volume>0.9 & .data$title>0.90 & .data$author>0.80 & .data$journal>0.6) |
+        (.data$pages>0.9 & .data$number>0.9 & .data$title>0.90 & .data$author>0.80 & .data$isbn>0.99) |
+        (.data$pages>0.9 & .data$number>0.9 & .data$title>0.90 & .data$author>0.80 & .data$isbn>0.99) |
+        (.data$pages>0.9 & .data$number>0.9 & .data$title>0.90 & .data$author>0.80 & .data$isbn>0.99) |
         
-        (pages>0.8 & volume>0.8 & title>0.95 & author>0.80 & journal>0.9) |
-        (number>0.8 & volume>0.8 & title>0.95 & author>0.80 & journal>0.9)|
-        (number>0.8 & pages>0.8 & title>0.95 & author>0.80 & journal>0.9) |
-        (pages>0.8 & volume>0.8 & title>0.95 & author>0.80 & isbn>0.99) |
-        (pages>0.8 & volume>0.8 & title>0.95 & author>0.80 & isbn>0.99) |
-        (pages>0.8 & volume>0.8 & title>0.95 & author>0.80 & isbn>0.99))
+        (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.95 & .data$author>0.80 & .data$journal>0.9) |
+        (.data$number>0.8 & .data$volume>0.8 & .data$title>0.95 & .data$author>0.80 & .data$journal>0.9)|
+        (.data$number>0.8 & .data$pages>0.8 & .data$title>0.95 & .data$author>0.80 & .data$journal>0.9) |
+        (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.95 & .data$author>0.80 & .data$isbn>0.99) |
+        (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.95 & .data$author>0.80 & .data$isbn>0.99) |
+        (.data$pages>0.8 & .data$volume>0.8 & .data$title>0.95 & .data$author>0.80 & .data$isbn>0.99))
   
   # Find papers with low matching dois - often indicates FALSE positive matches
   true_pairs_mismatch_doi <- true_pairs %>%
-    dplyr::filter(!(is.na(doi)| doi ==0 | doi > 0.99)) %>%
-    dplyr::filter(!(title > 0.9 & abstract > 0.9 & (journal|isbn > 0.9)))
+    dplyr::filter(!(is.na(.data$doi)| .data$doi ==0 | .data$doi > 0.99)) %>%
+    dplyr::filter(!(.data$title > 0.9 & .data$abstract > 0.9 & (.data$journal|.data$isbn > 0.9)))
   
   # Remove papers with low matching dois from filtered matched
   true_pairs <- true_pairs %>%
-    dplyr::filter(is.na(doi)| doi > 0.99 | doi == 0 | (title > 0.9 & abstract>0.9 & (journal|isbn > 0.9)))
+    dplyr::filter(is.na(.data$doi)| .data$doi > 0.99 | .data$doi == 0 | (.data$title > 0.9 & .data$abstract>0.9 & (.data$journal|.data$isbn > 0.9)))
   
   true_pairs <- unique(true_pairs)
   
@@ -351,28 +353,28 @@ generate_dup_id <- function(true_pairs, formatted_citations){
   
   # generate duplicate IDs
   dup_ids <- true_pairs %>%
-    dplyr::group_by(record_id1) %>%
-    dplyr::mutate(duplicate_id = dplyr::first(record_id1)) %>%
+    dplyr::group_by(.data$record_id1) %>%
+    dplyr::mutate(duplicate_id = dplyr::first(.data$record_id1)) %>%
     dplyr::ungroup() %>%
-    dplyr::group_by(record_id2) %>%
-    dplyr::mutate(duplicate_id = dplyr::first(duplicate_id)) %>%
+    dplyr::group_by(.data$record_id2) %>%
+    dplyr::mutate(duplicate_id = dplyr::first(.data$duplicate_id)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(record_id1, record_id2, duplicate_id) %>%
+    dplyr::select(.data$record_id1, .data$record_id2, .data$duplicate_id) %>%
     unique()
   
   citations_with_dup_id1 <- dplyr::inner_join(formatted_citations, dup_ids, by=c("record_id"="record_id1")) %>%
-    dplyr::select(-record_id2) %>%
+    dplyr::select(-.data$record_id2) %>%
     unique()
   
   citations_with_dup_id2 <- dplyr::inner_join(formatted_citations, dup_ids, by=c("record_id"="record_id2")) %>%
-    dplyr::select(-record_id1) %>%
+    dplyr::select(-.data$record_id1) %>%
     unique()
   
   citations_with_dup_id <- rbind(citations_with_dup_id1, citations_with_dup_id2) %>% unique()
   
   unique_citations <- formatted_citations %>%
-    dplyr::filter(!record_id %in% citations_with_dup_id$record_id) %>%
-    mutate(duplicate_id = record_id)
+    dplyr::filter(!.data$record_id %in% citations_with_dup_id$record_id) %>%
+    mutate(duplicate_id = .data$record_id)
   
   citations_with_dup_id <- rbind(unique_citations, citations_with_dup_id)
   matched_pairs_with_ids <- unique(citations_with_dup_id)
@@ -391,7 +393,7 @@ generate_dup_id <- function(true_pairs, formatted_citations){
 keep_one_unique_citation <- function(raw_citations_with_id, matched_pairs_with_ids, preferred_source){
   
   duplicate_id <- matched_pairs_with_ids %>%
-    dplyr::select(duplicate_id, record_id) %>%
+    dplyr::select(.data$duplicate_id, .data$record_id) %>%
     unique()
   
   all_metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id)
@@ -403,9 +405,9 @@ keep_one_unique_citation <- function(raw_citations_with_id, matched_pairs_with_i
     citations_with_dup_id_pick <- all_metadata_with_duplicate_id %>%
       dplyr::mutate_all(~replace(., .=='NA', NA)) %>%
       dplyr::group_by(duplicate_id) %>%
-      arrange(doi, abstract) %>%
-      mutate(order = ifelse(cite_source == preferred_source, 1, 2)) %>%
-      arrange(order) %>%
+      dplyr::arrange(.data$doi, .data$abstract) %>%
+      dplyr::mutate(order = ifelse(.data$cite_source == preferred_source, 1, 2)) %>%
+      dplyr::arrange(order) %>%
       dplyr::select(-order, -preferred_source) %>%
       dplyr::slice_head()
   }
@@ -414,7 +416,7 @@ keep_one_unique_citation <- function(raw_citations_with_id, matched_pairs_with_i
     citations_with_dup_id_pick <- all_metadata_with_duplicate_id %>%
       dplyr::mutate_all(~replace(., .=='NA', NA)) %>%
       dplyr::group_by(duplicate_id) %>%
-      arrange(doi, abstract) %>%
+      dplyr::arrange(.data$doi, .data$abstract) %>%
       dplyr::slice_head()
     
   }
@@ -429,23 +431,24 @@ keep_one_unique_citation <- function(raw_citations_with_id, matched_pairs_with_i
 get_manual_dedup_list <- function(maybe_pairs, matched_pairs_with_ids, pairs){
   
   maybe_also_pairs <- pairs %>%
-    dplyr::filter(record_id1 %in% matched_pairs_with_ids$record_id &
-             record_id2 %in% matched_pairs_with_ids$record_id) %>%
-    dplyr::filter(doi > 0.99 |
-             title>0.85 & author>0.75 |
-             title>0.80 & abstract>0.80 |
-             title>0.80 & isbn>0.99 |
-             title>0.80 & journal>0.80)
+    dplyr::filter(.data$record_id1 %in% matched_pairs_with_ids$record_id &
+                  .data$record_id2 %in% matched_pairs_with_ids$record_id) %>%
+    dplyr::filter(.data$doi > 0.99 |
+             .data$title>0.85 & .data$author>0.75 |
+             .data$title>0.80 & .data$abstract>0.80 |
+             .data$title>0.80 & .data$isbn>0.99 |
+             .data$title>0.80 & .data$journal>0.80)
   
   # Add in problem doi matching pairs and different year data in ManualDedup
   maybe_pairs <- rbind(maybe_pairs, maybe_also_pairs)
   maybe_pairs <- unique(maybe_pairs)
   
-  maybe_pairs <- maybe_pairs %>%
-    dplyr::filter(record_id1 %in% matched_pairs_with_ids$record_id &
-             record_id2 %in% matched_pairs_with_ids$record_id)
+  maybe_pairs %>%
+    dplyr::filter(.data$record_id1 %in% matched_pairs_with_ids$record_id &
+                  .data$record_id2 %in% matched_pairs_with_ids$record_id)
   
 }
+
 #' This function merges duplicates into a single citation
 #' @param matched_pairs_with_ids citation data with duplicate ids
 #' @param raw_citations_with_id  original citation data with unique ids
@@ -454,7 +457,7 @@ get_manual_dedup_list <- function(maybe_pairs, matched_pairs_with_ids, pairs){
 merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   
   duplicate_id <- matched_pairs_with_ids %>%
-    dplyr::select(duplicate_id, record_id) %>%
+    dplyr::select(.data$duplicate_id, .data$record_id) %>%
     unique()
   
   duplicate_id$record_id <- as.character(duplicate_id$record_id)
@@ -469,7 +472,7 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   
   metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id, by="record_id")
   metadata_with_duplicate_id <- metadata_with_duplicate_id %>%
-    dplyr::select(record_id, duplicate_id, cite_source, cite_string, cite_label)
+    dplyr::select(.data$record_id, .data$duplicate_id, .data$cite_source, .data$cite_string, .data$cite_label)
   
   # summarise cite_sources for each dup id
   # citations_with_dup_id_merged <- metadata_with_duplicate_id %>%
@@ -497,27 +500,24 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
     citations_with_dup_id_merged <- metadata_with_duplicate_id %>%
       dplyr::mutate_if(is.character, utf8::utf8_encode) %>%
       dplyr::mutate_all(~replace(., .=='NA', NA)) %>%
-      dplyr::group_by(duplicate_id) %>%
-      dplyr::arrange(record_id) %>%
+      dplyr::group_by(.data$duplicate_id) %>%
+      dplyr::arrange(.data$record_id) %>%
       dplyr::summarise_all(~(trimws(paste(na.omit(.), collapse = ';;;')))) %>%
-      dplyr::mutate(dplyr::across(c(dplyr::everything(), -cite_label, -cite_source, -cite_string, -record_id), gsub, pattern = ";;;.*", replacement = "")) %>%
-      dplyr::mutate(dplyr::across(cite_label, gsub, pattern = ";;;", replacement = ", ")) %>%
-      dplyr::mutate(dplyr::across(cite_source, gsub, pattern = ";;;", replacement = ", ")) %>%
-      dplyr::mutate(dplyr::across(cite_string, gsub, pattern = ";;;", replacement = ", ")) %>%
-      dplyr::mutate(dplyr::across(record_id, gsub, pattern = ";;;", replacement = ", ")) %>%
+      dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$cite_label, -.data$cite_source, -.data$cite_string, -.data$record_id), gsub, pattern = ";;;.*", replacement = "")) %>%
+      dplyr::mutate(dplyr::across(c(.data$cite_label, .data$cite_source, .data$cite_string, .data$record_id), gsub, pattern = ";;;", replacement = ", ")) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by(duplicate_id) %>%
-      dplyr::mutate(record_ids = paste0(unique(record_id),collapse=", ")) %>%
-      dplyr::mutate(record_ids = rem_dup_word(record_ids)) %>%
-      dplyr::arrange(dplyr::desc(cite_source)) %>%
+      dplyr::group_by(.data$duplicate_id) %>%
+      dplyr::mutate(record_ids = paste0(unique(.data$record_id),collapse=", ")) %>%
+      dplyr::mutate(record_ids = rem_dup_word(.data$record_ids)) %>%
+      dplyr::arrange(dplyr::desc(.data$cite_source)) %>%
       dplyr::slice_head() %>%
-      dplyr::select(-record_id) %>%
+      dplyr::select(-.data$record_id) %>%
       dplyr::ungroup()
   
     all_metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id, by="record_id") %>%
-      dplyr::group_by(duplicate_id) %>% 
-      dplyr::select(-cite_source, -cite_label, -cite_string) %>%
-      dplyr::slice(which.max(nchar(as.character(abstract)))) %>%
+      dplyr::group_by(.data$duplicate_id) %>% 
+      dplyr::select(-.data$cite_source, -.data$cite_label, -.data$cite_string) %>%
+      dplyr::slice(which.max(nchar(as.character(.data$abstract)))) %>%
       dplyr::ungroup()
     
     # identify and remove empty columns
