@@ -61,6 +61,10 @@ read_citations <- function(files,
                            cite_labels = NULL,
                            tag_naming = "best_guess"
                            ) {
+  if (!is.null(utils::packageDescription("synthesisr")$Repository) && utils::packageDescription("synthesisr")$Repository == "CRAN" && !utils::packageVersion("synthesisr") > "0.3.0") {
+    rlang::warn("NB: There is a bug in synthesisr 0.3.0 on CRAN that can lead to issues here. Best update to Github dev version or a newer version.",   .frequency = "once", .frequency_id = "synthesisr-version")
+  }
+  
  
   if (is.null(cite_sources)) {
     cite_sources <- purrr::map_chr(files, ~tools::file_path_sans_ext(basename(.x)))
