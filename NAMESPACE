@@ -3,6 +3,7 @@
 export(compare_sources)
 export(count_unique)
 export(dedup_citations)
+export(facets)
 export(plot_source_overlap_heatmap)
 export(plot_source_overlap_upset)
 export(read_citations)
