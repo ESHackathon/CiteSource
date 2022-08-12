@@ -58,9 +58,8 @@ unique_citations <- dedup_results$unique
 
 
 ```{r}
-# classify unique citations across difference sources/ labels/ strings
+# classify unique citations across different sources/ labels/ strings
 n_unique <- count_unique(unique_citations)
-n_unique <- unique(n_unique)
 
 # for each unique citation, which sources are present
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
@@ -72,6 +71,11 @@ label_comparison <- compare_sources(unique_citations, comp_type = "labels")
 ### Existing plots
 
 ```{r}
+#Faceted bar
+# making cite_label a factor in a certain order to reflect SR process - search, screen, final
+n_unique$cite_label <- factor(n_unique$cite_label, levels=c('search','screen','final'))
+plot_contributions(n_unique, center = TRUE)
+
 # heatmap of sources
 plot_source_overlap_heatmap(source_comparison)
 plot_source_overlap_heatmap(label_comparison)
