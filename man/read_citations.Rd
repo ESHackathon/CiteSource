@@ -32,10 +32,10 @@ This function imports RIS and Bibtex files with citations and merges them
 into one long tibble with one record per line.
 }
 \examples{
-\dontrun{
+if (interactive()) {
  read_citations(c("res.ris", "res.bib"),
  cite_sources = c("CINAHL", "MEDLINE"),
  cite_strings = c("Search1", "Search2"),
- cite_labels = c("raw", "screened"),
+ cite_labels = c("raw", "screened"))
  }
 }
