@@ -1,6 +1,4 @@
-#' ASySD Modified Function
-
-#' Deduplicate citations
+#' Deduplicate citations (ASySD Modified Function)
 #'
 #' This function deduplicates citation data
 #' @export
@@ -12,7 +10,7 @@
 
 dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=FALSE, preferred_source=NULL) {
   
-  print("formatting data...")
+  message("formatting data...")
   raw_citations <- add_cols(raw_citations, c("record_id", "cite_label","cite_source","cite_string"))
   
   # rename colulmns
@@ -26,13 +24,13 @@ dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=
 
   formatted_citations <- format_citations(raw_citations_with_id)
   
-  print("identifying potential duplicates...")
+  message("identifying potential duplicates...")
   pairs <- match_citations(formatted_citations)
   
   pair_types <- identify_true_matches(pairs)
   
   true_pairs <- pair_types$true_pairs
-  print("identified duplicates!")
+  message("identified duplicates!")
   
   maybe_pairs <- pair_types$maybe_pairs
   matched_pairs_with_ids <- generate_dup_id(true_pairs, formatted_citations)
@@ -44,7 +42,7 @@ dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=
   
   if(merge_citations == TRUE){
     
-    print("merging citations...")
+    message("merging citations...")
     
     unique_citations_with_metadata <- merge_metadata(raw_citations_with_id, matched_pairs_with_ids)
   }
@@ -58,7 +56,7 @@ dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=
               "manual_dedup" = manual_dedup))
 }
 
-#' ####------ Add colulmns ------ ####
+#' ####------ Add columns ------ ####
 
 #' This function adds citesource columns to citation data if missing
 #' @param raw_citations Citation dataframe with relevant columns
@@ -354,10 +352,10 @@ generate_dup_id <- function(true_pairs, formatted_citations){
   # generate duplicate IDs
   dup_ids <- true_pairs %>%
     dplyr::group_by(record_id1) %>%
-    mutate(duplicate_id = dplyr::first(record_id1)) %>%
+    dplyr::mutate(duplicate_id = dplyr::first(record_id1)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(record_id2) %>%
-    mutate(duplicate_id = dplyr::first(duplicate_id)) %>%
+    dplyr::mutate(duplicate_id = dplyr::first(duplicate_id)) %>%
     dplyr::ungroup() %>%
     dplyr::select(record_id1, record_id2, duplicate_id) %>%
     unique()
@@ -500,33 +498,33 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
       dplyr::mutate_if(is.character, utf8::utf8_encode) %>%
       dplyr::mutate_all(~replace(., .=='NA', NA)) %>%
       dplyr::group_by(duplicate_id) %>%
-      arrange(record_id) %>%
+      dplyr::arrange(record_id) %>%
       dplyr::summarise_all(~(trimws(paste(na.omit(.), collapse = ';;;')))) %>%
-      mutate(dplyr::across(c(dplyr::everything(), -cite_label, -cite_source, -cite_string, -record_id), gsub, pattern = ";;;.*", replacement = "")) %>%
-      mutate(dplyr::across(cite_label, gsub, pattern = ";;;", replacement = ", ")) %>%
-      mutate(dplyr::across(cite_source, gsub, pattern = ";;;", replacement = ", ")) %>%
-      mutate(dplyr::across(cite_string, gsub, pattern = ";;;", replacement = ", ")) %>%
-      mutate(dplyr::across(record_id, gsub, pattern = ";;;", replacement = ", ")) %>%
+      dplyr::mutate(dplyr::across(c(dplyr::everything(), -cite_label, -cite_source, -cite_string, -record_id), gsub, pattern = ";;;.*", replacement = "")) %>%
+      dplyr::mutate(dplyr::across(cite_label, gsub, pattern = ";;;", replacement = ", ")) %>%
+      dplyr::mutate(dplyr::across(cite_source, gsub, pattern = ";;;", replacement = ", ")) %>%
+      dplyr::mutate(dplyr::across(cite_string, gsub, pattern = ";;;", replacement = ", ")) %>%
+      dplyr::mutate(dplyr::across(record_id, gsub, pattern = ";;;", replacement = ", ")) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(duplicate_id) %>%
-      mutate(record_ids = paste0(unique(record_id),collapse=", ")) %>%
-      mutate(record_ids = rem_dup_word(record_ids)) %>%
-      arrange(desc(cite_source)) %>%
+      dplyr::mutate(record_ids = paste0(unique(record_id),collapse=", ")) %>%
+      dplyr::mutate(record_ids = rem_dup_word(record_ids)) %>%
+      dplyr::arrange(dplyr::desc(cite_source)) %>%
       dplyr::slice_head() %>%
       dplyr::select(-record_id) %>%
       dplyr::ungroup()
   
     all_metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id, by="record_id") %>%
-    group_by(duplicate_id) %>% 
-    dplyr::select(-cite_source, -cite_label, -cite_string) %>%
-    slice(which.max(nchar(as.character(abstract)))) %>%
-    dplyr::ungroup()
+      dplyr::group_by(duplicate_id) %>% 
+      dplyr::select(-cite_source, -cite_label, -cite_string) %>%
+      dplyr::slice(which.max(nchar(as.character(abstract)))) %>%
+      dplyr::ungroup()
     
     # identify and remove empty columns
     empty_columns <- sapply(all_metadata_with_duplicate_id, function(x) all(is.na(x) | x == ""))
     all_metadata_with_duplicate_id <- all_metadata_with_duplicate_id[, !empty_columns]
     
-    all_metadata_with_duplicate_id <- left_join(citations_with_dup_id_merged, all_metadata_with_duplicate_id)
+    all_metadata_with_duplicate_id <- dplyr::left_join(citations_with_dup_id_merged, all_metadata_with_duplicate_id, by = "duplicate_id")
     
 }
 

@@ -56,13 +56,13 @@ check_unique_search_meta <- function(files, ref_list) {
 # search_json is ignored.
  
 read_citations <- function(files,
-                           cite_sources = NA,
-                           cite_strings = NA,
-                           cite_labels = NA,
+                           cite_sources = NULL,
+                           cite_strings = NULL,
+                           cite_labels = NULL,
                            tag_naming = "best_guess"
                            ) {
  
-  if (is.na(cite_sources)) {
+  if (is.null(cite_sources)) {
     cite_sources <- purrr::map_chr(files, ~tools::file_path_sans_ext(basename(.x)))
     
     if(any(duplicated(cite_sources))) {
@@ -74,12 +74,12 @@ read_citations <- function(files,
   if (length(files) != length(cite_sources)) {
     stop("Files and origins cite_sources be of equal length")
   }
-  if (!is.na(cite_strings)) {
+  if (!is.null(cite_strings)) {
     if (length(cite_sources) != length(cite_strings)) {
       stop("Cite_sources and cite_strings must be of equal length")
     }
   }
-  if (!is.na(cite_labels)) {
+  if (!is.null(cite_labels)) {
     if (length(cite_sources) != length(cite_labels)) {
       stop("Cite_sources and cite_labels must be of equal length")
     }
@@ -89,12 +89,22 @@ read_citations <- function(files,
   ref_list <- lapply(files,
                      synthesisr::read_refs,
                      tag_naming = tag_naming)
+  
+  
+  #Drop empty citations
+  ref_list <- lapply(ref_list,
+                     function(data) {data[rowSums(is.na(data)) != (ncol(data)-1),]})
+  
+  for (i in seq_along(files)) {
+    message(basename(files[i]), ": read ", nrow(ref_list[[i]]), " citations.")
+  }
+  
   for (index in seq_len(length(files))) {
     ref_list[[index]]$cite_source <- cite_sources[[index]]
-    if (!is.na(cite_strings)) {
+    if (!is.null(cite_strings)) {
       ref_list[[index]]$cite_string <- cite_strings[[index]]
     }
-    if (!is.na(cite_labels)) {
+    if (!is.null(cite_labels)) {
       ref_list[[index]]$cite_label <- cite_labels[[index]]
     }
   }

@@ -1,43 +1,63 @@
-# example workflow
+---
+title: "CiteSource - Example workflow"
 
-source('R/import.R')
-source('R/dedup.R')
-source('R/compare.R')
-source('R/plots.R')
-library(dplyr)
-library(ggplot2)
+author: ""
 
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CiteSource}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+<! -- 
+
+This is primarily intended for internal testing
+
+--> 
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  fig.width = 6,
+  fig.height = 6
+  )
+```
+
+## 1. Import
+
+
+```{r}
 # step 1: bring in RIS files-----
 
 # listRIS citation files in folder
-citation_files <- list.files(path= "tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
-
-# print to console
-citation_files
-
+citation_files <- list.files(path= "../tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
 
 # read in citations and specify sources, labels (no strings relevant here)
 citations <- read_citations(citation_files,
                             cite_sources = c("DIM", NA,"LENS", NA, "WOS"),
                             cite_labels = c("search",  "final", "search", "screen", "search"),
                             tag_naming = "best_guess")
+```
 
-# FIX for blank spaces in dimensions file 
-citations <- citations %>%
-  mutate(delete = ifelse(is.na(year) & is.na(title) & is.na(author), "yes", "no")) %>%
-  filter(!delete == "yes") %>% 
-  select(-delete)
+## 2. Deduplication
 
-# step 2: deduplication-----
-
+```{r}
 # deduplicate citations 
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 
 # get unique citations
 unique_citations <- dedup_results$unique
+```
 
-# step 3: compare sources / labels/ strings
+## 3. compare sources / labels/ strings
 
+
+```{r}
 # classify unique citations across difference sources/ labels/ strings
 n_unique <- count_unique(unique_citations)
 n_unique <- unique(n_unique)
@@ -45,8 +65,28 @@ n_unique <- unique(n_unique)
 # for each unique citation, which sources are present
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 label_comparison <- compare_sources(unique_citations, comp_type = "labels")
+```
 
-# step 4: visualise comparisons
+## step 4: visualise comparisons
+
+### Existing plots
+
+```{r}
+# heatmap of sources
+plot_source_overlap_heatmap(source_comparison)
+plot_source_overlap_heatmap(label_comparison)
+
+# upset plot of sources
+plot_source_overlap_upset(source_comparison)
+plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+```
+
+### Custom plots
+
+```{r}
+
+library(ggplot2)
+library(dplyr)
 
 # making cite_label a factor in a certain order to reflect SR process - search, screen, final
 n_unique$cite_label = factor(n_unique$cite_label, levels=c('search','screen','final'))
@@ -101,11 +141,4 @@ n_unique %>%
   ggplot(aes(fill=cite_source, x=cite_label)) + 
   geom_bar(position="stack", stat="count") +
   xlab("") + ylab("Number of citations")
-
-# heatmap of sources
-plot_source_overlap_heatmap(source_comparison)
-
-# upset plot of sources
-plot_source_overlap_upset(source_comparison)
-plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-
+```

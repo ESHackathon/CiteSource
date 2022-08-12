@@ -9,7 +9,7 @@ count_unique <- function(unique_data){
     tidyr::separate_rows(.data$cite_source, convert = T) %>%
     tidyr::separate_rows(.data$cite_label, convert = T) %>%
     tidyr::separate_rows(.data$cite_string, convert = T) %>%
-    group_by(.data$duplicate_id) %>%
+    dplyr::group_by(.data$duplicate_id) %>%
     mutate(unique = ifelse(length(unique(.data$cite_source))==1, TRUE, FALSE)) %>%
     dplyr::ungroup() %>%
     unique()
