@@ -263,6 +263,7 @@ match_citations <- function(formatted_citations){
 #' This function identifies true pairs from matching pairs of citations and pairs which may be duplicates - for manual deduplication
 #' @param pairs citation matches which may be duplicates
 #' @return Dataframe of true citation pairs
+#' @noRd
 
 identify_true_matches <- function(pairs){
   
