@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   citesource_example: citesource_example.html
   citesource_vignette: citesource_vignette.html
-last_built: 2022-08-12T14:37Z
+last_built: 2022-08-14T13:32Z
 urls:
   reference: http://www.eshackathon.org/CiteSource/reference
   article: http://www.eshackathon.org/CiteSource/articles
