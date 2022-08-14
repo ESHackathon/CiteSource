@@ -141,7 +141,7 @@ plot_source_overlap_upset <- function(data, nsets = ncol(data) - 1,  sets.x.labe
 }
 
 # Hack to suppress check warning re default values below
-facets <- bars <- color <- NULL
+cite_source <- cite_label <- type <- NULL
 
 #' Create a bar chart that compares source contributions over stages
 #' 
@@ -188,7 +188,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations") + 
-      scale_y_continuous(labels = abs)
+      ggplot2::scale_y_continuous(labels = abs)
     
   }
   
