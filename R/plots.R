@@ -182,7 +182,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     vals <- unique(data %>% dplyr::select(!!color) %>% dplyr::pull())
     if(length(vals) != 2) stop("center is only implemented for two colors")
     
-    data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% dplyr::summarise(n = n())
+    data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% dplyr::summarise(n = dplyr::n())
     
     ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
