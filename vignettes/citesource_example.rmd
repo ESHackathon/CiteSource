@@ -130,7 +130,29 @@ n_unique %>%
   geom_bar(position="stack", stat="count") +
   facet_grid(~cite_label) +
   xlab("") + ylab("Number of citations")
+  
+## stacked bar Uniqe/Crossover Per Source - across Label (label as factor specified)
+n_unique %>%
+  select(cite_label, cite_source, unique, duplicate_id) %>% 
+  ggplot(aes(fill=unique, x=cite_source)) + 
+  geom_bar(position="stack", stat="count") +
+  facet_grid(~factor(cite_label, levels=c("search", "screened", "final"))) +
+  xlab("Source") + ylab("Number of citations")
 
+## dodged bar Uniqe/Crossover PER Source
+n_unique %>%
+  select(cite_label, cite_source, unique) %>% 
+  ggplot(aes(fill=unique, x=cite_source)) + 
+  geom_bar(position=position_dodge(width=0.5), stat="count") +
+  xlab("") + ylab("Number of citations")
+
+## dodged bar Label count PER Source 
+n_unique %>%
+  select(cite_source, cite_label, unique) %>%
+  ggplot(aes(fill=cite_label, x=cite_source)) + 
+  geom_bar(position=position_dodge2(revers=TRUE, width = 0.9), stat="count") +
+  xlab("") + ylab("Number of citations")+
+  guides(fill = guide_legend(reverse = TRUE))
 
 # stacked bar labels PER database
 n_unique %>%
