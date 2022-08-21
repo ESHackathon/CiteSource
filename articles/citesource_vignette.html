@@ -63,7 +63,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CiteSource</h1>
             
-            <h4 data-toc-skip class="date">2022-08-19</h4>
+            <h4 data-toc-skip class="date">2022-08-21</h4>
       
       
       <div class="d-none name"><code>citesource_vignette.rmd</code></div>
@@ -77,36 +77,64 @@
 <div class="section level2">
 <h2 id="about-the-package">About the package<a class="anchor" aria-label="anchor" href="#about-the-package"></a>
 </h2>
-<p>CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in two fields, “Source” and “Tag”. In the merging process, select metadata fields are also automatically compared (currently DOI &amp; Abstract) and the most complete metadata is used in the main record.</p>
+<p>CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, “cite_source”, “cite_label” and “tag_naming”. In the merging process, select metadata fields are also automatically compared (currently DOI &amp; Abstract) and the most complete metadata is used in the main record.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>For now, CiteSource is only available on GitHub - so you need the following code to install it.</p>
+<p>Use the following code to install CiteSource.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ESHackathon/CiteSource"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co">#To install a package from GitHub, you'll need the remotes package</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#Use the remotes package to install CiteSource</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ESHackathon/CiteSource"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#Load the library</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">CiteSource</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="import-files-from-multiple-sources">Import files from multiple sources<a class="anchor" aria-label="anchor" href="#import-files-from-multiple-sources"></a>
 </h2>
-<p>Currently, users can import multiple RIS files into CiteSource, which will be labelled with source information such as database, platform, and a search ID. The latter can be used to specify search parameters.</p>
+<p>Users can import multiple RIS or bibtex files into CiteSource, which the user can label with source information such as database or platform. A second metadata field called ‘cite_labels’ can be used to specify other attributes. For example, a common use of CiteSource may be to examine the origin of records at different screening stages of a review. Search results from databases can be imported along with screened records and final included studies.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">CiteSource</span><span class="op">)</span></span>
-<span><span class="va">my_records</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"asfa.ris"</span>, <span class="st">"econlit.ris"</span>, <span class="st">"greenfile.ris"</span><span class="op">)</span>,</span>
-<span>                             database <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ASFA"</span>, <span class="st">"EconLit"</span>, <span class="st">"GreenFILE"</span><span class="op">)</span>,</span>
-<span>                             plaform <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ProQuest"</span>, <span class="st">"EBSCO"</span>, <span class="st">"EBSCO"</span><span class="op">)</span>,</span>
-<span>                             search_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Search1"</span>, <span class="st">"Search2"</span>, <span class="st">"Search3"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co">#Indicate location of citation files</span></span>
+<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span> <span class="st">"data/bibfiles"</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">citation_files</span></span>
+<span></span>
+<span><span class="co">#Read citation files and store. Labels is used to compare stages of review.</span></span>
+<span></span>
+<span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
+<span>                            cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ABI"</span>, <span class="st">"BSU"</span>, <span class="st">"EconLit"</span>, </span>
+<span>                                             <span class="st">"Gray"</span>, <span class="cn">NA</span>, <span class="st">"PQDT"</span>, <span class="st">"Scopus"</span>, </span>
+<span>                                             <span class="cn">NA</span>, <span class="st">"WoS"</span><span class="op">)</span>,</span>
+<span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, </span>
+<span>                                            <span class="st">"search"</span>, <span class="st">"included"</span>, <span class="st">"search"</span>,</span>
+<span>                                            <span class="st">"search"</span>, <span class="st">"screened"</span>, </span>
+<span>                                            <span class="st">"search"</span><span class="op">)</span>,</span>
+<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="deduplicate-while-maintaining-source-information">Deduplicate while maintaining source information<a class="anchor" aria-label="anchor" href="#deduplicate-while-maintaining-source-information"></a>
 </h2>
-<p>CiteSource allows users to merge duplicates while maintaining information …</p>
+<p>CiteSource allows users to merge duplicates while maintaining information in the cite_label and cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">my_records</span><span class="op">)</span></span>
+<span><span class="co">#Deduplicate records while maintaining source information and label information.</span></span>
+<span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">data_sources</span> <span class="op">&lt;-</span> <span class="fu">source_comparison</span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span>
+<span></span>
+<span><span class="co">#Count number of unique and non-unique citations from different sources and labels</span></span>
+<span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#Create dataframe indicating occurrence of records across sources or labels</span></span>
+<span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span>
+<span><span class="va">label_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"labels"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="source-or-method-analysis">Source or method analysis<a class="anchor" aria-label="anchor" href="#source-or-method-analysis"></a>
@@ -117,8 +145,7 @@
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu">plot_source_overlap</span><span class="op">(</span><span class="va">data_sources</span>, </span>
-<span>                                  plot_type <span class="op">=</span> <span class="st">"percentages"</span><span class="op">)</span></span>
+<span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span><span class="va">my_heatmap</span> </span></code></pre></div>
 </div>
 <div class="section level3">
@@ -126,28 +153,33 @@
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">my_upset_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">data_sources</span><span class="op">)</span></span>
+<span><span class="va">my_upset_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">my_upset_plot</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="review-stage-analysis">Review stage analysis<a class="anchor" aria-label="anchor" href="#review-stage-analysis"></a>
 </h2>
-<p>Once the title and absract screening has been complete OR once the final papers the final literature has been selected, users can analyze the contributions of each Source/Method to better understand its impact on the review. By using the “Source” data along with the “Tag” data, users can analyze the number of overlapping/unique records from each source or method.</p>
+<p>Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the “cite_source” data along with the “cite_label” data, users can analyze the number of overlapping/unique records from each source or method.</p>
 <div class="section level3">
 <h3 id="assess-contribution-of-sources-by-review-stage">Assess contribution of sources by review stage<a class="anchor" aria-label="anchor" href="#assess-contribution-of-sources-by-review-stage"></a>
 </h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">my_contributions</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="documentation-and-output">Documentation and output<a class="anchor" aria-label="anchor" href="#documentation-and-output"></a>
 </h2>
+<p>In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see <a href="https://doi.org/10.5195/jmla.2021.809" class="external-link">Bethel et al. 2021</a> for more about search summary tables.).</p>
 <div class="section level3">
-<h3 id="generate-a-search-summary-table">Generate a search summary table<a class="anchor" aria-label="anchor" href="#generate-a-search-summary-table"></a>
+<h3 id="export-deduplicated-files">Export deduplicated files<a class="anchor" aria-label="anchor" href="#export-deduplicated-files"></a>
 </h3>
 </div>
 <div class="section level3">
-<h3 id="export-deduplicated-files">Export deduplicated files<a class="anchor" aria-label="anchor" href="#export-deduplicated-files"></a>
+<h3 id="generate-a-search-summary-table">Generate a search summary table<a class="anchor" aria-label="anchor" href="#generate-a-search-summary-table"></a>
 </h3>
 </div>
 </div>
