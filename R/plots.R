@@ -188,7 +188,8 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations") + 
-      ggplot2::scale_y_continuous(labels = abs)
+      ggplot2::scale_y_continuous(labels = abs) + 
+      ggplot2::guides(x =  guide_axis(angle = 45)) 
     
   }
   
