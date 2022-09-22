@@ -184,12 +184,16 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     
     data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% dplyr::summarise(n = dplyr::n())
     
+    data_sum$labelpos <- ifelse(data_sum$type=="duplicated",
+                               -1*data_sum$n - 0.02*max(data_sum$n), 1 + data_sum$n+ 0.02*max(data_sum$n)) #add lablel positions for geom_text
+    
     ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations") + 
       ggplot2::scale_y_continuous(labels = abs) + 
-      ggplot2::guides(x =  guide_axis(angle = 45)) 
+      ggplot2::guides(x =  guide_axis(angle = 45)) +
+      ggplot2::geom_text(data = data_sum, aes(label = paste0(data_sum$n), y=labelpos),size = 3.5) 
     
   }
   
