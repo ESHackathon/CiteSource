@@ -11,21 +11,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
-<! -- 
-
-Currently none of the code here is run - one the vignette is ready, remove eval = FALSE below.
-
---> 
-
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   warning = FALSE,
   fig.width = 6,
-  fig.height = 6,
-  eval = FALSE
+  fig.height = 6
 )
 ```
 
@@ -34,17 +26,16 @@ knitr::opts_chunk$set(
 CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
 
 ## Installation
-Use the following code to install CiteSource.
-```{r}
-
-#To install a package from GitHub, you'll need the remotes package
+Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
+```{r load}
+#Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
 library(remotes)
 
-#Use the remotes package to install CiteSource
+#Install CiteSource
 remotes::install_github("ESHackathon/CiteSource")
 
-#Load the library
+#Load the CiteSource library
 library(CiteSource)
 
 ```
@@ -57,9 +48,10 @@ Users can import multiple RIS or bibtex files into CiteSource, which the user ca
 ```{r}
 
 #Indicate location of citation files
-citation_files <- list.files(path= "data/bibfiles", pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path= "data/data_v4", pattern = "\\.ris", full.names = TRUE)
 
 citation_files
+
 
 #Read citation files and store. Labels is used to compare stages of review.
 
@@ -106,6 +98,7 @@ When teams are selecting databases for inclusion in a review it can be extremely
 ```{r}
 
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
+
 my_heatmap 
 
 ```
@@ -116,6 +109,7 @@ my_heatmap
 ```{r}
 
 my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
 my_upset_plot
 
 ```
@@ -129,6 +123,7 @@ Once the title and abstract screening has been completed or once the final paper
 ```{r}
 
 my_contributions <- plot_contributions(n_unique, center = TRUE)
+
 my_contributions
 
 ```
@@ -149,5 +144,4 @@ In addition to the above visualizations, it may be useful to export datasets for
 ```{r}
 
 ```
-
 
