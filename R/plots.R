@@ -219,5 +219,5 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::geom_text(data = data_sum, aes(label = paste0(data_sum$n), y=labelpos),size = 3.5) 
     
   }
-}
+
 
