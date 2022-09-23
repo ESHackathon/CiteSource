@@ -165,7 +165,7 @@ cite_source <- cite_label <- type <- NULL
 #' 
 #' plot_contributions(data, center = TRUE)
 
-plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE) {
+plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order="any", facet_order="any"){
   facets <- rlang::enquo(facets)
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
@@ -187,15 +187,37 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     data_sum$labelpos <- ifelse(data_sum$type=="duplicated",
                                -1*data_sum$n - 0.02*max(data_sum$n), 1 + data_sum$n+ 0.02*max(data_sum$n)) #add lablel positions for geom_text
     
+    if(bar_order != "any")
+      
+      data_sum <- data_sum  %>%
+        ungroup() %>%
+        mutate_at(vars(!!bars), ~forcats::fct_relevel(.x, bar_order)) #reorder bars if specified
+      
+      data <- data  %>%
+        mutate_at(vars(!!bars), ~forcats::fct_relevel(.x, bar_order)) 
+    }
+      
+    
+    if(facet_order != "any"){
+      
+ 
+      data_sum <- data_sum  %>%
+        mutate_at(vars(!!facets), ~forcats::fct_relevel(.x, facet_order)) #reorder facets if specified
+      
+      data <- data  %>%
+        mutate_at(vars(!!facets), ~forcats::fct_relevel(.x, facet_order))
+      
+    }
+  
     ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
-      ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations") + 
+      ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + 
+      ggplot2::labs(y = "Citations") + 
       ggplot2::scale_y_continuous(labels = abs) + 
-      ggplot2::guides(x =  guide_axis(angle = 45)) +
+      ggplot2::guides(x =  guide_axis(angle = 45), fill= guide_legend(reverse=TRUE)) + #make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, aes(label = paste0(data_sum$n), y=labelpos),size = 3.5) 
     
   }
-  
 }
 
