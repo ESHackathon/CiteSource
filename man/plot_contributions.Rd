@@ -9,7 +9,9 @@ plot_contributions(
   facets = cite_source,
   bars = cite_label,
   color = type,
-  center = FALSE
+  center = FALSE,
+  bar_order = "any",
+  facet_order = "any"
 )
 }
 \arguments{
