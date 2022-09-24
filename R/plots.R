@@ -194,7 +194,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
         dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) #reorder bars if specified
     
       data <- data  %>%
-        dplyr::mutate(across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
+        dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
       }
       
     
@@ -202,10 +202,10 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       
  
       data_sum <- data_sum  %>%
-        dplyr::mutate(dplyr::across(c(!!facets), ~forcats::fct_relevel(.x, facet_order)) ) #reorder facets if specified
+        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)) ) #reorder facets if specified
       
       data <- data  %>%
-        dplyr::mutate(dplyr::across(c(!!facets), ~forcats::fct_relevel(.x, facet_order)))
+        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))
       
     }
   
