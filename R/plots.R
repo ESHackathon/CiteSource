@@ -190,7 +190,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     if(bar_order != "any")
       
       data_sum <- data_sum  %>%
-        ungroup() %>%
+        dplyr::ungroup() %>%
         dplyr::mutate(dplyr::across(c(!!bars), ~forcats::fct_relevel(.x, bar_order))) #reorder bars if specified
       
       data <- data  %>%
