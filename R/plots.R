@@ -195,8 +195,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     
       data <- data  %>%
         dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
-      }
-      
+      }      
     
     if(facet_order != "any"){
       
@@ -205,8 +204,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
         dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)) ) #reorder facets if specified
       
       data <- data  %>%
-        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))
-      
+        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))      
     }
   
     ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
