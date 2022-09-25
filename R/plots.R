@@ -213,7 +213,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + 
       ggplot2::labs(y = "Citations") + 
       ggplot2::scale_y_continuous(labels = abs) + 
-      ggplot2::guides(x =  guide_axis(angle = 45), fill= guide_legend(reverse=TRUE)) + #make legend ordering the same as plot ordering
+      ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill= guide_legend(reverse=TRUE)) + #make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, aes(label = paste0(data_sum$n), y=labelpos),size = 3.5) 
     
   }
