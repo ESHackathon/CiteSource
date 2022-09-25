@@ -154,6 +154,10 @@ cite_source <- cite_label <- type <- NULL
 #' @param bars Variable in data used for bars. Defaults to label (i.e. cite_label)
 #' @param color Color used to fill bars. Default to `unique`
 #' @param center Logical. Should one color be above and one below the axis?
+#' @param color_order Character vector indicating the desired order of colors (e.g., c("unique", "duplicated"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.
+#' @param bar_order Character vector indicating the desired order of bars (e.g., c("found", "screened"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.
+#' @param facet_order Character vector indicating the desired order of facets (e.g., c("WoS", "Scopus"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.
+#' @param x_axis_label Character. Label for the x-axis, indicating what the bars represent.
 #' @export
 #' @examples 
 #' data <- data.frame(
@@ -165,7 +169,8 @@ cite_source <- cite_label <- type <- NULL
 #' 
 #' plot_contributions(data, center = TRUE)
 
-plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order="any", facet_order="any"){
+plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, 
+                               color_order = c("unique", "duplicated"), bar_order="any", facet_order="any", x_axis_label = "") {
   facets <- rlang::enquo(facets)
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
@@ -173,49 +178,59 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
   if (!rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data." )
   if (!rlang::as_name(bars) %in% colnames(data)) stop("Column ", rlang::as_name(bars), " not found in data." )
   if (!rlang::as_name(color) %in% colnames(data)) stop("Column ", rlang::as_name(color), " not found in data." )
+
+  
+  if (!(length(bar_order) == 1 && bar_order == "any")) {
+    data <- data  %>%
+      dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
+  }      
+  
+  if (!(length(facet_order) == 1 && facet_order == "any")) {
+    data <- data  %>%
+      dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))      
+  }
+  
+  if (!(length(color_order) == 1 && color_order == "any")) {
+    data <- data  %>%
+      dplyr::mutate(dplyr::across(!!color, ~forcats::fct_relevel(.x, color_order)))      
+  }
+  
   
   if (!center) {
-  
-    ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + ggplot2::geom_bar() + 
-           ggplot2::facet_grid(ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations")
+    out <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + ggplot2::geom_bar() + 
+           ggplot2::facet_grid(ggplot2::vars(!!facets)) 
   } else {
     vals <- unique(data %>% dplyr::select(!!color) %>% dplyr::pull())
     if(length(vals) != 2) stop("center is only implemented for two colors")
     
-    data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% dplyr::summarise(n = dplyr::n())
-    
-    data_sum$labelpos <- ifelse(data_sum$type=="duplicated",
-                               -1*data_sum$n - 0.02*max(data_sum$n), 1 + data_sum$n+ 0.02*max(data_sum$n)) #add lablel positions for geom_text
-    
-    if(bar_order != "any")
-      
-      data_sum <- data_sum  %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) #reorder bars if specified
-    
-      data <- data  %>%
-        dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
-      }      
-    
-    if(facet_order != "any"){
-      
- 
-      data_sum <- data_sum  %>%
-        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)) ) #reorder facets if specified
-      
-      data <- data  %>%
-        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))      
+    factor_if_needed <- function(x) {
+      if (is.factor(x)) return(x)
+      forcats::as_factor(x)
     }
+    
+    data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% 
+      dplyr::summarise(n = dplyr::n()) %>%
+      dplyr::mutate(across(!!color, factor_if_needed)) %>%
+      dplyr::ungroup()
+    
+    vals <- data_sum %>% dplyr::select(!!color) %>% dplyr::pull() %>% levels()
+
+    data_sum$labelpos <- ifelse((data_sum %>% dplyr::select(!!color) %>% dplyr::pull()) == vals[1],
+                               1 * data_sum$n, 
+                               -1 * data_sum$n)
   
-    ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
+    out <- ggplot2::ggplot(data_sum, ggplot2::aes(!!bars, fill = !!color)) + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) + 
-      ggplot2::labs(y = "Citations") + 
       ggplot2::scale_y_continuous(labels = abs) + 
-      ggplot2::guides(x =  guide_axis(angle = 45), fill= guide_legend(reverse=TRUE)) + #make legend ordering the same as plot ordering
-      ggplot2::geom_text(data = data_sum, aes(label = paste0(data_sum$n), y=labelpos),size = 3.5) 
+      ggplot2::geom_text(data = data_sum %>% dplyr::filter(.data$labelpos >= 0), ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5, vjust = -0.25) +
+      ggplot2::geom_text(data = data_sum %>% dplyr::filter(.data$labelpos < 0), ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5, vjust = 1.1) +
+    ggplot2::guides(fill= ggplot2::guide_legend(reverse=TRUE)) 
     
   }
+  
+  out + ggplot2::labs(y = "Citations", x = x_axis_label) + 
+    ggplot2::guides(x = ggplot2::guide_axis(angle = 45)) 
 
-
+}
