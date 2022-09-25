@@ -10,8 +10,10 @@ plot_contributions(
   bars = cite_label,
   color = type,
   center = FALSE,
+  color_order = c("unique", "duplicated"),
   bar_order = "any",
-  facet_order = "any"
+  facet_order = "any",
+  x_axis_label = ""
 )
 }
 \arguments{
@@ -24,6 +26,14 @@ plot_contributions(
 \item{color}{Color used to fill bars. Default to \code{unique}}
 
 \item{center}{Logical. Should one color be above and one below the axis?}
+
+\item{color_order}{Character vector indicating the desired order of colors (e.g., c("unique", "duplicated"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.}
+
+\item{bar_order}{Character vector indicating the desired order of bars (e.g., c("found", "screened"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.}
+
+\item{facet_order}{Character vector indicating the desired order of facets (e.g., c("WoS", "Scopus"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.}
+
+\item{x_axis_label}{Character. Label for the x-axis, indicating what the bars represent.}
 }
 \description{
 Create a faceted plot that shows unique contributions and duplicated records across
