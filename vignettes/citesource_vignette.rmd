@@ -134,7 +134,8 @@ In addition to the above visualizations, it may be useful to export datasets for
 ### Export deduplicated files
 
 ```{r export}
-
+export_csv(unique_citations, "cite_sources.csv", separate = "cite_source")
+export_ris(unique_citations, "cite_sources.ris")
 ```
 
 
