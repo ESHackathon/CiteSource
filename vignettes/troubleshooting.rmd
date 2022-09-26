@@ -1,0 +1,66 @@
+---
+title: "Troubleshooting"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Troubleshooting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  fig.width = 6,
+  fig.height = 6
+)
+
+library(CiteSource)
+library(dplyr)
+```
+
+
+# Deduplication issue 54
+
+```{r}
+#Indicate location of citation files
+citation_files <- list.files(path= "troubled_data", pattern = "\\.ris", full.names = TRUE)
+
+citations <- read_citations(citation_files,
+                            cite_sources = c("WoS", "WoS_early"),
+                            tag_naming = "best_guess")
+
+
+dedup_results <- dedup_citations(citations1, merge_citations = TRUE)
+```
+
+## Resolved: Issue 51
+
+```{r}
+#Indicate location of citation files
+citation_files <- list.files(path= "troubled_data", pattern = "\\.ris", full.names = TRUE)
+
+#Read citation files
+citations <- read_citations(citation_files,
+                            cite_sources = c("WoS", "WoS_Early"),
+                            tag_naming = "best_guess")
+
+citations %>% count(cite_source)
+
+dedup_results <- dedup_citations(citations, manual_dedup = FALSE, merge_citations = TRUE)
+
+unique_citations <- dedup_results$unique
+
+#Create dataframe indicating occurrence of records across sources or labels
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+
+plot_source_overlap_heatmap(source_comparison)
+
+```
+
+
