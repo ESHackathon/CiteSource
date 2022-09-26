@@ -50,7 +50,7 @@ Users can import multiple RIS or bibtex files into CiteSource, which the user ca
 ```{r read}
 
 #Indicate location of citation files
-citation_files <- list.files(path= "data/db_exports", pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path= "db_exports", pattern = "\\.ris", full.names = TRUE)
 
 citation_files
 
