@@ -43,6 +43,8 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/citesource_example.html">CiteSource - Example workflow</a>
     <a class="dropdown-item" href="../articles/citesource_vignette.html">CiteSource</a>
+    <a class="dropdown-item" href="../articles/citesource_working_example.html">CiteSource - Example 2</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
   </div>
 </li>
       </ul>
@@ -50,7 +52,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/ESHackathon/CiteSource/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -63,9 +72,9 @@
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CiteSource - Example workflow</h1>
             
-            <h4 data-toc-skip class="date">2022-08-21</h4>
+            <h4 data-toc-skip class="date">2022-09-26</h4>
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_example.rmd" class="external-link"><code>vignettes/citesource_example.rmd</code></a></small>
       <div class="d-none name"><code>citesource_example.rmd</code></div>
     </div>
 
@@ -78,7 +87,7 @@
 <h2 id="import">1. Import<a class="anchor" aria-label="anchor" href="#import"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">CiteSource</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.eshackathon.org/CiteSource/" class="external-link">CiteSource</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># listRIS citation files in folder</span></span>
 <span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span> <span class="st">"../tests/testthat/data/example_ris_with_labels"</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -127,9 +136,7 @@
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Faceted bar</span></span>
-<span><span class="co"># making cite_label a factor in a certain order to reflect SR process - search, screen, final</span></span>
-<span><span class="va">n_unique</span><span class="op">$</span><span class="va">cite_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_unique</span><span class="op">$</span><span class="va">cite_label</span>, levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>,<span class="st">'screen'</span>,<span class="st">'final'</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>,<span class="st">'screen'</span>,<span class="st">'final'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="citesource_example_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -266,7 +273,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Lukas Wallrich, Sarah Young, Kaitlyn Hair, Chris Pritchard, Trevor Riley, Matthew Grainger, Neal Haddaway.</p>
+<p>Developed by Trevor Riley, Kaitlyn Hair, Lukas Wallrich, Matthew Grainger, Sarah Young, Chris Pritchard, Neal Haddaway.</p>
 </div>
 
 <div class="pkgdown-footer-right">
