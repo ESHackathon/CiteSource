@@ -129,19 +129,18 @@ my_contributions
 
 ## Documentation and output
 
-In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.). 
+In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. The `export_csv` function in CiteSource will generate a .csv file that includes original record metadata (like title, authors, etc.) and the sources and labels applied to the files upon import. The presence of a record in a given source is provided as binary TRUE/FALSE variables appended to the end of the dataframe.
 
-### Export deduplicated files
+CiteSource also provides an option to export your records as an .RIS file that can be read into a citation manager. Source information is added to the DB field, while label and string information is added to custom fields 7 and 8, respectively.
 
 ```{r export}
 export_csv(unique_citations, "cite_sources.csv", separate = "cite_source")
-export_ris(unique_citations, "cite_sources.ris")
+CiteSource::export_ris(unique_citations, "cite_sources.ris")
 ```
 
 
 ### Generate a search summary table
 
-```{r sst}
+Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.). These tables can be published as supplementary matrial with a review to provide a reader more context about the sources that were searched and their contributions to the review. The ability to generate a search summary table is a feature that will be coming in a future version of CiteSource.
 
-```
 
