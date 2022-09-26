@@ -36,7 +36,7 @@ citations <- read_citations(citation_files,
                             tag_naming = "best_guess")
 
 
-dedup_results <- dedup_citations(citations1, merge_citations = TRUE)
+dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 ```
 
 ## Resolved: Issue 51
