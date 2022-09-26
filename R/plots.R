@@ -210,7 +210,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     
     data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% 
       dplyr::summarise(n = dplyr::n()) %>%
-      dplyr::mutate(across(!!color, factor_if_needed)) %>%
+      dplyr::mutate(dplyr::across(!!color, factor_if_needed)) %>%
       dplyr::ungroup()
     
     vals <- data_sum %>% dplyr::select(!!color) %>% dplyr::pull() %>% levels()
