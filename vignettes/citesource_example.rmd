@@ -6,7 +6,7 @@ author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource-Example}
+  %\VignetteIndexEntry{CiteSource - Example workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -72,9 +72,7 @@ label_comparison <- compare_sources(unique_citations, comp_type = "labels")
 
 ```{r}
 #Faceted bar
-# making cite_label a factor in a certain order to reflect SR process - search, screen, final
-n_unique$cite_label <- factor(n_unique$cite_label, levels=c('search','screen','final'))
-plot_contributions(n_unique, center = TRUE)
+plot_contributions(n_unique, center = TRUE, bar_order = c('search','screen','final'))
 
 # heatmap of sources
 plot_source_overlap_heatmap(source_comparison)

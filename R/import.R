@@ -89,6 +89,12 @@ read_citations <- function(files,
     }
   }
   
+  contains_commas <- any(stringr::str_detect(c(cite_sources, cite_labels, cite_strings), ","))
+  
+  if (!is.na(contains_commas) && contains_commas) {
+    stop("',' must not be used in cite_source, cite_labels or cite_strings (or filenames if these are not specified)")
+  }
+  
   # Need to import files separately to add origin, platform, and searches
   ref_list <- lapply(files,
                      synthesisr::read_refs,

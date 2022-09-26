@@ -1,12 +1,12 @@
 ---
-title: "CiteSource"
+title: "CiteSource - Example 2"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource}
+  %\VignetteIndexEntry{CiteSource - Example 2}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,9 +15,9 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  warning = FALSE,
-  fig.width = 6,
-  fig.height = 6
+  fig.width = 10,
+  fig.height = 10,
+ warning = FALSE
 )
 ```
 
@@ -27,19 +27,22 @@ CiteSource provides users with the ability to deduplicate references while maint
 
 ## Installation
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
-```{r load}
+
+
+```{r eval = FALSE}
 #Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
 library(remotes)
 
 #Install CiteSource
 remotes::install_github("ESHackathon/CiteSource")
-
-#Load the CiteSource library
-library(CiteSource)
-
 ```
 
+After installation, you can load the package.
+
+```{r}
+library(CiteSource)
+```
 
 ## Import files from multiple sources
 
@@ -48,8 +51,8 @@ Users can import multiple RIS or bibtex files into CiteSource, which the user ca
 ```{r}
 
 #Indicate location of citation files
-## NOTE that short and long versions are seperate in the working_example data folder
-citation_files <- list.files(path="/working_example/short", pattern = "\\.ris", full.names = TRUE)
+## NOTE that short and long versions are separate in the working_example data folder
+citation_files <- list.files(path=file.path("../tests/testthat/data", "working_example/short"), pattern = "\\.ris", full.names = TRUE)
 
 citation_files
 
@@ -134,7 +137,8 @@ Once the title and abstract screening has been completed or once the final paper
 
 ```{r}
 
-my_contributions <- plot_contributions(n_unique, center = TRUE)
+my_contributions <- plot_contributions(n_unique, center = TRUE, 
+                                       bar_order = c('search', 'Screened', 'Final'))
 
 my_contributions
 
