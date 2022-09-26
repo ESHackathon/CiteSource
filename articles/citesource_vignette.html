@@ -201,17 +201,15 @@
 <div class="section level2">
 <h2 id="documentation-and-output">Documentation and output<a class="anchor" aria-label="anchor" href="#documentation-and-output"></a>
 </h2>
-<p>In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see <a href="https://doi.org/10.5195/jmla.2021.809" class="external-link">Bethel et al. 2021</a> for more about search summary tables.).</p>
-<div class="section level3">
-<h3 id="export-deduplicated-files">Export deduplicated files<a class="anchor" aria-label="anchor" href="#export-deduplicated-files"></a>
-</h3>
+<p>In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. The <code>export_csv</code> function in CiteSource will generate a .csv file that includes original record metadata (like title, authors, etc.) and the sources and labels applied to the files upon import. The presence of a record in a given source is provided as binary TRUE/FALSE variables appended to the end of the dataframe.</p>
+<p>CiteSource also provides an option to export your records as an .RIS file that can be read into a citation manager. Source information is added to the DB field, while label and string information is added to custom fields 7 and 8, respectively.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/export_csv.html">export_csv</a></span><span class="op">(</span><span class="va">unique_citations</span>, <span class="st">"cite_sources.csv"</span>, separate <span class="op">=</span> <span class="st">"cite_source"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/export_ris.html">export_ris</a></span><span class="op">(</span><span class="va">unique_citations</span>, <span class="st">"cite_sources.ris"</span><span class="op">)</span></span></code></pre></div>
-</div>
+<span><span class="fu">CiteSource</span><span class="fu">::</span><span class="fu"><a href="../reference/export_ris.html">export_ris</a></span><span class="op">(</span><span class="va">unique_citations</span>, <span class="st">"cite_sources.ris"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="generate-a-search-summary-table">Generate a search summary table<a class="anchor" aria-label="anchor" href="#generate-a-search-summary-table"></a>
 </h3>
+<p>Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see <a href="https://doi.org/10.5195/jmla.2021.809" class="external-link">Bethel et al. 2021</a> for more about search summary tables.). These tables can be published as supplementary matrial with a review to provide a reader more context about the sources that were searched and their contributions to the review. The ability to generate a search summary table is a feature that will be coming in a future version of CiteSource.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
