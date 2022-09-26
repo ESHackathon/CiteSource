@@ -23,7 +23,7 @@ count_unique <- function(unique_data){
 #' @param comp_type argument to specify comparison of strings, sources, or labels?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
-compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labels")){
+compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labels")) {
   
   comp_type <- match.arg(comp_type)
   
@@ -31,7 +31,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
   
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$record_ids) %>%
-    tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
     unique() %>%
     tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_source, values_from=c(.data$record_ids),
                 values_fn =  function(x) TRUE,
@@ -42,7 +42,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
   
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_string, .data$record_ids) %>%
-    tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
     unique() %>%
     tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_string, values_from=c(.data$record_ids),
                        values_fn =  function(x) TRUE,
@@ -53,7 +53,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
     
     source_comparison <- unique_data %>%
       dplyr::select(.data$duplicate_id, .data$cite_label, .data$record_ids) %>%
-      tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
+      tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
       unique() %>%
       tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_label, values_from=c(.data$record_ids),
                          values_fn =  function(x) TRUE,
