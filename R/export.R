@@ -98,6 +98,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 
 #' Changed synthesisr function
 #' @keywords internal
+#' @noRd
 
 new_write_ris <- function(x,
                       tag_naming = "synthesisr"
