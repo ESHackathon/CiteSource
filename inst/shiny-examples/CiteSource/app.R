@@ -44,20 +44,16 @@ ui <- navbarPage("CiteSource", id = "tabs",
                             column(12,
                                    # Sidebar layout with input and output definitions ----
                                    sidebarLayout(
-                                     
-                                     # Sidebar panel for inputs ----
-                                     sidebarPanel(
-                                       
-                                       # Input: Select a file ----
-                                       fileInput("files", 
-                                                 "Upload", 
-                                                 multiple = TRUE, 
-                                                 accept = c('.ris', '.txt', '.bib')),
-                                       textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
-                                       textInput('tag', 'Citestring', placeholder = 'e.g. search string 1.3'),
-                                       textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
-                                       actionButton('upload', 'Upload file')
-                                     ),
+                                       sidebarPanel(# Input: Select a file ----
+                                                    fileInput("files", 
+                                                              "Upload", 
+                                                              multiple = TRUE, 
+                                                              accept = c('.ris', '.txt', '.bib')),
+                                                    textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
+                                                    textInput('tag', 'Citestring', placeholder = 'e.g. search string 1.3'),
+                                                    textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
+                                                    actionButton('upload', 'Upload file')
+                                       ),
                                      
                                      # Main panel for displaying outputs ----
                                      mainPanel(
@@ -76,114 +72,27 @@ ui <- navbarPage("CiteSource", id = "tabs",
                           fluidRow(
                             
                             column(12,
-                                   # Sidebar layout ----
-                                   sidebarLayout(
-                                     
-                                     # Sidebar panel for inputs with fields required for dedup  ----
-                                     sidebarPanel(
-                                       
-                                       # Source selection from user input sources (updated in server)
-                                       radioGroupButtons(
-                                         inputId = "source_selection",
-                                         label = "",
-                                         choices = ""
-                                       ),
-                                       
-                                       # Matching fields in RIS to ASYSD required fields (updated in server)
-                                       selectInput(
-                                         "record_id_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "title_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "author_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "year_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "abstract_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "journal_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "doi_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "start_page_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "end_page_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "pages_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "volume_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "number_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       selectInput(
-                                         "isbn_field_match",
-                                         "Match fields",
-                                         choices = ""
-                                       ),
-                                       
-                                       # action button to deduplicate records after matching
-                                       actionButton("deduplicate", "Deduplicate citations")
-                                     ),
+                                   actionButton("deduplicate", "Deduplicate citations"),
                                      
                                      # Main panel for displaying outputs ----
                                      mainPanel(
                                        
                                        tabsetPanel(
                                          
-                                         tabPanel("Raw citations",
-                                                  
-                                                  dataTableOutput("refs_df")
-                                         ),
-                                         
                                          tabPanel("Deduplication results",
                                                   
                                                   tableOutput("dedup_results_table")
                                                   
-                                         ),
-                                         tabPanel("Source comparison table",
-                                                  
-                                                  dataTableOutput("comparison_table")
+                                         # ),
+                                         # tabPanel("Source comparison table",
+                                         #          
+                                         #          dataTableOutput("comparison_table")
                                                   
                                          )
                                          
                                        ))
                                      
-                                   )))),
+                                   ))),
                  
                  
                  # Visualise tab
@@ -239,253 +148,38 @@ server <- function(input, output, session) {
     if (is.null(input$files)) {
       return(NULL)
     } else {
-      
-      #upload files one-by-one
-      path_list <- input$files$datapath
-      if(rlang::is_empty(input$source)){
-        source=rep(NA,length(path_list))
-              }else{
-                source=unlist(strsplit(input$source, split=" "))  
-              }
-                
-      if(rlang::is_empty(input$tag)){
-        tag=NULL
-      }else{
-              tag=unlist(strsplit(input$tag, split=" "))  
-              }
-      if(rlang::is_empty(input$label)){
-        label=NULL   }else{
-                label=unlist(strsplit(input$label, split=" "))  
-                
-      }
-      
-    
       files=input$files$datapath
-      cite_sources=source
-      cite_strings = tag
-      cite_labels = label
-      
-      print(rlang::is_empty(cite_sources))
-      print(files)
-      print(cite_sources)
-      print(cite_strings)
-      print(cite_labels)
-      
+      cite_sources=paste0("c(",input$source, ")")
+      cite_sources=eval(parse(text=cite_sources))
       rv$upload_df <- CiteSource::read_citations(files=files, 
-                                                 cite_sources=cite_sources,
-                                                 cite_strings = cite_strings,
-                                                 cite_labels = cite_labels
-                                                 )
-      
-      print(rv$upload_df)
-      
-      
-      #test citesource::read_citations()
-      
-      
-      
-      #save the df to a reactive value and store the upload and its source-tag data in a list
-      
+                                              cite_sources = cite_sources)
+
+    }
     
-      }
-  })
-  
+ 
   # # display summary input table
-  # output$tbl_out <- renderDataTable({
-  #   DT::datatable(rv$df, 
-  #                 options = list(paging = FALSE, 
-  #                                searching = FALSE),
-  #                 rownames = FALSE)
-  # })
-  # 
-  # # display summary of bound dfs
-  # output$refs_df <- renderDataTable({
-  #   
-  #   data <- rv$upload_df %>%
-  #     filter(cs_source == input$source_selection) 
-  #   
-  #   
-  #   try(data$abstract <- paste(strtrim(data$abstract, 100), "..."), silent=TRUE)
-  #   try(data$keywords <- paste(strtrim(data$keywords, 100), "..."), silent=TRUE)
-  #   try(data$author <- paste(strtrim(data$author, 100), "..."), silent=TRUE)
-  #   try(data$address <- paste(strtrim(data$address, 100), "..."), silent=TRUE)
-  #   
-  #   
-  #   data <- data[,colSums(is.na(data))<nrow(data)]
-  #   
-  #   DT::datatable(head(data, 10), 
-  #                 options = list(paging = FALSE, 
-  #                                searching = FALSE),
-  #                 rownames = FALSE)
-  #   
-  # })
-  # 
-  # # get rective object field_names with names from each search file
-  # field_names <- reactive({
-  #   
-  #   data <-  rv$upload_df
-  #   data_split <- split(data , f = data$cs_source)
-  #   data_split <- lapply(data_split, function(x) x[,colSums(is.na(x))<nrow(x)])
-  #   
-  #   data_split_names <- lapply(data_split , function(x) names(x))
-  #   
-  # })
-  # 
-  # # when files uploaded, update buttons for each source
-  # observeEvent(input$upload, {
-  #   
-  #   source_choices <- unique(rv$df$cs_source)
-  #   source_choices <- as.character(source_choices)
-  #   
-  #   updateRadioGroupButtons(session, "source_selection",
-  #                           label = "Select source and match the correct fields",
-  #                           choices =  source_choices,
-  #                           checkIcon = list(
-  #                             yes = tags$i(class = "fa fa-circle", 
-  #                                          style = "color: steelblue"),
-  #                             no = tags$i(class = "fa fa-circle-o", 
-  #                                         style = "color: steelblue")))
-  #   
-  # })
-  # 
-  # # when source selected, get all relevant field names
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('title',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   # update selectInputs for each ASYSD relevant field based on source selected 
-  #   updateSelectInput(session, "title_field_match",
-  #                     label = "Title",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('record_id',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   updateSelectInput(session, "record_id_field_match",
-  #                     label = "Record ID",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # 
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('author',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   updateSelectInput(session, "author_field_match",
-  #                     label = "Author",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('source',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   updateSelectInput(session, "journal_field_match",
-  #                     label = "Journal",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('year',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   updateSelectInput(session, "year_field_match",
-  #                     label = "Year",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('doi',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   updateSelectInput(session, "doi_field_match",
-  #                     label = "DOI",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # observeEvent(input$source_selection, {
-  #   
-  #   relevant_choices <- field_names() 
-  #   relevant_choices <- relevant_choices[[input$source_selection]]
-  #   
-  #   index <- match('start_page',relevant_choices)
-  #   
-  #   if(is.na(index)){
-  #     
-  #     index <- 1
-  #   }
-  #   
-  #   updateSelectInput(session, "start_page_field_match",
-  #                     label = "Start page",
-  #                     choices =  c("None", relevant_choices),
-  #                     selected = relevant_choices[index])
-  #   
-  # })
-  # 
-  # 
-  # 
+   output$tbl_out <- renderDataTable({
+     DT::datatable(rv$upload_df, 
+                   options = list(paging = FALSE, 
+                                  searching = FALSE),
+                   rownames = FALSE)
+   })
+ 
+  
+  dedup_results<-CiteSource::dedup_citations(rv$upload_df, merge_citations = TRUE)
+    unique_citations <- dedup_results$unique
+    
+    output$dedup_results_table<-renderDataTable({
+      DT::datatable(unique_citations,
+                    options = list(paging = FALSE,
+                                   searching = FALSE),
+                    rownames = FALSE)
+
+
+  
+    })
+  })
+   
   # observeEvent(input$source_selection, {
   #   
   #   relevant_choices <- field_names() 
