@@ -31,6 +31,7 @@ across different screening stages."><!-- mathjax --><script src="https://cdnjs.c
     <a class="dropdown-item" href="../articles/citesource_example.html">CiteSource - Example workflow</a>
     <a class="dropdown-item" href="../articles/citesource_vignette.html">CiteSource</a>
     <a class="dropdown-item" href="../articles/citesource_working_example.html">CiteSource - Example 2</a>
+    <a class="dropdown-item" href="../articles/kh_example.html">CiteSource - Example workflow</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
   </div>
 </li>
@@ -69,10 +70,8 @@ across different screening stages.</p>
 <span>  bars <span class="op">=</span> <span class="va">cite_label</span>,</span>
 <span>  color <span class="op">=</span> <span class="va">type</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  color_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unique"</span>, <span class="st">"duplicated"</span><span class="op">)</span>,</span>
 <span>  bar_order <span class="op">=</span> <span class="st">"any"</span>,</span>
-<span>  facet_order <span class="op">=</span> <span class="st">"any"</span>,</span>
-<span>  x_axis_label <span class="op">=</span> <span class="st">""</span></span>
+<span>  facet_order <span class="op">=</span> <span class="st">"any"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,22 +95,6 @@ across different screening stages.</p>
 
 <dt>center</dt>
 <dd><p>Logical. Should one color be above and one below the axis?</p></dd>
-
-
-<dt>color_order</dt>
-<dd><p>Character vector indicating the desired order of colors (e.g., c("unique", "duplicated"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.</p></dd>
-
-
-<dt>bar_order</dt>
-<dd><p>Character vector indicating the desired order of bars (e.g., c("found", "screened"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.</p></dd>
-
-
-<dt>facet_order</dt>
-<dd><p>Character vector indicating the desired order of facets (e.g., c("WoS", "Scopus"). Any levels not mentioned will be left in their existing order after the explicitly mentioned levels. Use "any" to leave order as is.</p></dd>
-
-
-<dt>x_axis_label</dt>
-<dd><p>Character. Label for the x-axis, indicating what the bars represent.</p></dd>
 
 </dl></div>
 
