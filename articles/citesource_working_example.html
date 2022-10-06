@@ -120,8 +120,8 @@
 <span><span class="co">#&gt;  [6] "../tests/testthat/data/working_example/short/McK.ris"      </span></span>
 <span><span class="co">#&gt;  [7] "../tests/testthat/data/working_example/short/RM.ris"       </span></span>
 <span><span class="co">#&gt;  [8] "../tests/testthat/data/working_example/short/TiAb.ris"     </span></span>
-<span><span class="co">#&gt;  [9] "../tests/testthat/data/working_example/short/WoS_early.ris"</span></span>
-<span><span class="co">#&gt; [10] "../tests/testthat/data/working_example/short/WoS.ris"</span></span>
+<span><span class="co">#&gt;  [9] "../tests/testthat/data/working_example/short/WoS.ris"      </span></span>
+<span><span class="co">#&gt; [10] "../tests/testthat/data/working_example/short/WoSEarly.ris"</span></span>
 <span></span>
 <span></span>
 <span><span class="co">#Read citation files and store. Labels is used to compare stages of review.</span></span>
@@ -146,16 +146,18 @@
 <span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>,<span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>, </span>
 <span>                                            <span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"Screened"</span>, <span class="st">"search"</span>,<span class="st">"search"</span><span class="op">)</span>,</span>
 <span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; AGRIS.ris: read 12 citations.</span></span>
-<span><span class="co">#&gt; CAB.ris: read 687 citations.</span></span>
-<span><span class="co">#&gt; EconLit.ris: read 50 citations.</span></span>
-<span><span class="co">#&gt; Final.ris: read 243 citations.</span></span>
-<span><span class="co">#&gt; GreenFile.ris: read 139 citations.</span></span>
-<span><span class="co">#&gt; McK.ris: read 2661 citations.</span></span>
-<span><span class="co">#&gt; RM.ris: read 530 citations.</span></span>
-<span><span class="co">#&gt; TiAb.ris: read 1574 citations.</span></span>
-<span><span class="co">#&gt; WoS_early.ris: read 2639 citations.</span></span>
-<span><span class="co">#&gt; WoS.ris: read 738 citations.</span></span></code></pre></div>
+<span><span class="co">#&gt; Import completed - with the following details:</span></span>
+<span><span class="co">#&gt;             file cite_source cite_string cite_label citations</span></span>
+<span><span class="co">#&gt; 1      AGRIS.ris       AGRIS          NA     search        12</span></span>
+<span><span class="co">#&gt; 2        CAB.ris         CAB          NA     search       687</span></span>
+<span><span class="co">#&gt; 3    EconLit.ris     EconLit          NA     search        50</span></span>
+<span><span class="co">#&gt; 4      Final.ris       Final          NA     search       243</span></span>
+<span><span class="co">#&gt; 5  GreenFile.ris   GreenFile          NA     search       139</span></span>
+<span><span class="co">#&gt; 6        McK.ris         McK          NA     search      2661</span></span>
+<span><span class="co">#&gt; 7         RM.ris          RM          NA     search       530</span></span>
+<span><span class="co">#&gt; 8       TiAb.ris    Screened          NA     search      1574</span></span>
+<span><span class="co">#&gt; 9        WoS.ris         WoS          NA     search       738</span></span>
+<span><span class="co">#&gt; 10  WoSEarly.ris        WoSE          NA     search      2639</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="deduplicate-while-maintaining-source-information">Deduplicate while maintaining source information<a class="anchor" aria-label="anchor" href="#deduplicate-while-maintaining-source-information"></a>
