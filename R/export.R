@@ -63,15 +63,15 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
   
   if (!is.null(source_field)) {
-    citations <- citations %>% dplyr::rename(cite_source_include = cite_source)
+    citations <- citations %>% dplyr::rename(cite_source_include = .data$cite_source)
   } 
   
   if (!is.null(label_field)) {
-    citations <- citations %>% dplyr::rename(cite_label_include = cite_label)
+    citations <- citations %>% dplyr::rename(cite_label_include = .data$cite_label)
   } 
   
   if (!is.null(string_field)) {
-    citations <- citations %>% dplyr::rename(cite_string_include = cite_string)
+    citations <- citations %>% dplyr::rename(cite_string_include = .data$cite_string)
   } 
   
   citations <- citations %>% dplyr::select(-tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))

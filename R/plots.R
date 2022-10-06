@@ -154,6 +154,9 @@ cite_source <- cite_label <- type <- NULL
 #' @param bars Variable in data used for bars. Defaults to label (i.e. cite_label)
 #' @param color Color used to fill bars. Default to `unique`
 #' @param center Logical. Should one color be above and one below the axis?
+#' @param bar_order Character. Order of bars within each facet, any levels not specified will follow at the end. If "keep", then this is based on factor levels (or the first value) in the input data.
+#' @param facet_order Character. Order of facets. Any levels not specified will follow at the end.
+#' @param color_order Character. Order of values on the color scale.
 #' @export
 #' @examples 
 #' data <- data.frame(
@@ -163,9 +166,9 @@ cite_source <- cite_label <- type <- NULL
 #'   type = c("unique", "duplicated")[rbinom(100, 1, .7) + 1]
 #' )
 #' 
-#' plot_contributions(data, center = TRUE)
+#' plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), color_order = c("unique", "duplicated"))
 
-plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order="any", facet_order="any"){
+plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep"){
   facets <- rlang::enquo(facets)
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
@@ -173,38 +176,38 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
   if (!rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data." )
   if (!rlang::as_name(bars) %in% colnames(data)) stop("Column ", rlang::as_name(bars), " not found in data." )
   if (!rlang::as_name(color) %in% colnames(data)) stop("Column ", rlang::as_name(color), " not found in data." )
+
+  
+  
+  
+  if (!(length(color_order) == 1 && color_order == "keep")) {
+    data <- data  %>%
+      dplyr::mutate(dplyr::across(!!color, ~forcats::fct_relevel(.x, color_order))) 
+  }      
+  
+  if (!(length(bar_order) == 1 && bar_order == "keep")) {
+    data <- data  %>%
+      dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
+  }      
+  
+  if (!(length(facet_order) == 1 && facet_order == "keep")) {
+    data <- data  %>%
+      dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))      
+  }
   
   if (!center) {
-  
     ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + ggplot2::geom_bar() + 
            ggplot2::facet_grid(ggplot2::vars(!!facets)) + ggplot2::labs(y = "Citations")
   } else {
-    vals <- unique(data %>% dplyr::select(!!color) %>% dplyr::pull())
-    if(length(vals) != 2) stop("center is only implemented for two colors")
+    vals <- levels(data %>% dplyr::select(!!color) %>% dplyr::pull() %>% forcats::as_factor())
+    
+    if(length(vals) != 2) stop("center is only implemented for two colors, call the function with center = FALSE")
     
     data_sum <- data %>% dplyr::group_by(!!bars, !!facets, !!color) %>% dplyr::summarise(n = dplyr::n())
+
+    data_sum$labelpos <- ifelse(data_sum$type == vals[1],
+                               .5*data_sum$n, -.5 * data_sum$n) #add label positions for geom_text
     
-    data_sum$labelpos <- ifelse(data_sum$type=="duplicated",
-                               1*data_sum$n - 0.02*max(data_sum$n), -1 * data_sum$n + 0.02*max(data_sum$n)) #add lablel positions for geom_text
-    
-    if (length(bar_order) == 1 && bar_order != "any") {
-      
-      data_sum <- data_sum  %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) #reorder bars if specified
-    
-      data <- data  %>%
-        dplyr::mutate(dplyr::across(!!bars, ~forcats::fct_relevel(.x, bar_order))) 
-      }      
-    
-    if(length(facet_order) == 1 && facet_order != "any") {
-      data_sum <- data_sum  %>%
-        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)) ) #reorder facets if specified
-      
-      data <- data  %>%
-        dplyr::mutate(dplyr::across(!!facets, ~forcats::fct_relevel(.x, facet_order)))      
-    }
-  
     ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") + 
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
@@ -212,7 +215,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::labs(y = "Citations") + 
       ggplot2::scale_y_continuous(labels = abs) + 
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill= ggplot2::guide_legend(reverse=TRUE)) + #make legend ordering the same as plot ordering
-      ggplot2::geom_text(data = data_sum,  ggplot2::aes(label = paste0(data_sum$n), y=labelpos),size = 3.5) 
+      ggplot2::geom_text(data = data_sum,  ggplot2::aes(label = paste0(.data$n), y=.data$labelpos),size = 3.5) 
     
   }
 }
