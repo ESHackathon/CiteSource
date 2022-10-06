@@ -1,6 +1,11 @@
 # CiteSource
 <img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="200px" align="right">
 
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ESHackathon/CiteSource/workflows/R-CMD-check/badge.svg)](https://github.com/ESHackathon/CiteSource/actions)
+<!-- badges: end -->
+
 CiteSource is an R package and Shiny app that is currently in development. Work on this project began as part of the Evidence Synthesis Hackathon and as part of ESMARConf 2022.
 
 CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains eac duplicate record while merging metadata into a single master record. This master record maintains user-customized metadata in two fields, "Source" and "Tag". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the master record. 
