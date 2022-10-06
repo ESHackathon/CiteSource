@@ -475,29 +475,6 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   metadata_with_duplicate_id <- metadata_with_duplicate_id %>%
     dplyr::select(.data$record_id, .data$duplicate_id, .data$cite_source, .data$cite_string, .data$cite_label)
   
-  # summarise cite_sources for each dup id
-  # citations_with_dup_id_merged <- metadata_with_duplicate_id %>%
-  #   dplyr::mutate_if(is.character, utf8::utf8_encode) %>%
-  #   dplyr::mutate_all(~replace(., .=='NA', NA)) %>%
-  #   dplyr::group_by(duplicate_id) %>%
-  #   arrange(record_id) %>%
-  #   dplyr::summarise_all(~(trimws(paste(na.omit(.), collapse = ';;;')))) %>%
-  #   mutate(dplyr::across(c(dplyr::everything(), -cite_label, -cite_source, -cite_string, -record_id), gsub, pattern = ";;;.*", replacement = "")) %>%
-  #   mutate(dplyr::across(cite_label, gsub, pattern = ";;;", replacement = ", ")) %>%
-  #   mutate(dplyr::across(cite_source, gsub, pattern = ";;;", replacement = ", ")) %>%
-  #   mutate(dplyr::across(cite_string, gsub, pattern = ";;;", replacement = ", ")) %>%
-  #   mutate(dplyr::across(record_id, gsub, pattern = ";;;", replacement = ", ")) %>%
-  #   dplyr::ungroup()
-  #   mutate(duplicate_id = paste0(stringr::str_match(record_id, "^.*?(?=,.*)"))) %>%
-  #   mutate(duplicate_id = ifelse(duplicate_id == "NA", paste0(record_id), paste0(duplicate_id))) %>%
-  #   dplyr::group_by(duplicate_id) %>%
-  #   mutate(record_ids = paste0(unique(record_id),collapse=", ")) %>%
-  #   mutate(record_ids = rem_dup_word(record_ids)) %>%
-  #   arrange(desc(cite_source)) %>%
-  #   dplyr::slice_head() %>%
-  #   dplyr::select(-record_id) %>%
-  #   dplyr::ungroup()
-    
     citations_with_dup_id_merged <- metadata_with_duplicate_id %>%
       dplyr::mutate_if(is.character, utf8::utf8_encode) %>%
       dplyr::mutate_all(~replace(., .=='NA', NA)) %>%
@@ -507,6 +484,8 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
       dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$cite_label, -.data$cite_source, -.data$cite_string, -.data$record_id), gsub, pattern = ";;;.*", replacement = "")) %>%
       dplyr::mutate(dplyr::across(c(.data$cite_label, .data$cite_source, .data$cite_string, .data$record_id), gsub, pattern = ";;;", replacement = ", ")) %>%
       dplyr::ungroup() %>%
+      dplyr::mutate(duplicate_id = paste0(stringr::str_match(record_id, "^.*?(?=,.*)"))) %>%
+      dplyr::mutate(duplicate_id = ifelse(duplicate_id == "NA", paste0(record_id), paste0(duplicate_id))) %>%
       dplyr::group_by(.data$duplicate_id) %>%
       dplyr::mutate(record_ids = paste0(unique(.data$record_id),collapse=", ")) %>%
       dplyr::mutate(record_ids = rem_dup_word(.data$record_ids)) %>%
@@ -515,6 +494,7 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
       dplyr::select(-.data$record_id) %>%
       dplyr::ungroup()
   
+    
     all_metadata_with_duplicate_id <- dplyr::left_join(duplicate_id, raw_citations_with_id, by="record_id") %>%
       dplyr::group_by(.data$duplicate_id) %>% 
       dplyr::select(-.data$cite_source, -.data$cite_label, -.data$cite_string) %>%
