@@ -33,6 +33,7 @@ check_unique_search_meta <- function(files, ref_list) {
 #' @param cite_sources The origin of the citation files (e.g. "Scopus", "WOS", "Medline") - vector with one value per file, defaults to file names.
 #' @param cite_strings Optional. The search string used (or another grouping to analyse) - vector with one value per file
 #' @param cite_labels Optional. An additional label per file, for instance the stage of search - vector with one value per file
+#' @param verbose Should number of reference and allocation of labels be reported?
 #' @inheritParams synthesisr::read_refs
 #' @return A tibble with one row per citation
 #' @examples
@@ -59,10 +60,11 @@ read_citations <- function(files,
                            cite_sources = NULL,
                            cite_strings = NULL,
                            cite_labels = NULL,
+                           verbose = TRUE,
                            tag_naming = "best_guess"
                            ) {
   if (!is.null(utils::packageDescription("synthesisr")$Repository) && utils::packageDescription("synthesisr")$Repository == "CRAN" && !utils::packageVersion("synthesisr") > "0.3.0") {
-    rlang::warn("NB: There is a bug in synthesisr 0.3.0 on CRAN that can lead to issues here. Best update to Github dev version or a newer version.",   .frequency = "once", .frequency_id = "synthesisr-version")
+    rlang::warn("NB: There is a bug in synthesisr 0.3.0 on CRAN that can lead to issues here. Best update to Github dev version or a newer version.",   .frequency = "regularly", .frequency_id = "synthesisr-version")
   }
   
  
@@ -105,8 +107,10 @@ read_citations <- function(files,
   ref_list <- lapply(ref_list,
                      function(data) {data[rowSums(is.na(data)) != (ncol(data)-1),]})
   
+  ref_counts <- numeric(length(files))
+  
   for (i in seq_along(files)) {
-    message(basename(files[i]), ": read ", nrow(ref_list[[i]]), " citations.")
+    ref_counts[i] <- nrow(ref_list[[i]])
   }
   
   for (index in seq_len(length(files))) {
@@ -118,8 +122,19 @@ read_citations <- function(files,
       ref_list[[index]]$cite_label <- cite_labels[[index]]
     }
   }
- ref_list <- ref_list %>%
+  
+  if (verbose) {
+    report <- data.frame(file = basename(files),
+                         cite_source = cite_sources,
+                         cite_string = ifelse(is.null(cite_strings), NA, cite_strings),
+                         cite_label = ifelse(is.null(cite_labels), NA, cite_labels),
+                         citations = ref_counts)
+
+    message("Import completed - with the following details:")    
+    message(paste0(capture.output(report), collapse = "\n"))
+  }
+
+ ref_list %>%
    purrr::map(tibble::as_tibble) %>%
    purrr::reduce(dplyr::bind_rows)
-  return(ref_list)
 }
