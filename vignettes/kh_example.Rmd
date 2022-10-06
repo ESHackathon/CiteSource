@@ -1,12 +1,12 @@
 ---
-title: "CiteSource - Example workflow"
+title: "CiteSource - Example workflow KH"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Example workflow}
+  %\VignetteIndexEntry{CiteSource - Example workflow - KH}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
