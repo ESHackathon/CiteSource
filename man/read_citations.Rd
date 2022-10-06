@@ -9,6 +9,7 @@ read_citations(
   cite_sources = NULL,
   cite_strings = NULL,
   cite_labels = NULL,
+  verbose = TRUE,
   tag_naming = "best_guess"
 )
 }
@@ -21,6 +22,8 @@ Should be .bib or .ris files}
 \item{cite_strings}{Optional. The search string used (or another grouping to analyse) - vector with one value per file}
 
 \item{cite_labels}{Optional. An additional label per file, for instance the stage of search - vector with one value per file}
+
+\item{verbose}{Should number of reference and allocation of labels be reported?}
 
 \item{tag_naming}{Either a length-1 character stating how should ris tags be replaced (see details for a list of options), or an object inheriting from class \code{data.frame} containing user-defined replacement tags.}
 }
