@@ -10,8 +10,9 @@ plot_contributions(
   bars = cite_label,
   color = type,
   center = FALSE,
-  bar_order = "any",
-  facet_order = "any"
+  bar_order = "keep",
+  facet_order = "keep",
+  color_order = "keep"
 )
 }
 \arguments{
@@ -24,6 +25,12 @@ plot_contributions(
 \item{color}{Color used to fill bars. Default to \code{unique}}
 
 \item{center}{Logical. Should one color be above and one below the axis?}
+
+\item{bar_order}{Character. Order of bars within each facet, any levels not specified will follow at the end. If "keep", then this is based on factor levels (or the first value) in the input data.}
+
+\item{facet_order}{Character. Order of facets. Any levels not specified will follow at the end.}
+
+\item{color_order}{Character. Order of values on the color scale.}
 }
 \description{
 Create a faceted plot that shows unique contributions and duplicated records across
@@ -38,5 +45,5 @@ data <- data.frame(
   type = c("unique", "duplicated")[rbinom(100, 1, .7) + 1]
 )
 
-plot_contributions(data, center = TRUE)
+plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), color_order = c("unique", "duplicated"))
 }
