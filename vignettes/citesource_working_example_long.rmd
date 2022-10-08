@@ -73,12 +73,12 @@ citations <- read_citations(citation_files,
 
 ## short version with combined RM and McK files
 
-citations <- read_citations(citation_files,
-                           cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
-                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),
-                            cite_labels = c("search","search", "search", "Final", 
-                                            "search","search","search","Screened", "search","search"),
-                            tag_naming = "best_guess")
+#citations <- read_citations(citation_files,
+#                          cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
+#                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),
+#                            cite_labels = c("search","search", "search", "Final", 
+#                                            "search","search","search","Screened", "search","search"),
+#                            tag_naming = "best_guess")
 
 ```
 
