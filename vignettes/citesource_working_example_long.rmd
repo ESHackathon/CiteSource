@@ -1,0 +1,163 @@
+---
+title: "CiteSource - Example 2"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CiteSource - Example 2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10,
+  fig.height = 10,
+ warning = FALSE
+)
+```
+
+## About the package 
+
+CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
+
+## Installation
+Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
+
+
+```{r eval = FALSE}
+#Install the remotes packages to enable installation from GitHub
+install.packages("remotes")
+library(remotes)
+
+#Install CiteSource
+remotes::install_github("ESHackathon/CiteSource")
+```
+
+After installation, you can load the package.
+
+```{r}
+library(CiteSource)
+```
+
+## Import files from multiple sources
+
+Users can import multiple RIS or bibtex files into CiteSource, which the user can label with source information such as database or platform. A second metadata field called 'cite_labels' can be used to specify other attributes. For example, a common use of CiteSource may be to examine the origin of records at different screening stages of a review. Search results from databases can be imported along with screened records and final included studies. 
+
+```{r}
+
+#Indicate location of citation files
+## NOTE that short and long versions are separate in the working_example data folder
+citation_files <- list.files(path=file.path("../tests/testthat/data", "working_example/long"), pattern = "\\.ris", full.names = TRUE)
+
+citation_files
+
+
+#Read citation files and store. Labels is used to compare stages of review.
+##with all files seperate
+
+## long version with all RM and McK broken out -> good example for seeing how heatmap is squeezed & limitations on upset plot due to high # of combinations
+## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves
+citations <- read_citations(citation_files,
+                            cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
+                                            "GreenFile", "McKE", "McKI", "RMB", "RML", "RMPul", "RMPur", "RMR", "RMDFM",       
+                                            "RMPES", NA, "WoS", "WoSE"),
+                            cite_labels = c("search", "search", "search", "Final", 
+                                            "search","search","search","search","search","search","search","search","search",
+                                            "search","Screened","search","search"),
+                            tag_naming = "best_guess")
+
+## short version with combined RM and McK files
+
+citations <- read_citations(citation_files,
+                           cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
+                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),
+                            cite_labels = c("search","search", "search", "Final", 
+                                            "search","search","search","Screened", "search","search"),
+                            tag_naming = "best_guess")
+
+```
+
+
+## Deduplicate while maintaining source information
+
+CiteSource allows users to merge duplicates while maintaining information in the cite_label and cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. 
+
+```{r}
+
+#Deduplicate records while maintaining source information and label information.
+dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+
+unique_citations <- dedup_results$unique
+
+#Count number of unique and non-unique citations from different sources and labels
+n_unique <- count_unique(unique_citations)
+
+#Create dataframe indicating occurrence of records across sources or labels
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+label_comparison <- compare_sources(unique_citations, comp_type = "labels")
+
+
+```
+
+## Source or method analysis
+
+When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
+
+### Plot overlap as a heatmap matrix
+
+```{r}
+
+my_heatmap <- plot_source_overlap_heatmap(source_comparison)
+
+my_heatmap 
+
+```
+
+
+### Plot overlap as an upset plot
+
+```{r}
+
+my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
+my_upset_plot
+
+```
+
+## Review stage analysis
+
+Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
+
+### Assess contribution of sources by review stage
+
+```{r}
+
+my_contributions <- plot_contributions(n_unique, center = TRUE, 
+                                       bar_order = c('search', 'Screened', 'Final'))
+
+my_contributions
+
+```
+
+## Documentation and output
+
+In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.). 
+
+### Export deduplicated files
+
+```{r}
+
+```
+
+
+### Generate a search summary table
+
+```{r}
+
+```
+
