@@ -1,5 +1,5 @@
 ---
-title: "CiteSource - Example 2"
+title: "CiteSource - Example 3"
 
 author: ""
 
