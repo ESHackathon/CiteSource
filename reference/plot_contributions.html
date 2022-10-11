@@ -31,6 +31,7 @@ across different screening stages."><!-- mathjax --><script src="https://cdnjs.c
     <a class="dropdown-item" href="../articles/citesource_example.html">CiteSource - Example workflow</a>
     <a class="dropdown-item" href="../articles/citesource_vignette.html">CiteSource</a>
     <a class="dropdown-item" href="../articles/citesource_working_example.html">CiteSource - Example 2</a>
+    <a class="dropdown-item" href="../articles/citesource_working_example_long.html">CiteSource - Example 2</a>
     <a class="dropdown-item" href="../articles/kh_example.html">CiteSource - Example workflow KH</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
   </div>
@@ -70,8 +71,9 @@ across different screening stages.</p>
 <span>  bars <span class="op">=</span> <span class="va">cite_label</span>,</span>
 <span>  color <span class="op">=</span> <span class="va">type</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  bar_order <span class="op">=</span> <span class="st">"any"</span>,</span>
-<span>  facet_order <span class="op">=</span> <span class="st">"any"</span></span>
+<span>  bar_order <span class="op">=</span> <span class="st">"keep"</span>,</span>
+<span>  facet_order <span class="op">=</span> <span class="st">"keep"</span>,</span>
+<span>  color_order <span class="op">=</span> <span class="st">"keep"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,6 +98,18 @@ across different screening stages.</p>
 <dt>center</dt>
 <dd><p>Logical. Should one color be above and one below the axis?</p></dd>
 
+
+<dt>bar_order</dt>
+<dd><p>Character. Order of bars within each facet, any levels not specified will follow at the end. If "keep", then this is based on factor levels (or the first value) in the input data.</p></dd>
+
+
+<dt>facet_order</dt>
+<dd><p>Character. Order of facets. Any levels not specified will follow at the end.</p></dd>
+
+
+<dt>color_order</dt>
+<dd><p>Character. Order of values on the color scale.</p></dd>
+
 </dl></div>
 
     <div class="section level2">
@@ -107,7 +121,7 @@ across different screening stages.</p>
 <span class="r-in"><span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unique"</span>, <span class="st">"duplicated"</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span>, <span class="fl">.7</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">plot_contributions</span><span class="op">(</span><span class="va">data</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_contributions</span><span class="op">(</span><span class="va">data</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2022"</span>, <span class="st">"2021"</span>, <span class="st">"2020"</span><span class="op">)</span>, color_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unique"</span>, <span class="st">"duplicated"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_contributions-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

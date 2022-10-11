@@ -70,14 +70,14 @@
 
 
 
-<script src="citesource_working_example_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+<script src="citesource_working_example_long_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CiteSource - Example 2</h1>
             
             <h4 data-toc-skip class="date">2022-10-11</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_working_example.rmd" class="external-link"><code>vignettes/citesource_working_example.rmd</code></a></small>
-      <div class="d-none name"><code>citesource_working_example.rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_working_example_long.rmd" class="external-link"><code>vignettes/citesource_working_example_long.rmd</code></a></small>
+      <div class="d-none name"><code>citesource_working_example_long.rmd</code></div>
     </div>
 
     
@@ -110,19 +110,26 @@
 <code class="sourceCode R"><span></span>
 <span><span class="co">#Indicate location of citation files</span></span>
 <span><span class="co">## NOTE that short and long versions are separate in the working_example data folder</span></span>
-<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/short"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/long"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">citation_files</span></span>
-<span><span class="co">#&gt;  [1] "../tests/testthat/data/working_example/short/AGRIS.ris"    </span></span>
-<span><span class="co">#&gt;  [2] "../tests/testthat/data/working_example/short/CAB.ris"      </span></span>
-<span><span class="co">#&gt;  [3] "../tests/testthat/data/working_example/short/EconLit.ris"  </span></span>
-<span><span class="co">#&gt;  [4] "../tests/testthat/data/working_example/short/Final.ris"    </span></span>
-<span><span class="co">#&gt;  [5] "../tests/testthat/data/working_example/short/GreenFile.ris"</span></span>
-<span><span class="co">#&gt;  [6] "../tests/testthat/data/working_example/short/McK.ris"      </span></span>
-<span><span class="co">#&gt;  [7] "../tests/testthat/data/working_example/short/RM.ris"       </span></span>
-<span><span class="co">#&gt;  [8] "../tests/testthat/data/working_example/short/TiAb.ris"     </span></span>
-<span><span class="co">#&gt;  [9] "../tests/testthat/data/working_example/short/WoS.ris"      </span></span>
-<span><span class="co">#&gt; [10] "../tests/testthat/data/working_example/short/WoSEarly.ris"</span></span>
+<span><span class="co">#&gt;  [1] "../tests/testthat/data/working_example/long/AGRIS.ris"        </span></span>
+<span><span class="co">#&gt;  [2] "../tests/testthat/data/working_example/long/CAB.ris"          </span></span>
+<span><span class="co">#&gt;  [3] "../tests/testthat/data/working_example/long/EconLit.ris"      </span></span>
+<span><span class="co">#&gt;  [4] "../tests/testthat/data/working_example/long/Final.ris"        </span></span>
+<span><span class="co">#&gt;  [5] "../tests/testthat/data/working_example/long/GreenFile.ris"    </span></span>
+<span><span class="co">#&gt;  [6] "../tests/testthat/data/working_example/long/McK_exc.ris"      </span></span>
+<span><span class="co">#&gt;  [7] "../tests/testthat/data/working_example/long/McK_inc.ris"      </span></span>
+<span><span class="co">#&gt;  [8] "../tests/testthat/data/working_example/long/RM_Bowler.ris"    </span></span>
+<span><span class="co">#&gt;  [9] "../tests/testthat/data/working_example/long/RM_Leisher.ris"   </span></span>
+<span><span class="co">#&gt; [10] "../tests/testthat/data/working_example/long/RM_Pullin.ris"    </span></span>
+<span><span class="co">#&gt; [11] "../tests/testthat/data/working_example/long/RM_Puri.ris"      </span></span>
+<span><span class="co">#&gt; [12] "../tests/testthat/data/working_example/long/RM_Roe.ris"       </span></span>
+<span><span class="co">#&gt; [13] "../tests/testthat/data/working_example/long/RM_Sammii_DFM.ris"</span></span>
+<span><span class="co">#&gt; [14] "../tests/testthat/data/working_example/long/RM_Sammii_PES.ris"</span></span>
+<span><span class="co">#&gt; [15] "../tests/testthat/data/working_example/long/TiAb.ris"         </span></span>
+<span><span class="co">#&gt; [16] "../tests/testthat/data/working_example/long/WoS_early.ris"    </span></span>
+<span><span class="co">#&gt; [17] "../tests/testthat/data/working_example/long/WoS.ris"</span></span>
 <span></span>
 <span></span>
 <span><span class="co">#Read citation files and store. Labels is used to compare stages of review.</span></span>
@@ -130,35 +137,42 @@
 <span></span>
 <span><span class="co">## long version with all RM and McK broken out -&gt; good example for seeing how heatmap is squeezed &amp; limitations on upset plot due to high # of combinations</span></span>
 <span><span class="co">## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves</span></span>
-<span><span class="co">#citations &lt;- read_citations(citation_files,</span></span>
-<span><span class="co">#                            cite_sources = c("AGRIS", "CAB", "EconLit", NA, </span></span>
-<span><span class="co">#                                            "GreenFile", "McK_E", "McK_I", "RM_B", "RM_L", "RM_Pul", "RM_Pur", "RM_R", "RM_DFM",       </span></span>
-<span><span class="co">#                                            "RM_PES", NA, "WoS", "WoS_E"),</span></span>
-<span><span class="co">#                            cite_labels = c("search", "search", "search", "Final", </span></span>
-<span><span class="co">#                                            "search","search","search","search","search","search","search","search","search",</span></span>
-<span><span class="co">#                                            "search","Screened","search","search"),</span></span>
-<span><span class="co">#                            tag_naming = "best_guess")</span></span>
+<span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
+<span>                            cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
+<span>                                            <span class="st">"GreenFile"</span>, <span class="st">"McKE"</span>, <span class="st">"McKI"</span>, <span class="st">"RMB"</span>, <span class="st">"RML"</span>, <span class="st">"RMPul"</span>, <span class="st">"RMPur"</span>, <span class="st">"RMR"</span>, <span class="st">"RMDFM"</span>,       </span>
+<span>                                            <span class="st">"RMPES"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span><span class="op">)</span>,</span>
+<span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>, </span>
+<span>                                            <span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,</span>
+<span>                                            <span class="st">"search"</span>,<span class="st">"Screened"</span>,<span class="st">"search"</span>,<span class="st">"search"</span><span class="op">)</span>,</span>
+<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Import completed - with the following details:</span></span>
+<span><span class="co">#&gt;                 file cite_source cite_string cite_label citations</span></span>
+<span><span class="co">#&gt; 1          AGRIS.ris       AGRIS          NA     search        12</span></span>
+<span><span class="co">#&gt; 2            CAB.ris         CAB          NA     search       687</span></span>
+<span><span class="co">#&gt; 3        EconLit.ris     EconLit          NA     search        50</span></span>
+<span><span class="co">#&gt; 4          Final.ris        &lt;NA&gt;          NA     search       243</span></span>
+<span><span class="co">#&gt; 5      GreenFile.ris   GreenFile          NA     search       139</span></span>
+<span><span class="co">#&gt; 6        McK_exc.ris        McKE          NA     search      2099</span></span>
+<span><span class="co">#&gt; 7        McK_inc.ris        McKI          NA     search       562</span></span>
+<span><span class="co">#&gt; 8      RM_Bowler.ris         RMB          NA     search        70</span></span>
+<span><span class="co">#&gt; 9     RM_Leisher.ris         RML          NA     search        17</span></span>
+<span><span class="co">#&gt; 10     RM_Pullin.ris       RMPul          NA     search        98</span></span>
+<span><span class="co">#&gt; 11       RM_Puri.ris       RMPur          NA     search       118</span></span>
+<span><span class="co">#&gt; 12        RM_Roe.ris         RMR          NA     search       188</span></span>
+<span><span class="co">#&gt; 13 RM_Sammii_DFM.ris       RMDFM          NA     search        19</span></span>
+<span><span class="co">#&gt; 14 RM_Sammii_PES.ris       RMPES          NA     search        20</span></span>
+<span><span class="co">#&gt; 15          TiAb.ris        &lt;NA&gt;          NA     search      1574</span></span>
+<span><span class="co">#&gt; 16     WoS_early.ris         WoS          NA     search      2639</span></span>
+<span><span class="co">#&gt; 17           WoS.ris        WoSE          NA     search       738</span></span>
 <span></span>
 <span><span class="co">## short version with combined RM and McK files</span></span>
 <span></span>
-<span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
-<span>                           cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
-<span>                                            <span class="st">"GreenFile"</span>, <span class="st">"McK"</span>, <span class="st">"RM"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span><span class="op">)</span>,</span>
-<span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>,<span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>, </span>
-<span>                                            <span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"Screened"</span>, <span class="st">"search"</span>,<span class="st">"search"</span><span class="op">)</span>,</span>
-<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Import completed - with the following details:</span></span>
-<span><span class="co">#&gt;             file cite_source cite_string cite_label citations</span></span>
-<span><span class="co">#&gt; 1      AGRIS.ris       AGRIS          NA     search        12</span></span>
-<span><span class="co">#&gt; 2        CAB.ris         CAB          NA     search       687</span></span>
-<span><span class="co">#&gt; 3    EconLit.ris     EconLit          NA     search        50</span></span>
-<span><span class="co">#&gt; 4      Final.ris        &lt;NA&gt;          NA     search       243</span></span>
-<span><span class="co">#&gt; 5  GreenFile.ris   GreenFile          NA     search       139</span></span>
-<span><span class="co">#&gt; 6        McK.ris         McK          NA     search      2661</span></span>
-<span><span class="co">#&gt; 7         RM.ris          RM          NA     search       530</span></span>
-<span><span class="co">#&gt; 8       TiAb.ris        &lt;NA&gt;          NA     search      1574</span></span>
-<span><span class="co">#&gt; 9        WoS.ris         WoS          NA     search       738</span></span>
-<span><span class="co">#&gt; 10  WoSEarly.ris        WoSE          NA     search      2639</span></span></code></pre></div>
+<span><span class="co">#citations &lt;- read_citations(citation_files,</span></span>
+<span><span class="co">#                          cite_sources = c("AGRIS", "CAB", "EconLit", NA, </span></span>
+<span><span class="co">#                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),</span></span>
+<span><span class="co">#                            cite_labels = c("search","search", "search", "Final", </span></span>
+<span><span class="co">#                                            "search","search","search","Screened", "search","search"),</span></span>
+<span><span class="co">#                            tag_naming = "best_guess")</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="deduplicate-while-maintaining-source-information">Deduplicate while maintaining source information<a class="anchor" aria-label="anchor" href="#deduplicate-while-maintaining-source-information"></a>
@@ -194,7 +208,7 @@
 <span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_heatmap</span> </span></code></pre></div>
-<p><img src="citesource_working_example_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
+<p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="plot-overlap-as-an-upset-plot">Plot overlap as an upset plot<a class="anchor" aria-label="anchor" href="#plot-overlap-as-an-upset-plot"></a>
@@ -205,7 +219,7 @@
 <span><span class="co">#&gt; Plotting a large number of sources. Consider reducing nset or sub-setting the data.</span></span>
 <span></span>
 <span><span class="va">my_upset_plot</span></span></code></pre></div>
-<p><img src="citesource_working_example_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
+<p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -221,7 +235,7 @@
 <span>                                       bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>, <span class="st">'Screened'</span>, <span class="st">'Final'</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_contributions</span></span></code></pre></div>
-<p><img src="citesource_working_example_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
+<p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
