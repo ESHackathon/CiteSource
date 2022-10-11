@@ -64,8 +64,11 @@ citation_files
 ## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves
 citations <- read_citations(citation_files,
                             cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
-                                            "GreenFile", "McKE", "McKI", "RMB", "RML", "RMPul", "RMPur", "RMR", "RMDFM",       
+                                            "GreenFile", "McK", "McK", "RMB", "RML", "RMPul", "RMPur", "RMR", "RMDFM",       
                                             "RMPES", NA, "WoS", "WoSE"),
+                            cite_strings = c(NA, NA, NA, NA,
+                                             NA,"McKE", "MCKI", "B", "L", "Pul", "Pur", "RMR", "DFM",
+                                             "PES", NA, NA, NA),
                             cite_labels = c("search", "search", "search", "Final", 
                                             "search","search","search","search","search","search","search","search","search",
                                             "search","Screened","search","search"),
