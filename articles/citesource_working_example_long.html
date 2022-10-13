@@ -140,31 +140,34 @@
 <span><span class="co">## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves</span></span>
 <span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
 <span>                            cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
-<span>                                            <span class="st">"GreenFile"</span>, <span class="st">"McKE"</span>, <span class="st">"McKI"</span>, <span class="st">"RMB"</span>, <span class="st">"RML"</span>, <span class="st">"RMPul"</span>, <span class="st">"RMPur"</span>, <span class="st">"RMR"</span>, <span class="st">"RMDFM"</span>,       </span>
+<span>                                            <span class="st">"GreenFile"</span>, <span class="st">"McK"</span>, <span class="st">"McK"</span>, <span class="st">"RMB"</span>, <span class="st">"RML"</span>, <span class="st">"RMPul"</span>, <span class="st">"RMPur"</span>, <span class="st">"RMR"</span>, <span class="st">"RMDFM"</span>,       </span>
 <span>                                            <span class="st">"RMPES"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span><span class="op">)</span>,</span>
+<span>                            cite_strings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>,</span>
+<span>                                             <span class="cn">NA</span>,<span class="st">"McKE"</span>, <span class="st">"MCKI"</span>, <span class="st">"B"</span>, <span class="st">"L"</span>, <span class="st">"Pul"</span>, <span class="st">"Pur"</span>, <span class="st">"RMR"</span>, <span class="st">"DFM"</span>,</span>
+<span>                                             <span class="st">"PES"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>, </span>
 <span>                                            <span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,</span>
 <span>                                            <span class="st">"search"</span>,<span class="st">"Screened"</span>,<span class="st">"search"</span>,<span class="st">"search"</span><span class="op">)</span>,</span>
 <span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file cite_source cite_string cite_label citations</span></span>
-<span><span class="co">#&gt; 1          AGRIS.ris       AGRIS          NA     search        12</span></span>
-<span><span class="co">#&gt; 2            CAB.ris         CAB          NA     search       687</span></span>
-<span><span class="co">#&gt; 3        EconLit.ris     EconLit          NA     search        50</span></span>
-<span><span class="co">#&gt; 4          Final.ris        &lt;NA&gt;          NA     search       243</span></span>
-<span><span class="co">#&gt; 5      GreenFile.ris   GreenFile          NA     search       139</span></span>
-<span><span class="co">#&gt; 6        McK_exc.ris        McKE          NA     search      2099</span></span>
-<span><span class="co">#&gt; 7        McK_inc.ris        McKI          NA     search       562</span></span>
-<span><span class="co">#&gt; 8      RM_Bowler.ris         RMB          NA     search        70</span></span>
-<span><span class="co">#&gt; 9     RM_Leisher.ris         RML          NA     search        17</span></span>
-<span><span class="co">#&gt; 10     RM_Pullin.ris       RMPul          NA     search        98</span></span>
-<span><span class="co">#&gt; 11       RM_Puri.ris       RMPur          NA     search       118</span></span>
-<span><span class="co">#&gt; 12        RM_Roe.ris         RMR          NA     search       188</span></span>
-<span><span class="co">#&gt; 13 RM_Sammii_DFM.ris       RMDFM          NA     search        19</span></span>
-<span><span class="co">#&gt; 14 RM_Sammii_PES.ris       RMPES          NA     search        20</span></span>
-<span><span class="co">#&gt; 15          TiAb.ris        &lt;NA&gt;          NA     search      1574</span></span>
-<span><span class="co">#&gt; 16     WoS_early.ris         WoS          NA     search      2639</span></span>
-<span><span class="co">#&gt; 17           WoS.ris        WoSE          NA     search       738</span></span>
+<span><span class="co">#&gt; 1          AGRIS.ris       AGRIS        &lt;NA&gt;     search        12</span></span>
+<span><span class="co">#&gt; 2            CAB.ris         CAB        &lt;NA&gt;     search       687</span></span>
+<span><span class="co">#&gt; 3        EconLit.ris     EconLit        &lt;NA&gt;     search        50</span></span>
+<span><span class="co">#&gt; 4          Final.ris        &lt;NA&gt;        &lt;NA&gt;     search       243</span></span>
+<span><span class="co">#&gt; 5      GreenFile.ris   GreenFile        &lt;NA&gt;     search       139</span></span>
+<span><span class="co">#&gt; 6        McK_exc.ris         McK        &lt;NA&gt;     search      2099</span></span>
+<span><span class="co">#&gt; 7        McK_inc.ris         McK        &lt;NA&gt;     search       562</span></span>
+<span><span class="co">#&gt; 8      RM_Bowler.ris         RMB        &lt;NA&gt;     search        70</span></span>
+<span><span class="co">#&gt; 9     RM_Leisher.ris         RML        &lt;NA&gt;     search        17</span></span>
+<span><span class="co">#&gt; 10     RM_Pullin.ris       RMPul        &lt;NA&gt;     search        98</span></span>
+<span><span class="co">#&gt; 11       RM_Puri.ris       RMPur        &lt;NA&gt;     search       118</span></span>
+<span><span class="co">#&gt; 12        RM_Roe.ris         RMR        &lt;NA&gt;     search       188</span></span>
+<span><span class="co">#&gt; 13 RM_Sammii_DFM.ris       RMDFM        &lt;NA&gt;     search        19</span></span>
+<span><span class="co">#&gt; 14 RM_Sammii_PES.ris       RMPES        &lt;NA&gt;     search        20</span></span>
+<span><span class="co">#&gt; 15          TiAb.ris        &lt;NA&gt;        &lt;NA&gt;     search      1574</span></span>
+<span><span class="co">#&gt; 16     WoS_early.ris         WoS        &lt;NA&gt;     search      2639</span></span>
+<span><span class="co">#&gt; 17           WoS.ris        WoSE        &lt;NA&gt;     search       738</span></span>
 <span></span>
 <span><span class="co">## short version with combined RM and McK files</span></span>
 <span></span>
