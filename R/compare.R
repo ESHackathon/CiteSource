@@ -31,6 +31,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
   
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$record_ids) %>%
+    dplyr::filter(!cite_source == "") %>%
     tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
     unique() %>%
     tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_source, values_from=c(.data$record_ids),
@@ -42,6 +43,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
   
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_string, .data$record_ids) %>%
+    dplyr::filter(!cite_string == "") %>%
     tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
     unique() %>%
     tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_string, values_from=c(.data$record_ids),
@@ -53,6 +55,7 @@ compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labe
     
     source_comparison <- unique_data %>%
       dplyr::select(.data$duplicate_id, .data$cite_label, .data$record_ids) %>%
+      dplyr::filter(!cite_label == "") %>%
       tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
       unique() %>%
       tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_label, values_from=c(.data$record_ids),
