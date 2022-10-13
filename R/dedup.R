@@ -473,12 +473,12 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   citations_with_dup_id_merged <- all_metadata_with_duplicate_id %>%
     dplyr::mutate_if(is.character, utf8::utf8_encode) %>%
     dplyr::mutate_all(~replace(., .=='NA', NA)) %>% #replace NA
-    group_by(record_id) %>%
-    arrange(duplicate_id) %>%
-    add_count() # get count of duplicate ids assigned to a single record ID (happens when A = B, A = C, A = D for example, duplicate ID for A could be both D and B
+    dplyr::group_by(record_id) %>%
+    dplyr::arrange(duplicate_id) %>%
+    dplyr::add_count() # get count of duplicate ids assigned to a single record ID (happens when A = B, A = C, A = D for example, duplicate ID for A could be both D and B
   
   citations_with_dup_id_merged <- citations_with_dup_id_merged %>%
-    mutate(duplicate_id = ifelse(n>1, first(duplicate_id), paste(duplicate_id))) %>% #when more than 1 duplicate id for one record id, make duplicate ID the FIRST one. 
+    mutate(duplicate_id = ifelse(n>1, dplyr::first(duplicate_id), paste(duplicate_id))) %>% #when more than 1 duplicate id for one record id, make duplicate ID the FIRST one. 
     mutate(duplicate_id = ifelse(n==1 & duplicate_id %in% citations_with_dup_id_merged$record_id,
                                  paste(citations_with_dup_id_merged$duplicate_id[which(citations_with_dup_id_merged$record_id == duplicate_id)]),
                                  paste0(duplicate_id))) %>% #when only 1 record id to 1 duplicate ID, check for other instances of the duplicate ID in the record ID column, then paste the duplicate ID THAT record has- linking together all the studies in one duplicatee group
