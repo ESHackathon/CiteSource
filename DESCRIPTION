@@ -1,7 +1,7 @@
 Package: CiteSource
 Title: Identify where records for evidence aggregation came from, by deduplicating results and comparing sources
 Version: 0.0.0.9000
-Date: 2022-10-13
+Date: 2022-10-14
 Authors@R: 
     c(person("Trevor", "Riley", email = "trevor.riley@noaa.gov", role =c("aut", "cre"), 
            comment = c(ORCID = "0000-0002-6834-9802")),
