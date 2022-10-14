@@ -118,6 +118,15 @@ my_heatmap
 
 ```
 
+### Plot overlap as a heatmap matrix as percentage
+
+```{r}
+
+my_heatmap_percent <-plot_source_overlap_heatmap(source_comparison, "percentages")
+
+my_heatmap_percent
+
+```
 
 ### Plot overlap as an upset plot
 
