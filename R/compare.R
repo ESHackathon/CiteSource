@@ -5,6 +5,7 @@
 
 count_unique <- function(unique_data){
   count_unique <- unique_data %>%
+    dplyr::filter(!cite_source == "") %>%
     dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
     tidyr::separate_rows(.data$cite_source, convert = T) %>%
     tidyr::separate_rows(.data$cite_label, convert = T) %>%
