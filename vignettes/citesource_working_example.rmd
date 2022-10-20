@@ -46,7 +46,13 @@ library(CiteSource)
 
 ## Import files from multiple sources
 
-Users can import multiple RIS or bibtex files into CiteSource, which the user can label with source information such as database or platform. A second metadata field called 'cite_labels' can be used to specify other attributes. For example, a common use of CiteSource may be to examine the origin of records at different screening stages of a review. Search results from databases can be imported along with screened records and final included studies. 
+Users can import multiple RIS or bibtex files into CiteSource, which they can label with three custom metadata fields, Cite_Source, Cite_String, and Cite_Label. 
+
+Using the Cite_Source field, which the user can label individual files with source information such as database or platform. Beyond source information, users may also use #the Cite_Source field to provide search results using various search methodologies. 
+
+A second metadata field 'cite_string' can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results. 
+
+Finally, a third field Cite_Label can be used to apply yet another variable. This label was intended to be used in combination with the previous two, in order to track the inclusion or exclusion of citations over the course of title/abstract screening and full text screening.
 
 ```{r}
 
