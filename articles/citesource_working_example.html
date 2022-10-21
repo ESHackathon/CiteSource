@@ -75,7 +75,7 @@
       <img src="" class="logo" alt=""><h1>CiteSource - Short working example</h1>
                         <h4 data-toc-skip class="author">Trevor Riley</h4>
             
-            <h4 data-toc-skip class="date">2022-10-20</h4>
+            <h4 data-toc-skip class="date">2022-10-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_working_example.rmd" class="external-link"><code>vignettes/citesource_working_example.rmd</code></a></small>
       <div class="d-none name"><code>citesource_working_example.rmd</code></div>
@@ -193,6 +193,9 @@
 <div class="section level3">
 <h3 id="plot-overlap-as-a-heatmap-matrix">Plot overlap as a heatmap matrix<a class="anchor" aria-label="anchor" href="#plot-overlap-as-a-heatmap-matrix"></a>
 </h3>
+<p>CiteSource performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to that each source at the top of the source’s column. The heatmap also provides a count of citations that were found at the intersection of each source.</p>
+<p>In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.</p>
+<p>CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
