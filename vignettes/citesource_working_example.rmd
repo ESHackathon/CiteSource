@@ -115,6 +115,11 @@ label_comparison <- compare_sources(unique_citations, comp_type = "labels")
 When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
 
 ### Plot overlap as a heatmap matrix
+CiteSource performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to that each source at the top of the source's column. The heatmap also provides a count of citations that were found at the intersection of each source. 
+
+In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.
+
+CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues. 
 
 ```{r}
 
