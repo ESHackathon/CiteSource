@@ -122,7 +122,6 @@ In this case you can see that the source tag McK only shows 2400 results, while 
 CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues. 
 
 ```{r}
-
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
 
 my_heatmap 
@@ -130,9 +129,9 @@ my_heatmap
 ```
 
 ### Plot overlap as a heatmap matrix as percentage
+The following heatmap provides the an overview of the overlapping citations by percent of each source's count. For example the EconLit source contains 50 citations, of those 50 we can see on the previous heatmap that 8 of these citations were also in the source WoSE, which represents 16% of the citations from EconLit. On the other hand the same 8 citations only represent .3% of the total citations from WoSE. (currently this chart is set to display only whole numbers - we are considering changing this to display to the first decimal)
 
 ```{r}
-
 my_heatmap_percent <-plot_source_overlap_heatmap(source_comparison, "percentages")
 
 my_heatmap_percent
@@ -142,7 +141,6 @@ my_heatmap_percent
 ### Plot overlap as an upset plot
 
 ```{r}
-
 my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
 my_upset_plot
@@ -156,7 +154,6 @@ Once the title and abstract screening has been completed or once the final paper
 ### Assess contribution of sources by review stage
 
 ```{r}
-
 my_contributions <- plot_contributions(n_unique, center = TRUE, 
                                        bar_order = c('search', 'Screened', 'Final'))
 
