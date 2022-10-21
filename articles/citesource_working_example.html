@@ -197,8 +197,7 @@
 <p>In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.</p>
 <p>CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_heatmap</span> </span></code></pre></div>
 <p><img src="citesource_working_example_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
@@ -206,9 +205,9 @@
 <div class="section level3">
 <h3 id="plot-overlap-as-a-heatmap-matrix-as-percentage">Plot overlap as a heatmap matrix as percentage<a class="anchor" aria-label="anchor" href="#plot-overlap-as-a-heatmap-matrix-as-percentage"></a>
 </h3>
+<p>The following heatmap provides the an overview of the overlapping citations by percent of each source’s count. For example the EconLit source contains 50 citations, of those 50 we can see on the previous heatmap that 8 of these citations were also in the source WoSE, which represents 16% of the citations from EconLit. On the other hand the same 8 citations only represent .3% of the total citations from WoSE. (currently this chart is set to display only whole numbers - we are considering changing this to display to the first decimal)</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, <span class="st">"percentages"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, <span class="st">"percentages"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_heatmap_percent</span></span></code></pre></div>
 <p><img src="citesource_working_example_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
@@ -217,8 +216,7 @@
 <h3 id="plot-overlap-as-an-upset-plot">Plot overlap as an upset plot<a class="anchor" aria-label="anchor" href="#plot-overlap-as-an-upset-plot"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">my_upset_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_upset_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Plotting a large number of sources. Consider reducing nset or sub-setting the data.</span></span>
 <span></span>
 <span><span class="va">my_upset_plot</span></span></code></pre></div>
@@ -233,8 +231,7 @@
 <h3 id="assess-contribution-of-sources-by-review-stage">Assess contribution of sources by review stage<a class="anchor" aria-label="anchor" href="#assess-contribution-of-sources-by-review-stage"></a>
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<code class="sourceCode R"><span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                                       bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>, <span class="st">'Screened'</span>, <span class="st">'Final'</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_contributions</span></span></code></pre></div>
