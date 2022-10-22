@@ -158,13 +158,13 @@ In addition to the above visualizations, it may be useful to export datasets for
 ### Export deduplicated files
 
 ```{r}
-In progress
+
 ```
 
 
 ### Generate a search summary table
 
 ```{r}
-Planned enhancement
+
 ```
 
