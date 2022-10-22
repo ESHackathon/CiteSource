@@ -25,10 +25,10 @@ knitr::opts_chunk$set(
 
 CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
 
+
+
 ### Installation
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
-
-
 ```{r eval = FALSE}
 #Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
@@ -61,8 +61,8 @@ citation_files <- list.files(path=file.path("../tests/testthat/data", "working_e
 citation_files
 ```
 
-### Read citation files store. 
-Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette.
+### Read citation files
+Read citation files and store. Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette.
 ```{r}
 citations <- read_citations(citation_files,
                     cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
@@ -151,13 +151,13 @@ In addition to the above visualizations, it may be useful to export datasets for
 ### Export deduplicated files
 
 ```{r}
-
+In progress
 ```
 
 
 ### Generate a search summary table
 
 ```{r}
-
+Planned enhancement
 ```
 
