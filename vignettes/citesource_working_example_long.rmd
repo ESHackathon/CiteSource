@@ -6,7 +6,7 @@ author: "Trevor Riley"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Example 3}
+  %\VignetteIndexEntry{CiteSource - Long working example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
