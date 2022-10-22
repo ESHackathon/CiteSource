@@ -54,60 +54,42 @@ A second metadata field 'cite_string' can be used to specify another attribute o
 
 Finally, a third field Cite_Label can be used to apply yet another variable. This label was intended to be used in combination with the previous two, in order to track the inclusion or exclusion of citations over the course of title/abstract screening and full text screening.
 
+##Indicate location of citation files
 ```{r}
-
-#Indicate location of citation files
-## NOTE that short and long versions are separate in the working_example data folder
 citation_files <- list.files(path=file.path("../tests/testthat/data", "working_example/short"), pattern = "\\.ris", full.names = TRUE)
 
 citation_files
+```
 
-
-#Read citation files and store. Labels is used to compare stages of review.
-##with all files seperate
-
-## long version with all RM and McK broken out -> good example for seeing how heatmap is squeezed & limitations on upset plot due to high # of combinations
-## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves
-#citations <- read_citations(citation_files,
-#                            cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
-#                                            "GreenFile", "McK_E", "McK_I", "RM_B", "RM_L", "RM_Pul", "RM_Pur", "RM_R", "RM_DFM",       
-#                                            "RM_PES", NA, "WoS", "WoS_E"),
-#                            cite_labels = c("search", "search", "search", "Final", 
-#                                            "search","search","search","search","search","search","search","search","search",
-#                                            "search","Screened","search","search"),
-#                            tag_naming = "best_guess")
-
-## short version with combined RM and McK files
-
+## Read citation files store. 
+Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette.
+```{r}
 citations <- read_citations(citation_files,
                            cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
                                             "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),
                             cite_labels = c("search","search", "search", "Final", 
                                             "search","search","search","Screened", "search","search"),
                             tag_naming = "best_guess")
-
 ```
-
 
 ## Deduplicate while maintaining source information
 
 CiteSource allows users to merge duplicates while maintaining information in the cite_label and cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. 
 
 ```{r}
-
-#Deduplicate records while maintaining source information and label information.
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 
 unique_citations <- dedup_results$unique
-
-#Count number of unique and non-unique citations from different sources and labels
+```
+## Count number of unique and non-unique citations from different sources and labels
+```{r}
 n_unique <- count_unique(unique_citations)
+```
 
-#Create dataframe indicating occurrence of records across sources or labels
+## Create dataframe indicating occurrence of records across sources or labels
+```{r}
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 label_comparison <- compare_sources(unique_citations, comp_type = "labels")
-
-
 ```
 
 ## Source or method analysis
@@ -120,7 +102,6 @@ CiteSource performs citation analysis and deduplication within each source file,
 In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.
 
 CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues. 
-
 ```{r}
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
 
@@ -130,7 +111,6 @@ my_heatmap
 
 ### Plot overlap as a heatmap matrix as percentage
 The following heatmap provides the an overview of the overlapping citations by percent of each source's count. For example the EconLit source contains 50 citations, of those 50 we can see on the previous heatmap that 8 of these citations were also in the source WoSE, which represents 16% of the citations from EconLit. On the other hand the same 8 citations only represent .3% of the total citations from WoSE. (currently this chart is set to display only whole numbers - we are considering changing this to display to the first decimal)
-
 ```{r}
 my_heatmap_percent <-plot_source_overlap_heatmap(source_comparison, "percentages")
 
@@ -139,7 +119,6 @@ my_heatmap_percent
 ```
 
 ### Plot overlap as an upset plot
-
 ```{r}
 my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
@@ -152,7 +131,6 @@ my_upset_plot
 Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
 
 ### Assess contribution of sources by review stage
-
 ```{r}
 my_contributions <- plot_contributions(n_unique, center = TRUE, 
                                        bar_order = c('search', 'Screened', 'Final'))
@@ -164,6 +142,9 @@ my_contributions
 ## Documentation and output
 
 In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.). 
+```{r}
+
+```
 
 ### Export deduplicated files
 
