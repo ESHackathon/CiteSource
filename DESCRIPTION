@@ -19,7 +19,7 @@ Authors@R:
            comment=c(ORCID ="0000-0003-3902-2234")) 
            )
 Description: CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where only one record is selected to be retained, CiteSource retains each duplicate record and merges metadata into a single, primary record. The primary record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". During the merging process, select metadata fields are also compared for completeness as well as length (currently DOI & Abstract). CiteSource applies the more complete (based on length) metadata to the main record.
-License: use_gpl_license(version = 3, include_future = TRUE)
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
