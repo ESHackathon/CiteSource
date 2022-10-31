@@ -103,13 +103,15 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.eshackathon.org/CiteSource/" class="external-link">CiteSource</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="import-files-from-multiple-sources">Import files from multiple sources<a class="anchor" aria-label="anchor" href="#import-files-from-multiple-sources"></a>
+<h2 id="import-and-read-citation-files">Import and read citation files<a class="anchor" aria-label="anchor" href="#import-and-read-citation-files"></a>
 </h2>
 <p>Users can import multiple RIS or bibtex files into CiteSource, which they can label with three custom metadata fields, Cite_Source, Cite_String, and Cite_Label.</p>
 <p>Using the Cite_Source field, which the user can label individual files with source information such as database or platform. Beyond source information, users may also use #the Cite_Source field to provide search results using various search methodologies.</p>
 <p>A second metadata field Cite_String can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results.</p>
 <p>Finally, a third field Cite_Label can be used to apply yet another variable. This label was intended to be used in combination with the previous two, in order to track the inclusion or exclusion of citations over the course of title/abstract screening and full text screening.</p>
-<p>##Indicate location of citation files</p>
+<div class="section level3">
+<h3 id="indicate-location-files">Indicate location files<a class="anchor" aria-label="anchor" href="#indicate-location-files"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/short"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -124,6 +126,7 @@
 <span><span class="co">#&gt;  [8] "../tests/testthat/data/working_example/short/TiAb.ris"     </span></span>
 <span><span class="co">#&gt;  [9] "../tests/testthat/data/working_example/short/WoS.ris"      </span></span>
 <span><span class="co">#&gt; [10] "../tests/testthat/data/working_example/short/WoSEarly.ris"</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="read-citation-files">Read citation files<a class="anchor" aria-label="anchor" href="#read-citation-files"></a>
 </h3>
@@ -150,7 +153,7 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="deduplicate-while-maintaining-source-information">Deduplicate while maintaining source information<a class="anchor" aria-label="anchor" href="#deduplicate-while-maintaining-source-information"></a>
+<h2 id="deduplicate-and-identify-crossover-records">Deduplicate and identify crossover records<a class="anchor" aria-label="anchor" href="#deduplicate-and-identify-crossover-records"></a>
 </h2>
 <p>CiteSource allows users to merge duplicates while maintaining information in the cite_label and cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -161,22 +164,22 @@
 <span><span class="co">#&gt; merging citations...</span></span>
 <span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels">Count number of unique and non-unique citations from different sources and labels<a class="anchor" aria-label="anchor" href="#count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels"></a>
-</h2>
+<div class="section level3">
+<h3 id="count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels">Count number of unique and non-unique citations from different sources and labels<a class="anchor" aria-label="anchor" href="#count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels"></a>
+</h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="create-dataframe-indicating-occurrence-of-records-across-sources-or-labels">Create dataframe indicating occurrence of records across sources or labels<a class="anchor" aria-label="anchor" href="#create-dataframe-indicating-occurrence-of-records-across-sources-or-labels"></a>
-</h2>
+<div class="section level3">
+<h3 id="create-dataframe-indicating-occurrence-of-records-across-sources-or-labels">Create dataframe indicating occurrence of records across sources or labels<a class="anchor" aria-label="anchor" href="#create-dataframe-indicating-occurrence-of-records-across-sources-or-labels"></a>
+</h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span>
 <span><span class="va">label_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"labels"</span><span class="op">)</span></span></code></pre></div>
 </div>
+</div>
 <div class="section level2">
-<h2 id="source-or-method-analysis">Source or method analysis<a class="anchor" aria-label="anchor" href="#source-or-method-analysis"></a>
+<h2 id="source-method-analysis">Source &amp; method analysis<a class="anchor" aria-label="anchor" href="#source-method-analysis"></a>
 </h2>
 <p>When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.</p>
 <div class="section level3">
@@ -213,7 +216,7 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="review-stage-analysis">Review stage analysis<a class="anchor" aria-label="anchor" href="#review-stage-analysis"></a>
+<h2 id="analyzing-records-after-screening">Analyzing records after screening<a class="anchor" aria-label="anchor" href="#analyzing-records-after-screening"></a>
 </h2>
 <p>Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the “cite_source” data along with the “cite_label” data, users can analyze the number of overlapping/unique records from each source or method.</p>
 <div class="section level3">
