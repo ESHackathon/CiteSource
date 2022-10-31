@@ -25,14 +25,8 @@ knitr::opts_chunk$set(
 
 CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
 
-<<<<<<< HEAD
-
-
-### Installation
 =======
 ## Installation
->>>>>>> parent of 2064ca2 (Update citesource_working_example.rmd)
-Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
 ```{r eval = FALSE}
 #Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
