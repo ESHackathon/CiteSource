@@ -87,7 +87,10 @@
 <h2 id="about-the-package">About the package<a class="anchor" aria-label="anchor" href="#about-the-package"></a>
 </h2>
 <p>CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, “cite_source”, “cite_label” and “tag_naming”. In the merging process, select metadata fields are also automatically compared (currently DOI &amp; Abstract) and the most complete metadata is used in the main record.</p>
-<p>======= ## Installation</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Install the remotes packages to enable installation from GitHub</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
@@ -104,7 +107,7 @@
 </h2>
 <p>Users can import multiple RIS or bibtex files into CiteSource, which they can label with three custom metadata fields, Cite_Source, Cite_String, and Cite_Label.</p>
 <p>Using the Cite_Source field, which the user can label individual files with source information such as database or platform. Beyond source information, users may also use #the Cite_Source field to provide search results using various search methodologies.</p>
-<p>A second metadata field ‘cite_string’ can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results.</p>
+<p>A second metadata field Cite_String can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results.</p>
 <p>Finally, a third field Cite_Label can be used to apply yet another variable. This label was intended to be used in combination with the previous two, in order to track the inclusion or exclusion of citations over the course of title/abstract screening and full text screening.</p>
 <p>##Indicate location of citation files</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -121,7 +124,10 @@
 <span><span class="co">#&gt;  [8] "../tests/testthat/data/working_example/short/TiAb.ris"     </span></span>
 <span><span class="co">#&gt;  [9] "../tests/testthat/data/working_example/short/WoS.ris"      </span></span>
 <span><span class="co">#&gt; [10] "../tests/testthat/data/working_example/short/WoSEarly.ris"</span></span></code></pre></div>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD ### Read citation files Read citation files and store. Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette. ======= ## Read citation files store. Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette. &gt;&gt;&gt;&gt;&gt;&gt;&gt; parent of 2064ca2 (Update citesource_working_example.rmd)</p>
+<div class="section level3">
+<h3 id="read-citation-files">Read citation files<a class="anchor" aria-label="anchor" href="#read-citation-files"></a>
+</h3>
+<p>Read citation files and store. Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
 <span>                           cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
@@ -141,6 +147,7 @@
 <span><span class="co">#&gt; 8       TiAb.ris        &lt;NA&gt;          NA     search      1574</span></span>
 <span><span class="co">#&gt; 9        WoS.ris         WoS          NA     search       738</span></span>
 <span><span class="co">#&gt; 10  WoSEarly.ris        WoSE          NA     search      2550</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="deduplicate-while-maintaining-source-information">Deduplicate while maintaining source information<a class="anchor" aria-label="anchor" href="#deduplicate-while-maintaining-source-information"></a>
