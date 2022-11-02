@@ -8,6 +8,8 @@ library(htmltools)
 library(markdown)
 library(CiteSource)
 library(plotly)
+library(shinyalert)
+
 options(shiny.maxRequestSize=30*1024^2)
 # Set background colour
 tags$head(tags$style(
@@ -45,22 +47,24 @@ ui <- navbarPage("CiteSource", id = "tabs",
                             column(12,
                                    # Sidebar layout with input and output definitions ----
                                    sidebarLayout(
-                                       sidebarPanel(# Input: Select a file ----
-                                                    fileInput("files", 
-                                                              "Upload", 
-                                                              multiple = TRUE, 
-                                                              accept = c('.ris', '.txt', '.bib')),
-                                                    textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
-                                                    textInput('tag', 'Citestring', placeholder = 'e.g. search string 1.3'),
-                                                    textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
-                                                    actionButton('upload', 'Upload file')
-                                       ),
+                                     sidebarPanel(# Input: Select a file ----
+                                                  fileInput("file", 
+                                                            "Upload", 
+                                                            multiple = FALSE, 
+                                                            accept = c('.ris', '.txt', '.bib')),
+                                                  textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
+                                                  textInput('string', 'Citestring', placeholder = 'e.g. search string 1.3'),
+                                                  textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
+                                                  actionButton('upload', 'Add file'),
+                                                  actionButton('identify_dups', 'Identify duplicates')
+                                     ),
                                      
                                      # Main panel for displaying outputs ----
                                      mainPanel(
-                                       # Output: Data file ----
-                                       dataTableOutput("tbl_out")
                                        
+                                       # Output: Data file ----
+                                       dataTableOutput("tbl_out"),
+                                   
                                      )
                                    )
                             )
@@ -78,19 +82,29 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                               
                                               # Sidebar panel for inputs ----
                                               sidebarPanel(id="sidebar",
-                                                           'Select sources',
-                                                           uiOutput('checkbox1'),
-                                                           hr(),
-                                                           'Select tags',
-                                                           uiOutput('checkbox2')),
+                                                           
+                                                           # COME BACK TO IN V2?
+                                                           # 'Select sources',
+                                                           # uiOutput('checkbox1'),
+                                                           # hr(),
+                                                           # 'Select tags',
+                                                           # uiOutput('checkbox2')),
+                                              
+                                              shinyWidgets::prettyRadioButtons(
+                                                inputId = "comp_type",
+                                                label = "Chose a comparison",
+                                                inline = TRUE,
+                                                choices = c("sources",
+                                                            "labels", "strings"),
+                                                status="primary")),
                                               
                                               mainPanel(
                                                 tabsetPanel(
                                                   tabPanel("Plot overlap as a heatmap matrix", plotly::plotlyOutput("plotgraph1")),
                                                   tabPanel("Plot overlap as an upset plot", downloadButton("downloadPlot"),
                                                            plotOutput("plotgraph2"))
-                                                  ))))
-                            )))),
+                                                ))))
+                                   )))),
                  
                  
                  # Export tab
@@ -115,95 +129,106 @@ server <- function(input, output, session) {
   rv$df <- data.frame()
   rv$upload_df <- data.frame()
   rv$CiteSource<-data.frame()
+  rv$unique<-data.frame()
   
   #### Upload files tab section ####
   #upload on click
   observeEvent(input$upload,{
-    validate(need(input$files != "", "Select your bibliographic file to upload..."))
+    validate(need(input$file != "", "Select your bibliographic file to upload..."))
     
-    if (is.null(input$files)) {
+    if (is.null(input$file)) {
       return(NULL)
     } else {
-      files=input$files$datapath
-      cite_sources=paste0("c(",input$source, ")")
-      cite_sources=eval(parse(text=cite_sources))
-      rv$upload_df <- CiteSource::read_citations(files=files, 
-                                              cite_sources = cite_sources)
-
+      
+      #upload files one-by-one
+      path_list <- input$file$datapath
+      rv$upload_number <- 0
+      rv$upload_number <- rv$upload_number + 1
+      upload_df <- CiteSource::read_citations(files=input$file$datapath, 
+                                              cite_sources = input$source,
+                                              cite_labels = input$label,
+                                              cite_strings = input$strings)
+      upload_length <- nrow(upload_df)
+      
+      #create a dataframe summarising inputs
+      df <- data.frame('file' = input$file[1], 
+                       'records' = upload_length,
+                       'source' = input$source,
+                       'label' = input$label,
+                       'string' = input$string)
+      
+      rv$df <- dplyr::bind_rows(rv$df, df)
+      rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df) 
+      
     }
-    
- 
-  # # display summary input table
-   output$tbl_out <- renderDataTable({
-     DT::datatable(rv$upload_df, 
-                   options = list(paging = FALSE, 
-                                  searching = FALSE),
-                   rownames = FALSE)
-   })
- 
-  
-  dedup_results<-CiteSource::dedup_citations(rv$upload_df, merge_citations = TRUE)
-    unique_citations <- dedup_results$unique
-    
-    output$dedup_results_table<-renderDataTable({
-      DT::datatable(unique_citations,
-                    options = list(paging = FALSE,
-                                   searching = FALSE),
-                    rownames = FALSE)
-
-
-  
-    })
   })
-
+  
+  
+  # # display summary input table - summary of files added
+  output$tbl_out <- renderDataTable({
+    DT::datatable(rv$df, 
+                  options = list(paging = FALSE, 
+                                 searching = FALSE),
+                  rownames = FALSE)
+  })
+  
+  
+  observeEvent(input$identify_dups,{
+    
+    dedup_results <- CiteSource::dedup_citations(rv$upload_df, merge_citations = TRUE)
+    rv$unique <- dedup_results$unique
+        
+    n_citations <- nrow(rv$upload_df)
+    n_unique <- nrow(rv$unique)
+    n_duplicate <-n_citations - n_unique
+    
+        shinyalert("Deduplication complete", 
+                   paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Compare citations across sources,
+                   labels, and strings in the visualisation tab"), type = "success")
+    
+  })
+  
   # Add data for testing 
-  dedup_results <- readRDS("www/dedup.RDS") #TODO remove when the upload and dedup is finished
+  # dedup_results <- readRDS("www/dedup.RDS") #TODO remove when the upload and dedup is finished
   
   #### end section ####
   
   #### Visualise tab ####
   output$plotgraph1<-renderPlotly({
-    unique_citations <- dedup_results$unique
-  n_unique <- count_unique(unique_citations)
-  # for each unique citation, which sources are present
-  source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-  label_comparison <- compare_sources(unique_citations, comp_type = "labels")
-  n_unique$cite_label <- factor(n_unique$cite_label, levels=c('search','screen','final'))
-  plot_source_overlap_heatmap(source_comparison)
+    n_unique <- count_unique(rv$unique)
+    
+    # for each unique citation, which sources/ strings/ labels are present
+    source_comparison <- CiteSource::compare_sources(rv$unique, comp_type = input$comp_type)
+    plot_source_overlap_heatmap(source_comparison)
   })
-
-output$plotgraph2<-renderPlot({
-  plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-})
-
-
-output$plotgraph2 <- renderPlot({
-  myplot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-  myplot
-})
-
-plotInput = function() {
   
-  ##################################################
-  ##################################################
-  #This doesn't work - upset plots not supported
-  unique_citations <- dedup_results$unique
-  n_unique <- count_unique(unique_citations)
+  output$plotgraph2<-renderPlot({
+    source_comparison <- CiteSource::compare_sources(rv$unique, comp_type = input$comp_type)
+    plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+  })
+  
+  plotInput = function() {
+    
+    ##################################################
+    ##################################################
+    #This doesn't work - upset plots not supported
+    unique_citations <- dedup_results$unique
+    n_unique <- count_unique(unique_citations)
     source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-  plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-  ##################################################
-  ##################################################
-  
-}
-
-output$downloadPlot <- downloadHandler(
-  filename = function() { paste("test", '.svg', sep='') },
-  content = function(file) {
-    ggsave(file, plot = plotInput(), device = "svg")
+    plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+    ##################################################
+    ##################################################
+    
   }
-)
-
-
+  
+  output$downloadPlot <- downloadHandler(
+    filename = function() { paste("test", '.svg', sep='') },
+    content = function(file) {
+      ggsave(file, plot = plotInput(), device = "svg")
+    }
+  )
+  
+  
 }
 
 # Create Shiny app ----
