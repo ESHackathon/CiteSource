@@ -6,6 +6,8 @@
 \usage{
 plot_source_overlap_heatmap(
   data,
+  cells = "source",
+  facets = NULL,
   plot_type = c("counts", "percentages"),
   sort_sources = TRUE,
   interactive = FALSE
@@ -14,6 +16,10 @@ plot_source_overlap_heatmap(
 \arguments{
 \item{data}{A tibble with one record per row, an id column and then one column
 per source indicating whether the record was found in that source.}
+
+\item{cells}{Variable to display in the cells. Should be 'source', 'label' or 'string'}
+
+\item{facets}{Variable in data used for facets (i.e. sub-plots). Should be NULL, 'source', 'label' or 'string'}
 
 \item{plot_type}{Either \code{counts} (number of shared records) or \code{percentages}
 (share of overlapping records).}
@@ -44,4 +50,5 @@ data <- data.frame(
 
 plot_source_overlap_heatmap(data)
 plot_source_overlap_heatmap(data, plot_type = "percentages")
+
 }
