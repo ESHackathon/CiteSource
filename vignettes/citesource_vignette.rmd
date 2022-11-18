@@ -96,6 +96,7 @@ When teams are selecting databases for inclusion in a review it can be extremely
 
 ```{r heatmap}
 plot_source_overlap_heatmap(complete_comparison)
+plot_source_overlap_heatmap(complete_comparison, plot_type = "percentages")
 ```
 
 

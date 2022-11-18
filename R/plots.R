@@ -62,7 +62,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
     data$facet <- "1"
     data <- list(data)
   }
-
+  
   data <- purrr::map(data, function(df) {
     df <- df %>% dplyr::select(dplyr::all_of(sources_order))
     cooc_mat <- purrr::map_dfr(names(df), function(source) {
@@ -107,9 +107,9 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
           ggplot2::scale_fill_gradient(low = "white")
       }
     } else {
-      p <- data %>%
-        ggplot2::ggplot(ggplot2::aes(.data$DB1, .data$DB2, fill = .data$records)) +
-        ggplot2::geom_tile()
+      p <- p +
+        ggplot2::geom_tile() +
+        ggplot2::scale_fill_gradient(low = "white")
     }
 
     p +
@@ -118,6 +118,8 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       ggplot2::scale_y_discrete(limits = sources_order) +
       ggplot2::labs(x = "", y = "", fill = "Records")
   } else if (plot_type == "percentages") {
+    
+    
     data <- purrr::map(data, function(df) {
       diag <- diag(as.matrix(df))
       df <- df / diag
