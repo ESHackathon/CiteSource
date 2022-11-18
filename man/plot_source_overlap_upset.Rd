@@ -6,7 +6,8 @@
 \usage{
 plot_source_overlap_upset(
   data,
-  nsets = ncol(data) - 1,
+  groups = "source",
+  nsets = NULL,
   sets.x.label = "Number of records",
   mainbar.y.label = "Overlapping record count",
   order.by = c("freq", "degree"),
@@ -16,6 +17,8 @@ plot_source_overlap_upset(
 \arguments{
 \item{data}{A tibble with one record per row, an id column and then one column
 per source indicating whether the record was found in that source.}
+
+\item{groups}{Variable to use as groups. Should be 'source', 'label' or 'string' - defaults to source.}
 
 \item{nsets}{Number of sets to look at}
 
@@ -86,19 +89,19 @@ of each source and of any subsets
 \examples{
 data <- data.frame(
   article_id = 1:500,
-  source1 = rbinom(500, 1, .5) == 1,
-  source2 = rbinom(500, 1, .2) == 1,
-  source3 = rbinom(500, 1, .1) == 1,
-  source4 = rbinom(500, 1, .6) == 1,
-  source5 = rbinom(500, 1, .7) == 1
+  source__source1 = rbinom(500, 1, .5) == 1,
+  source__source2 = rbinom(500, 1, .2) == 1,
+  source__source3 = rbinom(500, 1, .1) == 1,
+  source__source4 = rbinom(500, 1, .6) == 1,
+  source__source5 = rbinom(500, 1, .7) == 1
 )
 
 plot_source_overlap_upset(data)
 
-# To start with the records shared among the greatest number of sources,
-# use
+# To start with the records shared among the greatest number of sources, use
 
 plot_source_overlap_upset(data, decreasing = c(TRUE, TRUE))
+
 }
 \references{
 Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.

@@ -46,4 +46,5 @@ data <- data.frame(
 )
 
 plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), color_order = c("unique", "duplicated"))
+
 }
