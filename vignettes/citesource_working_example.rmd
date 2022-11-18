@@ -85,10 +85,9 @@ unique_citations <- dedup_results$unique
 n_unique <- count_unique(unique_citations)
 ```
 
-### Create dataframe indicating occurrence of records across sources or labels
+### Create dataframe indicating occurrence of records across sources
 ```{r}
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-label_comparison <- compare_sources(unique_citations, comp_type = "labels")
 ```
 
 ## Source & method analysis
