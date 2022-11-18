@@ -41,11 +41,11 @@ number or the percentages of shared records between any pair of sources.
 \examples{
 data <- data.frame(
   article_id = 1:500,
-  source1 = rbinom(500, 1, .5) == 1,
-  source2 = rbinom(500, 1, .2) == 1,
-  source3 = rbinom(500, 1, .1) == 1,
-  source4 = rbinom(500, 1, .6) == 1,
-  source5 = rbinom(500, 1, .7) == 1
+  source__source1 = rbinom(500, 1, .5) == 1,
+  source__source2 = rbinom(500, 1, .2) == 1,
+  source__source3 = rbinom(500, 1, .1) == 1,
+  source__source4 = rbinom(500, 1, .6) == 1,
+  source__source5 = rbinom(500, 1, .7) == 1
 )
 
 plot_source_overlap_heatmap(data)
