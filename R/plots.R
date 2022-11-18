@@ -19,11 +19,11 @@
 #' @examples
 #' data <- data.frame(
 #'   article_id = 1:500,
-#'   source1 = rbinom(500, 1, .5) == 1,
-#'   source2 = rbinom(500, 1, .2) == 1,
-#'   source3 = rbinom(500, 1, .1) == 1,
-#'   source4 = rbinom(500, 1, .6) == 1,
-#'   source5 = rbinom(500, 1, .7) == 1
+#'   source__source1 = rbinom(500, 1, .5) == 1,
+#'   source__source2 = rbinom(500, 1, .2) == 1,
+#'   source__source3 = rbinom(500, 1, .1) == 1,
+#'   source__source4 = rbinom(500, 1, .6) == 1,
+#'   source__source5 = rbinom(500, 1, .7) == 1
 #' )
 #'
 #' plot_source_overlap_heatmap(data)
@@ -97,12 +97,17 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
     if (length(unique(data$facet)) > 1) {
       p <- p +
-        ggplot2::facet_wrap(vars(facet), ncol = 1) + ggplot2::theme(aspect.ratio = 1, legend.position = "none") + ggplot2::scale_fill_gradient(low = "white")
+        ggplot2::facet_wrap(ggplot2::vars(facet), ncol = 1) + 
+        ggplot2::theme(aspect.ratio = 1, legend.position = "none",
+                         strip.background = ggplot2::element_rect(
+                           color="black", fill="darkgrey"
+                         )
+                       ) + ggplot2::scale_fill_gradient(low = "white")
       # Removed legends here because they do not appear in correct order - maybe worth fixing in the future
       facets <- unique(data$facet)
 
       for (i in seq_along(facets)) {
-        p <- p + ggnewscale::new_scale_fill() + ggplot2::geom_tile(aes(fill = .data$records), data = data %>% dplyr::filter(.data$facet == facets[i])) +
+        p <- p + ggnewscale::new_scale_fill() + ggplot2::geom_tile(ggplot2::aes(fill = .data$records), data = data %>% dplyr::filter(.data$facet == facets[i])) +
 
           ggplot2::scale_fill_gradient(low = "white")
       }
@@ -163,7 +168,12 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
 
     if (length(unique(data$facet)) > 1) {
-      p <- p + ggplot2::facet_wrap(vars(facet), ncol = 1) + ggplot2::theme(aspect.ratio = 1)
+      p <- p + ggplot2::facet_wrap(ggplot2::vars(facet), ncol = 1) + 
+        ggplot2::theme(aspect.ratio = 1,  
+                       strip.background = ggplot2::element_rect(
+          color="black", fill="darkgrey"
+        )
+        )
     }
     p
   }

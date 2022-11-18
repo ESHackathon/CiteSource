@@ -124,7 +124,7 @@ plot_contributions(n_unique, center = TRUE)
 
 ... or with separate heatmaps.
 
-```{r contributions-heat}
+```{r contributions-heat, fig.height=10}
 
 plot_source_overlap_heatmap(complete_comparison, facets = "label")
 
