@@ -1,7 +1,7 @@
 Package: CiteSource
 Title: Identify where records for evidence aggregation came from, by deduplicating results and comparing sources
 Version: 0.0.0.9000
-Date: 2022-10-31
+Date: 2022-11-18
 Authors@R: 
     c(person("Trevor", "Riley", email = "trevor.riley@noaa.gov", role =c("aut", "cre"), 
            comment = c(ORCID = "0000-0002-6834-9802")),
@@ -22,7 +22,7 @@ Description: CiteSource provides users with the ability to deduplicate reference
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 URL: https://www.eshackathon.org/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
 Suggests: 

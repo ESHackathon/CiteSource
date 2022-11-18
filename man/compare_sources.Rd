@@ -9,10 +9,10 @@ compare_sources(unique_data, comp_type = c("sources", "strings", "labels"))
 \arguments{
 \item{unique_data}{from ASySD, merged unique rows with duplicate IDs}
 
-\item{comp_type}{argument to specify comparison of strings, sources, or labels?}
+\item{comp_type}{Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.}
 }
 \value{
-dataframe with indicators of where a citation appears, with source/label/string as column
+dataframe with indicators of where a citation appears, with sources/labels/strings as columns
 }
 \description{
 Compare duplicate citations across sources, labels, and strings

@@ -1,27 +1,32 @@
 # CiteSource
-<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="200px" align="right">
+<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="300px" align="left">
 
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/ESHackathon/CiteSource/workflows/R-CMD-check/badge.svg)](https://github.com/ESHackathon/CiteSource/actions)
 <!-- badges: end -->
+**About CiteSource**
 
-CiteSource is an R package and Shiny app that is currently in development. Work on this project began as part of the Evidence Synthesis Hackathon and as part of ESMARConf 2022.
+CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where only one record is selected to be retained, CiteSource retains each duplicate record and merges metadata into a single, primary record. The primary record maintains user-customized metadata in three fields, "Cite_Source", "Cite_String" and "Cite_Label". During the merging process, select metadata fields are also compared for completeness as well as length (currently DOI & Abstract). CiteSource applies the more complete (based on length) metadata to the main record.
 
-CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains eac duplicate record while merging metadata into a single master record. This master record maintains user-customized metadata in two fields, "Source" and "Tag". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the master record. 
+CiteSource is an R package and Shiny app that is currently in development. Work on this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis & Meta-Analysis in R Conference - ESMARConf 2022. Learn more @ https://esmarconf.org/
 
+CiteSource was created under the General Public License v3 (GPL3) find more information on GPL @ https://www.gnu.org/licenses/gpl-3.0.html
+
+The CiteSource Shiny app is available @ https://estech.shinyapps.io/citesource/ (please note that the shiny app is still under development)
+
+Find vignettes for various use cases @ https://www.eshackathon.org/CiteSource/
 
 **USE CASE TYPES & EXAMPLES**
 
-**Source/Method Analysis**
+**Source & Method Analysis**
 
-When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
+When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison and hedge validation.
 
 -Database/Platform/Index
-
 -Methodology
-
 -Search string/strategy
+-Hedge validation
 
 Examples:
 
@@ -43,7 +48,7 @@ Examples:
 Databases/Database & (Stage Analysis): GreenFile (Search, Screen, Final) Aquatic Sciences and Fisheries Abstracts (Search, Screen, Final)
 Databases/Database & (Topic Analysis): GreenFile (life history, genetics, stock dynamics) Aquatic Sciences and Fisheries Abstracts (life history, genetics, stock dynamics)
 
-**Metadata Enhancement + Time Savings**
+**Metadata Enhancement**
 
 Beyond the ability to analyze and track an idividual citations' Source/Methods. The functions behind CiteSource provides users with the ability to create a single record that uses prefered metadata in selecte metadata fields. Selection is based on metadata attributes (filled or empty, length). This function alone will help to resolve many hours of metadata entry and ensure that each record is as complete as possible. At some point in the future users may be able to select Source data as prefered over these rules.
 
