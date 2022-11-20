@@ -78,8 +78,8 @@ plot_source_overlap_heatmap(complete_comparison)
 plot_source_overlap_heatmap(complete_comparison, cells = "label")
 
 # upset plot of sources
-plot_source_overlap_upset(source_comparison)
-plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+plot_source_overlap_upset(complete_comparison)
+plot_source_overlap_upset(complete_comparison, decreasing = c(TRUE, TRUE))
 ```
 
 ### Custom plots

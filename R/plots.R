@@ -55,7 +55,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
   if (!is.null(facets)) {
     data <- data %>%
       tidyr::pivot_longer(tidyselect::matches(paste0(facets, "__")), names_to = "facet") %>%
-      dplyr::mutate(facet = stringr::str_remove(facet, paste0(facets, "__"))) %>%
+      dplyr::mutate(facet = stringr::str_remove(.data$facet, paste0(facets, "__"))) %>%
       dplyr::filter(.data$value == TRUE) %>%
       split(.$facet)
   } else {
@@ -65,7 +65,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
   
   data <- purrr::map(data, function(df) {
     df <- df %>% dplyr::select(dplyr::all_of(sources_order))
-    cooc_mat <- purrr::map_dfr(names(df), function(source) {
+    purrr::map_dfr(names(df), function(source) {
       df[df[source] == 1, ] %>% colSums()
     }) %>% dplyr::select(dplyr::all_of(names(df)))
   })
@@ -97,7 +97,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
     if (length(unique(data$facet)) > 1) {
       p <- p +
-        ggplot2::facet_wrap(ggplot2::vars(facet), ncol = 1) + 
+        ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) + 
         ggplot2::theme(aspect.ratio = 1, legend.position = "none",
                          strip.background = ggplot2::element_rect(
                            color="black", fill="darkgrey"
@@ -168,7 +168,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
 
     if (length(unique(data$facet)) > 1) {
-      p <- p + ggplot2::facet_wrap(ggplot2::vars(facet), ncol = 1) + 
+      p <- p + ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) + 
         ggplot2::theme(aspect.ratio = 1,  
                        strip.background = ggplot2::element_rect(
           color="black", fill="darkgrey"

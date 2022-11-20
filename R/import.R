@@ -105,7 +105,7 @@ read_citations <- function(files,
   
   #Drop empty citations
   ref_list <- lapply(ref_list,
-                     function(data) {data[rowSums(is.na(data)) != (ncol(data)-1),]})
+                     function(data) data[rowSums(is.na(data)) != (ncol(data)-1), ])
   
   ref_counts <- numeric(length(files))
   

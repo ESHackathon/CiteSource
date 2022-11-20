@@ -37,11 +37,11 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
   
   citations_spread <- compare_sources(citations, c("labels", comparison_type))
   
-  citations_long <- citations_spread %>% tidyr::pivot_longer(-duplicate_id, values_to = "bool") %>% 
-    dplyr::filter(bool == TRUE) %>% dplyr::select(-"bool") %>%  
-    tidyr::separate(name, c("type", "value")) %>% 
-    dplyr::filter((type == "label" & value %in% c("search", screening_label)) |
-                    type == comparison_type_singular) 
+  citations_long <- citations_spread %>% tidyr::pivot_longer(-.data$duplicate_id, values_to = "bool") %>% 
+    dplyr::filter(.data$bool == TRUE) %>% dplyr::select(-"bool") %>%  
+    tidyr::separate(.data$name, c("type", "value")) %>% 
+    dplyr::filter((.data$type == "label" & .data$value %in% c("search", screening_label)) |
+                    .data$type == comparison_type_singular) 
   
   
   types <- as.factor(paste0("_", unique(citations_long$type))) %>% levels()
@@ -52,8 +52,8 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     split(.$value_label)
   
   yields <- purrr::map_dfr(yield_dfs, .id = "stage", function(df) {
-    indicators <- df %>% tidyr::pivot_wider(names_from = value_source, 
-                              values_from = value_source, values_fn = ~TRUE,
+    indicators <- df %>% tidyr::pivot_wider(names_from = .data$value_source, 
+                              values_from = .data$value_source, values_fn = ~TRUE,
                               values_fill = FALSE) %>% 
       dplyr::select(-dplyr::all_of(c("duplicate_id", "value_label")))
     
@@ -61,14 +61,15 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     
     purrr::map_dfr(clusters, function(cluster) {
       rs <- indicators %>% dplyr::filter(.data[[cluster]] == TRUE) %>% rowSums()
-      tibble::tibble(!!comparison_type := cluster, total = length(rs), unique = sum(rs == 1), crossover = total - unique)
+      tibble::tibble(!!comparison_type := cluster, total = length(rs), unique = sum(rs == 1), 
+                     crossover = total - unique)
     })
     
   })
   
   yields <- yields %>% 
     dplyr::group_by(stage) %>% 
-    mutate(sensitivity = total / sum(total)) %>% 
+    mutate(sensitivity = .data$total / sum(.data$total)) %>% 
     dplyr::ungroup() %>% 
    dplyr::bind_rows(group_by(., stage) %>% summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
     
@@ -76,7 +77,7 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
   
   yields <- yields %>% dplyr::filter(stage != "search") %>% dplyr::left_join(
     search_results %>% dplyr::select(-"stage", total_search = total, -c("unique":"sensitivity")), by = comparison_type) %>% 
-    dplyr::mutate(precision = total / total_search) %>% 
+    dplyr::mutate(precision = .data$total / .data$total_search) %>% 
     dplyr::select(-"total_search") %>% 
     dplyr::bind_rows(search_results) %>% 
     dplyr::arrange(-total)

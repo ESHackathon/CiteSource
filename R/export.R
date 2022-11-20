@@ -26,7 +26,8 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
         dplyr::select(tidyselect::all_of(x), .data$duplicate_id, .data$record_ids) %>%
         tidyr::separate_rows(1, sep = ", ", convert = TRUE) %>%
         unique() %>%
-        tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix = paste0(stringr::str_remove(x, "cite_"), "_"), names_from = 1, values_from=c(.data$record_ids),
+        tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix = paste0(stringr::str_remove(x, "cite_"), "_"), 
+                           names_from = 1, values_from = c(.data$record_ids),
                            values_fn =  function(x) TRUE,
                            values_fill = FALSE) %>%
         dplyr::select(tidyselect::starts_with(paste0(stringr::str_remove(x, "cite_"))))
@@ -72,7 +73,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
   
   if (!is.null(string_field)) {
     citations <- citations %>% dplyr::rename(cite_string_include = .data$cite_string)
-  } 
+  }
   
   citations <- citations %>% dplyr::select(-tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))
   
@@ -89,7 +90,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 
   #Should be able to pass custom tibble here - but
   #currently that does not work: https://github.com/mjwestgate/synthesisr/issues/23
-  environment(new_write_ris) <- asNamespace('synthesisr')
+  environment(new_write_ris) <- asNamespace("synthesisr")
   utils::assignInNamespace("write_ris", new_write_ris, ns = "synthesisr")
   
   #Currently, write_refs does not accept tibbles, thus converted  

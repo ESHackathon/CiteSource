@@ -49,4 +49,5 @@ Imports:
     snakecase,
     utf8,
     stringr,
-    ggnewscale
+    ggnewscale,
+    gt

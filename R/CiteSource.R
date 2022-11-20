@@ -12,5 +12,5 @@ NULL
 # Use magrittr rather than base R pipe to be compatible with older R versions
 # And data pronoun .data to avoid issues/warnings due to dplyr non-standard evaluation
 #' @importFrom magrittr `%>%`
-#' @importFrom rlang .data
+#' @importFrom rlang .data :=
 NULL

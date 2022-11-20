@@ -3,15 +3,15 @@
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
-count_unique <- function(unique_data){
-  count_unique <- unique_data %>%
+count_unique <- function(unique_data) {
+  unique_data %>%
     dplyr::filter(!cite_source == "") %>%
     dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
-    tidyr::separate_rows(.data$cite_source, convert = T) %>%
-    tidyr::separate_rows(.data$cite_label, convert = T) %>%
-    tidyr::separate_rows(.data$cite_string, convert = T) %>%
+    tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
     dplyr::group_by(.data$duplicate_id) %>%
-    dplyr::mutate(unique = ifelse(length(unique(.data$cite_source))==1, TRUE, FALSE),
+    dplyr::mutate(unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),
                   type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))) %>%
     dplyr::ungroup() %>%
     unique()
@@ -28,7 +28,7 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   
   out <- list()
   
-  if("sources" %in% comp_type) {
+  if ("sources" %in% comp_type) {
   
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$record_ids) %>%
@@ -63,7 +63,8 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
       dplyr::filter(!cite_label == "") %>%
       tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
       unique() %>%
-      tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="label__", names_from = .data$cite_label, values_from=c(.data$record_ids),
+      tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="label__", names_from = .data$cite_label, 
+                         values_from = c(.data$record_ids),
                          values_fn =  function(x) TRUE,
                          values_fill = FALSE)
     out <- c(out, list(source_comparison))
