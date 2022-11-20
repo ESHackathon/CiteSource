@@ -29,7 +29,6 @@ CiteSource provides users with the ability to deduplicate references while maint
 ```{r eval = FALSE}
 #Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
-library(remotes)
 
 #Install CiteSource
 remotes::install_github("ESHackathon/CiteSource")
