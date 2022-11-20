@@ -48,4 +48,5 @@ Imports:
     parallel,
     snakecase,
     utf8,
-    stringr
+    stringr,
+    ggnewscale
