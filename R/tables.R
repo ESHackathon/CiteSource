@@ -22,6 +22,7 @@ record_level_table <- function(data, include = "source") {
 #' @param comparison_type Either "sources" to summarise and assess sources or "strings" to consider strings.
 #' @param search_label One or multiple labels that identify initial search results (default: "search") - if multiple labels are provided, they are merged.
 #' @param screening_label One or multiple label that identify screened records (default: "final") - if multiple are provided, each is compared to the search stage.
+#' @export
 
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final") {
   
