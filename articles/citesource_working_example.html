@@ -70,12 +70,14 @@
 
 
 
-<script src="citesource_working_example_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CiteSource - Short working example</h1>
-                        <h4 data-toc-skip class="author">Trevor Riley</h4>
+                        <h4 data-toc-skip class="author">Trevor
+Riley</h4>
             
-            <h4 data-toc-skip class="date">2022-11-09</h4>
+            <h4 data-toc-skip class="date">2022-11-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_working_example.rmd" class="external-link"><code>vignettes/citesource_working_example.rmd</code></a></small>
       <div class="d-none name"><code>citesource_working_example.rmd</code></div>
@@ -86,7 +88,15 @@
 <div class="section level2">
 <h2 id="about-the-package">About the package<a class="anchor" aria-label="anchor" href="#about-the-package"></a>
 </h2>
-<p>CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, “cite_source”, “cite_label” and “tag_naming”. In the merging process, select metadata fields are also automatically compared (currently DOI &amp; Abstract) and the most complete metadata is used in the main record.</p>
+<p>CiteSource provides users with the ability to deduplicate references
+while maintaining customizable metadata. Instead of the traditional
+deduplication method where records are removed and only one record is
+selected to be retained, CiteSource retains each duplicate record while
+merging metadata into a single main record. This main record maintains
+user-customized metadata in three fields, “cite_source”, “cite_label”
+and “tag_naming”. In the merging process, select metadata fields are
+also automatically compared (currently DOI &amp; Abstract) and the most
+complete metadata is used in the main record.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -94,7 +104,6 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Install the remotes packages to enable installation from GitHub</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Install CiteSource</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ESHackathon/CiteSource"</span><span class="op">)</span></span></code></pre></div>
@@ -105,10 +114,22 @@
 <div class="section level2">
 <h2 id="import-and-read-citation-files">Import and read citation files<a class="anchor" aria-label="anchor" href="#import-and-read-citation-files"></a>
 </h2>
-<p>Users can import multiple RIS or bibtex files into CiteSource, which they can label with three custom metadata fields, Cite_Source, Cite_String, and Cite_Label.</p>
-<p>Using the Cite_Source field, which the user can label individual files with source information such as database or platform. Beyond source information, users may also use #the Cite_Source field to provide search results using various search methodologies.</p>
-<p>A second metadata field Cite_String can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results.</p>
-<p>Finally, a third field Cite_Label can be used to apply yet another variable. This label was intended to be used in combination with the previous two, in order to track the inclusion or exclusion of citations over the course of title/abstract screening and full text screening.</p>
+<p>Users can import multiple RIS or bibtex files into CiteSource, which
+they can label with three custom metadata fields, Cite_Source,
+Cite_String, and Cite_Label.</p>
+<p>Using the Cite_Source field, which the user can label individual
+files with source information such as database or platform. Beyond
+source information, users may also use #the Cite_Source field to provide
+search results using various search methodologies.</p>
+<p>A second metadata field Cite_String can be used to specify another
+attribute or variable. For example, a use of Cite_Source and Cite_String
+may be to examine the unique and crossover citations that occur between
+databases, while simultaneously evaluating unique search string
+results.</p>
+<p>Finally, a third field Cite_Label can be used to apply yet another
+variable. This label was intended to be used in combination with the
+previous two, in order to track the inclusion or exclusion of citations
+over the course of title/abstract screening and full text screening.</p>
 <div class="section level3">
 <h3 id="indicate-location-files">Indicate location files<a class="anchor" aria-label="anchor" href="#indicate-location-files"></a>
 </h3>
@@ -130,7 +151,11 @@
 <div class="section level3">
 <h3 id="read-citation-files">Read citation files<a class="anchor" aria-label="anchor" href="#read-citation-files"></a>
 </h3>
-<p>Read citation files and store. Provide tags for each file with appropriate Cite_Source, Cite_String, or Cite_Label. Store these citations. Note: This vignette is the short a short version. Sources McK and RM represent a consolidation of multiple citation files, to see these citation files, view the long version of this vignette.</p>
+<p>Read citation files and store. Provide tags for each file with
+appropriate Cite_Source, Cite_String, or Cite_Label. Store these
+citations. Note: This vignette is the short a short version. Sources McK
+and RM represent a consolidation of multiple citation files, to see
+these citation files, view the long version of this vignette.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
 <span>                           cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
@@ -155,7 +180,10 @@
 <div class="section level2">
 <h2 id="deduplicate-and-identify-crossover-records">Deduplicate and identify crossover records<a class="anchor" aria-label="anchor" href="#deduplicate-and-identify-crossover-records"></a>
 </h2>
-<p>CiteSource allows users to merge duplicates while maintaining information in the cite_label and cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process.</p>
+<p>CiteSource allows users to merge duplicates while maintaining
+information in the cite_label and cite_source metadata field. Thus,
+information about the origin of the records is not lost in the
+deduplication process.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; formatting data...</span></span>
@@ -165,29 +193,51 @@
 <span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels">Count number of unique and non-unique citations from different sources and labels<a class="anchor" aria-label="anchor" href="#count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels"></a>
+<h3 id="count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels">Count number of unique and non-unique citations from different
+sources and labels<a class="anchor" aria-label="anchor" href="#count-number-of-unique-and-non-unique-citations-from-different-sources-and-labels"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="create-dataframe-indicating-occurrence-of-records-across-sources-or-labels">Create dataframe indicating occurrence of records across sources or labels<a class="anchor" aria-label="anchor" href="#create-dataframe-indicating-occurrence-of-records-across-sources-or-labels"></a>
+<h3 id="create-dataframe-indicating-occurrence-of-records-across-sources">Create dataframe indicating occurrence of records across
+sources<a class="anchor" aria-label="anchor" href="#create-dataframe-indicating-occurrence-of-records-across-sources"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span>
-<span><span class="va">label_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"labels"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="source-method-analysis">Source &amp; method analysis<a class="anchor" aria-label="anchor" href="#source-method-analysis"></a>
 </h2>
-<p>When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.</p>
+<p>When teams are selecting databases for inclusion in a review it can
+be extremely difficult to determine the best resources and determine the
+ROI in terms of the time it takes to apply searches. This is especially
+true in environmental research where research is often
+cross-disciplinary. By tracking where/how each citation was found, the
+evidence synthesis community could in turn track the efficacy of various
+databases and identify the most relevant resources as it relates to
+their research topic. This idea can be extended to search string
+comparison as well as strategy and methodology comparison.</p>
 <div class="section level3">
 <h3 id="plot-overlap-as-a-heatmap-matrix">Plot overlap as a heatmap matrix<a class="anchor" aria-label="anchor" href="#plot-overlap-as-a-heatmap-matrix"></a>
 </h3>
-<p>CiteSource performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to that each source at the top of the source’s column. The heatmap also provides a count of citations that were found at the intersection of each source.</p>
-<p>In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.</p>
-<p>CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues.</p>
+<p>CiteSource performs citation analysis and deduplication within each
+source file, prior to comparing sources across source files. This
+heatmap shows the number of citations unique to that each source at the
+top of the source’s column. The heatmap also provides a count of
+citations that were found at the intersection of each source.</p>
+<p>In this case you can see that the source tag McK only shows 2400
+results, while the initial .ris file contained 2661 citations. This
+means that CiteSource identified 261 duplicate references within that
+citation list. The 2400 remaining citations then attributed to this
+source. Looking at the source Greenfile, we can see that the CiteSource
+did not find any duplicate citations within this source as both counts
+read 139.</p>
+<p>CiteSource is more accurate in deduplicating references when complete
+metadata is provided. It is recommended that users provide the most full
+metadata as possible. Please not that citations in this vignette were
+stripped of their abstracts to avoid any copyright issues.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span></span>
@@ -197,9 +247,16 @@
 <div class="section level3">
 <h3 id="plot-overlap-as-a-heatmap-matrix-as-percentage">Plot overlap as a heatmap matrix as percentage<a class="anchor" aria-label="anchor" href="#plot-overlap-as-a-heatmap-matrix-as-percentage"></a>
 </h3>
-<p>The following heatmap provides the an overview of the overlapping citations by percent of each source’s count. For example the EconLit source contains 50 citations, of those 50 we can see on the previous heatmap that 8 of these citations were also in the source WoSE, which represents 16% of the citations from EconLit. On the other hand the same 8 citations only represent .3% of the total citations from WoSE. (currently this chart is set to display only whole numbers - we are considering changing this to display to the first decimal)</p>
+<p>The following heatmap provides the an overview of the overlapping
+citations by percent of each source’s count. For example the EconLit
+source contains 50 citations, of those 50 we can see on the previous
+heatmap that 8 of these citations were also in the source WoSE, which
+represents 16% of the citations from EconLit. On the other hand the same
+8 citations only represent .3% of the total citations from WoSE.
+(currently this chart is set to display only whole numbers - we are
+considering changing this to display to the first decimal)</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, <span class="st">"percentages"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, plot_type <span class="op">=</span> <span class="st">"percentages"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_heatmap_percent</span></span></code></pre></div>
 <p><img src="citesource_working_example_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
@@ -209,7 +266,7 @@
 </h3>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_upset_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Plotting a large number of sources. Consider reducing nset or sub-setting the data.</span></span>
+<span><span class="co">#&gt; Plotting a large number of groups. Consider reducing nset or sub-setting the data.</span></span>
 <span></span>
 <span><span class="va">my_upset_plot</span></span></code></pre></div>
 <p><img src="citesource_working_example_files/figure-html/unnamed-chunk-10-1.png" width="960"></p>
@@ -218,7 +275,12 @@
 <div class="section level2">
 <h2 id="analyzing-records-after-screening">Analyzing records after screening<a class="anchor" aria-label="anchor" href="#analyzing-records-after-screening"></a>
 </h2>
-<p>Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the “cite_source” data along with the “cite_label” data, users can analyze the number of overlapping/unique records from each source or method.</p>
+<p>Once the title and abstract screening has been completed or once the
+final papers have been selected, users can analyze the contributions of
+each source or search method to these screening phases to better
+understand their impact on the review. By using the “cite_source” data
+along with the “cite_label” data, users can analyze the number of
+overlapping/unique records from each source or method.</p>
 <div class="section level3">
 <h3 id="assess-contribution-of-sources-by-review-stage">Assess contribution of sources by review stage<a class="anchor" aria-label="anchor" href="#assess-contribution-of-sources-by-review-stage"></a>
 </h3>
@@ -233,7 +295,12 @@
 <div class="section level2">
 <h2 id="documentation-and-output">Documentation and output<a class="anchor" aria-label="anchor" href="#documentation-and-output"></a>
 </h2>
-<p>In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see <a href="https://doi.org/10.5195/jmla.2021.809" class="external-link">Bethel et al. 2021</a> for more about search summary tables.).</p>
+<p>In addition to the above visualizations, it may be useful to export
+datasets for additional analysis, for example to identify the origin of
+specific records. Presenting data in the form a search summary table can
+also provide a user with information about the specificity and recall of
+each database (see <a href="https://doi.org/10.5195/jmla.2021.809" class="external-link">Bethel et al. 2021</a> for
+more about search summary tables.).</p>
 <div class="section level3">
 <h3 id="export-deduplicated-files">Export deduplicated files<a class="anchor" aria-label="anchor" href="#export-deduplicated-files"></a>
 </h3>

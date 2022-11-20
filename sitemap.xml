@@ -40,6 +40,9 @@
     <loc>http://www.eshackathon.org/CiteSource/reference/check_unique_search_meta.html</loc>
   </url>
   <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/citation_summary_table.html</loc>
+  </url>
+  <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/compare_sources.html</loc>
   </url>
   <url>
@@ -68,5 +71,8 @@
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/read_citations.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/record_level_table.html</loc>
   </url>
 </urlset>
