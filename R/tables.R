@@ -72,7 +72,7 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     dplyr::group_by(stage) %>% 
     mutate(sensitivity = .data$total / sum(.data$total)) %>% 
     dplyr::ungroup() %>% 
-   dplyr::bind_rows(group_by(., stage) %>% summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
+   dplyr::bind_rows(dplyr::group_by(., stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
     
   search_results <- yields %>% dplyr::filter(stage == "search")
   
