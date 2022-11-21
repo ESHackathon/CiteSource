@@ -111,8 +111,10 @@ ui <- navbarPage("CiteSource", id = "tabs",
                  tabPanel("Export",
                           fluidRow(
                             column(12,
-                                   'Export your data in various formats here.')
-                          )
+                            mainPanel(
+                              dataTableOutput("exportTbl")
+                            )
+                          ))
                  )
                  
                  
@@ -218,7 +220,22 @@ server <- function(input, output, session) {
        dev.off()
         }
   )
-  
+   
+  #### Export tab ####
+   output$exportTbl<-DT::renderDataTable(
+     DT::datatable(rv$unique,
+                   extensions = 'Buttons',
+                   options=list(
+                     paging=TRUE,
+                     searching=TRUE,
+                     fixedColumns=TRUE,
+                     autoWidth=TRUE,
+                     ordering=TRUE,
+                     dom = 'Bfrtip',
+                     buttons=c("copy", "csv", "pdf", "excel"),
+                     class="display"
+                   ))
+   )
   
 }
 
