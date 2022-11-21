@@ -188,8 +188,6 @@ server <- function(input, output, session) {
     
   })
   
-  # Add data for testing 
-  # dedup_results <- readRDS("www/dedup.RDS") #TODO remove when the upload and dedup is finished
   
   #### end section ####
   
@@ -202,30 +200,23 @@ server <- function(input, output, session) {
     plot_source_overlap_heatmap(source_comparison)
   })
   
-  output$plotgraph2<-renderPlot({
+  plotInput <- reactive({
     source_comparison <- CiteSource::compare_sources(rv$unique, comp_type = input$comp_type)
     plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+    
   })
   
-  plotInput = function() {
-    
-    ##################################################
-    ##################################################
-    #This doesn't work - upset plots not supported
-    unique_citations <- dedup_results$unique
-    n_unique <- count_unique(unique_citations)
-    source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-    plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-    ##################################################
-    ##################################################
-    
-  }
+  output$plotgraph2<-renderPlot({
+    print(plotInput())
+    })
   
-  output$downloadPlot <- downloadHandler(
-    filename = function() { paste("test", '.svg', sep='') },
-    content = function(file) {
-      ggsave(file, plot = plotInput(), device = "svg")
-    }
+   output$downloadPlot <- downloadHandler(
+     filename = function() { paste("upset", '.png', sep='') },
+     content = function(file) {
+       png(file)
+       print(plotInput())
+       dev.off()
+        }
   )
   
   
