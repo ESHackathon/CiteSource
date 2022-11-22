@@ -7,7 +7,7 @@
 #' @return A tibble that can be turned into a pretty table with (e.g.) the `gt`-package
 #' @export
 
-record_level_table <- function(data, include = "source") {
+record_level_table <- function(citations, include = "source") {
   
   warning("Not yet implemented.")
   
@@ -69,22 +69,22 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
   })
   
   yields <- yields %>% 
-    dplyr::group_by(stage) %>% 
+    dplyr::group_by(.data$stage) %>% 
     mutate(sensitivity = .data$total / sum(.data$total)) %>% 
     dplyr::ungroup() %>% 
-   dplyr::bind_rows(dplyr::group_by(., stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
+   dplyr::bind_rows(dplyr::group_by(., .data$stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
     
   search_results <- yields %>% dplyr::filter(.data$stage == "search")
   
   yields <- yields %>% dplyr::filter(.data$stage != "search") %>% dplyr::left_join(
-    search_results %>% dplyr::select(-"stage", total_search = total, -c("unique":"sensitivity")), by = comparison_type) %>% 
+    search_results %>% dplyr::select(-"stage", total_search = .data$total, -c("unique":"sensitivity")), by = comparison_type) %>% 
     dplyr::mutate(precision = .data$total / .data$total_search) %>% 
     dplyr::select(-"total_search") %>% 
     dplyr::bind_rows(search_results) %>% 
     dplyr::arrange(-.data$total)
   
   
-  yields %>% dplyr::group_by(stage) %>% gt::gt() %>% 
+  yields %>% dplyr::group_by(.data$stage) %>% gt::gt() %>% 
     gt::fmt_percent(6:7) %>% gt::sub_missing() %>% 
     gt::tab_spanner("Records", 3:5) %>% 
     gt::fmt_number(3:5, decimals = 0)

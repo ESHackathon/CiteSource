@@ -72,7 +72,7 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   
   if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
   
-  purrr:::reduce(out, dplyr::left_join, by = "duplicate_id")
+  purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
   
 }
 

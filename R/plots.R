@@ -320,7 +320,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       type
     }
     
-    p <- p + scale_fill_discrete(labels = scales::trans_format("identity", get_total))
+    p <- p + ggplot2::scale_fill_discrete(labels = scales::trans_format("identity", get_total))
   }
   
   p

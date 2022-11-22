@@ -483,8 +483,8 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
                                  paste(citations_with_dup_id_merged$duplicate_id[which(citations_with_dup_id_merged$record_id == duplicate_id)]),
                                  paste0(.data$duplicate_id))) %>% #when only 1 record id to 1 duplicate ID, check for other instances of the duplicate ID in the record ID column, then paste the duplicate ID THAT record has- linking together all the studies in one duplicatee group
     dplyr::group_by(duplicate_id) %>% # group by duplicate id
-    dplyr::summarise(dplyr::across(everything(), ~trimws(paste(na.omit(.), collapse = ';;;')))) %>% #merge all rows with same dup id, dont merge NA values
-    dplyr::mutate(dplyr::across(c(everything(), -.data$cite_label, -.data$cite_string, -.data$cite_source, -.data$record_id), gsub, pattern = ";;;.*", replacement = "")) %>% #remove extra values in each col, keep first one only
+    dplyr::summarise(dplyr::across(dplyr::everything(), ~trimws(paste(na.omit(.), collapse = ';;;')))) %>% #merge all rows with same dup id, dont merge NA values
+    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$cite_label, -.data$cite_string, -.data$cite_source, -.data$record_id), gsub, pattern = ";;;.*", replacement = "")) %>% #remove extra values in each col, keep first one only
     dplyr::mutate(dplyr::across(.data$cite_label, gsub, pattern = ";;;", replacement = ", ")) %>%
     dplyr::mutate(dplyr::across(.data$cite_string, gsub, pattern = ";;;", replacement = ", ")) %>%
     dplyr::mutate(dplyr::across(.data$cite_source, gsub, pattern = ";;;", replacement = ", ")) %>%
