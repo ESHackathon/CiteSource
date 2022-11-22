@@ -5,7 +5,7 @@
 
 count_unique <- function(unique_data) {
   unique_data %>%
-    dplyr::filter(!cite_source == "") %>%
+    dplyr::filter(!.data$cite_source == "") %>%
     dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
     tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
     tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
@@ -46,7 +46,7 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
     
   source_comparison <- unique_data %>%
     dplyr::select(.data$duplicate_id, .data$cite_string, .data$record_ids) %>%
-    dplyr::filter(!cite_string == "") %>%
+    dplyr::filter(!.data$cite_string == "") %>%
     tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
     unique() %>%
     tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="string__", names_from = .data$cite_string, values_from=c(.data$record_ids),

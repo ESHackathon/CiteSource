@@ -131,7 +131,7 @@ read_citations <- function(files,
                          citations = ref_counts)
 
     message("Import completed - with the following details:")    
-    message(paste0(capture.output(report), collapse = "\n"))
+    message(paste0(utils::capture.output(report), collapse = "\n"))
   }
 
  ref_list %>%

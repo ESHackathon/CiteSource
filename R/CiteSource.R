@@ -14,3 +14,6 @@ NULL
 #' @importFrom magrittr `%>%`
 #' @importFrom rlang .data :=
 NULL
+
+# Declare . as global variable to remove warnings
+utils::globalVariables(".")
