@@ -242,6 +242,7 @@ cite_source <- cite_label <- type <- NULL
 #' @param bar_order Character. Order of bars within each facet, any levels not specified will follow at the end. If "keep", then this is based on factor levels (or the first value) in the input data.
 #' @param facet_order Character. Order of facets. Any levels not specified will follow at the end.
 #' @param color_order Character. Order of values on the color scale.
+#' @param totals_in_legend Logical. Should totals be shown in legend (e.g. as Unique (N = 1234))
 #' @export
 #' @examples
 #' data <- data.frame(
@@ -253,7 +254,7 @@ cite_source <- cite_label <- type <- NULL
 #'
 #' plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), color_order = c("unique", "duplicated"))
 #'
-plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep") {
+plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep", totals_in_legend = TRUE) {
   facets <- rlang::enquo(facets)
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
@@ -281,7 +282,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
   }
 
   if (!center) {
-    ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
+   p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
       ggplot2::geom_bar() +
       ggplot2::facet_grid(ggplot2::vars(!!facets)) +
       ggplot2::labs(y = "Citations")
@@ -298,7 +299,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       .5 * data_sum$n, -.5 * data_sum$n
     ) # add label positions for geom_text
 
-    ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
+ p <-   ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") +
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) +
@@ -307,4 +308,20 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) + # make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5)
   }
+  
+  if (totals_in_legend == TRUE) {
+    
+    get_total <- function(type) {
+      
+      for (i in seq_along(type)) {
+        type[i] <- glue::glue("{type[i]}\n(N = {formatC(sum(data$type == type[i]), big.mark = ",")})")
+      }
+      
+      type
+    }
+    
+    p <- p + scale_fill_discrete(labels = scales::trans_format("identity", get_total))
+  }
+  
+  p
 }
