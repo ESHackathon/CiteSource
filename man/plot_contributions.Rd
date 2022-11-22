@@ -12,7 +12,8 @@ plot_contributions(
   center = FALSE,
   bar_order = "keep",
   facet_order = "keep",
-  color_order = "keep"
+  color_order = "keep",
+  totals_in_legend = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ plot_contributions(
 \item{facet_order}{Character. Order of facets. Any levels not specified will follow at the end.}
 
 \item{color_order}{Character. Order of values on the color scale.}
+
+\item{totals_in_legend}{Logical. Should totals be shown in legend (e.g. as Unique (N = 1234))}
 }
 \description{
 Create a faceted plot that shows unique contributions and duplicated records across
