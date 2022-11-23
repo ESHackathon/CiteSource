@@ -4,12 +4,12 @@
 \alias{record_level_table}
 \title{Record-level table}
 \usage{
-record_level_table(data, include = "source")
+record_level_table(citations, include = "source")
 }
 \arguments{
-\item{include}{Which metadata should be included in the table? Defaults to 'source', can be replaced or expanded with 'label' and/or 'string'}
-
 \item{citations}{A deduplicated tibble as returned by \code{dedup_citations()}.}
+
+\item{include}{Which metadata should be included in the table? Defaults to 'source', can be replaced or expanded with 'label' and/or 'string'}
 }
 \value{
 A tibble that can be turned into a pretty table with (e.g.) the \code{gt}-package
