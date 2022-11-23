@@ -48,6 +48,7 @@ data <- data.frame(
   type = c("unique", "duplicated")[rbinom(100, 1, .7) + 1]
 )
 
-plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), color_order = c("unique", "duplicated"))
+plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), 
+   color_order = c("unique", "duplicated"))
 
 }
