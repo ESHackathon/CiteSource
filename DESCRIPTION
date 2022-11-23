@@ -50,4 +50,5 @@ Imports:
     utf8,
     stringr,
     ggnewscale,
-    gt
+    gt,
+    glue

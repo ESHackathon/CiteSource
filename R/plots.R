@@ -252,7 +252,8 @@ cite_source <- cite_label <- type <- NULL
 #'   type = c("unique", "duplicated")[rbinom(100, 1, .7) + 1]
 #' )
 #'
-#' plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), color_order = c("unique", "duplicated"))
+#' plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), 
+#'    color_order = c("unique", "duplicated"))
 #'
 plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep", totals_in_legend = TRUE) {
   facets <- rlang::enquo(facets)

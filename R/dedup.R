@@ -473,7 +473,7 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
   citations_with_dup_id_merged <- all_metadata_with_duplicate_id %>%
     dplyr::mutate_if(is.character, utf8::utf8_encode) %>%
     dplyr::mutate_all(~replace(., .=='NA', NA)) %>% #replace NA
-    dplyr::group_by(record_id) %>%
+    dplyr::group_by(.data$record_id) %>%
     dplyr::arrange(.data$duplicate_id) %>%
     dplyr::add_count() # get count of duplicate ids assigned to a single record ID (happens when A = B, A = C, A = D for example, duplicate ID for A could be both D and B
   
@@ -482,7 +482,7 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
     mutate(duplicate_id = ifelse(.data$n==1 & .data$duplicate_id %in% citations_with_dup_id_merged$record_id,
                                  paste(citations_with_dup_id_merged$duplicate_id[which(citations_with_dup_id_merged$record_id == duplicate_id)]),
                                  paste0(.data$duplicate_id))) %>% #when only 1 record id to 1 duplicate ID, check for other instances of the duplicate ID in the record ID column, then paste the duplicate ID THAT record has- linking together all the studies in one duplicatee group
-    dplyr::group_by(duplicate_id) %>% # group by duplicate id
+    dplyr::group_by(duplicate_id) %>% # group by duplicate id 
     dplyr::summarise(dplyr::across(dplyr::everything(), ~trimws(paste(na.omit(.), collapse = ';;;')))) %>% #merge all rows with same dup id, dont merge NA values
     dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$cite_label, -.data$cite_string, -.data$cite_source, -.data$record_id), gsub, pattern = ";;;.*", replacement = "")) %>% #remove extra values in each col, keep first one only
     dplyr::mutate(dplyr::across(.data$cite_label, gsub, pattern = ";;;", replacement = ", ")) %>%
@@ -490,8 +490,8 @@ merge_metadata <- function(raw_citations_with_id, matched_pairs_with_ids){
     dplyr::mutate(dplyr::across(.data$cite_source, gsub, pattern = ";;;", replacement = ", ")) %>%
     dplyr::mutate(dplyr::across(.data$record_id, gsub, pattern = ";;;", replacement = ", ")) %>% #replace separator to comma
     dplyr::ungroup() %>%
-    mutate(record_ids = record_id) %>%
-    dplyr::select(-"record_id", -"n") %>%
+    dplyr::rename(record_ids = "record_id") %>% 
+    dplyr::select(-"n") %>%
     dplyr::ungroup()
   
  
