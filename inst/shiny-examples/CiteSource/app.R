@@ -113,6 +113,8 @@ ui <- navbarPage("CiteSource", id = "tabs",
                             column(12,
                             mainPanel(
                               dataTableOutput("exportTbl")
+                              #,
+                              #downloadButton("downloadData", "Download bibtex")
                             )
                           ))
                  )
@@ -236,6 +238,20 @@ server <- function(input, output, session) {
                      class="display"
                    ))
    )
+   # # Downloadable bibtex ----
+   # output$downloadData <- downloadHandler(
+   #   filename = function() {
+   #     paste("bib", ".bib", sep = "")
+   #   },
+   #   content = function(file) {
+   #     rv$unique %>% 
+   #       select(!c(duplicate_id, cite_source, cite_string, cite_label,
+   #                 record_id, record_ids)) %>% 
+   #       bib2df::df2bib(., file="bib.bib") 
+   #     
+   #   }
+   # )
+   
   
 }
 
