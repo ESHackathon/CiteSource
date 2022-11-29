@@ -1,5 +1,5 @@
 Package: CiteSource
-Title: Identify where records for evidence aggregation came from, by deduplicating results and comparing sources
+Title: Analyze the utility of information sources and retrieval methodologies for evidence synthesis
 Version: 0.0.0.9000
 Date: 2022-11-18
 Authors@R: 
