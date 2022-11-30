@@ -3,14 +3,14 @@
 #' Creates a per-record table that shows which sources (and/or labels/strings) each item was found in.
 #'
 #' @param citations A deduplicated tibble as returned by `dedup_citations()`.
-#' @param include Which metadata should be included in the table? Defaults to 'source', can be replaced or expanded with 'label' and/or 'string'
+#' @param include Which metadata should be included in the table? Defaults to 'sources', can be replaced or expanded with 'labels' and/or 'strings'
 #' @return A tibble that can be turned into a pretty table with (e.g.) the `gt`-package
 #' @export
 
-record_level_table <- function(citations, include = "source") {
-  
+record_level_table <- function(citations, include = "sources") {
   warning("Not yet implemented.")
-  
+  sources <<- compare_sources(citations, comp_type = include)
+  citations <<- citations
 }
 
 #' Summary table
@@ -70,25 +70,25 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
   
   yields <- yields %>% 
     dplyr::group_by(.data$stage) %>% 
-    mutate(sensitivity = .data$Records_total / sum(.data$Records_total)) %>% 
+    dplyr::mutate(Sensitivity = .data$Records_total / sum(.data$Records_total)) %>% 
     dplyr::ungroup() %>% 
-   dplyr::bind_rows(dplyr::group_by(., .data$stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
+   dplyr::bind_rows(dplyr::group_by(., .data$stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), Sensitivity = NA))
   
   search_results <- yields %>% dplyr::filter(.data$stage == "search") 
   
   yields <- yields %>% dplyr::filter(.data$stage != "search") %>% dplyr::left_join(
-    search_results %>% dplyr::select(-"stage", total_search = .data$Records_total, -c("Records_unique":"sensitivity")), by = comparison_type) %>% 
-    dplyr::mutate(precision = .data$Records_total / .data$total_search) %>% 
+    search_results %>% dplyr::select(-"stage", total_search = .data$Records_total, -c("Records_unique":"Sensitivity")), by = comparison_type) %>% 
+    dplyr::mutate(Precision = .data$Records_total / .data$total_search) %>% 
     dplyr::select(-"total_search") %>% 
     dplyr::bind_rows(search_results) %>% 
     dplyr::arrange(-.data$Records_total) %>% 
     dplyr::mutate(total_total = dplyr::if_else(sources == "Total", Records_total, NA_integer_)) %>% 
     tidyr::fill(total_total) %>% 
     dplyr::mutate(Contribution_total = dplyr::if_else(sources == "Total", NA_real_, Records_total/total_total), 
-                  Contribution_unique = dplyr::if_else(sources == "Total", NA_real_, Records_unique/total_total)) %>% 
+                  Contribution_unique = Records_unique/total_total) %>% 
     dplyr::select(-"total_total")
   
-  yields %>% dplyr::group_by(.data$stage) %>% gt::gt() %>% 
+  yields %>% dplyr::rename("Sensitivity/ Recall" = "Sensitivity") %>% dplyr::group_by(.data$stage) %>% gt::gt() %>% 
     gt::fmt_percent(6:9) %>% gt::sub_missing() %>% 
     gt::tab_spanner_delim("_") %>% 
     gt::fmt_number(3:5, decimals = 0)
