@@ -62,31 +62,35 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     
     purrr::map_dfr(clusters, function(cluster) {
       rs <- indicators %>% dplyr::filter(.data[[cluster]] == TRUE) %>% rowSums()
-      tibble::tibble(!!comparison_type := cluster, total = length(rs), unique = sum(rs == 1), 
-                     crossover = .data$total - unique)
+      tibble::tibble(!!comparison_type := cluster, Records_total = length(rs), Records_unique = sum(rs == 1), 
+                     Records_crossover = .data$Records_total - Records_unique)
     })
     
   })
   
   yields <- yields %>% 
     dplyr::group_by(.data$stage) %>% 
-    mutate(sensitivity = .data$total / sum(.data$total)) %>% 
+    mutate(sensitivity = .data$Records_total / sum(.data$Records_total)) %>% 
     dplyr::ungroup() %>% 
    dplyr::bind_rows(dplyr::group_by(., .data$stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), sensitivity = NA))
-    
-  search_results <- yields %>% dplyr::filter(.data$stage == "search")
+  
+  search_results <- yields %>% dplyr::filter(.data$stage == "search") 
   
   yields <- yields %>% dplyr::filter(.data$stage != "search") %>% dplyr::left_join(
-    search_results %>% dplyr::select(-"stage", total_search = .data$total, -c("unique":"sensitivity")), by = comparison_type) %>% 
-    dplyr::mutate(precision = .data$total / .data$total_search) %>% 
+    search_results %>% dplyr::select(-"stage", total_search = .data$Records_total, -c("Records_unique":"sensitivity")), by = comparison_type) %>% 
+    dplyr::mutate(precision = .data$Records_total / .data$total_search) %>% 
     dplyr::select(-"total_search") %>% 
     dplyr::bind_rows(search_results) %>% 
-    dplyr::arrange(-.data$total)
-  
+    dplyr::arrange(-.data$Records_total) %>% 
+    dplyr::mutate(total_total = dplyr::if_else(sources == "Total", Records_total, NA_integer_)) %>% 
+    tidyr::fill(total_total) %>% 
+    dplyr::mutate(Contribution_total = dplyr::if_else(sources == "Total", NA_real_, Records_total/total_total), 
+                  Contribution_unique = dplyr::if_else(sources == "Total", NA_real_, Records_unique/total_total)) %>% 
+    dplyr::select(-"total_total")
   
   yields %>% dplyr::group_by(.data$stage) %>% gt::gt() %>% 
-    gt::fmt_percent(6:7) %>% gt::sub_missing() %>% 
-    gt::tab_spanner("Records", 3:5) %>% 
+    gt::fmt_percent(6:9) %>% gt::sub_missing() %>% 
+    gt::tab_spanner_delim("_") %>% 
     gt::fmt_number(3:5, decimals = 0)
   
 }
