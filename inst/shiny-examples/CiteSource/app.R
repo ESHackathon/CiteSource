@@ -48,24 +48,25 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                    # Sidebar layout with input and output definitions ----
                                    sidebarLayout(
                                      sidebarPanel(# Input: Select a file ----
-                                                  fileInput("file", 
-                                                            "Upload", 
-                                                            multiple = FALSE, 
+                                                  h4("Step 1: Upload your citation files"),
+                                                  fileInput("file",  "",
+                                                            multiple = TRUE, 
                                                             accept = c('.ris', '.txt', '.bib')),
-                                                  textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
-                                                  textInput('string', 'Citestring', placeholder = 'e.g. search string 1.3'),
-                                                  textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
-                                                  actionBttn(
-                                                    'upload', 'Add citation file',
-                                                    style = "pill",
-                                                    color = "primary",
-                                                    icon = icon("plus")
-                                                  )
+                                                  # textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
+                                                  # textInput('string', 'Citestring', placeholder = 'e.g. search string 1.3'),
+                                                  # textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
+                                                  # actionBttn(
+                                                  #   'upload', 'Add citation file',
+                                                  #   style = "pill",
+                                                  #   color = "primary",
+                                                  #   icon = icon("plus")
+                                                  # )
                                      ),
                                      
                                      # Main panel for displaying outputs ----
                                      mainPanel(
                                        
+                                       h4("Step 2: Double click the row to edit sources, labels, and strings"),
                                        # Output: Data file ----
                                        dataTableOutput("tbl_out"),
                                    
@@ -77,6 +78,7 @@ ui <- navbarPage("CiteSource", id = "tabs",
                  
                  tabPanel("Deduplicate",
                           
+                            # Action button: identify duplicates in uploaded datset
                             actionBttn(
                               'identify_dups', 'Identify duplicate citations',
                               style = "pill",
@@ -84,6 +86,8 @@ ui <- navbarPage("CiteSource", id = "tabs",
                               icon = icon("search")
                             ),               
                                      
+                          # Output: datatable of deduplication results
+                          dataTableOutput("dedup_results")
                 ),
                  
                  # Visualise tab
@@ -152,7 +156,7 @@ server <- function(input, output, session) {
   
   #### Upload files tab section ####
   #upload on click
-  observeEvent(input$upload,{
+  observeEvent(input$file,{
     validate(need(input$file != "", "Select your bibliographic file to upload..."))
     
     if (is.null(input$file)) {
@@ -163,18 +167,26 @@ server <- function(input, output, session) {
       path_list <- input$file$datapath
       rv$upload_number <- 0
       rv$upload_number <- rv$upload_number + 1
+      suggested_source <- stringr::str_replace_all(input$file$name, ".ris", "")
+      suggested_source <- stringr::str_replace_all(suggested_source, ".bib", "")
+      suggested_source <- stringr::str_replace_all(suggested_source, ".txt", "")
       upload_df <- CiteSource::read_citations(files=input$file$datapath, 
-                                              cite_sources = input$source,
-                                              cite_labels = input$label,
-                                              cite_strings = input$strings)
-      upload_length <- nrow(upload_df)
+                                              cite_sources = suggested_source,
+                                              cite_labels = rep("", length(input$file$datapath)),
+                                              cite_strings =rep("", length(input$file$datapath)))
+      upload_length <- upload_df %>%
+        group_by(cite_source) %>%
+        count(name="records") %>%
+        rename(source = cite_source)
       
       #create a dataframe summarising inputs
-      df <- data.frame('file' = input$file[1], 
-                       'records' = upload_length,
-                       'source' = input$source,
-                       'label' = input$label,
-                       'string' = input$string)
+      df <- data.frame('file' = input$file, 
+                       'source' = suggested_source,
+                       'label' = rep("", length(input$file$datapath)),
+                       'string' = rep("", length(input$file$datapath)))
+      
+      df <- left_join(upload_length, df, by="source") %>%
+        select(file.name,records, source, label, string)
       
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df) 
@@ -186,12 +198,16 @@ server <- function(input, output, session) {
   # # display summary input table - summary of files added
   output$tbl_out <- renderDataTable({
     DT::datatable(rv$df, 
+                  editable = TRUE,
                   options = list(paging = FALSE, 
                                  searching = FALSE),
                   rownames = FALSE)
   })
   
   
+  ### Deduplication tab ####
+  
+  # when dedup button clicked, deduplicate
   observeEvent(input$identify_dups,{
     
     dedup_results <- CiteSource::dedup_citations(rv$upload_df, merge_citations = TRUE)
@@ -206,6 +222,11 @@ server <- function(input, output, session) {
                    labels, and strings in the visualisation tab"), type = "success")
     
   })
+  
+  # display results of deduplication
+  dedup_results <- renderDataTable(
+    datatable(rv$unique)
+  )
   
   
   #### end section ####
