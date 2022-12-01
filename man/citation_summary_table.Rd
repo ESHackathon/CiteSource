@@ -2,7 +2,7 @@
 % Please edit documentation in R/tables.R
 \name{citation_summary_table}
 \alias{citation_summary_table}
-\title{Summary table}
+\title{Contribution summary table}
 \usage{
 citation_summary_table(
   citations,

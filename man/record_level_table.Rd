@@ -4,15 +4,24 @@
 \alias{record_level_table}
 \title{Record-level table}
 \usage{
-record_level_table(citations, include = "sources")
+record_level_table(
+  citations,
+  include = "sources",
+  return = c("tibble", "DT"),
+  indicator_presence = NULL,
+  indicator_absence = NULL
+)
 }
 \arguments{
 \item{citations}{A deduplicated tibble as returned by \code{dedup_citations()}.}
 
 \item{include}{Which metadata should be included in the table? Defaults to 'sources', can be replaced or expanded with 'labels' and/or 'strings'}
-}
-\value{
-A tibble that can be turned into a pretty table with (e.g.) the \code{gt}-package
+
+\item{return}{Either a \code{tibble} that can be exported, e.g. as a csv, or a DataTable (\code{DT}) that allows for interactive exploration}
+
+\item{indicator_presence}{How should it be indicated that a value is present in a source/label/string? Defaults to TRUE in tibbles and a tickmark in DT tables}
+
+\item{indicator_absence}{How should it be indicated that a value is \emph{not} present in a source/label/string? Defaults to FALSE in tibbles and a cross in DT tables}
 }
 \description{
 Creates a per-record table that shows which sources (and/or labels/strings) each item was found in.
