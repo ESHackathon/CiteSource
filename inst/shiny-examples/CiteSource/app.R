@@ -185,9 +185,13 @@ server <- function(input, output, session) {
                        'label' = rep("", length(input$file$datapath)),
                        'string' = rep("", length(input$file$datapath)))
       
+      upload_df <- left_join(upload_df, df, by=c("cite_source"="source")) %>%
+        select(-source, -label, -string) %>%
+        select(cite_source, cite_label, cite_string, everything()) 
+      
       df <- left_join(upload_length, df, by="source") %>%
         select(file.name,records, source, label, string)
-      
+
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df) 
       
@@ -204,6 +208,37 @@ server <- function(input, output, session) {
                   rownames = FALSE)
   })
   
+  # when file upload table is edited, edit reactive value upload df
+  observeEvent(input$tbl_out_cell_edit, {
+    
+    # make sure not blank to avoid blanks in output
+  
+    info <- input$tbl_out_cell_edit
+    val <- info$value
+    
+    if(val == ""){
+      
+      val <- NA
+    }
+    
+    print(val)
+    
+    rv$df[info$row, info$col+1] <- val
+
+    # get rownames for file  
+    row_indexes <- rv$upload_df %>%
+      mutate(rowname = row_number()) %>%
+      group_by(file.name) %>%
+      summarise(min_row = first(rowname), max_row=last(rowname)) 
+    
+    rows <- row_indexes[info$row, 2:3]
+    col <- paste0("cite_", names(rv$df[info$col+1]))
+    file <- rv$df[info$row,1]
+    
+    rv$upload_df[c(rows$min_row:rows$max_row), col] <- val
+    
+  
+    })
   
   ### Deduplication tab ####
   
@@ -223,11 +258,12 @@ server <- function(input, output, session) {
     
   })
   
-  # display results of deduplication
-  dedup_results <- renderDataTable(
-    datatable(rv$unique)
-  )
-  
+  # # display results of deduplication
+  # output$dedup_results <- renderDataTable({
+  # 
+  #   gr
+  # })
+
   
   #### end section ####
   
