@@ -71,17 +71,23 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
           td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
         )
       ))
-
       citations %>%
         dplyr::select(-"duplicate_id", -"reference") %>%
         cbind(" " = "&oplus;", .) %>%
         DT::datatable(
           escape = FALSE,
+          extensions = 'Buttons',
           options = list(
             columnDefs = list(
               list(visible = FALSE, targets = c(0, 3)),
-              list(orderable = FALSE, className = "details-control", targets = 1)
-            )
+              list(orderable = FALSE, className = "details-control", targets = 1)),
+              dom = 'Bfrtip',
+              buttons = 
+                list('print', list(
+                  extend = 'csv', filename = 'CiteSource_record_summary',
+                  text = 'Download csv',
+                  exportOptions = list(columns = c(0, 2:(ncol(citations)-1)))
+                ))
           ), container = sketch,
           callback = DT::JS("
               table.column(1).nodes().to$().css({cursor: 'pointer'});
@@ -181,8 +187,10 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
                   Contribution_unique = Records_unique/total_total) %>% 
     dplyr::select(-"total_total")
   
-  yields %>% dplyr::rename("Sensitivity/ Recall" = "Sensitivity") %>% dplyr::group_by(.data$stage) %>% gt::gt() %>% 
+  yields %>% dplyr::relocate("Sensitivity", "Precision", .after = dplyr::last_col()) %>% 
+    dplyr::rename_with(stringr::str_to_title) %>% dplyr::group_by(.data$Stage) %>% gt::gt() %>% 
     gt::fmt_percent(6:9) %>% gt::sub_missing() %>% 
+    gt::cols_hide(names(yields) %>% stringr::str_subset("_crossover")) %>% 
     gt::tab_spanner_delim("_") %>% 
     gt::fmt_number(3:5, decimals = 0)
   
