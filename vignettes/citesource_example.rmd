@@ -70,7 +70,6 @@ complete_comparison <- compare_sources(unique_citations)
 ```{r}
 citation_summary_table(unique_citations)
 ```
-
 ## step 4b: visualise comparisons
 
 ### Existing plots
@@ -172,3 +171,13 @@ n_unique %>%
   geom_bar(position="stack", stat="count") +
   xlab("") + ylab("Number of citations")
 ```
+
+## Step 4c: review individual records
+
+This will usually be impractical for all records, but it might be worth showing/reporting where final records came from.
+
+```{r}
+unique_citations %>% filter(stringr::str_detect(cite_label, "final")) %>% 
+  record_level_table(return = "DT")
+```
+
