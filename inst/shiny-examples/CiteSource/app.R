@@ -42,7 +42,7 @@ ui <- navbarPage("CiteSource", id = "tabs",
                  ),
                  
                  # File upload tab
-                 tabPanel("File upload & Deduplicate",
+                 tabPanel("File upload",
                           fluidRow(
                             column(12,
                                    # Sidebar layout with input and output definitions ----
@@ -55,8 +55,12 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                                   textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
                                                   textInput('string', 'Citestring', placeholder = 'e.g. search string 1.3'),
                                                   textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
-                                                  actionButton('upload', 'Add file'),
-                                                  actionButton('identify_dups', 'Identify duplicates')
+                                                  actionBttn(
+                                                    'upload', 'Add citation file',
+                                                    style = "pill",
+                                                    color = "primary",
+                                                    icon = icon("plus")
+                                                  )
                                      ),
                                      
                                      # Main panel for displaying outputs ----
@@ -70,6 +74,17 @@ ui <- navbarPage("CiteSource", id = "tabs",
                             )
                           )
                  ),
+                 
+                 tabPanel("Deduplicate",
+                          
+                            actionBttn(
+                              'identify_dups', 'Identify duplicate citations',
+                              style = "pill",
+                              color = "primary",
+                              icon = icon("search")
+                            ),               
+                                     
+                ),
                  
                  # Visualise tab
                  tabPanel("Visualise",
