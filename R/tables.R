@@ -192,7 +192,24 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     gt::fmt_percent(6:9) %>% gt::sub_missing() %>% 
     gt::cols_hide(names(yields) %>% stringr::str_subset("_crossover")) %>% 
     gt::tab_spanner_delim("_") %>% 
-    gt::fmt_number(3:5, decimals = 0)
+    gt::fmt_number(3:5, decimals = 0) %>% 
+    gt::tab_options(row_group.background.color = "grey") %>% 
+    gt::tab_style(
+      locations = gt::cells_column_labels(columns = gt::everything()),
+      style     = list(
+        gt::cell_borders(sides = c("bottom"), weight = gt::px(3)),
+        gt::cell_borders(sides = c("top"), weight = gt::px(2)),
+        gt::cell_text(weight = "bold")
+      )
+    ) %>% 
+    gt::tab_style(
+      locations = gt::cells_column_spanners(),
+      style     = list(
+        gt::cell_borders(sides = "top", weight = gt::px(2)),
+        gt::cell_borders(sides = "bottom", weight = NULL),
+        gt::cell_text(weight = "bold", style = "italic")
+      )
+    )
   
 }
 
