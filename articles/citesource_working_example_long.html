@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">Trevor
 Riley</h4>
             
-            <h4 data-toc-skip class="date">2022-12-09</h4>
+            <h4 data-toc-skip class="date">2022-12-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_working_example_long.rmd" class="external-link"><code>vignettes/citesource_working_example_long.rmd</code></a></small>
       <div class="d-none name"><code>citesource_working_example_long.rmd</code></div>
@@ -253,6 +253,1220 @@ comparison as well as strategy and methodology comparison.</p>
 <span><span class="va">my_upset_plot</span></span></code></pre></div>
 <p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
 </div>
+<div class="section level3">
+<h3 id="report-contributions-of-different-sources-in-table">Report contributions of different sources in table<a class="anchor" aria-label="anchor" href="#report-contributions-of-different-sources-in-table"></a>
+</h3>
+<p>You can create a table that reports on the contribution of each
+source. To keep it simple, this can be restricted to a specific number
+(<code>top_n</code>) of sources.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/citation_summary_table.html">citation_summary_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, screening_label <span class="op">=</span> <span class="st">"Final"</span>, top_n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<div id="eaqqonldsk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+html {
+  font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#eaqqonldsk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: 300;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: none;
+  border-top-width: 3px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: left;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#eaqqonldsk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#eaqqonldsk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#eaqqonldsk .gt_bottom_border {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_col_headings {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: normal;
+  text-transform: uppercase;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#eaqqonldsk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: normal;
+  text-transform: uppercase;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#eaqqonldsk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#eaqqonldsk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#eaqqonldsk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#eaqqonldsk .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #BEBEBE;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#eaqqonldsk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #BEBEBE;
+  font-size: 80%;
+  font-weight: bolder;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #FFFFFF;
+  vertical-align: middle;
+}
+
+#eaqqonldsk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#eaqqonldsk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#eaqqonldsk .gt_row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#eaqqonldsk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-right-style: solid;
+  border-right-width: 0px;
+  border-right-color: #FFFFFF;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eaqqonldsk .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#eaqqonldsk .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#eaqqonldsk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eaqqonldsk .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#eaqqonldsk .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eaqqonldsk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#eaqqonldsk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eaqqonldsk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eaqqonldsk .gt_sourcenote {
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eaqqonldsk .gt_left {
+  text-align: left;
+}
+
+#eaqqonldsk .gt_center {
+  text-align: center;
+}
+
+#eaqqonldsk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#eaqqonldsk .gt_font_normal {
+  font-weight: normal;
+}
+
+#eaqqonldsk .gt_font_bold {
+  font-weight: bold;
+}
+
+#eaqqonldsk .gt_font_italic {
+  font-style: italic;
+}
+
+#eaqqonldsk .gt_super {
+  font-size: 65%;
+}
+
+#eaqqonldsk .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#eaqqonldsk .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#eaqqonldsk .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#eaqqonldsk .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#eaqqonldsk .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#eaqqonldsk .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#eaqqonldsk .gt_indent_5 {
+  text-indent: 25px;
+}
+
+tbody tr:last-child {
+  border-bottom: 2px solid #ffffff00;
+}
+</style>
+<table class="table gt_table">
+<thead class="gt_col_headings">
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="Sources">Sources</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="border-top-width: 2px; border-top-style: solid; border-top-color: #000000; border-bottom-width: 0; border-bottom-style: solid; border-bottom-color: #000000; font-style: italic; font-weight: bold;" scope="colgroup" id="Records">
+        <span class="gt_column_spanner">Records</span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1" style="border-top-width: 2px; border-top-style: solid; border-top-color: #000000; border-bottom-width: 0; border-bottom-style: solid; border-bottom-color: #000000; font-style: italic; font-weight: bold;" scope="col" id="Contribution">
+        <span class="gt_column_spanner">Contribution</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="Sensitivity">Sensitivity</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="Precision">Precision</th>
+    </tr>
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="total">total</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="unique">unique</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="unique">unique</th>
+    </tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="gt_group_heading_row">
+<th colspan="6" class="gt_group_heading" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black;" scope="colgroup" id="search">search</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="search  Sources" class="gt_row gt_left">WoS</td>
+<td headers="search  Records_total" class="gt_row gt_right">2,550</td>
+<td headers="search  Records_unique" class="gt_row gt_right">1,612</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">27.27%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">43.13%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Sources" class="gt_row gt_left">McK</td>
+<td headers="search  Records_total" class="gt_row gt_right">2,404</td>
+<td headers="search  Records_unique" class="gt_row gt_right">1,658</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">28.04%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">40.66%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Sources" class="gt_row gt_left">WoSE</td>
+<td headers="search  Records_total" class="gt_row gt_right">738</td>
+<td headers="search  Records_unique" class="gt_row gt_right">498</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">8.42%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">12.48%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Sources" class="gt_row gt_left">CAB</td>
+<td headers="search  Records_total" class="gt_row gt_right">686</td>
+<td headers="search  Records_unique" class="gt_row gt_right">630</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">10.66%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">11.60%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Sources" class="gt_row gt_left">RMR</td>
+<td headers="search  Records_total" class="gt_row gt_right">186</td>
+<td headers="search  Records_unique" class="gt_row gt_right">129</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">62.62%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">3.15%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Sources" class="gt_row gt_left">Total<sup class="gt_footnote_marks">1</sup>
+</td>
+<td headers="search  Records_total" class="gt_row gt_right">5,912</td>
+<td headers="search  Records_unique" class="gt_row gt_right">4,852</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">82.07%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">—</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr class="gt_group_heading_row">
+<th colspan="6" class="gt_group_heading" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black;" scope="colgroup" id="Final">Final</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="Final  Sources" class="gt_row gt_left">McK</td>
+<td headers="Final  Records_total" class="gt_row gt_right">113</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">49</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">23.79%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">54.85%</td>
+<td headers="Final  Precision" class="gt_row gt_right">4.70%</td>
+</tr>
+<tr>
+<td headers="Final  Sources" class="gt_row gt_left">WoS</td>
+<td headers="Final  Records_total" class="gt_row gt_right">87</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">29</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">14.08%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">42.23%</td>
+<td headers="Final  Precision" class="gt_row gt_right">3.41%</td>
+</tr>
+<tr>
+<td headers="Final  Sources" class="gt_row gt_left">WoSE</td>
+<td headers="Final  Records_total" class="gt_row gt_right">30</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">22</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">10.68%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">14.56%</td>
+<td headers="Final  Precision" class="gt_row gt_right">4.07%</td>
+</tr>
+<tr>
+<td headers="Final  Sources" class="gt_row gt_left">RMR</td>
+<td headers="Final  Records_total" class="gt_row gt_right">16</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">5</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">2.43%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">7.77%</td>
+<td headers="Final  Precision" class="gt_row gt_right">8.60%</td>
+</tr>
+<tr>
+<td headers="Final  Sources" class="gt_row gt_left">CAB</td>
+<td headers="Final  Records_total" class="gt_row gt_right">4</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">2</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">0.97%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">1.94%</td>
+<td headers="Final  Precision" class="gt_row gt_right">0.58%</td>
+</tr>
+<tr>
+<td headers="Final  Sources" class="gt_row gt_left">Total<sup class="gt_footnote_marks">1</sup>
+</td>
+<td headers="Final  Records_total" class="gt_row gt_right">206</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">127</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">61.65%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">—</td>
+<td headers="Final  Precision" class="gt_row gt_right">3.48%</td>
+</tr>
+</tbody>
+<tfoot class="gt_sourcenotes">
+<tr>
+<td class="gt_sourcenote" colspan="6">
+<strong>Included fields:</strong>
+<ul>
+<li>
+<p><strong><em>Total</em> records</strong> are all records returned by that source, while <strong><em>unique</em> records</strong> are found in only that source (or, in the Total rows, in only one source).</p>
+</li>
+<li>
+<p>The <strong>unique contribution</strong> is the share of records only found in that source (or, in the Total rows, in only one source).</p>
+</li>
+<li>
+<p><strong>Sensitivity</strong> is the share of all (deduplicated) records retained at that stage compared to the total number found in that particular source.</p>
+</li>
+<li>
+<p><strong>Precision</strong> is the share of initial records in that source that are retained for inclusion at that stage.</p>
+</li>
+</ul>
+</td>
+    </tr>
+<tr>
+<td class="gt_sourcenote" colspan="6">NB: For clarity, <strong>only the top-5 sources are displayed</strong>. Totals and percentages, however, are based on <em>all</em> sources.</td>
+    </tr>
+</tfoot>
+<tfoot class="gt_footnotes"><tr>
+<td class="gt_footnote" colspan="6">
+<sup class="gt_footnote_marks">1</sup> After deduplication</td>
+    </tr></tfoot>
+</table>
+</div>
+<p>Such summaries can also be created for search strings, if a different
+grouping is to be explored.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/citation_summary_table.html">citation_summary_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, comparison_type <span class="op">=</span> <span class="st">"strings"</span>, screening_label <span class="op">=</span> <span class="st">"Final"</span><span class="op">)</span></span></code></pre></div>
+<div id="hvtbjgyjts" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+html {
+  font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#hvtbjgyjts .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: 300;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: none;
+  border-top-width: 3px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_heading {
+  background-color: #FFFFFF;
+  text-align: left;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#hvtbjgyjts .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#hvtbjgyjts .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#hvtbjgyjts .gt_bottom_border {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_col_headings {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: normal;
+  text-transform: uppercase;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#hvtbjgyjts .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: normal;
+  text-transform: uppercase;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#hvtbjgyjts .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#hvtbjgyjts .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#hvtbjgyjts .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#hvtbjgyjts .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #BEBEBE;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#hvtbjgyjts .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #BEBEBE;
+  font-size: 80%;
+  font-weight: bolder;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #FFFFFF;
+  vertical-align: middle;
+}
+
+#hvtbjgyjts .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#hvtbjgyjts .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#hvtbjgyjts .gt_row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#hvtbjgyjts .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-right-style: solid;
+  border-right-width: 0px;
+  border-right-color: #FFFFFF;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hvtbjgyjts .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#hvtbjgyjts .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#hvtbjgyjts .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hvtbjgyjts .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#hvtbjgyjts .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hvtbjgyjts .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#hvtbjgyjts .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hvtbjgyjts .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hvtbjgyjts .gt_sourcenote {
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hvtbjgyjts .gt_left {
+  text-align: left;
+}
+
+#hvtbjgyjts .gt_center {
+  text-align: center;
+}
+
+#hvtbjgyjts .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#hvtbjgyjts .gt_font_normal {
+  font-weight: normal;
+}
+
+#hvtbjgyjts .gt_font_bold {
+  font-weight: bold;
+}
+
+#hvtbjgyjts .gt_font_italic {
+  font-style: italic;
+}
+
+#hvtbjgyjts .gt_super {
+  font-size: 65%;
+}
+
+#hvtbjgyjts .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#hvtbjgyjts .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#hvtbjgyjts .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#hvtbjgyjts .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#hvtbjgyjts .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#hvtbjgyjts .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#hvtbjgyjts .gt_indent_5 {
+  text-indent: 25px;
+}
+
+tbody tr:last-child {
+  border-bottom: 2px solid #ffffff00;
+}
+</style>
+<table class="table gt_table">
+<thead class="gt_col_headings">
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="Strings">Strings</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="border-top-width: 2px; border-top-style: solid; border-top-color: #000000; border-bottom-width: 0; border-bottom-style: solid; border-bottom-color: #000000; font-style: italic; font-weight: bold;" scope="colgroup" id="Records">
+        <span class="gt_column_spanner">Records</span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1" style="border-top-width: 2px; border-top-style: solid; border-top-color: #000000; border-bottom-width: 0; border-bottom-style: solid; border-bottom-color: #000000; font-style: italic; font-weight: bold;" scope="col" id="Contribution">
+        <span class="gt_column_spanner">Contribution</span>
+      </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="Sensitivity">Sensitivity</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="Precision">Precision</th>
+    </tr>
+<tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="total">total</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="unique">unique</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; border-top-width: 0px; border-top-style: solid; border-top-color: black; font-weight: bold;" scope="col" id="unique">unique</th>
+    </tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="gt_group_heading_row">
+<th colspan="6" class="gt_group_heading" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black;" scope="colgroup" id="search">search</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="search  Strings" class="gt_row gt_left">McKE</td>
+<td headers="search  Records_total" class="gt_row gt_right">1,999</td>
+<td headers="search  Records_unique" class="gt_row gt_right">1,811</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">65.07%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">71.83%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">MCKI</td>
+<td headers="search  Records_total" class="gt_row gt_right">562</td>
+<td headers="search  Records_unique" class="gt_row gt_right">359</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">12.90%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">20.19%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">RMR</td>
+<td headers="search  Records_total" class="gt_row gt_right">186</td>
+<td headers="search  Records_unique" class="gt_row gt_right">144</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">5.17%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">6.68%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">Pur</td>
+<td headers="search  Records_total" class="gt_row gt_right">118</td>
+<td headers="search  Records_unique" class="gt_row gt_right">93</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">66.43%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">4.24%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">Pul</td>
+<td headers="search  Records_total" class="gt_row gt_right">98</td>
+<td headers="search  Records_unique" class="gt_row gt_right">66</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">47.14%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">3.52%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">B</td>
+<td headers="search  Records_total" class="gt_row gt_right">53</td>
+<td headers="search  Records_unique" class="gt_row gt_right">38</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">27.14%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">1.90%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">PES</td>
+<td headers="search  Records_total" class="gt_row gt_right">20</td>
+<td headers="search  Records_unique" class="gt_row gt_right">2</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">1.43%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">0.72%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">DFM</td>
+<td headers="search  Records_total" class="gt_row gt_right">19</td>
+<td headers="search  Records_unique" class="gt_row gt_right">2</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">1.43%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">0.68%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">L</td>
+<td headers="search  Records_total" class="gt_row gt_right">17</td>
+<td headers="search  Records_unique" class="gt_row gt_right">15</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">10.71%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">0.61%</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr>
+<td headers="search  Strings" class="gt_row gt_left">Total<sup class="gt_footnote_marks">1</sup>
+</td>
+<td headers="search  Records_total" class="gt_row gt_right">2,783</td>
+<td headers="search  Records_unique" class="gt_row gt_right">2,530</td>
+<td headers="search  Contribution_unique" class="gt_row gt_right">90.91%</td>
+<td headers="search  Sensitivity" class="gt_row gt_right">—</td>
+<td headers="search  Precision" class="gt_row gt_right">—</td>
+</tr>
+<tr class="gt_group_heading_row">
+<th colspan="6" class="gt_group_heading" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black;" scope="colgroup" id="Final">Final</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="Final  Strings" class="gt_row gt_left">McKE</td>
+<td headers="Final  Records_total" class="gt_row gt_right">80</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">37</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">26.43%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">57.14%</td>
+<td headers="Final  Precision" class="gt_row gt_right">4.00%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">MCKI</td>
+<td headers="Final  Records_total" class="gt_row gt_right">71</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">22</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">15.71%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">50.71%</td>
+<td headers="Final  Precision" class="gt_row gt_right">12.63%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">Pur</td>
+<td headers="Final  Records_total" class="gt_row gt_right">26</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">14</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">10.00%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">18.57%</td>
+<td headers="Final  Precision" class="gt_row gt_right">22.03%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">RMR</td>
+<td headers="Final  Records_total" class="gt_row gt_right">16</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">6</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">4.29%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">11.43%</td>
+<td headers="Final  Precision" class="gt_row gt_right">8.60%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">Pul</td>
+<td headers="Final  Records_total" class="gt_row gt_right">5</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">0</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">0.00%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">3.57%</td>
+<td headers="Final  Precision" class="gt_row gt_right">5.10%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">PES</td>
+<td headers="Final  Records_total" class="gt_row gt_right">5</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">0</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">0.00%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">3.57%</td>
+<td headers="Final  Precision" class="gt_row gt_right">25.00%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">B</td>
+<td headers="Final  Records_total" class="gt_row gt_right">4</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">1</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">0.71%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">2.86%</td>
+<td headers="Final  Precision" class="gt_row gt_right">7.55%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">L</td>
+<td headers="Final  Records_total" class="gt_row gt_right">4</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">2</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">1.43%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">2.86%</td>
+<td headers="Final  Precision" class="gt_row gt_right">23.53%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">DFM</td>
+<td headers="Final  Records_total" class="gt_row gt_right">4</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">0</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">0.00%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">2.86%</td>
+<td headers="Final  Precision" class="gt_row gt_right">21.05%</td>
+</tr>
+<tr>
+<td headers="Final  Strings" class="gt_row gt_left">Total<sup class="gt_footnote_marks">1</sup>
+</td>
+<td headers="Final  Records_total" class="gt_row gt_right">140</td>
+<td headers="Final  Records_unique" class="gt_row gt_right">82</td>
+<td headers="Final  Contribution_unique" class="gt_row gt_right">58.57%</td>
+<td headers="Final  Sensitivity" class="gt_row gt_right">—</td>
+<td headers="Final  Precision" class="gt_row gt_right">5.03%</td>
+</tr>
+</tbody>
+<tfoot class="gt_sourcenotes"><tr>
+<td class="gt_sourcenote" colspan="6">
+<strong>Included fields:</strong>
+<ul>
+<li>
+<p><strong><em>Total</em> records</strong> are all records returned by that string, while <strong><em>unique</em> records</strong> are found in only that string (or, in the Total rows, in only one string).</p>
+</li>
+<li>
+<p>The <strong>unique contribution</strong> is the share of records only found in that string (or, in the Total rows, in only one string).</p>
+</li>
+<li>
+<p><strong>Sensitivity</strong> is the share of all (deduplicated) records retained at that stage compared to the total number found in that particular string.</p>
+</li>
+<li>
+<p><strong>Precision</strong> is the share of initial records in that string that are retained for inclusion at that stage.</p>
+</li>
+</ul>
+</td>
+    </tr></tfoot>
+<tfoot class="gt_footnotes"><tr>
+<td class="gt_footnote" colspan="6">
+<sup class="gt_footnote_marks">1</sup> After deduplication</td>
+    </tr></tfoot>
+</table>
+</div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="review-stage-analysis">Review stage analysis<a class="anchor" aria-label="anchor" href="#review-stage-analysis"></a>
@@ -266,13 +1480,13 @@ overlapping/unique records from each source or method.</p>
 <div class="section level3">
 <h3 id="assess-contribution-of-sources-by-review-stage">Assess contribution of sources by review stage<a class="anchor" aria-label="anchor" href="#assess-contribution-of-sources-by-review-stage"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                                       bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>, <span class="st">'Screened'</span>, <span class="st">'Final'</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_contributions</span></span></code></pre></div>
-<p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
+<p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
