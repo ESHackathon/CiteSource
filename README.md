@@ -1,5 +1,5 @@
 # CiteSource
-<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="300px" align="left">
+<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" style="float:right; height:200px;">
 
 
 <!-- badges: start -->

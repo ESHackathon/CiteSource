@@ -68,7 +68,7 @@ complete_comparison <- compare_sources(unique_citations)
 ## Step 4a: review a summary table
 
 ```{r}
-citation_summary_table(unique_citations)
+citation_summary_table(unique_citations, screening_label = c("screen", "final"))
 ```
 ## step 4b: visualise comparisons
 

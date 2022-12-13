@@ -121,9 +121,10 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
 #' @param comparison_type Either "sources" to summarise and assess sources or "strings" to consider strings.
 #' @param search_label One or multiple labels that identify initial search results (default: "search") - if multiple labels are provided, they are merged.
 #' @param screening_label One or multiple label that identify screened records (default: "final") - if multiple are provided, each is compared to the search stage.
+#' @param top_n Number of sources/strings to display, based on the number of total records they contributed at the search stage. Note that calculations and totals will still be based on all citations. Defaults to NULL, then all sources/strings are displayed.
 #' @export
 
-citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final") {
+citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
   
   if (!comparison_type %in% c("sources", "strings")) stop('comparison_type needs to be "sources" or "strings"')
   
@@ -136,6 +137,7 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
   }
   
   citations_spread <- compare_sources(citations, c("labels", comparison_type))
+  
   
   citations_long <- citations_spread %>% tidyr::pivot_longer(-.data$duplicate_id, values_to = "bool") %>% 
     dplyr::filter(.data$bool == TRUE) %>% dplyr::select(-"bool") %>%  
@@ -152,8 +154,8 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     split(.$value_label)
   
   yields <- purrr::map_dfr(yield_dfs, .id = "stage", function(df) {
-    indicators <- df %>% tidyr::pivot_wider(names_from = .data$value_source, 
-                              values_from = .data$value_source, values_fn = ~TRUE,
+    indicators <- df %>% tidyr::pivot_wider(names_from = .data[[glue::glue("value_{comparison_type_singular}")]], 
+                              values_from = .data[[glue::glue("value_{comparison_type_singular}")]], values_fn = ~TRUE,
                               values_fill = FALSE) %>% 
       dplyr::select(-dplyr::all_of(c("duplicate_id", "value_label")))
     
@@ -161,38 +163,69 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     
     purrr::map_dfr(clusters, function(cluster) {
       rs <- indicators %>% dplyr::filter(.data[[cluster]] == TRUE) %>% rowSums()
-      tibble::tibble(!!comparison_type := cluster, Records_total = length(rs), Records_unique = sum(rs == 1), 
-                     Records_crossover = .data$Records_total - Records_unique)
+      tibble::tibble(!!comparison_type := cluster, Records_total = length(rs), Records_unique = sum(rs == 1))
     })
     
   })
   
+  
+  yield_dfs_dedup <- purrr::map_dfr(yield_dfs, .id = "stage", ~.x %>% 
+                                  dplyr::select("duplicate_id") %>% unique()) %>% 
+    dplyr::group_by(.data$stage) %>% dplyr::summarise(stage_total = dplyr::n())
+     
   yields <- yields %>% 
+    dplyr::left_join(yield_dfs_dedup, by = "stage") %>% 
     dplyr::group_by(.data$stage) %>% 
-    dplyr::mutate(Sensitivity = .data$Records_total / sum(.data$Records_total)) %>% 
+    dplyr::mutate(Sensitivity = .data$Records_total / .data$stage_total) %>% 
     dplyr::ungroup() %>% 
-   dplyr::bind_rows(dplyr::group_by(., .data$stage) %>% dplyr::summarise(!!comparison_type := "Total", dplyr::across(tidyselect::where(is.numeric), sum), Sensitivity = NA))
+    dplyr::select(-"stage_total") 
   
-  search_results <- yields %>% dplyr::filter(.data$stage == "search") 
+  yields <- yield_dfs_dedup %>% dplyr::rename(Records_total = stage_total) %>% 
+    dplyr::mutate(!!comparison_type := "Total", Sensitivity = NA) %>% dplyr::left_join(yields %>% 
+                                                                                         dplyr::group_by(.data$stage) %>% 
+                                                                                         dplyr::summarise(Records_unique = sum(Records_unique)), by = "stage") %>% 
+  dplyr::bind_rows(yields, .)
   
-  yields <- yields %>% dplyr::filter(.data$stage != "search") %>% dplyr::left_join(
+  search_results <- yields %>% dplyr::filter(.data$stage == search_label) 
+  
+  
+  yields <- yields %>% dplyr::filter(.data$stage != search_label) %>% dplyr::left_join(
     search_results %>% dplyr::select(-"stage", total_search = .data$Records_total, -c("Records_unique":"Sensitivity")), by = comparison_type) %>% 
     dplyr::mutate(Precision = .data$Records_total / .data$total_search) %>% 
     dplyr::select(-"total_search") %>% 
     dplyr::bind_rows(search_results) %>% 
+    dplyr::group_by(.data$stage) %>% 
     dplyr::arrange(-.data$Records_total) %>% 
-    dplyr::mutate(total_total = dplyr::if_else(sources == "Total", Records_total, NA_integer_)) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::mutate(total_total = dplyr::if_else(.data[[comparison_type]] == "Total", Records_total, NA_integer_)) %>% 
     tidyr::fill(total_total) %>% 
-    dplyr::mutate(Contribution_total = dplyr::if_else(sources == "Total", NA_real_, Records_total/total_total), 
-                  Contribution_unique = Records_unique/total_total) %>% 
-    dplyr::select(-"total_total")
+    dplyr::mutate(Contribution_unique = Records_unique/total_total) %>% 
+    dplyr::select(-"total_total") %>% 
+    dplyr::group_by(.data$stage) %>% 
+    dplyr::arrange(.data[[comparison_type]] == "Total") %>% 
+    dplyr::ungroup()
   
-  yields %>% dplyr::relocate("Sensitivity", "Precision", .after = dplyr::last_col()) %>% 
+  if (!is.null(top_n)) {
+    
+    if (length(unique(search_results[[comparison_type]])) <= top_n) {
+      top_n <- NULL
+    } else {
+    
+    to_display <- search_results %>%  
+      dplyr::arrange(-.data$Records_total) %>% 
+      dplyr::slice_head(n = top_n + 1) %>% # +1 to include Total row
+      dplyr::pull(!!rlang::sym(comparison_type))
+    
+    yields <- yields %>% 
+      dplyr::filter(.data[[comparison_type]] %in% to_display)
+    }
+  }
+  
+  tab <- yields %>% dplyr::relocate("Sensitivity", "Precision", .after = dplyr::last_col()) %>% 
     dplyr::rename_with(stringr::str_to_title) %>% dplyr::group_by(.data$Stage) %>% gt::gt() %>% 
-    gt::fmt_percent(6:9) %>% gt::sub_missing() %>% 
-    gt::cols_hide(names(yields) %>% stringr::str_subset("_crossover")) %>% 
+    gt::fmt_percent(5:7) %>% gt::sub_missing() %>% 
     gt::tab_spanner_delim("_") %>% 
-    gt::fmt_number(3:5, decimals = 0) %>% 
+    gt::fmt_number(3:4, decimals = 0) %>% 
     gt::tab_options(row_group.background.color = "grey") %>% 
     gt::tab_style(
       locations = gt::cells_column_labels(columns = gt::everything()),
@@ -209,7 +242,20 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
         gt::cell_borders(sides = "bottom", weight = NULL),
         gt::cell_text(weight = "bold", style = "italic")
       )
-    )
+    ) %>% 
+    gt::tab_footnote("After deduplication", gt::cells_body(columns = dplyr::all_of(stringr::str_to_title(comparison_type)),
+                                                           rows = !!rlang::sym(stringr::str_to_title(comparison_type)) == "Total")) %>% 
+    gtExtras::gt_theme_538() %>% 
+    gt::tab_source_note(gt::md(glue::glue(" \n **Included fields:**
+    * **_Total_ records** are all records returned by that {comparison_type_singular}, while **_unique_ records** are found in only that {comparison_type_singular} (or, in the Total rows, in only one {comparison_type_singular}).
+    * The **unique contribution** is the share of records only found in that {comparison_type_singular} (or, in the Total rows, in only one {comparison_type_singular}).\n
+    * **Sensitivity** is the share of all (deduplicated) records retained at that stage compared to the total number found in that particular {comparison_type_singular}.\n
+    * **Precision** is the share of initial records in that {comparison_type_singular} that are retained for inclusion at that stage.")))
+  
+  if (!is.null(top_n)) {
+    tab <- tab %>%  gt::tab_source_note(gt::md(glue::glue("NB: For clarity, **only the top-{top_n} {comparison_type} are displayed**. Totals and percentages, however, are based on *all* {comparison_type}.")))
+  }
+  tab
   
 }
 
@@ -305,7 +351,7 @@ generate_apa_citation <- function(authors, year) {
     } else {
     # Case 2: distinct authors
       #Find maximum number of common authors
-      pairs <- combn(group$last_names, 2)
+      pairs <- utils::combn(group$last_names, 2)
       common <- numeric()
       for (i in seq_len(ncol(pairs))) {
         first <- pairs[[1,i]]

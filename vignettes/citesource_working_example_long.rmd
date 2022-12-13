@@ -131,6 +131,22 @@ my_upset_plot
 
 ```
 
+### Report contributions of different sources in table
+
+You can create a table that reports on the contribution of each source. To keep it simple, this can be restricted to a specific number (`top_n`) of sources.
+
+```{r}
+citation_summary_table(unique_citations, screening_label = "Final", top_n = 5)
+```
+
+Such summaries can also be created for search strings, if a different grouping is to be explored.
+
+```{r}
+citation_summary_table(unique_citations, comparison_type = "strings", screening_label = "Final")
+
+```
+
+
 ## Review stage analysis
 
 Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
