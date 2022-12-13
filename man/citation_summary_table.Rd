@@ -8,7 +8,8 @@ citation_summary_table(
   citations,
   comparison_type = "sources",
   search_label = "search",
-  screening_label = "final"
+  screening_label = "final",
+  top_n = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ citation_summary_table(
 \item{search_label}{One or multiple labels that identify initial search results (default: "search") - if multiple labels are provided, they are merged.}
 
 \item{screening_label}{One or multiple label that identify screened records (default: "final") - if multiple are provided, each is compared to the search stage.}
+
+\item{top_n}{Number of sources/strings to display, based on the number of total records they contributed at the search stage. Note that calculations and totals will still be based on all citations. Defaults to NULL, then all sources/strings are displayed.}
 }
 \description{
 Create a summary table to show the contribution of each source and the overall performance of the search. For this to work,
