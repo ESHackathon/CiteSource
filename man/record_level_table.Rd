@@ -7,6 +7,7 @@
 record_level_table(
   citations,
   include = "sources",
+  include_empty = TRUE,
   return = c("tibble", "DT"),
   indicator_presence = NULL,
   indicator_absence = NULL
@@ -17,7 +18,10 @@ record_level_table(
 
 \item{include}{Which metadata should be included in the table? Defaults to 'sources', can be replaced or expanded with 'labels' and/or 'strings'}
 
-\item{return}{Either a \code{tibble} that can be exported, e.g. as a csv, or a DataTable (\code{DT}) that allows for interactive exploration}
+\item{include_empty}{Should records with empty metadata (e.g., no information on 'sources') be included in the table? Defaults to FALSE.}
+
+\item{return}{Either a \code{tibble} that can be exported, e.g. as a csv, or a DataTable (\code{DT}) that allows for interactive exploration. Note that the DataTable allows
+users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.}
 
 \item{indicator_presence}{How should it be indicated that a value is present in a source/label/string? Defaults to TRUE in tibbles and a tickmark in DT tables}
 
