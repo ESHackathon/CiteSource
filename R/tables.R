@@ -4,25 +4,35 @@
 #'
 #' @param citations A deduplicated tibble as returned by `dedup_citations()`.
 #' @param include Which metadata should be included in the table? Defaults to 'sources', can be replaced or expanded with 'labels' and/or 'strings'
+#' @param include_empty Should records with empty metadata (e.g., no information on 'sources') be included in the table? Defaults to FALSE.
 #' @param indicator_presence How should it be indicated that a value is present in a source/label/string? Defaults to TRUE in tibbles and a tickmark in DT tables
 #' @param indicator_absence How should it be indicated that a value is *not* present in a source/label/string? Defaults to FALSE in tibbles and a cross in DT tables
-#' @param return Either a `tibble` that can be exported, e.g. as a csv, or a DataTable (`DT`) that allows for interactive exploration
+#' @param return Either a `tibble` that can be exported, e.g. as a csv, or a DataTable (`DT`) that allows for interactive exploration. Note that the DataTable allows 
+#' users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.
 #' @export
 
-record_level_table <- function(citations, include = "sources", return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
+record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
+  
+  if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
+  
   if (is.null(indicator_absence)) {
     indicator_absence <- switch(return[1],
       tibble = FALSE,
-      DT = "&#10004;"
+      DT = "&#x2717;"
     )
   }
   if (is.null(indicator_presence)) {
     indicator_presence <- switch(return[1],
       tibble = TRUE,
-      DT = "&#x2717;"
+      DT = "&#10004;"
     )
   }
   sources <- compare_sources(citations, comp_type = include)
+  
+  if(!include_empty == TRUE) {
+    citations <- citations %>% dplyr::filter(.data$duplicate_id %in% sources$duplicate_id)
+  }
+  
   citations <- citations %>%
     dplyr::mutate(
       citation = generate_apa_citation(author, year),
@@ -34,14 +44,16 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
     dplyr::select(duplicate_id, citation, reference, html_reference) %>%
     dplyr::left_join(sources, by = "duplicate_id")
 
-  if (!(is.logical(indicator_presence) & is.logical(indicator_absence))) {
-    indicator_presence <- as.character(indicator_presence)
-    indicator_absence <- as.character(indicator_absence)
-    citations <- citations %>% dplyr::mutate(dplyr::across(-c(1:3), as.character))
-    citations[-c(1:3)][citations[-c(1:3)] == "TRUE"] <- indicator_presence
-    citations[-c(1:3)][citations[-c(1:3)] == "FALSE"] <- indicator_absence
-  }
-  if (return[1] == "DT") {
+  indicator_presence <- as.character(indicator_presence)
+  indicator_absence <- as.character(indicator_absence)
+  
+  to_display <- citations %>% dplyr::select(-(1:4)) %>% 
+    dplyr::mutate(dplyr::across(dplyr::everything(), ~ifelse(.x, indicator_presence, indicator_absence))) %>% 
+    dplyr::rename_with(~paste0(.x, " ")) #Add space to keep column names unique
+
+    citations <- bind_cols(citations, to_display)
+
+    if (return[1] == "DT") {
     if (!rlang::is_installed("DT")) {
       warning('DT can only be returned when the DT package is installed. Please run install.packages("DT")')
       return(citations)
@@ -53,7 +65,6 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
           stringr::str_remove(glue::glue("^{type}__"))
         list(type = type %>% stringr::str_to_title(), values = values)
       }) %>% purrr::transpose()
-
 
       sketch <- htmltools::withTags(table(
         class = "display",
@@ -71,6 +82,8 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
           td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
         )
       ))
+      
+      
       citations %>%
         dplyr::select(-"duplicate_id", -"reference") %>%
         cbind(" " = "&oplus;", .) %>%
@@ -79,14 +92,14 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
           extensions = 'Buttons',
           options = list(
             columnDefs = list(
-              list(visible = FALSE, targets = c(0, 3)),
+              list(visible = FALSE, targets = c(0, 3, (4:(4+ncol(to_display))))),
               list(orderable = FALSE, className = "details-control", targets = 1)),
               dom = 'Bfrtip',
               buttons = 
                 list('print', list(
                   extend = 'csv', filename = 'CiteSource_record_summary',
                   text = 'Download csv',
-                  exportOptions = list(columns = c(0, 2:(ncol(citations)-1)))
+                  exportOptions = list(columns = c(0, 2:(2 + ncol(to_display))))
                 ))
           ), container = sketch,
           callback = DT::JS("
@@ -108,7 +121,8 @@ record_level_table <- function(citations, include = "sources", return = c("tibbl
         )
     }
   } else {
-    citations %>% dplyr::select(-"html_reference")
+    citations %>% dplyr::select(1:3, dplyr::matches(" "), -"html_reference") %>% 
+      dplyr::rename_with(stringr::str_trim)
   }
 }
 
@@ -297,7 +311,6 @@ generate_apa_citation <- function(authors, year) {
     purrr::transpose() %>% purrr::map(~paste(.x[[2]], .x[[1]])) 
 
   initialed_name <- initialed_name_list %>% unlist()
-  
   authors <- tibble::tibble(last_name, initialed_name)
   duplicated_last_names <- last_name[duplicated(last_name)]
   # Identify which last names appear with different initials

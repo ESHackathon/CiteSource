@@ -1,6 +1,8 @@
 #' Deduplicate citations (ASySD Modified Function)
 #'
-#' This function deduplicates citation data
+#' This function deduplicates citation data. Note that duplicates are assumed to published
+#' in the same source, so pre-prints and similar results will not be identified here.
+#' 
 #' @export
 #' @param raw_citations Citation dataframe with relevant columns
 #' @param manual_dedup Logical value. Do you want to retrieve dataframe for manual deduplication?
