@@ -2,6 +2,7 @@
 #'
 #' This function saves deduplicated citations as a csv file for further analysis and/or reporting.
 #' Metadata can be separated into one column per source, label or string, which facilitates analysis.
+#' Note that *existing files are overwritten without warning.*
 #'
 #' @param citations Dataframe with unique citations, resulting from `dedup_citations()`
 #' @param filename Name (and path) of file, should end in .csv
@@ -44,7 +45,8 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
 #' Export deduplicated citations to RIS file
 #'
 #' This function saves deduplicated citations as a RIS file with sources, labels and strings
-#' included as custom fields (if they were initially provided for any of the citations).
+#' included as custom fields (if they were initially provided for any of the citations). Note that 
+#' *existing files are overwritten without warning.*
 #'
 #' @param citations Dataframe with unique citations, resulting from `dedup_citations()`
 #' @param filename Name (and path) of file, should end in .ris
@@ -56,7 +58,7 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
 #' @examples 
 #' if (interactive()) {
 #' dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-#' export_ris(dedup_results$unique, "cite_sources.ris", separate = "cite_source")
+#' export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
 #' }
 
 export_ris <- function(citations, filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8") {
@@ -181,3 +183,47 @@ new_write_ris <- function(x,
   export <- do.call(c, result)
   return(export)
 }
+
+#' Export deduplicated citations to .bib file
+#'
+#' This function saves deduplicated citations as a BibTex file with sources, labels and strings
+#' included in the `note` field (if they were initially provided for any of the citations). Therefore,
+#' beware that **any `note` field that might be included in `citations` will be overwritten**. Also note that 
+#' *existing files are overwritten without warning.*
+#'
+#' @param citations Dataframe with unique citations, resulting from `dedup_citations()`
+#' @param filename Name (and path) of file, should end in .ris
+#' @param include Character. One or more of sources, labels or strings
+#'
+#' @export
+#' @examples 
+#' if (interactive()) {
+#' dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+#' export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
+#' }
+
+export_bib <- function(citations, filename = "citations.bib", include = c("sources", "labels", "strings")) {
+  
+  if (tolower(tools::file_ext(filename)) != "bib") warning("Function saves a BibTex file, so filename should (usually) end in .bib. For now, name is used as provided.")
+  
+  include <- stringr::str_remove(include, "s$") %>% paste0("cite_", .)
+
+  notes <- citations %>% dplyr::select(tidyselect::all_of(include))
+  
+  for (i in seq_along(include)) {
+    notes[include[i]] <- paste(include[i],  notes[[include[i]]], sep = ": ")
+  }
+  
+  notes <- notes %>%  tidyr::unite(note, dplyr::everything(), sep = "; ") %>% dplyr::pull(note)
+  
+  citations["note"] <- notes
+  
+  citations <- citations %>% 
+    dplyr::select(-dplyr::starts_with("cite_"), -tidyselect::any_of(c("duplicate_id", "record_ids", "record_id")))
+  
+  synthesisr::write_refs(as.data.frame(citations), format = "bib", file = filename)
+  
+  }
+  
+ # citations <- citations %>% dplyr::select(-tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))
+  
