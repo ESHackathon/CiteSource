@@ -25,11 +25,12 @@ export_ris(
 }
 \description{
 This function saves deduplicated citations as a RIS file with sources, labels and strings
-included as custom fields (if they were initially provided for any of the citations).
+included as custom fields (if they were initially provided for any of the citations). Note that
+\emph{existing files are overwritten without warning.}
 }
 \examples{
 if (interactive()) {
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-export_ris(dedup_results$unique, "cite_sources.ris", separate = "cite_source")
+export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
 }
 }

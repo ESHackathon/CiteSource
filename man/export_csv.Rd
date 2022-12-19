@@ -16,6 +16,7 @@ export_csv(citations, filename = "citations.csv", separate = NULL)
 \description{
 This function saves deduplicated citations as a csv file for further analysis and/or reporting.
 Metadata can be separated into one column per source, label or string, which facilitates analysis.
+Note that \emph{existing files are overwritten without warning.}
 }
 \examples{
 if (interactive()) {
