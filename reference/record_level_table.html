@@ -63,6 +63,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">record_level_table</span><span class="op">(</span></span>
 <span>  <span class="va">citations</span>,</span>
 <span>  include <span class="op">=</span> <span class="st">"sources"</span>,</span>
+<span>  include_empty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  return <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tibble"</span>, <span class="st">"DT"</span><span class="op">)</span>,</span>
 <span>  indicator_presence <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  indicator_absence <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -79,8 +80,13 @@
 <dd><p>Which metadata should be included in the table? Defaults to 'sources', can be replaced or expanded with 'labels' and/or 'strings'</p></dd>
 
 
+<dt>include_empty</dt>
+<dd><p>Should records with empty metadata (e.g., no information on 'sources') be included in the table? Defaults to FALSE.</p></dd>
+
+
 <dt>return</dt>
-<dd><p>Either a <code>tibble</code> that can be exported, e.g. as a csv, or a DataTable (<code>DT</code>) that allows for interactive exploration</p></dd>
+<dd><p>Either a <code>tibble</code> that can be exported, e.g. as a csv, or a DataTable (<code>DT</code>) that allows for interactive exploration. Note that the DataTable allows
+users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.</p></dd>
 
 
 <dt>indicator_presence</dt>
