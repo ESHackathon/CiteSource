@@ -38,7 +38,7 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
       dplyr::select(-tidyselect::all_of(separate)) %>%
       dplyr::bind_cols(separated)
   }
-  utils::write.csv(citations, filename)
+  utils::write.csv(citations, filename, row.names = FALSE)
 }
 
 
@@ -76,19 +76,23 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
   if (!is.null(string_field)) {
     citations <- citations %>% dplyr::rename(cite_string_include = .data$cite_string)
   }
-  
-  citations <- citations %>% dplyr::select(-tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))
+
+  # Move source_type to the front - should be there unless there was an import issue
+  # but these are common - see https://github.com/mjwestgate/synthesisr/issues/24
+  citations <- citations %>% 
+    dplyr::select(source_type, dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))
   
   synthesisr_codes <- dplyr::bind_rows(
-    synthesisr::code_lookup %>% dplyr::filter(.data$ris_synthesisr),
-  
     tibble::tribble(
       ~code, ~field, ~ris_synthesisr,
       source_field, "cite_source_include", TRUE,
       string_field, "cite_string_include", TRUE,
       label_field, "cite_label_include", TRUE
-    )
-  )
+    ),
+        synthesisr::code_lookup %>% dplyr::filter(.data$ris_synthesisr)
+  
+
+  ) %>% dplyr::distinct(code, .keep_all = TRUE) #Remove fields from synthesisr specification used for CiteSource metadata
 
   #Should be able to pass custom tibble here - but
   #currently that does not work: https://github.com/mjwestgate/synthesisr/issues/23

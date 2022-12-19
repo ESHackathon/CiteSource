@@ -6,7 +6,7 @@
 count_unique <- function(unique_data) {
   unique_data %>%
     dplyr::filter(!.data$cite_source == "") %>%
-    dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
+    dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, tidyselect::any_of("record_ids")) %>% 
     tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
     tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
     tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
@@ -29,13 +29,13 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   out <- list()
   
   if ("sources" %in% comp_type) {
-  
+    
   source_comparison <- unique_data %>%
-    dplyr::select(.data$duplicate_id, .data$cite_source, .data$record_ids) %>%
+    dplyr::select(.data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")) %>%
     dplyr::filter(!cite_source == "") %>%
     tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
     unique() %>%
-    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source__", names_from = .data$cite_source, values_from=c(.data$record_ids),
+    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source__", names_from = .data$cite_source, values_from = .data$cite_source,
                 values_fn =  function(x) TRUE,
                 values_fill = FALSE)
   
@@ -45,11 +45,11 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   if ("strings" %in% comp_type) {
     
   source_comparison <- unique_data %>%
-    dplyr::select(.data$duplicate_id, .data$cite_string, .data$record_ids) %>%
+    dplyr::select(.data$duplicate_id, .data$cite_string, tidyselect::any_of("record_ids")) %>%
     dplyr::filter(!.data$cite_string == "") %>%
     tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
     unique() %>%
-    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="string__", names_from = .data$cite_string, values_from=c(.data$record_ids),
+    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="string__", names_from = .data$cite_string, values_from = .data$cite_string,
                        values_fn =  function(x) TRUE,
                        values_fill = FALSE)
   
@@ -59,12 +59,12 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   if ("labels" %in% comp_type) {
     
     source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_label, .data$record_ids) %>%
+      dplyr::select(.data$duplicate_id, .data$cite_label,  tidyselect::any_of("record_ids")) %>%
       dplyr::filter(!cite_label == "") %>%
       tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
       unique() %>%
       tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="label__", names_from = .data$cite_label, 
-                         values_from = c(.data$record_ids),
+                         values_from = .data$cite_label,
                          values_fn =  function(x) TRUE,
                          values_fill = FALSE)
     out <- c(out, list(source_comparison))
