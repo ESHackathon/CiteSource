@@ -68,6 +68,22 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
                          values_fn =  function(x) TRUE,
                          values_fill = FALSE)
     out <- c(out, list(source_comparison))
+    
+    
+    if (any(stringr::str_detect(names(source_comparison), "[Ss]earch"))) {
+      search_stage <- stringr::str_subset(names(source_comparison), "[Ss]earch")
+      if (length(search_stage) == 1) {
+        not_in_search <- sum(!source_comparison[[search_stage]])
+        if (not_in_search > 0) {
+          warning("Beware: ", not_in_search, " records were not included in ", search_stage, " but in other labels.",
+                  " *If* this label indicates the full search stage, this might indicate that you ommitted a source, ",
+                  "or that the deduplication did not go right. Please treat results with caution until you fix this, ",
+                  "e.g., by using export_csv and then reimport_csv.")
+        }
+      }
+      
+    }
+    
   }
   
   if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
