@@ -189,6 +189,12 @@ For further processing, you might want to export the deduplicated and annotated 
 export_bib(unique_citations, "citations.bib")
 export_ris(unique_citations, "citations.ris")
 export_csv(unique_citations, "citations.csv", separate = "cite_source")
+
+# To continue, data could be reimported
+# unique_citations2 <- reimport_ris("citations.ris")
+# or as csv
+# export_csv(unique_citations, "citations.csv")
+# unique_citations <- reimport_csv("citations.csv")
 ```
 
 
