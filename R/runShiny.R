@@ -9,7 +9,6 @@
 #' @import shinyWidgets
 #' @import htmltools
 #' @import markdown
-#' @import CiteSource
 #' @import plotly
 #' @import shinyalert
 #' @export
