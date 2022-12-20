@@ -49,6 +49,7 @@ reimport_csv <- function(filename) {
 #' @param tag_naming Synthesisr option specifying how RIS tags should be replaced with names. This should not 
 #' be changed when using this function to reimport a file exported from CiteSource. If you import your own
 #' RIS, check `names(synthesisr::code_lookup)` and select any of the options that start with `ris_`
+#' @param verbose Should confirmation message be displayed?
 #' @export
 #' @examples 
 #' if (interactive()) {
@@ -86,8 +87,8 @@ reimport_ris <- function(filename = "citations.ris", source_field = "DB", label_
     custom_codes,
     synthesisr::code_lookup %>% dplyr::filter(.data[[tag_naming]])
   ) %>% 
-    dplyr::filter(!is.na(code)) %>% 
-    dplyr::distinct(code, .keep_all = TRUE) #Remove fields from synthesisr specification used for CiteSource metadata
+    dplyr::filter(!is.na(.data$code)) %>% 
+    dplyr::distinct(.data$code, .keep_all = TRUE) #Remove fields from synthesisr specification used for CiteSource metadata
   
   citations <- synthesisr::read_ref(filename, tag_naming = synthesisr_codes)
   

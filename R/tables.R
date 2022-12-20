@@ -35,13 +35,13 @@ record_level_table <- function(citations, include = "sources", include_empty = T
   
   citations <- citations %>%
     dplyr::mutate(
-      citation = generate_apa_citation(author, year),
-      reference = generate_apa_reference(author, year, title, source, volume, issue, doi, url),
-      html_reference = generate_apa_reference(author, year, title, source, volume, issue, doi, url, return_html = TRUE)
+      citation = generate_apa_citation(.data$author, .data$year),
+      reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$source, .data$volume, .data$issue, .data$doi, .data$url),
+      html_reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$source, .data$volume, .data$issue, .data$doi, .data$url, return_html = TRUE)
     ) %>%
     # Arrange by first author to avoid issue with initials
-    dplyr::arrange(stringr::str_extract(author, "^.*?,"), citation) %>%
-    dplyr::select(duplicate_id, citation, reference, html_reference) %>%
+    dplyr::arrange(stringr::str_extract(.data$author, "^.*?,"), citation) %>%
+    dplyr::select("duplicate_id", "citation", "reference", "html_reference") %>%
     dplyr::left_join(sources, by = "duplicate_id")
 
   indicator_presence <- as.character(indicator_presence)
@@ -51,7 +51,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
     dplyr::mutate(dplyr::across(dplyr::everything(), ~ifelse(.x, indicator_presence, indicator_absence))) %>% 
     dplyr::rename_with(~paste0(.x, " ")) #Add space to keep column names unique
 
-    citations <- bind_cols(citations, to_display)
+    citations <- dplyr::bind_cols(citations, to_display)
 
     if (return[1] == "DT") {
     if (!rlang::is_installed("DT")) {
@@ -66,22 +66,22 @@ record_level_table <- function(citations, include = "sources", include_empty = T
         list(type = type %>% stringr::str_to_title(), values = values)
       }) %>% purrr::transpose()
 
-      sketch <- htmltools::withTags(table(
+      sketch <- htmltools::tags$table(
         class = "display",
-        thead(
-          tr(
-            th(rowspan = 2, colspan = 2, htmltools::HTML("&nbsp;")),
-            th(rowspan = 2, colspan = 2, "Citation"),
-            purrr::map2(headings$type, lengths(headings$values), ~ th(colspan = .y, .x))
+        htmltools::tags$thead(
+          htmltools::tags$tr(
+            htmltools::tags$th(rowspan = 2, colspan = 2, htmltools::HTML("&nbsp;")),
+            htmltools::tags$th(rowspan = 2, colspan = 2, "Citation"),
+            purrr::map2(headings$type, lengths(headings$values), ~ htmltools::tags$th(colspan = .y, .x))
           ),
-          tr(
-            purrr::map(unlist(headings$values), ~ th(.x))
+          htmltools::tags$tr(
+            purrr::map(unlist(headings$values), ~ htmltools::tags$th(.x))
           )
         ),
-        tfoot(
-          td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
+        htmltools::tags$tfoot(
+          htmltools::tags$td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
         )
-      ))
+      )
       
       
       citations %>%
@@ -194,10 +194,10 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     dplyr::ungroup() %>% 
     dplyr::select(-"stage_total") 
   
-  yields <- yield_dfs_dedup %>% dplyr::rename(Records_total = stage_total) %>% 
+  yields <- yield_dfs_dedup %>% dplyr::rename(Records_total = .data$stage_total) %>% 
     dplyr::mutate(!!comparison_type := "Total", Sensitivity = NA) %>% dplyr::left_join(yields %>% 
                                                                                          dplyr::group_by(.data$stage) %>% 
-                                                                                         dplyr::summarise(Records_unique = sum(Records_unique)), by = "stage") %>% 
+                                                                                         dplyr::summarise(Records_unique = sum(.data$Records_unique)), by = "stage") %>% 
   dplyr::bind_rows(yields, .)
   
   search_results <- yields %>% dplyr::filter(.data$stage == search_label) 
@@ -211,9 +211,9 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     dplyr::group_by(.data$stage) %>% 
     dplyr::arrange(-.data$Records_total) %>% 
     dplyr::ungroup() %>% 
-    dplyr::mutate(total_total = dplyr::if_else(.data[[comparison_type]] == "Total", Records_total, NA_integer_)) %>% 
+    dplyr::mutate(total_total = dplyr::if_else(.data[[comparison_type]] == "Total", .data$Records_total, NA_integer_)) %>% 
     tidyr::fill(total_total) %>% 
-    dplyr::mutate(Contribution_unique = Records_unique/total_total) %>% 
+    dplyr::mutate(Contribution_unique = .data$Records_unique/.data$total_total) %>% 
     dplyr::select(-"total_total") %>% 
     dplyr::group_by(.data$stage) %>% 
     dplyr::arrange(.data[[comparison_type]] == "Total") %>% 
@@ -306,8 +306,8 @@ generate_apa_citation <- function(authors, year) {
  # False negative where same initial refers to different names
  # Appears to be best balance for now - further options and instructions could be provided
 
-  last_name <- processed_names %>% dplyr::pull(last_names) %>% unlist()
-  initialed_name_list <- processed_names %>% dplyr::select(last_names, initials) %>% as.list() %>% 
+  last_name <- processed_names %>% dplyr::pull(.data$last_names) %>% unlist()
+  initialed_name_list <- processed_names %>% dplyr::select("last_names", "initials") %>% as.list() %>% 
     purrr::transpose() %>% purrr::map(~paste(.x[[2]], .x[[1]])) 
 
   initialed_name <- initialed_name_list %>% unlist()
@@ -317,7 +317,7 @@ generate_apa_citation <- function(authors, year) {
   to_disambiguate <- authors %>% dplyr::filter(.data$last_name %in% duplicated_last_names) %>% 
     dplyr::group_by(.data$last_name) %>% 
     dplyr::summarise(disambiguate = dplyr::n_distinct(.data$initialed_name) > 1) %>% 
-    dplyr::filter(disambiguate == TRUE) %>% dplyr::pull(.data$last_name)
+    dplyr::filter(.data$disambiguate == TRUE) %>% dplyr::pull(.data$last_name)
     
   # Replace those last names with initials
   for (i in seq_along(processed_names$last_names)) {
@@ -339,10 +339,10 @@ generate_apa_citation <- function(authors, year) {
   
   # Disambiguate
   citations_unambiguous <- citations %>% 
-    dplyr::filter(!(duplicated(citation) | (duplicated(citation, fromLast = TRUE))))
+    dplyr::filter(!(duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE))))
   
   citations_ambiguous <- citations %>% 
-    dplyr::filter((duplicated(citation) | (duplicated(citation, fromLast = TRUE))))
+    dplyr::filter((duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE))))
 
   if (nrow(citations_ambiguous) > 0) {
   
@@ -460,20 +460,20 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
   # Compose references
   
   citations <- citations %>% dplyr::mutate(doi = dplyr::if_else(stringr::str_detect(doi, "http"), doi, paste0("https://doi.org/", doi)),
-                              link = coalesce(doi, weblink))
+                              link = dplyr::coalesce(doi, weblink))
   
   if (return_html) {
   citations %>%
     dplyr::rowwise() %>% dplyr::mutate(
                               reference = glue::glue("
                               {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {title}. {nNA(source, pre = '<i>', '</i>')}{nNA(volume, pre = '<i>, ', '</i>')}{nNA(issue, pre = '(', ')')}. {nNA(link, pre = '<a href = \"', '\">')}{nNA(link, '</a>')}
-                                                     ")) %>% dplyr::pull(reference)
+                                                     ")) %>% dplyr::pull(.data$reference)
   } else {
     citations %>%
       dplyr::rowwise() %>% dplyr::mutate(
         reference = glue::glue("
                               {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {title}. {nNA(source)}{nNA(volume, pre = ', ')}{nNA(issue, pre = '(', ')')}. {nNA(link)}
-                                                     ")) %>% dplyr::pull(reference)
+                                                     ")) %>% dplyr::pull(.data$reference)
   }
     
 }

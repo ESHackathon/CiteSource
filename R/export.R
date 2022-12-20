@@ -80,7 +80,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
   # Move source_type to the front - should be there unless there was an import issue
   # but these are common - see https://github.com/mjwestgate/synthesisr/issues/24
   citations <- citations %>% 
-    dplyr::select(source_type, dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))
+    dplyr::select("source_type", dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))
   
   synthesisr_codes <- dplyr::bind_rows(
     tibble::tribble(
@@ -92,7 +92,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
         synthesisr::code_lookup %>% dplyr::filter(.data$ris_synthesisr)
   
 
-  ) %>% dplyr::distinct(code, .keep_all = TRUE) #Remove fields from synthesisr specification used for CiteSource metadata
+  ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) #Remove fields from synthesisr specification used for CiteSource metadata
 
   #Should be able to pass custom tibble here - but
   #currently that does not work: https://github.com/mjwestgate/synthesisr/issues/23
@@ -218,7 +218,7 @@ export_bib <- function(citations, filename = "citations.bib", include = c("sourc
     notes[include[i]] <- paste(include[i],  notes[[include[i]]], sep = ": ")
   }
   
-  notes <- notes %>%  tidyr::unite(note, dplyr::everything(), sep = "; ") %>% dplyr::pull(note)
+  notes <- notes %>%  tidyr::unite(note, dplyr::everything(), sep = "; ") %>% dplyr::pull(.data$note)
   
   citations["note"] <- notes
   
