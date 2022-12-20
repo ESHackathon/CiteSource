@@ -1,43 +1,47 @@
 Package: CiteSource
-Title: Identify where records for evidence aggregation came from, by deduplicating results and comparing sources
+Title: Analyze the utility of information sources and retrieval methodologies for evidence synthesis
 Version: 0.0.0.9000
+Date: 2022-11-18
 Authors@R: 
-    c(person("Lukas", "Wallrich", email = "lukas.wallrich@gmail.com", role = c("aut"),
-           comment = c(ORCID = "0000-0003-2121-5177")),
-      person("Sarah", "Young", email = "sarahy@andrew.cmu.edu", role = c("aut"), 
-           comment = c(ORCID = "0000-0002-8301-5106")),
+    c(person("Trevor", "Riley", email = "trevor.riley@noaa.gov", role =c("aut", "cre"), 
+           comment = c(ORCID = "0000-0002-6834-9802")),
       person("Kaitlyn", "Hair", email = "kaitlyn.hair@ed.ac.uk", role = c("aut"),
            comment = c(ORCID = "0000-0003-0180-7343")),
-      person("Chris", "Pritchard", email = "chris.pritchard@ntu.ac.uk", role = c("aut"),
-           comment = c(ORCID = "0000-0002-1143-9751")),
-      person("Trevor", "Riley", email = "trevor.riley@noaa.gov", role =c("aut", "cre"), 
-           comment = c(ORCID = "0000-0002-6834-9802")),
+      person("Lukas", "Wallrich", email = "lukas.wallrich@gmail.com", role = c("aut"),
+           comment = c(ORCID = "0000-0003-2121-5177")),
       person("Matthew", "Grainger", email="matthewjamesgrainger@gmail.com", role=c("aut"), 
            comment=c(ORCID ="0000-0001-8426-6495")),
+      person("Sarah", "Young", email = "sarahy@andrew.cmu.edu", role = c("aut"), 
+           comment = c(ORCID = "0000-0002-8301-5106")),
+      person("Chris", "Pritchard", email = "chris.pritchard@ntu.ac.uk", role = c("aut"),
+           comment = c(ORCID = "0000-0002-1143-9751")),
       person("Neal", "Haddaway", email="nealhaddaway@gmail.com", role=c("aut"), 
            comment=c(ORCID ="0000-0003-3902-2234")) 
            )
-Description: What the package does (one paragraph).
+Description: CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where only one record is selected to be retained, CiteSource retains each duplicate record and merges metadata into a single, primary record. The primary record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". During the merging process, select metadata fields are also compared for completeness as well as length (currently DOI & Abstract). CiteSource applies the more complete (based on length) metadata to the main record.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
+URL: https://www.eshackathon.org/CiteSource/
+BugReports: https://github.com/ESHackathon/CiteSource/issues
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    DT,
+    htmltools
 VignetteBuilder: knitr    
 Config/testthat/edition: 3
 Imports: 
     dplyr,
+    forcats,
     synthesisr,
     ggplot2,
     UpSetR,
     purrr,
     tidyr,
-    plotly,
     magrittr,
-    jsonlite,
     tibble,
     scales,
     tidyselect,
@@ -46,4 +50,8 @@ Imports:
     parallel,
     snakecase,
     utf8,
-    stringr
+    stringr,
+    ggnewscale,
+    gt,
+    glue,
+    gtExtras

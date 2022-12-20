@@ -24,5 +24,6 @@ dedup_citations(
 A list of 2 dataframes - unique citations and citations to be manually deduplicated if option selected
 }
 \description{
-This function deduplicates citation data
+This function deduplicates citation data. Note that duplicates are assumed to published
+in the same source, so pre-prints and similar results will not be identified here.
 }

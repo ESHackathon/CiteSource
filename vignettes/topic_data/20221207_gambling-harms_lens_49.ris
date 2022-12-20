@@ -1,0 +1,1366 @@
+﻿TY  - GEN
+AB  - <p>Background and aims: Both the Problem Gambling Severity Index (PGSI) and the Short Gambling Harms Screen (SGHS) purport to identify individuals harmed by gambling. However, there is dispute as to how much individuals are harmed, conditional on their scores from these instruments. We used an experienced utility framework to estimate the magnitude of implied impacts on health and wellbeing.Methods: We measured health utility using the Short Form Six-Dimension (SF-6D), and used this as a benchmark. All 2603 cases were propensity score weighted, to balance the affected group (i.e., SGHS 1+ or PGSI 1+ vs 0) with a reference group of gamblers with respect to risk factors for gambling harm. Weighted regression models estimated decrements to health utility scores attributable to gambling, whilst controlling for key comorbidities.Results: We found significant attributable decrements to health utility for all non-zero SGHS scores, as well as moderate-risk and problem gamblers, but not for PGSI low-risk gamblers. Applying these coefficients to population data, we find a similar total burden for both instruments, although the SGHS more specifically identified the subpopulation of harmed individuals. For both screens, outcomes on the SF-6D implies that about two-thirds of the ‘burden of harm’ is attributable to gamblers outside of the most severe categories.Discussion and Conclusions: Gambling screens have hitherto provided nominal category membership, and population surveys typically focus on problem gambling prevalence. These results quantify the health utility decrement for each category, allowing for tracking of the aggregate population impact based on all affected gamblers.</p>
+AU  - Browne, Matthew
+AU  - Russell, Alex M T
+AU  - Begg, Stephen
+AU  - Rockloff, Matthew
+AU  - Li, En
+AU  - Rawat, Vijay
+AU  - Hing, Nerilee
+DA  - 2021/09/23
+DO  - 10.31234/osf.io/fu4mj
+ID  - 001-257-578-706-377
+PB  - Center for Open Science
+PY  - 2021
+TI  - Benchmarking gambling screens to health-state utility: The PGSI and the SGHS estimate similar levels of population gambling-harm
+UR  - https://lens.org/001-257-578-706-377
+ER  - 
+TY  - JOUR
+AB  - Recent research has shown that harm is not just a feature of problem gambling, but can also be observed in other lower risk categories. Some debates exist, however, as to the distribution of harm across these categories and how harm should be best measured. This study was designed to examine how estimates of self-reported harm are affected by the methodology used. A particular focus was on how harm estimates for low and higher risk gambling (as classified by the PGSI) varied when respondents were able to make more graded attributions of their harm to gambling. An online panel sample of 554 gamblers responded to a brief survey that included the PGSI, measures of gambling harm drawn from Browne et al. (Assessing gambling-related harm in Victoria: a public health perspective, Victorian Responsible Gambling Foundation, Melbourne, 2016) as well as questions about demographics and gambling habits. The recruitment was designed to obtain good representation of each PGSI group, with 23% found to be problem gamblers; 36% moderate risk and 21% low risk gamblers. In support of Browne et al. (2016), the findings showed that higher proportions of harm in low risk gamblers is likely to be identified when one uses binary or ‘any harm’ scoring, but that this effect mostly disappears when more graded scoring or attribution of harm measures are used. Higher risk PGSI groups consistently reported more harms and more serious harms than lower risk groups. It was concluded that the measurement of gambling harm and its estimated distribution over PGSI categories is quite sensitive to how it is measured.
+AU  - Delfabbro, Paul
+AU  - Georgiou, Neophytos
+AU  - King, Daniel L.
+CY  - United States
+DA  - 2020/05/18
+DO  - 10.1007/s10899-020-09954-1
+EP  - 598
+ID  - 002-369-373-685-368
+IS  - 2
+JF  - Journal of gambling studies
+KW  - Gambling-harm
+KW  - Low risk gambling
+KW  - Problem gambling
+KW  - Response-scaling
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32424665
+L2  - https://researchnow.flinders.edu.au/en/publications/measuring-gambling-harm-the-influence-of-response-scaling-on-esti
+L2  - https://link.springer.com/article/10.1007/s10899-020-09954-1
+PB  - Springer International Publishing AG
+PY  - 2020
+SN  - 15733602
+SN  - 10505350
+SP  - 583
+TI  - Measuring Gambling Harm: The Influence of Response Scaling on Estimates and the Distribution of Harm Across PGSI Categories
+UR  - https://lens.org/002-369-373-685-368
+VL  - 37
+ER  - 
+TY  - JOUR
+AB  - Gambling-related harm has become a key metric for measuring the adverse consequences of gambling on a population level. Yet, despite this renewed understanding in contemporary research, little exploration has been conducted to evaluate which instrument is best suited to capture the harmful consequences of gambling. This study was designed with the aim of determining whether Likert scales were better suited to capture gambling harm than binary scales. We hypothesized that the Short Gambling Harm Screen (SGHS), initially scored using a binary scale, would perform similarly to the alternate form that was Likertized for the purpose of this study. A corresponding comparison in the reverse direction was executed for the Problem Gambling Severity Index. The SGHS’s performance was assessed via a repeated-measures design in combination with three other measures of validity administered at the conclusion of the survey. In the end, we found that changing the scoring format (i.e., from binary to Likert) had negligible impact on the SGHS’s psychometric performance. We conclude that the original scoring method of the SGHS is not only appropriate but also no less suitable than Likert scales in measuring gambling harm. Resume Les dommages lies au jeu sont devenus une mesure cle pour evaluer les consequences nefastes du jeu a l’echelle de la population. Pourtant, malgre cette comprehension renouvelee dans la recherche contemporaine, on effectue tres peu d’exploration pour evaluer quel instrument est le mieux adapte pour comprendre les consequences nefastes du jeu. Cette etude a ete concue dans le but de determiner si les echelles de Likert etaient mieux adaptees que les echelles binaires pour saisir les dommages lies au jeu. Nous avons emis l’hypothese que le depistage rapide du jeu problematique (Short Gambling Harm Screen ou SGHS), initialement evalue a l’aide d’une echelle binaire, ne fonctionnera pas differemment de la forme de Likert alternative qui a ete creee aux fins de cette etude.  Une comparaison correspondante dans la direction inverse a ete effectuee pour l'indice de gravite du jeu excessif (PGSI).  Les performances du SGHS ont ete evaluees par un plan de mesures repetees, combines a trois autres mesures de validite administrees a la fin du sondage. En fin de compte, nous avons constate que le changement du format de pointage (c.-a-d. du binaire au Likert) avait un impact negligeable sur le rendement psychometrique du SGHS. Nous concluons que la methode de pointage originale du SGHS est non seulement appropriee, mais egalement non moins appropriee que les echelles de Likert pour evaluer les dommages lies au jeu.
+AU  - McLauchlan, James
+AU  - Browne, Matthew
+AU  - Russell, Alex M. T.
+AU  - Rockloff, Matthew
+CY  - Canada
+DA  - 2020/04/24
+DO  - 10.4309/jgi.2020.44.6
+ID  - 003-429-311-112-001
+JF  - Journal of Gambling Issues
+L2  - https://www.drugsandalcohol.ie/32817/
+L1  - http://jgi.camh.net/index.php/jgi/article/download/4070/4517
+L2  - https://jgi.camh.net/index.php/jgi/article/view/4070
+PB  - Journal of Gambling Issues
+PY  - 2020
+SN  - 19107595
+TI  - Evaluating the Reliability and Validity of the Short Gambling Harm Screen: Are Binary Scales worse than Likert Scales at capturing Gambling Harm?
+UR  - https://lens.org/003-429-311-112-001
+VL  - 44
+ER  - 
+TY  - JOUR
+AB  - Background and aims The Prevention Paradox (PP) suggests that a large proportion of aggregate harm from gambling occurs to people who do not have a gambling disorder. However, it has not yet been tested using a population-representative sample. We aimed to test whether the PP applies to gambling in Finland. The prevalence rates of diverse harmful consequences from gambling were surveyed amongst a population-representative sample of past-year gamblers. Methods The study used first wave data (N = 7,186) of Finnish Gambling Harms survey, collected via online and postal surveys in 2017. A subset of 3,795 adults (≥18 years), who had gambled at least monthly in 2016, were selected for analysis. Measurements Gambling-related harms were evaluated with the 72-item Harms Checklist. Problem and Pathological Gambling Measure (PPGM) measured respondents' probable disordered gambling from the subset of items for impaired control (4 questions) and other issues (3 questions). Findings Consistent with previous findings, the majority of harms were reported by those in the less severe PPGM categories (i.e. scoring <5). However, considering each domain separately, this was true only for financial, emotional/psychological, and work/study harms. The PP was not supported for health, relationship, or social deviance harms. Conclusions The population prevalence of the most serious harms (e.g. unsafe living conditions) is concentrated among those with severe impaired control issues. However, even excluding the ∼15% of harms occurring to occasional gamblers, most financial, emotional and work/study impacts occur to those with lower levels of control issues. Efforts at harm reduction should focus on the entire spectrum of issues that people experience from their gambling.
+AU  - Browne, Matthew
+AU  - Volberg, Rachel A.
+AU  - Rockloff, Matthew
+AU  - Salonen, Anne H.
+CY  - Hungary
+DA  - 2020/07/07
+DO  - 10.1556/2006.2020.00018
+EP  - 382
+ID  - 005-320-067-862-946
+IS  - 2
+JF  - Journal of behavioral addictions
+KW  - gambling harms
+KW  - population survey
+KW  - prevention paradox
+KW  - problem gambling
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32644932
+L2  - https://pubmed.ncbi.nlm.nih.gov/32644932/
+L2  - https://akjournals.com/view/journals/2006/aop/article-10.1556-2006.2020.00018/article-10.1556-2006.2020.00018.xml
+L2  - https://akjournals.com/view/journals/2006/9/2/article-p371.xml
+L1  - https://akjournals.com/downloadpdf/journals/2006/9/2/article-p371.pdf
+PB  - Akademiai Kiado
+PY  - 2020
+SN  - 20635303
+SN  - 20625871
+SP  - 371
+TI  - The prevention paradox applies to some but not all gambling harms: Results from a Finnish population-representative survey
+UR  - https://lens.org/005-320-067-862-946
+VL  - 9
+ER  - 
+TY  - JOUR
+AB  - Background and aims: It is common for gambling research to focus on problem and disordered gambling. Less is known about the prevalence of gambling-related harms among people in the general population. This study aimed to develop and validate the 18-item version of the Short Gambling Harms Screen (SGHS-18). Methods: Population-representative web-based and postal surveys were conducted in the three geographical areas of Finland (n = 7186, aged 18 or older). Reliability and internal structure of SGHS-18 was assessed using coefficient omega and via confirmatory factor analysis (CFA). Four measurement models of SGHS-18 were compared: one-factor, six-factor, a second-ordered factor model and a bifactor model (M4). Results: The analysis revealed that only the bifactor model had adequate fit for SGHS-18 (CFI = 0.953, TLI = 0.930, GFI = 0.974, RMSEA = 0.047, SRMR = 0.027). The general factor explained most of the common variance compared to specific factors. Coefficient omega hierarchical value for global gambling harm factor (0.80) was high, which suggested that SGHS-18 assessed the combination of general harm constructs sufficiently. The correlation with the Problem and Pathological Gambling Measures (PPGM) was 0.44, potentially reflecting that gambling harms are closely—although not perfectly—aligned with the mental health issue of problem gambling. SGHS-18 scores were substantially higher for participants who gambled more often, who spent more money or who had gambling problems, demonstrating convergent validity for the screen. Discussion: The SGHS-18 comprehensively measures the domains of gambling harm, while demonstrating desirable properties of internal consistency, and criterion and convergent validity.
+AU  - Latvala, Tiina
+AU  - Browne, Matthew
+AU  - Rockloff, Matthew
+AU  - Salonen, Anne H.
+CY  - Switzerland
+DA  - 2021/11/03
+DO  - 10.3390/ijerph182111552
+ID  - 005-700-426-097-081
+IS  - 21
+JF  - International journal of environmental research and public health
+KW  - gambling-related harm
+KW  - population screen
+KW  - public health
+KW  - validation
+L2  - https://www.mdpi.com/1660-4601/18/21/11552/pdf
+L2  - https://europepmc.org/article/MED/34770071
+L2  - https://pubmed.ncbi.nlm.nih.gov/34770071/
+L2  - https://www.mdpi.com/1660-4601/18/21/11552/htm
+PB  - Multidisciplinary Digital Publishing Institute (MDPI)
+PY  - 2021
+SN  - 16604601
+SN  - 16617827
+SP  - 11552
+TI  - 18-Item Version of the Short Gambling Harm Screen (SGHS-18): Validation of Screen for Assessing Gambling-Related Harm among Finnish Population.
+UR  - https://lens.org/005-700-426-097-081
+VL  - 18
+ER  - 
+TY  - JOUR
+AB  - This paper aimed to analyze the harms arising from gambling and gambling-related help-seeking behaviour within a large sample of Indigenous Australians. A self-selected sample of 1,259 Indigenous Australian adults completed a gambling survey at three Indigenous sports and cultural events, in several communities and online. Based on responses to the problem gambling severity index (PGSI), the proportions of the sample in the moderate risk and problem gambler groups were higher than those for the population of New South Wales. Many in our sample appeared to face higher risks with their gambling and experience severe gambling harms. From PGSI responses, notable harms include financial difficulties and feelings of guilt and regret about gambling. Further harms, including personal, relationship, family, community, legal and housing impacts, were shown to be significantly higher for problem gamblers than for the other PGSI groups. Most problem gamblers relied on family, extended family and friends for financial help or went without due to gambling losses. Nearly half the sample did not think they had a problem with gambling but the results show that the majority (57.7 %) faced some risk with their gambling. Of those who sought gambling help, family, extended family, friends and respected community members were consulted, demonstrating the reciprocal obligations underpinning traditional Aboriginal culture. The strength of this finding is that these people are potentially the greatest source of gambling help, but need knowledge and resources to provide that help effectively. Local Aboriginal services were preferred as the main sources of professional help for gambling-related problems.
+AU  - Hing, Nerilee
+AU  - Breen, Helen
+AU  - Gordon, Ashley
+AU  - Russell, Alex M. T.
+CY  - United States
+DA  - 2013/06/06
+DO  - 10.1007/s10899-013-9388-3
+EP  - 755
+ID  - 005-712-609-540-785
+IS  - 3
+JF  - Journal of gambling studies
+L2  - https://link.springer.com/article/10.1007/s10899-013-9388-3
+L2  - https://works.bepress.com/nerilee_hing/243/
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/23740348
+L2  - http://epubs.scu.edu.au/tourism_pubs/1974/
+L2  - https://works.bepress.com/nerilee_hing/243/download/
+L2  - https://europepmc.org/abstract/MED/23740348
+PB  - Springer International Publishing AG
+PY  - 2013
+SN  - 15733602
+SN  - 10505350
+SP  - 737
+TI  - Gambling Harms and Gambling Help-Seeking Amongst Indigenous Australians
+UR  - https://lens.org/005-712-609-540-785
+VL  - 30
+ER  - 
+TY  - JOUR
+AB  - To date, studies of gambling harms have been limited by reliance on small samples and self-reports of behaviour. Analysis of banking transactions provides unique insights into the scope and sequencing of gambling harms at the individual and population levels, with implications for gambling policy, regulation, and harm minimization.
+AU  - Volberg, Rachel A.
+CY  - England
+DA  - 2021/02/04
+DO  - 10.1038/s41562-021-01052-5
+EP  - 304
+ID  - 008-713-140-306-484
+IS  - 3
+JF  - Nature human behaviour
+L2  - https://EconPapers.repec.org/RePEc:nat:nathum:v:5:y:2021:i:3:d:10.1038_s41562-021-01052-5
+L2  - https://ideas.repec.org/a/nat/nathum/v5y2021i3d10.1038_s41562-021-01052-5.html
+L2  - https://www.nature.com/articles/s41562-021-01052-5
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/33542530
+L2  - https://europepmc.org/article/MED/33542530
+L2  - https://www.nature.com/articles/s41562-021-01052-5.pdf
+PB  - Springer Science and Business Media LLC
+PY  - 2021
+SN  - 23973374
+SP  - 303
+TI  - Banking transactions and gambling harms.
+UR  - https://lens.org/008-713-140-306-484
+VL  - 5
+ER  - 
+TY  - JOUR
+AB  - Incarcerated populations across the world have been found to be consistently and significantly more vulnerable to problem gambling than general populations in the same countries. In an effort to gain a more specific understanding of this vulnerability the present study applied latent class analysis and criminal career theory to gambling data collected from a sample of English and Scottish, male and female prisoners (N = 1057). Theoretical links between gambling and crime were tested through three hypotheses: (1) that prisoners in the UK would have higher rates of problem gambling behaviour than the national population; (2) that if the link between gambling and crime is coincidental, gambling behaviour would be highly prevalent in an offending population, and (3) if connections between gambling behaviour and offending are co-symptomatic a mediating factor would show a strong association. The first of these was supported, the second was not supported and the third was partially supported. Latent class analysis found six gambling behaviour clusters measured by responses to the Problem Gambling Severity Index, primarily distinguished by loss chasing behaviour. Longitudinal offending data drawn from the Police National Computer database found four criminal career types, distinguished by frequency and persistence over time. A significant association was found between higher level loss chasing and high rate offending in criminal careers suggesting that impulse control may be a mediating factor for both gambling harm and criminal careers.
+AU  - May-Chahal, Corinne
+AU  - Humphreys, Leslie
+AU  - Clifton, Alison Kay
+AU  - Francis, Brian
+AU  - Reith, Gerda
+CY  - United States
+DA  - 2016/04/26
+DO  - 10.1007/s10899-016-9612-z
+EP  - 84
+ID  - 010-609-774-311-770
+IS  - 1
+JF  - Journal of gambling studies
+KW  - Criminal careers
+KW  - Gambling harm
+KW  - Impulse control
+KW  - Latent class analysis
+KW  - Prisons
+KW  - Substance use
+L2  - http://eprints.gla.ac.uk/123752/
+L2  - https://paperity.org/p/76055572/gambling-harm-and-crime-careers
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5323489/
+L2  - https://link.springer.com/article/10.1007%2Fs10899-016-9612-z
+L2  - http://europepmc.org/abstract/MED/27116232
+L1  - https://link.springer.com/content/pdf/10.1007%2Fs10899-016-9612-z.pdf
+L2  - https://core.ac.uk/download/pdf/296185607.pdf
+PB  - Springer International Publishing AG
+PY  - 2016
+SN  - 15733602
+SN  - 10505350
+SP  - 65
+TI  - Gambling Harm and Crime Careers
+UR  - https://lens.org/010-609-774-311-770
+VL  - 33
+ER  - 
+TY  - JOUR
+AB  - The economic benefits of gambling may be offset by economic harm to other industries. This economic phenomenon, also known as substitution or cannibalization, refers to a new product that diverts consumption and profits from other products or industries. Gambling may displace revenue from other businesses, but economic impact studies on gambling do not consider such shifts between expenditures. This paper presents a systematic review of the available evidence (N = 118) on whether the introduction or expansion of gambling harms or benefits other business activity. Although the issue has been considered in previous review studies, no industry-level analysis is currently available. The results show that such an approach is necessary, as the impacts of gambling on other industries appear to depend strongly on the type of industry, as well as on the location and type of gambling. Industries that are negatively affected by gambling include other recreation, retail and merchandise, manufacturing, and agriculture and mining. Alcohol consumption, construction, and the finance, insurance, and real estate industries, as well as other services, appear to be positively affected by the presence of gambling. In other cases, the evidence is either mixed or inconclusive. These results nevertheless depend strongly on the type of gambling. Destination gambling appears to be more beneficial to other industries than recreational gambling. Overall, the results show that even in cases when gambling does substitute for other industries, the displacement is not complete. The reasons for this and the gaps in the existing evidence and literature are discussed. Resume Les avantages economiques obtenus des jeux de hasard peuvent etre neutralises par un prejudice economique porte a d’autres secteurs d’activites. Ce phenomene economique, egalement appele substitution ou cannibalisation, fait reference au fait qu’un nouveau produit detourne la consommation et les profits tires d’autres produits ou secteurs d’activites. Les jeux de hasard peuvent egalement soustraire des revenus d’autres entreprises, mais les etudes d’impact economique sur les jeux de hasard ne prennent pas en compte de tels mouvements des depenses. Ce document presente une analyse systematique des preuves disponibles (N = 118) permettant de determiner si l’introduction ou l’accroissement de l’offre de jeux porte prejudice ou apporte un avantage a d’autres activites economiques. Bien que la question ait ete examinee dans une precedente etude, aucune analyse des secteurs d’activite n’est actuellement disponible. Les resultats montrent qu’une telle approche est necessaire, car les impacts du jeu sur d’autres secteurs d’activites semblent dependre fortement du type d’activite, mais egalement de l’emplacement et du type de jeu. Les secteurs qui sont negativement touches par les jeux de hasard comprennent les autres loisirs, la vente au detail et les marchandises, la fabrication, l’agriculture et les mines. Les ventes d’alcool, la construction, le secteur de la finance, des assurances et de l’immobilier et d’autres services semblent en contrepartie beneficier de la presence de jeux de hasard. Dans d’autres cas, les preuves sont soit mitigees, soit peu concluantes. Ces resultats dependent neanmoins fortement du type de jeu. Les destinations de jeux semblent etre dans l’ensemble plus avantageuses pour les autres industries que le jeu recreatif. Dans l’ensemble, les resultats montrent que meme dans les cas ou le jeu se substitue a d’autres activites, le deplacement n’est pas complet. Dans cet article, on aborde les raisons sous-jacentes a ces mouvements ainsi que les lacunes dans les preuves existantes et la litterature.
+AU  - Marionneau, Virve
+AU  - Nikkinen, Janne
+CY  - Canada
+DA  - 2020/04/24
+DO  - 10.4309/jgi.2020.44.2
+ID  - 012-063-017-912-019
+JF  - Journal of Gambling Issues
+L2  - https://helda.helsinki.fi/handle/10138/324371
+L2  - http://jgi.camh.net/index.php/jgi/article/viewFile/4063/4514
+L2  - https://www.drugsandalcohol.ie/32815/
+L2  - https://jgi.camh.net/index.php/jgi/article/view/4063
+L1  - http://jgi.camh.net/index.php/jgi/article/download/4063/4514
+PB  - Journal of Gambling Issues
+PY  - 2020
+SN  - 19107595
+TI  - Does Gambling Harm or Benefit Other Industries? A Systematic Review
+UR  - https://lens.org/012-063-017-912-019
+VL  - 44
+ER  - 
+TY  - JOUR
+AB  - Background : Preventing gambling harm has become a policy priority in many European countries. Adverse consequences related to problem gambling are well known, but few studies have analyzed gambling-related harm in detail in general population samples. We determined the extent and distribution of gambling harm in Finland, as assessed by the Problem Gambling Severity Index (PGSI), and analyzed gambling involvement, demographics and their association with various types of harm. Methods: A nationwide telephone survey was conducted among 4484 Finns aged 15–74 years in 2011–12. Gambling-related harms were based on the nine-item PGSI. Gambling involvement was measured by gambling frequency and weekly average gambling expenditure. Associations among harms, demographics and gambling involvement were examined in logistic regression. Results: During the previous year, 13% of respondents experienced at least one gambling-related harm (males 18.1%, females 7.2%). The four commonest harms were ‘chasing losses’ (8.6%), ‘escalating gambling to maintain excitement’ (3.1%), ‘betting more than could afford to lose’ (2.8%), and ‘feeling guilty’ (2.6%). The harm profile in descending order was the same for both genders but differed in prevalence. Young age (<25 years) was associated with increased likelihood of reporting harms. Both monthly and weekly gambling and spending over €21 per week on gambling were related to the harms. Conclusions: Our results provide support for the public health approach to gambling: harms were reported even at low gambling frequency-expenditure levels. In addition to the high-risk approach, adopting a population-level approach to preventing gambling harm could shift the population distribution of harm in a lower direction.
+AU  - Raisamo, Susanna
+AU  - Mäkelä, Pia
+AU  - Salonen, Anne
+AU  - Lintonen, Tomi
+CY  - United Kingdom
+DA  - 2014/12/10
+DO  - 10.1093/eurpub/cku210
+EP  - 722
+ID  - 016-920-831-713-646
+IS  - 4
+JF  - European journal of public health
+L2  - https://www.julkari.fi/handle/10024/126826
+L2  - https://www.cabdirect.org/cabdirect/abstract/20153289663
+L2  - https://core.ac.uk/display/33461641
+L2  - https://academic.oup.com/eurpub/article/25/4/716/2399066
+L2  - http://eurpub.oxfordjournals.org/content/25/4/716
+L2  - https://www.cabdirect.org/abstracts/20153289663.html
+PB  - Oxford University Press
+PY  - 2014
+SN  - 1464360x
+SN  - 11011262
+SP  - 716
+TI  - The extent and distribution of gambling harm in Finland as assessed by the Problem Gambling Severity Index
+UR  - https://lens.org/016-920-831-713-646
+VL  - 25
+ER  - 
+TY  - JOUR
+AB  - This paper investigates consumer perspectives of implemented and proposed gambling harm minimisation measures taken from a geographically stratified survey of adult residents in Tasmania, Australia. Electronic gaming machine (EGM) gamblers were asked whether current and proposed EGM harm minimisation measures impacted on their actual or anticipated gambling expenditure and enjoyment. Participants were analysed based on their endorsement of Problem Gambling Severity Index criteria (scores 0–27), and categorised as non-problem gamblers (score 0), low-risk gamblers (scores 1–2), and moderate/problem gamblers (scores 3+). Specifically, we wanted to identify harm minimisation policies that resulted in the lowest decreases in enjoyment for non-problem gamblers and the highest decreases in expenditure for moderate/problem gamblers. Regarding current policies, the lowest decrease in enjoyment for non-problem gamblers was the ban on Automatic Teller Machines (ATMs) in EGM venues (0.2 %) while the highest decrease in expenditure for moderate/problem gamblers was the reduction in maximum lines (46.9 %). For the proposed measures, the lowest decrease in enjoyment for non-problem gamblers was visible clocks (1.2 %) while the highest decrease in expenditure for moderate/problem gamblers was reducing cash withdrawals (36.3 %). These results suggest universal EGM harm minimisation measures can differentially target non-problem and moderate/problem gamblers.
+AU  - Jackson, Alun C
+AU  - Christensen, Darren R.
+AU  - Francis, Kate L
+AU  - Dowling, Nicki A.
+CY  - United States
+DA  - 2015/10/06
+DO  - 10.1007/s10899-015-9568-4
+EP  - 822
+ID  - 017-403-600-773-28X
+IS  - 2
+JF  - Journal of gambling studies
+KW  - Consumer perspectives
+KW  - EGMs
+KW  - Harm minimisation
+KW  - Problem gambling
+L2  - http://www.ncbi.nlm.nih.gov/pubmed/26440108
+L2  - http://dro.deakin.edu.au/view/DU:30089264
+L2  - https://researchbank.acu.edu.au/cgi/viewcontent.cgi?article=6270&context=fhs_pub
+L2  - https://findanexpert.unimelb.edu.au/scholarlywork/1014305-consumer-perspectives-on-gambling-harm-minimisation-measures-in-an-australian-jurisdiction
+L2  - https://link.springer.com/content/pdf/10.1007%2Fs10899-015-9568-4.pdf
+L2  - https://link.springer.com/article/10.1007/s10899-015-9568-4
+L2  - https://acuresearchbank.acu.edu.au/item/865w2/consumer-perspectives-on-gambling-harm-minimisation-measures-in-an-australian-jurisdiction
+L2  - http://hdl.handle.net/10536/DRO/DU:30089264
+PB  - Springer International Publishing AG
+PY  - 2015
+SN  - 15733602
+SN  - 10505350
+SP  - 801
+TI  - Consumer Perspectives on Gambling Harm Minimisation Measures in an Australian Jurisdiction
+UR  - https://lens.org/017-403-600-773-28X
+VL  - 32
+ER  - 
+TY  - JOUR
+AB  - Aims: This study investigates the proportion of concerned significant others (CSOs) of problem gamblers at population level and describes the extent and type of gambling harms for CSOs. Methods: Cr...
+AU  - Salonen, Anne H.
+AU  - Alho, Hannu
+AU  - Castrén, Sari
+CY  - United States
+DA  - 2016/10/22
+DO  - 10.1177/1403494816673529
+EP  - 804
+ID  - 017-728-644-766-124
+IS  - 8
+JF  - Scandinavian journal of public health
+KW  - Concerned significant others
+KW  - cross-sectional
+KW  - gambling
+KW  - gambling harm
+KW  - population study
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/28929933
+L2  - https://helda.helsinki.fi/handle/10138/229288
+L2  - https://journals.sagepub.com/doi/10.1177/1403494816673529
+L2  - https://pubmed.ncbi.nlm.nih.gov/28929933/
+L2  - https://helda.helsinki.fi/bitstream/10138/229288/1/799.full.pdf
+L2  - http://journals.sagepub.com/doi/10.1177/1403494816673529
+L2  - https://researchportal.helsinki.fi/en/publications/the-extent-and-type-of-gambling-harms-for-concerned-significant-o
+L2  - https://europepmc.org/article/MED/28929933
+L2  - http://journals.sagepub.com/doi/pdf/10.1177/1403494816673529
+L2  - https://core.ac.uk/download/146448272.pdf
+PB  - SAGE Publications Ltd
+PY  - 2016
+SN  - 16511905
+SN  - 14034948
+SP  - 799
+TI  - The extent and type of gambling harms for concerned significant others: A cross-sectional population study in Finland
+UR  - https://lens.org/017-728-644-766-124
+VL  - 44
+ER  - 
+TY  - JOUR
+AB  - Background: Recent research evidence has suggested that gambling is a public health concern. A number of studies report the association between gambling activity and increased instances of various other harms, including substance misuse and psychological disorders. In parallel to alcohol misuse, it is also becoming clear that gambling related harm is more of a continuum of harm, as opposed to traditionally accepted categorisations of gambling behavior: safe and responsible or "problem" and harmful. Previous effective treatment models for alcohol misuse have considered a public health approach to develop interventions. As such, the current research seeks to use a public health approach to both investigate the extent of gambling harm across Wales, and to identify upstream predictors of harm to inform future interventions. Method: A triangulation of data collection methods was utilized across Wales, UK. Two hundred and forty-eight participants completed a quantitative survey relating to gambling behavior and related harm, which included the Problem Severity Gambling Index, the Gambling Commission measure of frequency, The Gambling Motives Questionnaire and the Fast Alcohol Screening tool. Ninety-eight of these participants completed a qualitative subsection. Structured interviews were conducted with 20 individuals from 11 service providers. Semi-structured interviews were conducted for the five case studies of individuals who had previously sought help for gambling. The geographical density and distribution of Licensed Gambling Outlets was also mapped in local areas. Results: The findings provide further evidence of a continuum of gambling related harm. Twenty seven percent of survey participants demonstrate some indicators of risk of gambling harm. Social, cultural and environmental contexts play a role in initiation and maintenance of gambling behavior and the subsequent related harm. Accounts from individuals corroborated the quantitative findings. Conclusions: Findings from this Welsh sample are in line with and add support to the growing international research evidence that gambling harms are a universal issue that cross cultures. It is clear that action is needed by legislators at a policy level and that broadening the focus of intervention to a public health level is necessary to develop effective strategies for harm reduction.
+AU  - John, Bev
+AU  - Holloway, Katy
+AU  - Davies, Nyle
+AU  - May, Thomas
+AU  - Buhociu, Marian
+AU  - Cousins, Alecia L.
+AU  - Thomas, Samantha L.
+AU  - Roderique-Davies, Gareth
+CY  - Switzerland
+DA  - 2020/07/22
+DO  - 10.3389/fpubh.2020.00320
+EP  - 320
+ID  - 020-377-866-930-619
+JF  - Frontiers in public health
+KW  - gambling density
+KW  - gambling harm
+KW  - mixed methods
+KW  - predictors of harm
+KW  - prevention
+KW  - public health
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32793537
+L2  - https://www.frontiersin.org/article/10.3389/fpubh.2020.00320/full
+L2  - https://www.drugsandalcohol.ie/32435/
+L2  - http://dro.deakin.edu.au/view/DU:30140619
+L2  - https://www.frontiersin.org/articles/10.3389/fpubh.2020.00320/full
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7387499
+L2  - https://pubmed.ncbi.nlm.nih.gov/32793537/
+L2  - http://europepmc.org/abstract/MED/32793537
+L2  - https://doaj.org/article/48d12c72580c4b1d9795138cc8ee4c65
+PB  - Frontiers Media SA
+PY  - 2020
+SN  - 22962565
+SP  - 320
+TI  - Gambling Harm as a Global Public Health Concern: A Mixed Method Investigation of Trends in Wales
+UR  - https://lens.org/020-377-866-930-619
+VL  - 8
+ER  - 
+TY  - JOUR
+AB  - Increasingly, industry operators and governments espouse the view that they play a role in minimizing gambling harm and have developed and implemented programs and policies designed to promote responsible gambling. However, little is known about gamblers’ perceptions of responsibility for minimizing gambling harm or whether these perceptions are linked to gamblers’ own experience of gambling harm. Gamblers’ perceptions of stakeholder responsibility for minimizing gambling harm could impact not only their gambling behavior but also the potential for legal action following excessive financial loss. We surveyed participants selected from MGM Resorts International (MGM)’s loyalty card database (N = 3748) regarding their perceptions of responsibility for minimizing gambling harm. Additionally, we administered the Brief Biosocial Gambling Screen (BBGS), the Positive Play Scale, and measures assessing participants’ understanding of gambling concepts and use of responsible gambling strategies. Compared to those who screened negative, participants who screened positive on the BBGS had more diffuse conceptions of responsibility for minimizing gambling harm and were more likely to hold five particular stakeholder groups (e.g., MGM Resorts employees, government regulators, public safety officials) responsible. In multivariate analyses, participants’ distributed sense of responsibility for reducing gambling harm predicted their BBGS status over and above other risk factors (i.e., Positive Play, understanding of gambling concepts, use of responsible gambling strategies). We discuss implications for responsible gambling programs and policies.
+AU  - Gray, Heather
+AU  - LaPlante, Debi A.
+AU  - Abarbanel, Brett
+AU  - Bernhard, Bo J.
+CY  - Germany
+DA  - 2019/01/24
+EP  - 17
+ID  - 021-559-832-468-845
+IS  - 4
+JF  - International Journal of Mental Health and Addiction
+L2  - https://link.springer.com/10.1007/s11469-019-0056-4
+L2  - https://digitalscholarship.unlv.edu/gaming_institute/2019/May29/76/
+L2  - https://link.springer.com/article/10.1007/s11469-019-0056-4
+PB  - Springer New York
+PY  - 2019
+SN  - 15571874
+SN  - 15571882
+SP  - 1
+TI  - Gamblers’ Perceptions of Stakeholder Responsibility for Minimizing Gambling Harm
+UR  - https://lens.org/021-559-832-468-845
+VL  - 19
+ER  - 
+TY  - JOUR
+AB  - Pacific people in New Zealand are a minority ethnic population identified in national prevalence studies as having the highest risk of developing gambling problems. As earlier studies identified some links between culture and gambling for this population, our study aimed to deepen understanding of these links and their role in explaining the disproportionate gambling harms experienced by Pacific people. To achieve this aim we employed intersectionality as a theoretical framework to explore the culture-gambling intersection for this population group. We analysed data from a subset of focus groups conducted for a broad study of gambling harms in New Zealand. The subset was selected based on the presence of individuals knowledgeable about Pacific people’s gambling behaviours, including staff from Pacific problem gambling treatment services who provided examples from a cultural perspective. We identified themes at a latent level via an interpretive process to identify underlying cultural contexts of gambling harms. Findings indicated that whilst harms experienced by Pacific people were similar to those identified amongst the general population, the cultural contexts in which some harms manifested were complex. This paper contributes to the existing knowledge base about gambling harms for Pacific people in relation to six culture-gambling intersecting themes that emerged from the data: collectivism, gift-giving, gambling-based fundraising, patriarchy, beliefs about blessings, and sports celebrities. Findings are discussed in relation to the current knowledge of gambling and conceptualisations of gambling harm within Pacific communities. Implications for culturally appropriate harm minimisation strategies and prevention interventions for this population are suggested.
+AU  - Kolandai-Matchett, Komathi
+AU  - Langham, Erika
+AU  - Bellringer, Maria
+AU  - Siitia, Pesio Ah-Honi
+CY  - Germany
+DA  - 2017/08/18
+DO  - 10.1186/s40405-017-0026-3
+EP  - 20
+ID  - 022-759-459-581-50X
+IS  - 1
+JF  - Asian journal of gambling issues and public health
+KW  - Culture-gambling intersections
+KW  - Gambling harms
+KW  - Pacific cultures
+L2  - https://link.springer.com/article/10.1186/s40405-017-0026-3
+L2  - https://ajgiph.springeropen.com/articles/10.1186/s40405-017-0026-3
+L2  - https://espace.library.uq.edu.au/view/UQ:79293b6
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5562785
+L2  - https://paperity.org/p/81197896/how-gambling-harms-experienced-by-pacific-people-in-new-zealand-amplify-when-they-are
+L2  - https://openrepository.aut.ac.nz/handle/10292/10806
+L2  - https://core.ac.uk/display/102250080
+L2  - http://europepmc.org/articles/PMC5562785
+L2  - https://pubmed.ncbi.nlm.nih.gov/28868234/
+L1  - https://link.springer.com/content/pdf/10.1186%2Fs40405-017-0026-3.pdf
+L2  - https://core.ac.uk/download/pdf/132419381.pdf
+PB  - Springer Science and Business Media LLC
+PY  - 2017
+SN  - 21953007
+SP  - 1
+TI  - How gambling harms experienced by Pacific people in New Zealand amplify when they are culture-related
+UR  - https://lens.org/022-759-459-581-50X
+VL  - 7
+ER  - 
+TY  - JOUR
+AB  - The prevalence of gambling harm among active duty military personnel is a largely unexplored topic. With different forms of social gambling often found within (or in close proximity to) military bases around the world, understanding the extent of gambling activities and consequent harms occurring within military contexts warrants further attention. This review aims to identify, describe and thematically synthesise published literature on gambling harm and related issues among active duty military personnel. Scoping review methods were applied in order to understand this relatively under-researched population and understand appropriate avenues for future research. A systematic multi-database text word search, incorporating search results from Scopus, Pubmed, Web of Science, PsychInfo, and the Journal Military Medicine, was conducted. A total of 11 sources met inclusion criteria, all originating from the United States of America. The results suggest a distinct gap in the current international literature on this topic. Despite gambling's long and colourful association with defence downtime, research into gambling harm prevalence rates in relation to what could be considered a high-risk group is limited. Findings reveal that strategies to identify and address gambling harm within this population are severely lacking from the published literature and non-existent outside North America. Implications for understanding and addressing gambling harm among active duty personnel and directions for future research are discussed.
+AU  - Paterson, Marisa
+AU  - Whitty, Megan
+AU  - Leslie, Patrick
+CY  - United States
+DA  - 2020/05/14
+DO  - 10.1007/s10899-020-09951-4
+EP  - 549
+ID  - 026-303-928-308-830
+IS  - 2
+JF  - Journal of gambling studies
+KW  - Active duty
+KW  - Defence
+KW  - Gambling
+KW  - Military
+KW  - Scoping review
+L1  - https://openresearch-repository.anu.edu.au/bitstream/1885/212429/1/01_Paterson%2b%2528previously%2bFogarty%2529_Exploring_the_prevalence_of_2020.pdf
+L1  - https://link.springer.com/content/pdf/10.1007/s10899-020-09951-4.pdf
+L2  - https://pubmed.ncbi.nlm.nih.gov/32410048/
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32410048
+L2  - https://openresearch-repository.anu.edu.au/handle/1885/212429
+L2  - https://europepmc.org/article/PMC/PMC8144149
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8144149
+L2  - https://link.springer.com/article/10.1007/s10899-020-09951-4
+PB  - Springer International Publishing AG
+PY  - 2020
+SN  - 15733602
+SN  - 10505350
+SP  - 529
+TI  - Exploring the prevalence of gambling harm among active duty military personnel: a systematic scoping review
+UR  - https://lens.org/026-303-928-308-830
+VL  - 37
+ER  - 
+TY  - JOUR
+AB  - <jats:p>Explanatory models of substance and behavioral addictions typically emphasize the contributions of three predictor domains: distorted cognitions related to control; motivations related to rewards and stress-reduction; and, failure to regulate emotions. In the present study, 271 (161 females) patrons at a racetrack-slots facility completed a survey comprising standardized measures of gambling-related cognitions, motivations for gambling, trait impulsivity, and problem gambling severity. The purpose was to explore dominance analysis as a statistical procedure to identify the relative importance of the three domains as predictors of the experience of gambling harms. The first step of the analysis isolated the dominant facet within each of the three multi-dimensional domains. The final step computed relative dominance among those facets. The results indicated that the most dominant predictor was the cognition of an inability to stop gambling. Motivation to avoid life stressors was the second most dominant predictor followed by the tendency to act rashly in the presence of negative emotion (negative urgency). The relative dominance of the predictors of gambling harm may provide a framework for scaffolding interventions directed at mitigating gambling harms.</jats:p>
+DA  - 2020/10/20
+DO  - 10.33140/jar.04.02.05
+ID  - 027-317-277-443-169
+IS  - 2
+JF  - Journal of Addiction Research
+PB  - Opast Group LLC
+PY  - 2020
+SN  - 25739514
+TI  - Gambling Harms: A Dominance Analysis of Cognitions, Motivation and Impulsivity
+UR  - https://lens.org/027-317-277-443-169
+VL  - 4
+ER  - 
+TY  - JOUR
+AB  - There is a growing consensus that gambling is a public health issue and that preventing gambling related harms requires a broad response. Although many policy decisions regarding gambling are made at a national level in the UK, there are clear opportunities to take action at local and regional levels to prevent the negative impacts on individuals, families and local communities. This response goes beyond the statutory roles of licencing authorities to include amongst others the National Health Service (NHS), the third sector, mental health services, homelessness and housing services, financial inclusion support. As evidence continues to emerge to strengthen the link between gambling and a wide range of risk factors and negative consequences, there is also a strong correlation with health inequalities. Because the North of England experiences increasing health inequalities, it offers an opportunity as a specific case study to share learning on reducing gambling-related harms within a geographic area. This article describes an approach to gambling as a public health issue identifying it as needing a cross-cutting, systemwide multisectoral approach to be taken at local and regional levels. Challenges at national and local levels require policy makers to adopt a 'health in all policy' approach and use the best evidence in their future decisions to prevent harm. A whole systems approach which aims to reduce poverty and health inequalities needs to incorporate gambling harm within place-based planning and draws on the innovative opportunities that exist to engage local stakeholders, builds local leadership and takes a collaborative approach to tackling gambling-related harms. This whole systems approach includes the following: (1) understanding the prevalence of gambling related harms with insights into the consequences and how individuals, their family and friends and wider community are affected; (2) ensuring tackling gambling harms is a key public health commitment at all levels by including it in strategic plans, with meaningful outcome measures, and communicating this to partners; (3) understanding the assets and resources available in the public, private and voluntary sectors and identifying what actions are underway; (4) raising awareness and sharing data, developing a compelling narrative and involving people who have been harmed and are willing to share their experience; (5) ensuring all regulatory authorities help tackle gambling-related harms under a 'whole council' approach.
+AU  - Johnstone, Paul
+AU  - Regan, M.
+CY  - United Kingdom
+DA  - 2020/07/17
+DO  - 10.1016/j.puhe.2020.06.010
+EP  - 66
+ID  - 030-272-291-303-295
+JF  - Public health
+KW  - Commercial determinants of health
+KW  - Gambling
+KW  - Gambling related harms
+KW  - Inequality
+KW  - Local authority
+KW  - Policy
+KW  - Practice
+KW  - Public health
+KW  - Systemwide approach
+L2  - https://europepmc.org/article/PMC/PMC7366099
+L2  - https://pubmed.ncbi.nlm.nih.gov/32684349/
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7366099
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32684349
+L2  - https://researchportal.phe.gov.uk/en/publications/gambling-harm-is-everybodys-business-a-public-health-approach-and
+L2  - https://www.sciencedirect.com/science/article/abs/pii/S0033350620302468
+PB  - Elsevier
+PY  - 2020
+SN  - 14765616
+SN  - 00333506
+SP  - 63
+TI  - Gambling harm is everybody's business: A public health approach and call to action.
+UR  - https://lens.org/030-272-291-303-295
+VL  - 184
+ER  - 
+TY  - JOUR
+AB  - Problem gambling represents a significant public health problem, however, research on effective gambling harm-minimisation measures lags behind other fields, including other addictive disorders. In recognition of the need for consistency between international jurisdictions and the importance of basing policy on empirical evidence, international conventions exist for policy on alcohol, tobacco, and illegal substances. This paper examines the evidence of best practice policies to provide recommendations for international guidelines for harm-minimisation policy for gambling, including specific consideration of the specific requirements for policies on Internet gambling. Evidence indicates that many of the public health policies implemented for addictive substances can be adapted to address gambling-related harms. Specifically, a minimum legal age of at least 18 for gambling participation, licensing of gambling venues and activities with responsible gambling and consumer protection strategies mandated, and brief interventions should be available for those at-risk for and experiencing gambling-related problems. However, there is mixed evidence on the effectiveness of limits on opening hours and gambling venue density and increased taxation to minimise harms. Given increases in trade globalisation and particularly the global nature of Internet gambling, it is recommended that jurisdictions take actions to harmonise gambling public health policies.
+AU  - Gainsbury, Sally M.
+AU  - Blankers, Matthijs
+AU  - Wilkinson, Claire
+AU  - Schelleman-Offermans, Karen
+AU  - Cousijn, Janna
+CY  - United States
+DA  - 2013/06/08
+DO  - 10.1007/s10899-013-9389-2
+EP  - 788
+ID  - 031-800-435-806-899
+IS  - 4
+JF  - Journal of gambling studies
+L2  - http://dspace.library.uu.nl/handle/1874/304497
+L2  - https://dare.uva.nl/search?field1=dai;value1=353260592;docsPerPage=1;startDoc=10
+L2  - https://europepmc.org/abstract/MED/23748884
+L2  - http://epubs.scu.edu.au/tourism_pubs/2166/
+L2  - https://works.bepress.com/sally_gainsbury/114/
+L2  - https://www.narcis.nl/publication/RecordID/oai%3Adare.uva.nl%3Apublications%2F3299a309-8b50-444c-b49d-384f465df333
+L2  - https://pubmed.ncbi.nlm.nih.gov/23748884/
+L2  - https://cris.maastrichtuniversity.nl/portal/en/publications/recommendations-for-international-gambling-harmminimisation-guidelines-comparison-with-effective-public-health-policy(743d190c-6d4c-4337-98bc-8f61acb6719b)/export.html
+L2  - https://link.springer.com/article/10.1007/s10899-013-9389-2
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/23748884
+PB  - Springer International Publishing AG
+PY  - 2013
+SN  - 15733602
+SN  - 10505350
+SP  - 771
+TI  - Recommendations for international gambling harm-minimisation guidelines: comparison with effective public health policy
+UR  - https://lens.org/031-800-435-806-899
+VL  - 30
+ER  - 
+TY  - JOUR
+AB  - <AbstractText Label="Background and aims" NlmCategory="UNASSIGNED">Legacy gambling harms are negative consequences of gambling that extend past periods of low risk, moderate risk and problem gambling. Gambling harm is typically measured within a 12-month timeframe and is often restricted to examining harm amongst active gamblers. The present research aimed to explore whether people experienced gambling harms 12 months or more after the resolution of at-risk or problem gambling, and how long these legacy harms lasted.</AbstractText>
+          <AbstractText Label="Methods" NlmCategory="UNASSIGNED">An online survey was conducted in New Zealand with past and current gamblers and concerned significant others (CSOs) of gamblers, N = 1,240 (50.8% female), that asked them about both past and current gambling harms.</AbstractText>
+          <AbstractText Label="Results" NlmCategory="UNASSIGNED">A majority of both gamblers and CSOs of gamblers indicated that they still suffered from gambling harm even after most of their behavioural issues with gambling had been resolved, 12+ months ago. Legacy gambling harms reduced over time, with harms diminishing most quickly in the early years, and having an average half-life of 4 years. Harms involving community-relationships, church involvement, and domestic and other violence resolved more quickly than others.</AbstractText>
+          <AbstractText Label="Discussion and conclusions" NlmCategory="UNASSIGNED">Legacy harms are common among ex-problem gamblers and should be considered in any full accounting of the impacts of gambling.</AbstractText>
+          <AbstractText Label="Conclusion" NlmCategory="UNASSIGNED">Understanding the time course and persistence of legacy harms from gambling can provide gamblers, treatment professionals and public health experts with insights into how to address gambling's long-term consequences.</AbstractText>
+AU  - Rockloff, Matthew
+AU  - Browne, Matthew
+AU  - Russell, Alex M T
+AU  - Hing, Nerilee
+AU  - Armstrong, Tess
+AU  - Greer, Nancy
+CY  - Hungary
+DA  - 2022/10/12
+DO  - 10.1556/2006.2022.00073
+ID  - 034-559-249-941-166
+JF  - Journal of behavioral addictions
+KW  - harm
+KW  - legacy
+KW  - lifetime
+KW  - long-term
+KW  - residual
+KW  - wellbeing
+PB  - Akademiai Kiado
+PY  - 2022
+SN  - 20635303
+SN  - 20625871
+TI  - Legacy gambling harms: What are they and how long do they last?
+UR  - https://lens.org/034-559-249-941-166
+ER  - 
+TY  - JOUR
+AB  - This systematic literature review evaluates the potential of gambling monopolies to affect gambling harms. It compares the occurrence of gambling harms in jurisdictions with gambling monopolies to jurisdictions with license-based regimes. The review identified 21 publications concerning three gambling-related harm indicators: problem gambling prevalence, total consumption, and the appearance of conflicts of interest. Due to the dearth of literature, concept papers and older publications were also included. Results show that there is a paucity of empirical research on the effectiveness of different regulatory regimes in affecting gambling harms. Available research demonstrates that monopolistic regimes appear to perform somewhat better in terms of problem gambling prevalence and total consumption but may also be more prone to conflicts of interest than license-based regimes. Monopolistic configurations also differ between themselves, and issues such as availability, accessibility, product range, scope of preventive work, monitoring, as well as the recognition of the public health approach may better predict the levels of harm in society than the existence of a monopoly.
+AU  - Marionneau, Virve
+AU  - Egerer, Michael
+AU  - Nikkinen, Janne
+DA  - 2021/05/08
+DO  - 10.1007/s40429-021-00370-y
+EP  - 234
+ID  - 036-777-347-215-430
+IS  - 2
+JF  - Current Addiction Reports
+L2  - https://link.springer.com/article/10.1007/s40429-021-00370-y
+L2  - https://researchportal.helsinki.fi/en/publications/how-do-state-gambling-monopolies-affect-levels-of-gambling-harm
+L1  - https://link.springer.com/content/pdf/10.1007/s40429-021-00370-y.pdf
+PB  - Springer Science and Business Media LLC
+PY  - 2021
+SN  - 21962952
+SP  - 225
+TI  - How Do State Gambling Monopolies Affect Levels of Gambling Harm
+UR  - https://lens.org/036-777-347-215-430
+VL  - 8
+ER  - 
+TY  - JOUR
+AB  - Background Engagement in responsible or 'positive play' strategies is known to be negatively associated with problem gambling, as indexed by measures such as the Problem Gambling Severity Index (PGSI). Less is known about whether positive play is associated with reduced harm or a greater ability to enjoy the recreational benefits of gambling. Aims This study investigated the relationship between positive play and gambling harm after controlling for PGSI scores and whether positive play moderated the relationship between PGSI scores and harm. It also examined whether positive play was related to perceived benefits associated with gambling. Methods The study utilised an online panel sample of 554 respondents who completed a survey that included the PGSI, measures of gambling harm drawn from Browne et al. (2016), and the newly developed Positive Play Scale (Wood et al., 2019). The study involved predominantly monthly gamblers with higher levels of gambling risk: 23% problem gamblers; 36% moderate risk; and 21% low risk gamblers. Results The results indicated that positive play was negatively associated with reduced gambling harm. The behavioural Positive Play subscales relating to pre-commitment and honesty and control explained additional variation in harm after controlling for PGSI scores. Higher levels of positive play also moderated and reduced the relationship between the PGSI and gambling harm. Perceived benefits were, unexpectedly, found to be higher in problem gamblers and negatively related to positive play. Conclusion Behavioural measures of positive play appear to be useful moderating factors in understanding the relationship between problem gambling and harm. Higher-risk gamblers appear to experience both greater costs as well as benefits from gambling, which likely reflects a stronger personal need to engage in the activity.
+AU  - Delfabbro, Paul
+AU  - King, Daniel L.
+AU  - Georgiou, Neophytos
+CY  - Hungary
+DA  - 2020/06/06
+DO  - 10.1556/2006.2020.00041
+EP  - 370
+ID  - 039-555-496-966-903
+IS  - 2
+JF  - Journal of behavioral addictions
+L2  - https://akjournals.com/view/journals/2006/9/2/article-p363.xml
+L2  - https://europepmc.org/article/MED/32634113
+L2  - https://pubmed.ncbi.nlm.nih.gov/32634113/
+L1  - https://akjournals.com/downloadpdf/journals/2006/9/2/article-p363.pdf
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32634113
+PB  - Akademiai Kiado
+PY  - 2020
+SN  - 20635303
+SN  - 20625871
+SP  - 363
+TI  - Positive play and its relationship with gambling harms and benefits.
+UR  - https://lens.org/039-555-496-966-903
+VL  - 9
+ER  - 
+TY  - JOUR
+AB  - Objective: Academics, gambling regulators, and the gambling industry increasingly espouse a shared responsibility view of preventing gambling harm, considering individual gamblers and external stakeholders (e.g., gambling industry employees, government regulators, and public health workers) to be jointly responsible for this task. This study is the third in a series exploring gamblers' beliefs about responsibility for preventing gambling harm. Method: A sample of 4,336 subscribers to MGM Resorts International (MGM)'s loyalty card program as of January 2020 completed a web-based survey. Results: We observed that 58.1% of participants only held individual gamblers responsible for helping prevent gambling harm. However, two factors increased the likelihood of holding a shared responsibility viewpoint and assigning responsibility to casinos for reducing gambling harm: (a) scoring positive on the Brief Biosocial Gambling Screen (BBGS) or an Expanded Problem Gambling Screen (EPGS) and (b) being aware of GameSense, an onsite responsible gambling education program. Those who screened positive on the BBGS or EPGS also were more likely than their counterparts to deny personal responsibility for minimizing gambling harm to individual gamblers; that is, they were more likely to hold a purely external responsibility viewpoint. A meta-analytic year-over-year comparison revealed that compared to being aware of GameSense, screening positive for problem gambling was more strongly associated with assigning responsibility to casinos for minimizing gambling harm. Conclusions: We discuss these findings in the context of self-determination theory and suggest implications for health promotion and best practices for message design in responsible gambling programs. (PsycInfo Database Record (c) 2021 APA, all rights reserved).
+AU  - Gray, Heather
+AU  - Louderback, Eric R.
+AU  - LaPlante, Debi A.
+AU  - Abarbanel, Brett
+AU  - Kraus, Shane W.
+AU  - Bernhard, Bo J.
+CY  - United States
+DA  - 2021/07/22
+DO  - 10.1037/adb0000767
+EP  - 357
+ID  - 043-448-459-851-139
+IS  - 4
+JF  - Psychology of addictive behaviors : journal of the Society of Psychologists in Addictive Behaviors
+L2  - https://pubmed.ncbi.nlm.nih.gov/34291955/
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/34291955
+PB  - Educational Publishing Foundation
+PY  - 2021
+SN  - 19391501
+SN  - 0893164x
+SP  - 347
+TI  - Who holds a shared responsibility view of minimizing gambling harm? Results from a multiwave survey of casino gamblers.
+UR  - https://lens.org/043-448-459-851-139
+VL  - 36
+ER  - 
+TY  - JOUR
+AB  - Prior studies have identified self-regulatory strategies that are infrequently used by problem-gamblers, but which might be protective if used. However, guidelines with evidence-based safe gambling practices (SGPs) that prevent gambling-related harm are lacking. This study aimed to: 1) identify a parsimonious set of evidence-based SGPs that best predict non-harmful gambling amongst gamblers who are otherwise most susceptible to experiencing gambling harm; 2) examine how widely are they used; and 3) assess whether their use differs by gambler characteristics. A sample of 1,174 regular gamblers in Alberta Canada completed an online survey measuring uptake of 43 potential SGPs, gambling harms and numerous risk factors for harmful gambling. Elastic net regression identified a sub-sample of 577 gamblers most susceptible to gambling harm and therefore most likely to benefit from the uptake of SGPs. A second elastic net predicted gambling harm scores in the sub-sample, using the SGPs as candidate predictors. Nine SGPs best predicted non-harmful gambling amongst this sub-sample. The behaviour most strongly associated with increased harm was using credit to gamble. The behaviour most strongly associated with reduced harm was ‘If I’m not having fun gambling, I stop’. These SGPs form the basis of evidence-based safe gambling guidelines which can be: 1) promoted to consumers, 2) form the basis of self-assessment tests, 3) used to measure safe gambling at a population level, and 4) inform supportive changes to policy and practice. The guidelines advise gamblers to: stop if they are not having fun, keep a household budget, keep a dedicated gambling budget, have a fixed amount they can spend, engage in other leisure activities, avoid gambling when upset or depressed, not use credit for gambling, avoid gambling to make money, and not think that strategies can help you win. These guidelines are a promising initiative to help reduce gambling-related harm.
+AU  - Hing, Nerilee
+AU  - Browne, Matthew
+AU  - Russell, Alex M. T.
+AU  - Rockloff, Matthew
+AU  - Rawat, Vijay
+AU  - Nicoll, Fiona
+AU  - Smith, Garry J.
+CY  - United States
+DA  - 2019/10/17
+DO  - 10.1371/journal.pone.0224083
+ID  - 043-975-108-242-790
+IS  - 10
+JF  - PloS one
+L2  - https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0224083
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6797237
+L2  - http://ui.adsabs.harvard.edu/abs/2019PLoSO..1424083H/abstract
+L2  - https://dx.plos.org/10.1371/journal.pone.0224083
+L2  - https://paperity.org/p/208049537/avoiding-gambling-harm-an-evidence-based-set-of-safe-gambling-practices-for-consumers
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/31622430
+PB  - Public Library of Science
+PY  - 2019
+SN  - 19326203
+SP  - e0224083
+TI  - Avoiding gambling harm: An evidence-based set of safe gambling practices for consumers.
+UR  - https://lens.org/043-975-108-242-790
+VL  - 14
+ER  - 
+TY  - JOUR
+AB  - Gambling harm is a serious public health issue affecting the health, financial security, and social well-being of millions of people and their close relations around the world. Despite its population health implications, gambling harm is not typically viewed and treated as a public health policy issue. This paper critically reviews the evolution of the public health perspective on gambling harm. It also considers how gambling harm can be operationalized within a public health model. A critical historical review of the emerging public health perspective on gambling harm was conducted. Key documents covering three decades of development were reviewed and appraised through a process of deliberation and debate over source impact in the fields of research, policy, and programming internationally. The first decade mainly focused on identifying gambling harm and framing the public health issue. The second decade featured the expansion of health assessment and emerging areas of policy and program development. The third decade saw an increased focus on public health frameworks that advanced understanding of harm mechanics and impact. As reflected by the essential functions of a general public health model, gambling harm prevention efforts emphasize health promotion over other key functions like health assessment and surveillance. Gambling harm is a public health issue requiring greater attention to health assessment and surveillance data development.
+AU  - Price, Alex
+AU  - Hilbrecht, Margo
+AU  - Billi, Rosa
+CY  - Germany
+DA  - 2021/01/07
+DO  - 10.1007/s10389-020-01437-2
+EP  - 53
+ID  - 045-149-552-866-725
+IS  - 1
+JF  - Zeitschrift fur Gesundheitswissenschaften = Journal of public health
+KW  - Critical review
+KW  - Essential functions
+KW  - Gambling harm
+KW  - Health assessment
+KW  - Public health model
+KW  - Surveillance
+L1  - https://link.springer.com/content/pdf/10.1007/s10389-020-01437-2.pdf
+L2  - https://link.springer.com/article/10.1007/s10389-020-01437-2
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7787930
+PB  - Springer Verlag
+PY  - 2021
+SN  - 21981833
+SN  - 09431853
+SN  - 16132238
+SP  - 37
+TI  - Charting a path towards a public health approach for gambling harm prevention.
+UR  - https://lens.org/045-149-552-866-725
+VL  - 29
+ER  - 
+TY  - JOUR
+AB  - Problem gambling is now recognised as a major public health issue, with some gambling products posing significant burdens for individuals, families and communities. While gambling has attracted significant political and media attention, governments have been largely unwilling to implement a comprehensive approach to gambling reform. This article reviews the evidence base associated with gambling harm and advocates for a shift in focus away from initiatives that focus on responsible gambling, towards an approach that recognises the mutual obligation between industry, individuals, governments and the general community to engage in practices that prevent the development of gambling-related harm.
+AU  - Thomas, Samantha L.
+AU  - Thomas, Stuart Dm
+DA  - 2015/08/01
+EP  - 42
+ID  - 050-654-820-080-218
+IS  - 1
+JF  - Australasian epidemiologist
+L2  - http://dro.deakin.edu.au/eserv/DU:30084307/thomas-thebiggamble-2015.pdf
+L2  - https://ro.uow.edu.au/sspapers/2107/
+L2  - https://search.informit.com.au/documentSummary;dn=464375040112591;res=IELHEA
+L2  - http://dro.deakin.edu.au/view/DU:30084307
+PY  - 2015
+SN  - 13278835
+SP  - 39
+TI  - The big gamble: the need for a comprehensive research approach to understanding the causes and consequences of gambling harm in Australia
+UR  - https://lens.org/050-654-820-080-218
+VL  - 22
+ER  - 
+TY  - JOUR
+AB  - The purpose of the present study was to introduce stochastic search variable selection (SSVS) as a procedure to identify a subset of important predictors of gambling harm. The target set of predictors were dimensions of trait impulsivity, gambling cognitions, and gambling motivations. Five types of gambling harm (feeling one has a personal problem; social criticism; feeling guilt; health; and, financial) were measured by the Problem Gambling Severity Index. Casino patrons completed the measures. As a first step, we identified the significant predictors that would be included in modelling an aggregate harm score. The most important predictors, the cognition that one is not able to stop gambling, and the motivation to escape or avoid life stressors, were positively associated with overall harm. Two weaker, but statistically significant, predictors were negatively associated with harm: sensation-seeking and illusion of control. Although a perceived inability to stop gambling was the most important predictor of each individual harm, the pattern of predictors varied across harms. For example, sensation-seeking was an important predictor only for the belief that one has a gambling problem, and escape/avoidance motivation was strongly predictive of financial harm. The results suggest that primary interventions designed to mitigate harm should address the belief that the gambler is unable to stop gambling, and motivations related to escape/avoid life stressors. Other interventions would be tailored to the specific harms experience by the gambler.
+AU  - Cooper, Alysha
+AU  - Marmurek, Harvey H. C.
+DO  - 10.28933/ijart-2020-07-2005
+ID  - 055-804-662-055-676
+JF  - International Journal of Addiction Research and Therapy
+L2  - https://escipub.com/ijart-2020-07-2005/
+PB  - eSciPub LLC
+PY  - 2020
+SN  - 26378795
+SP  - 20
+TI  - Modelling Predictors of Gambling Harms with Stochastic Search Variable Selection (SSVS)
+UR  - https://lens.org/055-804-662-055-676
+VL  - 3
+ER  - 
+TY  - JOUR
+AB  - <AbstractText Label="BACKGROUND">Gambling has traditionally been conceptualised as an issue of addiction and personal responsibility. While there are now clear public health models that recognise that gambling harm is caused by a range of socio-cultural, environmental, commercial and political determinants, government and industry messages about gambling are still largely personal responsibility focused. Given the well-recognised issues associated with personal responsibility paradigms, this study sought to understand how gamblers themselves conceptualised responsibility for gambling harm.</AbstractText>
+          <AbstractText Label="METHODS">A qualitatively led online panel survey was conducted with 363 adult gamblers in New South Wales and Victoria, Australia. Participants were asked to respond to what they thought were the causes of gambling harm, and what could be done to prevent harm. A reflexive thematic analysis was conducted.</AbstractText>
+          <AbstractText Label="RESULTS">Six common tropes were constructed from gamblers' responses: (1) Gambling in moderation; (2) Personal responsibility for rational behaviour; (3) Character flaws; (4) Personal responsibility to seek help; (5) More education is needed; and (6) Governments are responsible for action - but motivation and efficacy are questioned. Gamblers primarily understood gambling harm as being a matter of personal responsibility, and government responsibility was generally seen as limited to providing information to facilitate informed gambling choices.</AbstractText>
+          <AbstractText Label="CONCLUSIONS">This study demonstrates that gamblers' perceptions of gambling harm are similar to the personal responsibility framings and tropes present in industry and government messaging strategies. Refocusing public communication strategies away from 'responsible gambling' messaging, and towards evidence-based approaches, will be an important part of addressing the harms associated with gambling.</AbstractText>
+          <CopyrightInformation>© 2022. The Author(s).</CopyrightInformation>
+AU  - Marko, Sarah
+AU  - Thomas, Samantha L
+AU  - Robinson, Kim
+AU  - Daube, Mike
+CY  - United Kingdom
+DA  - 2022/04/12
+DO  - 10.1186/s12889-022-13109-9
+ID  - 056-220-062-781-006
+IS  - 1
+JF  - BMC public health
+KW  - Australia
+KW  - Campaigns
+KW  - Framing
+KW  - Gambling harm
+KW  - Personal responsibility
+KW  - Public health
+KW  - Qualitative
+KW  - Tropes
+PB  - BioMed Central
+PY  - 2022
+SN  - 14712458
+SP  - 725
+TI  - Gamblers' perceptions of responsibility for gambling harm: a critical qualitative inquiry.
+UR  - https://lens.org/056-220-062-781-006
+VL  - 22
+ER  - 
+TY  - JOUR
+AB  - <jats:title>Abstract
+</jats:title><jats:sec>
+              <jats:title>Purpose of Review</jats:title>
+              <jats:p>Legacy gambling harm refers to adverse consequences that extend past the period where people are actively gambling at harmful levels. These harms can affect the gambler, people close to them and the wider community. This article reviews current research that investigates legacy harms; the types of legacy harm, how long they last and whether evidence suggests these harms are real or instead imagined injuries or reflections on past regrets.</jats:p>
+            </jats:sec><jats:sec>
+              <jats:title>Recent Findings</jats:title>
+              <jats:p>Legacy harms to individuals can be broadly categorised as including financial, relationship, emotional/psychological, health, culture, work/study and criminal/deviance harms. In addition, legacy harms affect entire communities by drawing funds and social capital away from vulnerable communities, leaving them socially, culturally and materially impoverished. Most legacy harms that accrue to gamblers have a half-life of 4 years, although financial harms last somewhat longer at 5 years. Greater distance in time from a past gambling issue is reliably and positively related to health and well-being indicators, including the Health Utility Index and the Australian Unity Wellbeing Index, which suggests that legacy gambling harms are real and have a lasting impact on well-being, rather than just imagined hardship from prior gambling difficulties.</jats:p>
+            </jats:sec><jats:sec>
+              <jats:title>Summary</jats:title>
+              <jats:p>These findings suggest programme and policy development to support gamblers in reducing and managing their legacy harms, rather than focusing only on relapse prevention.</jats:p>
+            </jats:sec>
+AU  - Rockloff, Matthew
+AU  - Armstrong, Tess
+AU  - Hing, Nerilee
+AU  - Browne, Matthew
+AU  - Russell, Alex M. T.
+AU  - Bellringer, Maria
+AU  - du Preez, Katie Palmer
+AU  - Lowe, Giulia
+DA  - 2022/08/17
+DO  - 10.1007/s40429-022-00434-7
+ID  - 056-295-376-920-175
+JF  - Current Addiction Reports
+PB  - Springer Science and Business Media LLC
+PY  - 2022
+SN  - 21962952
+TI  - Legacy Gambling Harms: What Happens Once the Gambling Stops?
+UR  - https://lens.org/056-295-376-920-175
+ER  - 
+TY  - JOUR
+AB  - It is common for jurisdictions tasked with minimising gambling-related harm to conduct problem gambling prevalence studies for the purpose of monitoring the impact of gambling on the community. However, given that both public health theory and empirical findings suggest that harms can occur without individuals satisfying clinical criteria of addiction, there is a recognized conceptual disconnect between the prevalence of clinical problem gamblers, and aggregate harm to the community. Starting with an initial item pool of 72 specific harms caused by problematic gambling, our aim was to develop a short gambling harms scale (SGHS) to screen for the presence and degree of harm caused by gambling. An Internet panel of 1524 individuals who had gambled in the last year completed a 72-item checklist, along with the Personal Wellbeing Index, the PGSI, and other measures. We selected 10 items for the SGHS, with the goals of maximising sensitivity and construct coverage. Psychometric analysis suggests very strong reliability, homogeneity and unidimensionality. Non-zero responses on the SGHS were associated with a large decrease in personal wellbeing, with wellbeing decreasing linearly with the number of harms indicated. We conclude that weighted SGHS scores can be aggregated at the population level to yield a sensitive and valid measure of gambling harm.
+AU  - Browne, Matthew
+AU  - Goodwin, Belinda C.
+AU  - Rockloff, Matthew
+CY  - United States
+DA  - 2017/06/03
+DO  - 10.1007/s10899-017-9698-y
+EP  - 512
+ID  - 056-547-793-989-972
+IS  - 2
+JF  - Journal of gambling studies
+KW  - Gambling-related harm
+KW  - Population screen
+KW  - Public health
+KW  - Validation
+L2  - https://core.ac.uk/display/154345665
+L2  - https://acquire.cqu.edu.au/articles/journal_contribution/Validation_of_the_short_gambling_harm_screen_SGHS_A_tool_for_assessment_of_harms_from_gambling/13396913
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/28578519
+L2  - https://link.springer.com/article/10.1007/s10899-017-9698-y
+L2  - https://pubmed.ncbi.nlm.nih.gov/28578519/
+PB  - Springer International Publishing AG
+PY  - 2017
+SN  - 15733602
+SN  - 10505350
+SP  - 499
+TI  - Validation of the Short Gambling Harm Screen (SGHS): A Tool for Assessment of Harms from Gambling.
+UR  - https://lens.org/056-547-793-989-972
+VL  - 34
+ER  - 
+TY  - JOUR
+AB  - Issue addressed Advancements in mobile- and web-based technologies proliferate everyday opportunities to gamble. The increased availability, popularity and intensity of online gambling platforms and interactive gaming activities also changes the way we construct gambling harm reduction interventions. Information and communication technologies (ICT) provide potential opportunities to reduce harm from online gambling through harm minimisation initiatives and currently available services. The aim of this review was to firstly understand the scope of peer-reviewed evidence on ICT-based strategies to reduce online gambling harm, and secondly, what evidence exists specifically in relation to ICT-based harm reduction initiatives for people who gamble online. Methods Scoping review methods and a five-stage model of analysis were used to: identify the published literature on ICT-based harm minimisation activities for online gambling; distil models appropriate to address gambling harm in this setting; and synthesise all available evidence, noting gaps and patterns. Results Sixteen gambling-specific ICT-based interventions were reviewed in depth. The majority of included studies focused on different components of computer-assisted or online therapy programs for disordered gambling, specifically the development of individual skills in managing problematic gambling behaviour. Conclusions The review found that despite the widespread potential ICT represent for addressing gambling harm there has been only limited published research to date. So what There is a clear need for further investigation into uptake, usage, focus and effectiveness of all online gambling interventions on offer. The dearth of gambling-specific empirical knowledge potentially indicates a serious resourcing and reporting issues in this area.
+AU  - Paterson, Marisa
+AU  - Whitty, Megan
+AU  - Boyer, Charlotte
+CY  - Australia
+DA  - 2020/05/07
+DO  - 10.1002/hpja.341
+EP  - 257
+ID  - 062-791-670-372-78X
+IS  - 2
+JF  - Health promotion journal of Australia : official journal of Australian Association of Health Promotion Professionals
+KW  - harm reduction
+KW  - health promotion
+KW  - information and communication technology
+KW  - online gambling
+KW  - scoping review
+KW  - social media
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32246884
+L2  - https://openresearch-repository.anu.edu.au/handle/1885/210621
+L2  - https://onlinelibrary.wiley.com/doi/10.1002/hpja.341
+L2  - https://pubmed.ncbi.nlm.nih.gov/32246884/
+PB  - Australian Health Promotion Association
+PY  - 2020
+SN  - 10361073
+SP  - 248
+TI  - An overview of digital and online strategies to reduce gambling harm.
+UR  - https://lens.org/062-791-670-372-78X
+VL  - 32
+ER  - 
+TY  - JOUR
+AB  - Assessing the harmful consequences of gambling is an area of active investigation. One measure intended to capture gambling-related harm is the 10-item short gambling harm screen (SGHS). Although good psychometric properties have been reported, it has been suggested that the screen’s less severe probes may not represent genuinely harmful consequences, but rather may reflect rational opportunity costs. Consequently, it has been argued that the screen may lead to overestimation of the extent of gambling-related harm in the population. The current study sought to examine the psychometric performance of three less severe suspect items in the SGHS. Associations between each of these items and a specially constructed scale of relatively severe “unimpeachable” gambling harms were calculated from archival data from 5551 Australian and New Zealand gamblers. All three suspect items, both individually and upon aggregation, predicted greater endorsement of “unimpeachable” harms, and indicated the presence of gambling problems. Moreover, the SGHS as a whole is highly correlated with “unimpeachable” gambling harms. Including suspect items in the SGHS was found to improve predictions of low- and moderate-risk gambling status, but slightly decreased predictions of severe gambling problems. The results are inconsistent with the notion that SGHS harm probes capture either inconsequential consequences or opportunity costs. They confirm prior findings that harm symptomatology is unidimensional, and that the report of multiple more prevalent, but less severe, harms serves as an effective indicator of the spectrum of experienced harm.
+AU  - Boyle, Cailem Murray
+AU  - Browne, Matthew
+AU  - Rockloff, Matthew
+AU  - Flenady, Tracy
+CY  - Switzerland
+DA  - 2021/02/02
+DO  - 10.3390/jcm10030549
+ID  - 063-749-843-722-053
+IS  - 3
+JF  - Journal of clinical medicine
+KW  - gambling harms
+KW  - gambling-related harm
+KW  - screen
+KW  - unimpeachable
+KW  - validity
+L2  - https://europepmc.org/article/PMC/PMC7867326
+L1  - https://www.mdpi.com/2077-0383/10/3/549/pdf
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7867326
+L2  - https://www.mdpi.com/2077-0383/10/3/549
+L2  - https://pubmed.ncbi.nlm.nih.gov/33540872/
+PB  - Multidisciplinary Digital Publishing Institute (MDPI)
+PY  - 2021
+SN  - 20770383
+SP  - 549
+TI  - Opportunity Costs or Not? Validating the Short Gambling Harm Screen against a Set of "Unimpeachable" Negative Impacts.
+UR  - https://lens.org/063-749-843-722-053
+VL  - 10
+ER  - 
+TY  - JOUR
+AB  - Open letter from UK based academic scientists to the secretaries of state for digital, culture, media and sport and for health and social care regarding the need for independent funding for the prevention and treatment of gambling harms.
+AU  - Wardle, Heather
+AU  - Banks, James
+AU  - Bebbington, Paul
+AU  - Blank, Lindsey
+AU  - Jones, Henrietta Bowden
+AU  - Bramley, Stephanie
+AU  - Bunn, Christopher
+AU  - Casey, Emma
+AU  - Cassidy, Rebecca
+AU  - Chamberlain, Samuel R.
+AU  - Close, James
+AU  - Critchlow, Nathan
+AU  - Dobbie, Fiona
+AU  - Downs, Carolyn
+AU  - Dymond, Simon
+AU  - Fino, Emanuele
+AU  - Goyder, Elizabeth
+AU  - Gray, Cindy M.
+AU  - Griffiths, Mark D.
+AU  - Grindrod, Peter
+AU  - Hogan, Lee
+AU  - Hoon, Alice E.
+AU  - Hunt, Kate
+AU  - James, Richard
+AU  - John, Bev
+AU  - Manthorpe, Jill
+AU  - McCambridge, Jim
+AU  - McDaid, David
+AU  - McKee, Martin
+AU  - McManus, Sally
+AU  - Moss, Antony C.
+AU  - Norrie, Caroline
+AU  - Nutt, David J.
+AU  - Orford, Jim
+AU  - Pryce, Robert
+AU  - Purves, Richard
+AU  - Reith, Gerda
+AU  - Roberts, Amanda
+AU  - Roberts, Emmert
+AU  - Roderique-Davies, Gareth
+AU  - Rogers, Jim
+AU  - Rogers, Robert D.
+AU  - Sharman, Stephen
+AU  - Strang, John
+AU  - Tunney, Richard J.
+AU  - Turner, John J.D.
+AU  - West, Robert
+AU  - Zendle, David
+CY  - United Kingdom
+DA  - 2020/07/01
+DO  - 10.1136/bmj.m2613
+ID  - 069-778-572-180-459
+JF  - BMJ (Clinical research ed.)
+L2  - https://www.bmj.com/content/370/bmj.m2613
+L2  - https://research.aston.ac.uk/en/publications/open-letter-from-uk-based-academic-scientists-to-the-secretaries-
+L2  - https://dspace.stir.ac.uk/handle/1893/31395
+L2  - https://publications.aston.ac.uk/id/eprint/41680/
+L2  - https://researchportal.northumbria.ac.uk/en/publications/open-letter-from-uk-based-academic-scientists-to-the-secretaries-
+L2  - http://eprints.gla.ac.uk/222411/
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/32611591
+L2  - https://eprints.whiterose.ac.uk/164217/
+L1  - https://dspace.stir.ac.uk/bitstream/1893/31395/1/bmj.m2613.full.pdf
+L2  - https://discovery.ucl.ac.uk/id/eprint/10104294/
+L2  - https://openresearch.lsbu.ac.uk/item/8w0xy
+L2  - https://eprints.lancs.ac.uk/id/eprint/154062/
+L2  - https://pubmed.ncbi.nlm.nih.gov/32611591/
+L2  - https://www.bmj.com/lookup/ijlink/YTozOntzOjQ6InBhdGgiO3M6MTQ6Ii9sb29rdXAvaWpsaW5rIjtzOjU6InF1ZXJ5IjthOjQ6e3M6ODoibGlua1R5cGUiO3M6NDoiRlVMTCI7czoxMToiam91cm5hbENvZGUiO3M6MzoiYm1qIjtzOjU6InJlc2lkIjtzOjE4OiIzNzAvanVsMDFfMTIvbTI2MTMiO3M6NDoiYXRvbSI7czoyMzoiL2Jtai8zNzAvYm1qLm0yNjAwLmF0b20iO31zOjg6ImZyYWdtZW50IjtzOjA6IiI7fQ==
+L1  - https://www.bmj.com/content/bmj/370/bmj.m2613.full.pdf
+L2  - https://cronfa.swan.ac.uk/Record/cronfa54614
+L2  - https://research.gold.ac.uk/id/eprint/29253/
+L2  - https://eprints.lincoln.ac.uk/id/eprint/41463/
+L2  - https://www.storre.stir.ac.uk/handle/1893/31395
+L1  - https://cronfa.swan.ac.uk/Record/cronfa54614/Download/54614__18026__97d9fdb355304930a716b780e5a38783.pdf
+L2  - https://irep.ntu.ac.uk/id/eprint/40154/
+L2  - https://core.ac.uk/download/327077551.pdf
+PB  - British Medical Association
+PY  - 2020
+SN  - 17561833
+SN  - 09598138
+SN  - 14685833
+SP  - m2613
+TI  - Open letter from UK based academic scientists to the secretaries of state for digital, culture, media and sport and for health and social care regarding the need for independent funding for the prevention and treatment of gambling harms
+UR  - https://lens.org/069-778-572-180-459
+VL  - 370
+ER  - 
+TY  - JOUR
+AB  - Affected others impacted by someone else's gambling utilise numerous behaviour change strategies to minimise gambling-related harm but knowledge on what these strategies are and how they are implemented is limited. This study aimed to develop a comprehensive data-driven taxonomy of the types of self-help strategies used by affected others, and to categorize these into high-level behaviour change techniques (BCTs). Two taxonomies were developed using an inductive and deductive approach which was applied to a dataset of online sources and organised into the Rubicon model of action phases. These taxonomies were family-focused (how to reduce the impact of gambling harm on families) and gambler-focused (how to support the gambler in behaviour change). In total, 329 online sources containing 3536 different strategies were identified. The family-focused classification contained 16 BCTs, and the most frequent were professional support, financial management and planned consequences. The gambler-focused classification contained 11 BCTs, and the most frequent were feedback on behaviours, professional support and financial management. The majority of family- and gambler-focused BCTs fell under the actional phase of the Rubicon model. Grounded in lived experience, the findings highlight the need for intervention and resource development that includes a wide range of specific techniques that affected others can utilise.
+AU  - Booth, Natalia
+AU  - Dowling, Nicki A.
+AU  - Landon, Jason
+AU  - Lubman, Dan I.
+AU  - Merkouris, Stephanie S
+AU  - Rodda, Simone N.
+CY  - Switzerland
+DA  - 2021/02/04
+DO  - 10.3390/jcm10040583
+ID  - 073-188-299-511-492
+IS  - 4
+JF  - Journal of clinical medicine
+KW  - behaviour change
+KW  - behaviour change techniques
+KW  - concerned significant others
+KW  - gambling harm
+KW  - self-help
+KW  - treatment
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/33557212
+L2  - https://europepmc.org/article/PMC/PMC7913932
+L2  - https://findanexpert.unimelb.edu.au/scholarlywork/1496463-affected-others-responsivity-to-gambling-harm--an-international-taxonomy-of-consumer-derived-behaviour-change-techniques
+L2  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7913932
+L1  - https://www.mdpi.com/2077-0383/10/4/583/pdf
+L2  - https://pubmed.ncbi.nlm.nih.gov/33557212/
+L2  - https://www.mdpi.com/2077-0383/10/4/583
+L2  - http://dro.deakin.edu.au/view/DU:30147940
+PB  - Multidisciplinary Digital Publishing Institute (MDPI)
+PY  - 2021
+SN  - 20770383
+SP  - 583
+TI  - Affected Others Responsivity to Gambling Harm: An International Taxonomy of Consumer-Derived Behaviour Change Techniques
+UR  - https://lens.org/073-188-299-511-492
+VL  - 10
+ER  - 
+TY  - JOUR
+AB  - BACKGROUND Gambling harm affects men and women relatively equally, and gender influences the social determinants of gambling harm. Responses to preventing and minimising women's gambling harm have been shaped and constrained by population research identifying male gender as a key risk factor for gambling problems. Gender analysis in gambling studies is rare and has lacked theoretical underpinning and coherence, limiting possibilities for gender-responsive and gender-aware harm prevention and reduction activities. METHODS Two influential qualitative studies of gambling harm in New Zealand (involving total n = 165 people who gambled, affected others, community leaders, gambling and community support service providers, policy makers and academics) neglected to explore the role of gender. This study revisited data collected in these studies, using thematic analysis informed by feminist social constructionist theory. The overarching research questions were: How do gender-related issues, notions and practices influence women's gambling related harm? What are the implications for women's gambling harm reduction? RESULTS Women's socio-cultural positioning as primary caregivers for families and children constrained their ability to access a range of recreational and support options and increased the attractiveness of local gambling opportunities as accessible and 'safe' outlets for stress reduction. Patriarchal practices of power and control within family contexts operated to maintain gambling behaviour, shut down alternative recreational opportunities, and limit women's autonomy. Consideration of these themes in relation to current health promotion practice in New Zealand revealed that national programmes and strategies appear to be operating without cognisance of these gender dynamics and therefore have the potential to exacerbate or cause some women harm. CONCLUSIONS This study demonstrates the value of theoretically informed gender analysis for gambling harm reduction research, policy and practice. International guidelines for gender-aware and gender-responsive health research and practice should be engaged as a foundation for strategic and effective gambling harm reduction programmes, projects, research and policy, and as an essential part of developing and implementing interventions for gambling harm.
+AU  - du Preez, Katie Palmer
+AU  - Paavonen, Anna-Marie
+AU  - Bellringer, Maria
+CY  - United Kingdom
+DA  - 2021/11/08
+DO  - 10.1186/s12954-021-00558-5
+ID  - 076-911-704-641-418
+IS  - 1
+JF  - Harm reduction journal
+KW  - Gambling
+KW  - Gender analysis
+KW  - Social determinants
+KW  - Women
+L2  - https://harmreductionjournal.biomedcentral.com/articles/10.1186/s12954-021-00558-5
+PB  - BioMed Central
+PY  - 2021
+SN  - 14777517
+SP  - 111
+TI  - Theoretically informed gender analysis for gambling harm reduction: a New Zealand study.
+UR  - https://lens.org/076-911-704-641-418
+VL  - 18
+ER  - 
+TY  - JOUR
+AB  - <AbstractText Label="Background and aims" NlmCategory="UNASSIGNED">The Short Gambling Harm Screen (SGHS) is currently the most frequently applied dedicated measure of gambling-related harm (GRH), though concerns relating to scale validity have been expressed. The current study aimed to address criticisms that several SGHS items do not depict genuine harms that may occur as a result of gambling, causing the scale to overestimate harm. Specifically, we aimed to test convergence between the SGHS and its constituent items with: (1) wellbeing, and (2) psychological distress.</AbstractText>
+          <AbstractText Label="Methods" NlmCategory="UNASSIGNED">To test criterion validity of both the scale and the items, retrospective analyses of survey data from 2,704 Australian adults (36% non-gamblers; 64% gamblers) were conducted. Subjective wellbeing and psychological distress scores, captured using the Personal Wellbeing Index (PWI) and the Kessler-6 Psychological Distress Scale (K6), respectively, were used as external (non-gambling) benchmarks. A total of 428 (16%) respondents scored at least 1 on the SGHS.</AbstractText>
+          <AbstractText Label="Results" NlmCategory="UNASSIGNED">Monotonic decreases and increases, corresponding to poorer personal wellbeing and higher psychological distress, were found with each additional SGHS score increase. Gamblers endorsing a single SGHS item reported lower wellbeing and higher psychological distress than both non-gamblers and gamblers who scored zero on the SGHS.</AbstractText>
+          <AbstractText Label="Discussion and conclusion" NlmCategory="UNASSIGNED">These results show that the SGHS is a valid measure of GRH and contradict suggestions that low scores on the SGHS do not indicate true harm. The SGHS represents a valid and innovative short screening tool to measure GRH in population prevalence studies.</AbstractText>
+AU  - Murray Boyle, Cailem
+AU  - Browne, Matthew
+AU  - Rockloff, Matthew J
+AU  - Thorne, Hannah B
+CY  - Hungary
+DA  - 2022/10/12
+DO  - 10.1556/2006.2022.00075
+ID  - 085-681-453-197-724
+JF  - Journal of behavioral addictions
+KW  - SGHS
+KW  - gambling
+KW  - gambling harm
+KW  - psychological distress
+KW  - validation
+KW  - wellbeing
+PB  - Akademiai Kiado
+PY  - 2022
+SN  - 20635303
+SN  - 20625871
+TI  - Validating the short gambling harm screen against external benchmarks.
+UR  - https://lens.org/085-681-453-197-724
+ER  - 
+TY  - JOUR
+AB  - This article examines gambling harms from both gamblers and affected others' perspectives. Participants (3076 gamblers and 2129 affected others) completed a retrospective survey that elicited information on harms they experienced from gambling across their lifetime. Their responses were analyzed through testing measurement invariance, estimating item-response theoretic parameters, calculating percentages, confidence intervals, and correlations, as well as regressions. The results indicated large commonalities in the experience of harms reported by gamblers and affected others. Further, gamblers appeared to 'export' about half of the harms they experienced to those around them. The findings also provided detailed profiles of evolving harms as problem gambling severity varies.
+AU  - Li, En
+AU  - Browne, Matthew
+AU  - Rawat, Vijay
+AU  - Langham, Erika
+AU  - Rockloff, Matthew
+CY  - United States
+DA  - 2016/07/21
+DO  - 10.1007/s10899-016-9632-8
+EP  - 248
+ID  - 088-422-906-910-557
+IS  - 1
+JF  - Journal of gambling studies
+KW  - Affected others
+KW  - Gamblers
+KW  - Gambling harms
+KW  - Gambling problems
+KW  - Item-response theoretic (IRT) parameters
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/27443306
+L2  - https://link.springer.com/article/10.1007%2Fs10899-016-9632-8
+L2  - https://espace.library.uq.edu.au/view/UQ:bf1229a
+L2  - https://pubmed.ncbi.nlm.nih.gov/27443306/
+L2  - https://link.springer.com/article/10.1007/s10899-016-9632-8/fulltext.html
+L2  - https://europepmc.org/article/MED/27443306
+PB  - Springer International Publishing AG
+PY  - 2016
+SN  - 15733602
+SN  - 10505350
+SP  - 223
+TI  - Breaking Bad: Comparing Gambling Harms Among Gamblers and Affected Others.
+UR  - https://lens.org/088-422-906-910-557
+VL  - 33
+ER  - 
+TY  - JOUR
+AB  - Background The Gambling Act 2003 mandated a public health strategy for preventing and minimising gambling harm in New Zealand. Aware Communities and Supportive Communities are two public health programmes subsequently implemented nationwide. These programmes differed from common health promotion initiatives such as media or education campaigns as they were community-action based (requiring community involvement in programme planning and delivery). We carried out a process evaluation to determine their implementation effectiveness and inform improvement and future programme planning. Methods Our qualitative dominant mixed methods design comprised analysis of over a hundred implementer progress reports (submitted July 2010 - June 2013), a staff survey and a staff focus group interview. Results The programmes demonstrated capacity to not only achieve expected outcomes (e.g. enhanced community awareness about harmful gambling), but also to enhance social sustainability at the community level (e.g. established trustful relationships) and achieve some programme sustainability (e.g. community ownership over ongoing programme delivery). Conclusions The evaluation noted the potential for a sustainable gambling harm-minimisation model. Community-action based harm-minimisation programmes offer programme sustainability potential which in turn offers funding cost-effectiveness when there are continual public health outcomes beyond initial funding. Although resource intensive, the community-action based approach enables culturally appropriate public health programmes suitable for societies where specific ethnic groups have higher gambling risk. Recognition of such harm-minimisation programmes' contribution to social sustainability is important considering the potential for broader public health outcomes (e.g. better life quality, lesser social problems) within socially sustainable societies.
+AU  - Kolandai-Matchett, Komathi
+AU  - Bellringer, Maria
+AU  - Landon, Jason
+AU  - Abbott, Max
+CY  - United Kingdom
+DA  - 2017/08/31
+DO  - 10.1093/eurpub/ckx120
+EP  - 376
+ID  - 089-860-538-402-239
+IS  - 2
+JF  - European journal of public health
+L2  - https://academic.oup.com/eurpub/article/28/2/369/4100660
+L2  - https://europepmc.org/article/MED/29020385
+L2  - https://www.ncbi.nlm.nih.gov/pubmed/29020385
+L2  - https://pubmed.ncbi.nlm.nih.gov/29020385/
+PB  - Oxford University Press
+PY  - 2017
+SN  - 1464360x
+SN  - 11011262
+SP  - 369
+TI  - A process evaluation of the 'Aware' and 'Supportive Communities' gambling harm-minimisation programmes in New Zealand.
+UR  - https://lens.org/089-860-538-402-239
+VL  - 28
+ER  - 
+TY  - THES
+AB  - Executive control functions are higher-order cognitive processes essential for exercising self-control over behaviour. These executive processes are the antithesis of impulsivity, which describes actions routinely and automatically triggered by environmental cues without planning and consideration of the consequences of those actions, and represents a construct intimately linked with disordered gambling behaviour. To prevent the potential harm that can be experienced during gambling, it is desirable that decisions and actions within a gambling context are governed by high-levels of executive control, as opposed to thought and actions that are triggered automatically and on impulse. Of interest to the present thesis is the way that technological developments have afforded increased sophistication of the structural characteristics of electronic gambling products, and how these interact with executive control processes during gambling. More specifically, this thesis aims to investigate how the increased speeds of play during gambling, afforded by electronic gambling products, impacts a gambler's ability to exercise self-control over motor actions.
+ 
+An initial systematic critical review investigated the existing research findings pertaining to the impact of gambling speed of play on behaviour and cognition. Following an extensive literature search, 11 studies were selected for review based on several inclusion criteria. Some of the key findings stemming from the review were that games with higher event frequencies were more appealing to gamblers in general, and particularly appealing and enjoyed by problem and pathological gamblers. Faster games were associated with more difficulty quitting the game, and often resulted in more time and money being spent compared to slower games. Overall, the findings from the review suggest a link between increased speeds of play during gambling and reduced self-control, providing justification for the empirical chapters within this thesis that investigated the effects of gambling speed on executive control functions.
+ 
+In a repeated-measures experiment, Experiment 1 identified that as the speed of play is increased during a slot machine gambling simulation, motor response inhibition performance, as assessed using an embedded go/no-go task, is inhibited amongst regular gamblers. This highlights how the structural characteristic of speed during gambling can impair a gamblers ability to exercise self-control during gambling, independent of the presence of a problem or pathological gambling disorder.
+ 
+A second systematic critical review investigated the range of gambling harm-minimisation tools available during electronic gambling and their relative impact on thoughts and behaviour during gambling. Several within-session tools were identified, including enforced breaks in play, pop-up messaging, behavioural tracking tools, monetary limit setting, and visual clock displays. One of the key findings included that the efficacy of pop-up responsible gambling messages in shaping thoughts and behaviour during gambling is dependent on the mode of delivery and content displayed in the messages. Yet to be investigated in depth within the gambling literature is the potential for the use of emotive content to be displayed in pop-up messages, which may serve to have a more powerful influence over thoughts and behaviour compared to non-emotive content.
+ 
+Experiment 2 investigated the ability of new and existing gambling harm-minimisation tools to combat the loss of control over motor actions when gambling at high speeds of play, as demonstrated in Experiment 1. Pop-up responsible gambling messages containing either emotive or non-emotive content were compared to a structural change in the form of a forced discriminatory motor choice procedure and financial punishment intervention, in terms of their ability to facilitate motor response inhibition performance during slot machine gambling. Making structural changes to the slot machine that prevents prepotent response patterns developing and that requires greater levels of active attention over motor actions were successful in facilitating response inhibition performance amongst regular, non-problem gamblers. Changing the salience of no-go cues by financially punishing participants for erroneous motor responses increased motivation to exercise self-control and also improved response inhibition performance.
+ 
+Experiment 3 built on the findings from Experiment 2 and aimed to investigate if inducing more cautious motor response patterns and greater control of motor outputs had wider benefits for cognitive control. It was found that inducing more cautious motor responses during an electronic slot machine simulator resulted in more deliberation and more accurate decisions in an information sampling task (see Clark et al., 2006), as well as a greater tolerance for delayed reward in a monetary delay discounting task (Kirby et al., 1999). It was also found that using emotional content in a pop-up responsible gambling message also facilitated performance on these choice impulsivity tasks, but this effect was independent of a transfer of cautiousness account.
+ 
+This research has theoretical and applied implications to the field of gambling harm-minimisation. The research presented within this thesis suggests that making simple structural changes to electronic gambling products that prevent automatic response patterns developing are not only beneficial for motor control, but also have carry over benefits by reducing impulsive choice tendencies. In addition, the use of emotive content delivered via responsible gambling messages should be considered above the use of non-emotive content, as emotive content had a greater influence on decision-making processes amongst regular, non-problem gamblers.
+AU  - Harris, Andrew
+DA  - 2018/09/01
+ID  - 092-572-068-596-965
+L2  - https://ethos.bl.uk/OrderDetails.do?uin=uk.bl.ethos.780213
+L2  - https://irep.ntu.ac.uk/id/eprint/37108/
+PY  - 2018
+TI  - The impact of gambling speed of play on executive control functions : investigating gambling harm-minimisation approaches to combat impulsive action and impulsive choice
+UR  - https://lens.org/092-572-068-596-965
+ER  - 
+TY  - JOUR
+AB  - <jats:title>Abstract</jats:title>
+               <jats:sec>
+                  <jats:title>Background</jats:title>
+                  <jats:p>Messages to prevent gambling harm traditionally focused on individualised responsibility which stigmatise those who experience harm. Shifts have occurred among researchers, advocates, and some governments towards public health approaches which recognise broader determinants of harm. This includes the social practices of gambling and the tactics used by the industry to increase profits. This exploratory study aimed to identify how people who gamble conceptualise the causes of gambling harm.</jats:p>
+               </jats:sec>
+               <jats:sec>
+                  <jats:title>Methods</jats:title>
+                  <jats:p>A qualitatively led online panel survey was conducted via Qualtrics. A sample of 427 adults in two Australian states who gamble using electronic gambling machines or sports betting in a typical month provided text responses to the question “What do you think causes gambling harm?”. A reflexive thematic analysis was conducted.</jats:p>
+               </jats:sec>
+               <jats:sec>
+                  <jats:title>Results</jats:title>
+                  <jats:p>The vast majority of participants viewed gambling harm as being an issue of personal responsibility or addiction, with some making moral judgements about those who experience harm. Only a small portion of participants recognised the broader determinants beyond the individual that produce harm.</jats:p>
+               </jats:sec>
+               <jats:sec>
+                  <jats:title>Conclusions</jats:title>
+                  <jats:p>Gambling is still viewed by people who gamble as an issue of individual behaviour and addiction among a stigmatised sub-group of gamblers. The broader determinants of harm were generally not identified as causes of harm. This suggests the shift towards public health understandings of harm has not extended to the public. There are discrepancies between how the general public understands gambling harm and how it has been conceptualised by experts. Public health messages need to be reconsidered so they are relevant to and understood by the general community. Strategies to shift public understandings of harm also need to be identified.</jats:p>
+               </jats:sec>
+               <jats:sec>
+                  <jats:title>Key messages</jats:title>
+                  <jats:p>People who gamble understand gambling harm differently to how it has been conceptualised by experts. This has implications for how harm should be communicated in public health strategies. This study demonstrates the benefits of collecting qualitative data through online surveys.</jats:p>
+               </jats:sec>
+AU  - Marko, S
+AU  - Thomas, S
+DA  - 2021/10/01
+DO  - 10.1093/eurpub/ckab164.595
+ID  - 102-860-115-335-870
+IS  - Supplement_3
+JF  - European Journal of Public Health
+PB  - Oxford University Press (OUP)
+PY  - 2021
+SN  - 11011262
+SN  - 1464360x
+TI  - How are the causes of gambling harm conceptualised by people who gamble?
+UR  - https://lens.org/102-860-115-335-870
+VL  - 31
+ER  - 
+TY  - JOUR
+AB  - <AbstractText Label="BACKGROUND">Both the Problem Gambling Severity Index (PGSI) and the Short Gambling Harms Screen (SGHS) purport to identify individuals harmed by gambling. However, there is dispute as to how much individuals are harmed, conditional on their scores from these instruments. We used an experienced utility framework to estimate the magnitude of implied impacts on health and wellbeing.</AbstractText>
+          <AbstractText Label="METHODS">We measured health utility using the Short Form Six-Dimension (SF-6D), and used this as a benchmark. All 2603 cases were propensity score weighted, to balance the affected group (i.e., SGHS 1+ or PGSI 1+ vs 0) with a reference group of gamblers with respect to risk factors for gambling harm. Weighted regression models estimated decrements to health utility scores attributable to gambling, whilst controlling for key comorbidities.</AbstractText>
+          <AbstractText Label="RESULTS">We found significant attributable decrements to health utility for all non-zero SGHS scores, as well as moderate-risk and problem gamblers, but not for PGSI low-risk gamblers. Applying these coefficients to population data, we find a similar total burden for both instruments, although the SGHS more specifically identified the subpopulation of harmed individuals. For both screens, outcomes on the SF-6D implies that about two-thirds of the 'burden of harm' is attributable to gamblers outside of the most severe categories.</AbstractText>
+          <AbstractText Label="CONCLUSIONS">Gambling screens have hitherto provided nominal category membership, it has been unclear whether moderate or 'at-risk' scores imply meaningful impact, and accordingly, population surveys have typically focused on problem gambling prevalence. These results quantify the health utility decrement for each category, allowing for tracking of the aggregate population impact based on all affected gamblers.</AbstractText>
+          <CopyrightInformation>© 2022. The Author(s).</CopyrightInformation>
+AU  - Browne, Matthew
+AU  - Russell, Alex M T
+AU  - Begg, Stephen
+AU  - Rockloff, Matthew J
+AU  - Li, En
+AU  - Rawat, Vijay
+AU  - Hing, Nerilee
+CY  - United Kingdom
+DA  - 2022/04/27
+DO  - 10.1186/s12889-022-13243-4
+ID  - 104-640-475-348-067
+IS  - 1
+JF  - BMC public health
+KW  - Gambling harms
+KW  - Gambling problems
+KW  - Health utility
+KW  - Problem gambling severity index
+KW  - SF-6D
+KW  - Short gambling harms screen
+PB  - BioMed Central
+PY  - 2022
+SN  - 14712458
+SP  - 839
+TI  - Benchmarking gambling screens to health-state utility: the PGSI and the SGHS estimate similar levels of population gambling-harm.
+UR  - https://lens.org/104-640-475-348-067
+VL  - 22
+ER  - 
+TY  - GEN
+AB  - Join us to learn how we can work together to reduce gambling harm this Responsible Gambling Awareness Week.
+AU  - Thompson, Danielle
+DA  - 2017/10/19
+ID  - 109-113-843-900-749
+PY  - 2017
+TI  - Community Reducing Gambling Harm
+UR  - https://lens.org/109-113-843-900-749
+ER  - 
+TY  - JOUR
+AB  - AbstractUnderstanding of the harmfulness of game types is needed when planning harm minimization and prevention strategies. Adult data (N = 3555) from the Finnish Gambling 2015 survey was used to investigate the associations between different game types and gambling-related harms. A negative binomial regression model was used to analyse the effects of demographics, gambling involvement factors, and engaging in different game types on the number of gambling-related harms, which were evaluated by PGSI and SOGS. Age of 18–24, gambling several times a week, high relative expenditure, online gambling and engaging weekly either in scratch games, betting games or slot machine gambling were associated with a higher number of gambling harms. Chasing losses was the most typical harm among online poker players and fast-paced daily lottery game players, while poor self-control was the most typical harm with other game types, although some of the results were not statistically significant. Multiple factors were associ...
+AU  - Castrén, Sari
+AU  - Perhoniemi, Riku
+AU  - Kontto, Jukka
+AU  - Alho, Hannu
+AU  - Salonen, Anne
+CY  - United Kingdom
+DA  - 2017/11/30
+DO  - 10.1080/14459795.2017.1388830
+EP  - 142
+ID  - 115-733-109-888-153
+IS  - 1
+JF  - International Gambling Studies
+L2  - http://www.julkari.fi/handle/10024/135991
+L2  - https://core.ac.uk/display/147044152
+L2  - https://ideas.repec.org/a/taf/intgms/v18y2018i1p124-142.html
+L2  - https://www.julkari.fi/handle/10024/135931
+L2  - https://researchportal.helsinki.fi/en/publications/association-between-gambling-harms-and-game-types-finnish-populat
+L2  - https://www.tandfonline.com/doi/full/10.1080/14459795.2017.1388830
+PB  - Informa UK Limited
+PY  - 2017
+SN  - 14459795
+SN  - 14794276
+SP  - 124
+TI  - Association between gambling harms and game types : Finnish population study
+UR  - https://lens.org/115-733-109-888-153
+VL  - 18
+ER  - 
+TY  - JOUR
+AB  - <AbstractText Label="ISSUES ADDRESSED" NlmCategory="OBJECTIVE">Research is needed to understand young people's perspectives about public health promotion strategies relevant for their health and wellbeing. This study provides suggestions from young male gamblers about sports betting harm prevention and reduction strategies.</AbstractText>
+          <AbstractText Label="METHODS" NlmCategory="METHODS">In-depth interviews were conducted with 16 young men aged 18 to 24 years, from Melbourne, Victoria, who regularly engaged in sports betting. A critical qualitative inquiry approach, using methods of constructivist grounded theory guided the study. Reflexive thematic analysis was used to interpret and construct themes from the data.</AbstractText>
+          <AbstractText Label="RESULTS" NlmCategory="RESULTS">Participants indicated three main harm prevention strategies. These were online consumer protection and regulatory strategies, public education campaigns that highlighted sports betting risks and harms and the creation of formal and informal support networks to reduce stigma and encourage help seeking. They also supported being engaged in the development of harm prevention strategies and suggested ways to help reduce barriers to engagement.</AbstractText>
+          <AbstractText Label="CONCLUSION" NlmCategory="CONCLUSIONS">Young men recognise the need for regulatory, education and engagement responses to counter the risks posed by new gambling products. Young men may be difficult to engage in formal prevention activities, however, youth-led and informal interactive mechanisms may help to overcome this barrier, and contribute to a comprehensive public health approach to gambling harm prevention. SO WHAT?: Young men can draw upon their lived experiences of gambling to provide insights relevant for public health promotion. Mechanisms should be developed to engage young people in the co-production of strategies and policies aimed at gambling harm prevention and reduction.</AbstractText>
+          <CopyrightInformation>© 2022 The Authors. Health Promotion Journal of Australia published by John Wiley &amp; Sons Australia, Ltd on behalf of Australian Health Promotion Association.</CopyrightInformation>
+AU  - Nyemcsok, Christian
+AU  - Pitt, Hannah
+AU  - Kremer, Peter
+AU  - Thomas, Samantha L
+CY  - Australia
+DA  - 2022/07/14
+DO  - 10.1002/hpja.637
+ID  - 139-139-323-927-60X
+JF  - Health promotion journal of Australia : official journal of Australian Association of Health Promotion Professionals
+KW  - engagement
+KW  - lived experience
+KW  - public health
+KW  - sports betting
+KW  - young men
+PB  - Australian Health Promotion Association
+PY  - 2022
+SN  - 10361073
+TI  - "Drugs and alcohol get talked about, why not betting?" Young men's qualitative insights about strategies to prevent gambling harm.
+UR  - https://lens.org/139-139-323-927-60X
+ER  - 
+TY  - GEN
+AB  - <jats:title>Abstract</jats:title>
+        <jats:p><jats:bold><jats:italic>Background</jats:italic></jats:bold>Pacific peoples continue to be more at risk of gambling harm than the general population, despite increasing public health efforts and treatment service provisions introduced to address this social and health issue. In looking at why this is so, our first concern was to ask why the delivery of the prevailing gambling-focussed programmes was not influencing Pacific gambling behaviours. In seeking to answer this question, it was important to explore ethnic-Pacific-specific factors of gambling-harm prevention and minimisation.<jats:bold><jats:italic>Methods</jats:italic></jats:bold>The research design was interpretivist/constructivist and phenomenological, applied through the lens of a Tongan worldview. Participants comprised of Tongan male elders and youth. Recruitment of participants was through snowball sampling from churches and kava-drinking circles. A total of 28 elders and 18 youth participated through focus group talanoa and individual talanoa. This study employed the descriptive thematic analysis drawing on components of the Interpretative Phenomenological Analysis approach.<jats:bold><jats:italic>Results</jats:italic></jats:bold>Participants were not aware of any policy document or problem-gambling preventative programmes. Four key themes were raised, which include raising the awareness of existing gambling-harm treatment providers, the church influence in addressing gambling harm, community-based strategies, and cultural-based approaches. <jats:bold><jats:italic>Conclusions</jats:italic></jats:bold>This study proposes several recommendations and calls for further studies in addressing the prevention and minimisation of gambling harm amongst the Tongan community in New Zealand.</jats:p>
+AU  - Fehoko, Edmond
+AU  - Bellringer, Maria
+DA  - 2022/06/01
+DO  - 10.21203/rs.3.rs-1698640/v1
+ID  - 142-207-659-477-251
+PB  - Research Square Platform LLC
+PY  - 2022
+TI  - A qualitative study of the Tongan cultural and masculine factors that support the minimisation and prevention of gambling harm in New Zealand
+UR  - https://lens.org/142-207-659-477-251
+ER  - 
+TY  - GEN
+AB  - Aims: This study investigates the proportion of concerned significant others (CSOs) of problem gamblers at population level and describes the extent and type of gambling harms for CSOs. Methods: Cr...
+AU  - Salonen, Anne H.
+AU  - Alho, Hannu
+AU  - Castrén, Sari
+DA  - 2016/12/01
+ID  - 154-612-520-773-608
+L2  - https://www.julkari.fi/handle/10024/131509
+L2  - http://www.julkari.fi/handle/10024/131509
+PY  - 2016
+TI  - The extent and type of gambling harms for concerned significant others: A cross-sectional population study in Finland
+UR  - https://lens.org/154-612-520-773-608
+ER  - 
+TY  - JOUR
+AB  - This study presents a large-scale mapping review of how the literature on gambling identifies suggested solutions to prevent or reduce gambling harm and whose responsibility it is to implement them. The purpose of this is to provide a concise reference for stakeholders who must make critical decisions regarding the enhancement of consumer protection and harm minimization measures. Two databases, Scopus and Web of Science, were searched to identify relevant studies. The initial search yielded 5135 results, from which a total of 1292 empirical studies published between 2014 and 2018 were selected for analysis. Inductive content analysis was performed to identify suggested solutions reported in each study. The results indicate that commonly suggested solutions are the creation of educational and awareness programs (e.g., information on the risks of gambling, resources for help seekers, how games really work) and further restrictions on gambling advertising. We found that health service providers are mostly given the responsibility to implement various strategies, followed by policy makers. Numerous empirically proven suggestions for health service providers, policy makers, gambling industry operators, educational institutions, consumers, and families are discussed in detail.
+AU  - Akçayır, Murat
+AU  - Nicoll, Fiona
+AU  - Baxter, David G.
+AU  - Palmer, Zachary S.
+CY  - Germany
+DA  - 2021/01/04
+EP  - 21
+ID  - 188-277-417-818-749
+JF  - International Journal of Mental Health and Addiction
+L2  - https://www.scilit.net/article/50d06b259a83092f87a0c3e2d8c40ef3
+L2  - https://link.springer.com/article/10.1007/s11469-020-00459-x
+PB  - Springer New York
+PY  - 2021
+SN  - 15571874
+SN  - 15571882
+SP  - 1
+TI  - Whose Responsibility Is It to Prevent or Reduce Gambling Harm? A Mapping Review of Current Empirical Research
+UR  - https://lens.org/188-277-417-818-749
+ER  - 
+TY  - GEN
+AB  - Background and aims The Prevention Paradox (PP) suggests that a large proportion of aggregate harm from gambling occurs to people who do not have a gambling disorder. However, it has not yet been tested using a population-representative sample. We aimed to test whether the PP applies to gambling in Finland. The prevalence rates of diverse harmful consequences from gambling were surveyed amongst a population-representative sample of past-year gamblers. Methods The study used first wave data (N = 7,186) of Finnish Gambling Harms survey, collected via online and postal surveys in 2017. A subset of 3,795 adults (≥18 years), who had gambled at least monthly in 2016, were selected for analysis. Measurements Gambling-related harms were evaluated with the 72-item Harms Checklist. Problem and Pathological Gambling Measure (PPGM) measured respondents' probable disordered gambling from the subset of items for impaired control (4 questions) and other issues (3 questions). Findings Consistent with previous findings, the majority of harms were reported by those in the less severe PPGM categories (i.e. scoring <5). However, considering each domain separately, this was true only for financial, emotional/psychological, and work/study harms. The PP was not supported for health, relationship, or social deviance harms. Conclusions The population prevalence of the most serious harms (e.g. unsafe living conditions) is concentrated among those with severe impaired control issues. However, even excluding the ∼15% of harms occurring to occasional gamblers, most financial, emotional and work/study impacts occur to those with lower levels of control issues. Efforts at harm reduction should focus on the entire spectrum of issues that people experience from their gambling.
+AU  - Browne, Matthew
+AU  - Volberg, Rachel A.
+AU  - Rockloff, Matthew
+AU  - Salonen, Anne H.
+ID  - 196-759-315-376-312
+L2  - https://www.julkari.fi/handle/10024/141924
+PY  - 2020
+TI  - The prevention paradox applies to some but not all gambling harms: Results from a Finnish population-representative survey
+UR  - https://lens.org/196-759-315-376-312
+ER  - 
+TY  - JOUR
+AB  - <jats:p>The aim of this study is to provide an estimate of the social costs of gambling in Italy. In line with other research on social costs, the present study estimates the consequences of gambling harm on public finances, focusing on the estimated costs to treat high-risk gamblers, costs associated with productivity losses, costs of unemployment, personal and family costs, crime and legal costs. We used two different approaches to calculate these costs. The first approach, used for health care costs, consists of using the lump sum spent to prevent the harm caused to high-risk gamblers. The second approach involves estimating the number of high-risk gamblers causing the cost, which is then multiplied with the average unit cost per person.  Our estimates of the annual social costs of gambling in Italy – more than EUR 2.3 billion – demonstrate a substantial economic burden to society. However, the costs are a substantial underestimate, as they are limited to those of a public nature and do not take into consideration those costs borne by moderate and low-risk gamblers, as well as affected others.</jats:p>
+AU  - Lucchini, Fabio
+AU  - Comi, Simona Lorena
+DA  - 2022/03/07
+DO  - 10.29173/cgs50
+EP  - 82
+ID  - 199-705-785-512-388
+IS  - 1
+JF  - Critical Gambling Studies
+PB  - University of Alberta Libraries
+PY  - 2022
+SN  - 2563190x
+SP  - 71
+TI  - Social Costs of Gambling Harm in Italy
+UR  - https://lens.org/199-705-785-512-388
+VL  - 3
+ER  - 

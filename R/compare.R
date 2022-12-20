@@ -3,14 +3,15 @@
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
-count_unique <- function(unique_data){
-  count_unique <- unique_data %>%
-    dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, .data$record_ids) %>% 
-    tidyr::separate_rows(.data$cite_source, convert = T) %>%
-    tidyr::separate_rows(.data$cite_label, convert = T) %>%
-    tidyr::separate_rows(.data$cite_string, convert = T) %>%
+count_unique <- function(unique_data) {
+  unique_data %>%
+    dplyr::filter(!.data$cite_source == "") %>%
+    dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, tidyselect::any_of("record_ids")) %>% 
+    tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
     dplyr::group_by(.data$duplicate_id) %>%
-    dplyr::mutate(unique = ifelse(length(unique(.data$cite_source))==1, TRUE, FALSE),
+    dplyr::mutate(unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),
                   type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))) %>%
     dplyr::ungroup() %>%
     unique()
@@ -20,47 +21,75 @@ count_unique <- function(unique_data){
 #' 
 #' @export
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
-#' @param comp_type argument to specify comparison of strings, sources, or labels?
-#' @return dataframe with indicators of where a citation appears, with source/label/string as column
+#' @param comp_type Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.
+#' @return dataframe with indicators of where a citation appears, with sources/labels/strings as columns
 
-compare_sources <- function(unique_data, comp_type=c("sources", "strings", "labels")){
+compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels")) {
   
-  comp_type <- match.arg(comp_type)
+  out <- list()
   
-  if(comp_type == "sources"){
-  
+  if ("sources" %in% comp_type) {
+    
   source_comparison <- unique_data %>%
-    dplyr::select(.data$duplicate_id, .data$cite_source, .data$record_ids) %>%
-    tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
+    dplyr::select(.data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")) %>%
+    dplyr::filter(!cite_source == "") %>%
+    tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
     unique() %>%
-    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_source, values_from=c(.data$record_ids),
+    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source__", names_from = .data$cite_source, values_from = .data$cite_source,
                 values_fn =  function(x) TRUE,
                 values_fill = FALSE)
+  
+  out <- c(out, list(source_comparison))
   }
   
-  else if(comp_type == "strings"){
-  
+  if ("strings" %in% comp_type) {
+    
   source_comparison <- unique_data %>%
-    dplyr::select(.data$duplicate_id, .data$cite_string, .data$record_ids) %>%
-    tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
+    dplyr::select(.data$duplicate_id, .data$cite_string, tidyselect::any_of("record_ids")) %>%
+    dplyr::filter(!.data$cite_string == "") %>%
+    tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
     unique() %>%
-    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_string, values_from=c(.data$record_ids),
+    tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="string__", names_from = .data$cite_string, values_from = .data$cite_string,
                        values_fn =  function(x) TRUE,
                        values_fill = FALSE)
+  
+  out <- c(out, list(source_comparison))
   }
   
-  else{
+  if ("labels" %in% comp_type) {
     
     source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_label, .data$record_ids) %>%
-      tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
+      dplyr::select(.data$duplicate_id, .data$cite_label,  tidyselect::any_of("record_ids")) %>%
+      dplyr::filter(!cite_label == "") %>%
+      tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
       unique() %>%
-      tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="source_", names_from = .data$cite_label, values_from=c(.data$record_ids),
+      tidyr::pivot_wider(id_col = .data$duplicate_id, names_prefix="label__", names_from = .data$cite_label, 
+                         values_from = .data$cite_label,
                          values_fn =  function(x) TRUE,
                          values_fill = FALSE)
+    out <- c(out, list(source_comparison))
+    
+    
+    if (any(stringr::str_detect(names(source_comparison), "[Ss]earch"))) {
+      search_stage <- stringr::str_subset(names(source_comparison), "[Ss]earch")
+      if (length(search_stage) == 1) {
+        not_in_search <- sum(!source_comparison[[search_stage]])
+        if (not_in_search > 0) {
+          warning("Beware: ", not_in_search, " records were not included in ", search_stage, " but in other labels.",
+                  " *If* this label indicates the full search stage, this might indicate that you ommitted a source, ",
+                  "or that the deduplication did not go right. Please treat results with caution until you fix this, ",
+                  "e.g., by using export_csv and then reimport_csv.")
+        }
+      }
+      
+    }
+    
   }
   
-  return(as.data.frame(source_comparison))
+  if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
+  
+  purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
+  
 }
 
 

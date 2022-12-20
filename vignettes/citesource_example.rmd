@@ -6,7 +6,7 @@ author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource-Example}
+  %\VignetteIndexEntry{CiteSource - Example workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -62,28 +62,31 @@ unique_citations <- dedup_results$unique
 # classify unique citations across different sources/ labels/ strings
 n_unique <- count_unique(unique_citations)
 
-# for each unique citation, which sources are present
-source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-label_comparison <- compare_sources(unique_citations, comp_type = "labels")
+# for each unique citation, which sources, labels and strings were present
+complete_comparison <- compare_sources(unique_citations)
 ```
 
-## step 4: visualise comparisons
+## Step 4a: review a summary table
+
+```{r}
+citation_summary_table(unique_citations, screening_label = c("screen", "final"))
+```
+## step 4b: visualise comparisons
 
 ### Existing plots
 
 ```{r}
 #Faceted bar
-# making cite_label a factor in a certain order to reflect SR process - search, screen, final
-n_unique$cite_label <- factor(n_unique$cite_label, levels=c('search','screen','final'))
-plot_contributions(n_unique, center = TRUE)
+plot_contributions(n_unique, center = TRUE, bar_order = c('search','screen','final'))
 
 # heatmap of sources
-plot_source_overlap_heatmap(source_comparison)
-plot_source_overlap_heatmap(label_comparison)
+plot_source_overlap_heatmap(complete_comparison)
+# ... and labels
+plot_source_overlap_heatmap(complete_comparison, cells = "label")
 
 # upset plot of sources
-plot_source_overlap_upset(source_comparison)
-plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+plot_source_overlap_upset(complete_comparison)
+plot_source_overlap_upset(complete_comparison, decreasing = c(TRUE, TRUE))
 ```
 
 ### Custom plots
@@ -169,3 +172,30 @@ n_unique %>%
   geom_bar(position="stack", stat="count") +
   xlab("") + ylab("Number of citations")
 ```
+
+## Step 4c: review individual records
+
+This will usually be impractical for all records, but it might be worth showing/reporting where final records came from.
+
+```{r}
+unique_citations %>% filter(stringr::str_detect(cite_label, "final")) %>% 
+  record_level_table(return = "DT")
+```
+
+## Step 5: export deduplicated and annotated citations
+
+For further processing, you might want to export the deduplicated and annotated citations.
+
+```{r}
+export_bib(unique_citations, "citations.bib")
+export_ris(unique_citations, "citations.ris")
+export_csv(unique_citations, "citations.csv", separate = "cite_source")
+
+# To continue, data could be reimported
+# unique_citations2 <- reimport_ris("citations.ris")
+# or as csv
+# export_csv(unique_citations, "citations.csv")
+# unique_citations <- reimport_csv("citations.csv")
+```
+
+
