@@ -30,7 +30,8 @@ Suggests:
     knitr,
     rmarkdown,
     DT,
-    htmltools
+    htmltools,
+    tidyverse
 VignetteBuilder: knitr    
 Config/testthat/edition: 3
 Imports: 
@@ -55,3 +56,4 @@ Imports:
     gt,
     glue,
     gtExtras
+
