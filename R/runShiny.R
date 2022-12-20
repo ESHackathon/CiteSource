@@ -3,14 +3,7 @@
 #' Running this function will launch the CiteSource shiny
 #' @return CiteSource shiny app
 #' @param app CiteSource 
-#' @import shiny
-#' @import synthesisr
-#' @import dplyr
-#' @import shinyWidgets
-#' @import htmltools
-#' @import markdown
-#' @import plotly
-#' @import shinyalert
+#' @importFrom magrittr `%>%`
 #' @export
 
 runShiny <- function(app="CiteSource"){

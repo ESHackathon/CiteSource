@@ -1,14 +1,3 @@
-library(shiny)
-library(synthesisr)
-library(dplyr)
-library(tidyr)
-library(DT)
-library(shinyWidgets)
-library(htmltools)
-library(markdown)
-library(CiteSource)
-library(plotly)
-library(shinyalert)
 
 options(shiny.maxRequestSize=30*1024^2)
 # Set background colour
@@ -24,15 +13,15 @@ tags$head(tags$style(
 
 
 # Define UI for data upload app ----
-ui <- navbarPage("CiteSource", id = "tabs",
+ui <- shiny::navbarPage("CiteSource", id = "tabs",
                  
                  # Home tab
-                 tabPanel('Home',
-                          navlistPanel(
-                            tabPanel(title = 'About',
+                 shiny::tabPanel('Home',
+                                 shiny::navlistPanel(
+                                   shiny::tabPanel(title = 'About',
                                      htmltools::includeMarkdown('www/about.md')
                             ),
-                            tabPanel(title = 'Use Cases',
+                            shiny::tabPanel(title = 'Use Cases',
                                      column(9,
                                             'instructions text'),
                                      column(1,
@@ -42,14 +31,14 @@ ui <- navbarPage("CiteSource", id = "tabs",
                  ),
                  
                  # File upload tab
-                 tabPanel("File upload",
-                          fluidRow(
+                 shiny::tabPanel("File upload",
+                                 shiny::fluidRow(
                             column(12,
                                    # Sidebar layout with input and output definitions ----
-                                   sidebarLayout(
-                                     sidebarPanel(# Input: Select a file ----
+                                   shiny::sidebarLayout(
+                                     shiny::sidebarPanel(# Input: Select a file ----
                                                   h4("Step 1: Upload your citation files"),
-                                                  fileInput("file",  "",
+                                                  shiny::fileInput("file",  "",
                                                             multiple = TRUE, 
                                                             accept = c('.ris', '.txt', '.bib')),
                                                   # textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
@@ -64,11 +53,11 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                      ),
                                      
                                      # Main panel for displaying outputs ----
-                                     mainPanel(
+                                     shiny::mainPanel(
                                        
                                        h4("Step 2: Double click the row to edit sources, labels, and strings"),
                                        # Output: Data file ----
-                                       dataTableOutput("tbl_out"),
+                                       DT::dataTableOutput("tbl_out"),
                                    
                                      )
                                    )
@@ -76,10 +65,10 @@ ui <- navbarPage("CiteSource", id = "tabs",
                           )
                  ),
                  
-                 tabPanel("Deduplicate",
+                 shiny::tabPanel("Deduplicate",
                           
                             # Action button: identify duplicates in uploaded datset
-                            actionBttn(
+                            shinyWidgets::actionBttn(
                               'identify_dups', 'Identify duplicate citations',
                               style = "pill",
                               color = "primary",
@@ -87,20 +76,20 @@ ui <- navbarPage("CiteSource", id = "tabs",
                             ),               
                                      
                           # Output: datatable of deduplication results
-                          dataTableOutput("dedup_results")
+                          DT::dataTableOutput("dedup_results")
                 ),
                  
                  # Visualise tab
-                 tabPanel("Visualise",
-                          fluidRow(
+                shiny::tabPanel("Visualise",
+                                shiny::fluidRow(
                             column(12,
-                                   fluidRow(
+                                   shiny::fluidRow(
                                      column(12,
                                             # Sidebar layout with input and output definitions ----
-                                            sidebarLayout(
+                                            shiny::sidebarLayout(
                                               
                                               # Sidebar panel for inputs ----
-                                              sidebarPanel(id="sidebar",
+                                              shiny::sidebarPanel(id="sidebar",
                                                            
                                                            # COME BACK TO IN V2?
                                                            # 'Select sources',
@@ -117,21 +106,21 @@ ui <- navbarPage("CiteSource", id = "tabs",
                                                             "labels", "strings"),
                                                 status="primary")),
                                               
-                                              mainPanel(
-                                                tabsetPanel(
-                                                  tabPanel("Plot overlap as a heatmap matrix", plotly::plotlyOutput("plotgraph1")),
-                                                  tabPanel("Plot overlap as an upset plot", downloadButton("downloadPlot"),
-                                                           plotOutput("plotgraph2"))
+                                              shiny::mainPanel(
+                                                shiny::tabsetPanel(
+                                                  shiny::tabPanel("Plot overlap as a heatmap matrix", plotly::plotlyOutput("plotgraph1")),
+                                                  shiny::tabPanel("Plot overlap as an upset plot", downloadButton("downloadPlot"),
+                                                                  shiny::plotOutput("plotgraph2"))
                                                 ))))
                                    )))),
                  
                  
                  # Export tab
-                 tabPanel("Export",
-                          fluidRow(
+                shiny::tabPanel("Export",
+                                shiny::fluidRow(
                             column(12,
                             mainPanel(
-                              dataTableOutput("exportTbl")
+                              DT::dataTableOutput("exportTbl")
                               #,
                               #downloadButton("downloadData", "Download bibtex")
                             )
@@ -144,7 +133,7 @@ ui <- navbarPage("CiteSource", id = "tabs",
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
   
-  rv <- reactiveValues(
+  rv <- shiny::reactiveValues(
     
     
   )
@@ -156,8 +145,8 @@ server <- function(input, output, session) {
   
   #### Upload files tab section ####
   #upload on click
-  observeEvent(input$file,{
-    validate(need(input$file != "", "Select your bibliographic file to upload..."))
+  shiny::observeEvent(input$file,{
+    shiny::validate(need(input$file != "", "Select your bibliographic file to upload..."))
     
     if (is.null(input$file)) {
       return(NULL)
@@ -170,14 +159,14 @@ server <- function(input, output, session) {
       suggested_source <- stringr::str_replace_all(input$file$name, ".ris", "")
       suggested_source <- stringr::str_replace_all(suggested_source, ".bib", "")
       suggested_source <- stringr::str_replace_all(suggested_source, ".txt", "")
-      upload_df <- CiteSource::read_citations(files=input$file$datapath, 
+      upload_df <- read_citations(files=input$file$datapath, 
                                               cite_sources = suggested_source,
                                               cite_labels = rep("", length(input$file$datapath)),
                                               cite_strings =rep("", length(input$file$datapath)))
       upload_length <- upload_df %>%
-        group_by(cite_source) %>%
-        count(name="records") %>%
-        rename(source = cite_source)
+        dplyr::group_by(cite_source) %>%
+        dplyr::count(name="records") %>%
+        dplyr::rename(source = cite_source)
       
       #create a dataframe summarising inputs
       df <- data.frame('file' = input$file, 
@@ -185,12 +174,12 @@ server <- function(input, output, session) {
                        'label' = rep("", length(input$file$datapath)),
                        'string' = rep("", length(input$file$datapath)))
       
-      upload_df <- left_join(upload_df, df, by=c("cite_source"="source")) %>%
-        select(-source, -label, -string) %>%
-        select(cite_source, cite_label, cite_string, everything()) 
+      upload_df <- dplyr::left_join(upload_df, df, by=c("cite_source"="source")) %>%
+        dplyr::select(-source, -label, -string) %>%
+        dplyr::select(cite_source, cite_label, cite_string, everything()) 
       
-      df <- left_join(upload_length, df, by="source") %>%
-        select(file.name,records, source, label, string)
+      df <- dplyr::left_join(upload_length, df, by="source") %>%
+        dplyr::select(file.name,records, source, label, string)
 
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df) 
@@ -200,7 +189,7 @@ server <- function(input, output, session) {
   
   
   # # display summary input table - summary of files added
-  output$tbl_out <- renderDataTable({
+  output$tbl_out <- DT::renderDataTable({
     DT::datatable(rv$df, 
                   editable = TRUE,
                   options = list(paging = FALSE, 
@@ -209,7 +198,7 @@ server <- function(input, output, session) {
   })
   
   # when file upload table is edited, edit reactive value upload df
-  observeEvent(input$tbl_out_cell_edit, {
+  shiny::observeEvent(input$tbl_out_cell_edit, {
     
     # make sure not blank to avoid blanks in output
   
@@ -227,9 +216,9 @@ server <- function(input, output, session) {
 
     # get rownames for file  
     row_indexes <- rv$upload_df %>%
-      mutate(rowname = row_number()) %>%
-      group_by(file.name) %>%
-      summarise(min_row = first(rowname), max_row=last(rowname)) 
+      dplyr::mutate(rowname = dplyr::row_number()) %>%
+      dplyr::group_by(file.name) %>%
+      dplyr::summarise(min_row = dplyr::first(rowname), max_row=dplyr::last(rowname)) 
     
     rows <- row_indexes[info$row, 2:3]
     col <- paste0("cite_", names(rv$df[info$col+1]))
@@ -243,16 +232,16 @@ server <- function(input, output, session) {
   ### Deduplication tab ####
   
   # when dedup button clicked, deduplicate
-  observeEvent(input$identify_dups,{
+  shiny::observeEvent(input$identify_dups,{
     
-    dedup_results <- CiteSource::dedup_citations(rv$upload_df, merge_citations = TRUE)
+    dedup_results <- dedup_citations(rv$upload_df, merge_citations = TRUE)
     rv$unique <- dedup_results$unique
         
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
     n_duplicate <-n_citations - n_unique
     
-        shinyalert("Deduplication complete", 
+      shinyalert::shinyalert("Deduplication complete", 
                    paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Compare citations across sources,
                    labels, and strings in the visualisation tab"), type = "success")
     
@@ -268,11 +257,11 @@ server <- function(input, output, session) {
   #### end section ####
   
   #### Visualise tab ####
-  output$plotgraph1<-renderPlotly({
+  output$plotgraph1<-plotly::renderPlotly({
     n_unique <- count_unique(rv$unique)
     
     # for each unique citation, which sources/ strings/ labels are present
-    source_comparison <- CiteSource::compare_sources(rv$unique, comp_type = input$comp_type)
+    source_comparison <- compare_sources(rv$unique, comp_type = input$comp_type)
     plot_source_overlap_heatmap(source_comparison)
   })
   
@@ -282,11 +271,11 @@ server <- function(input, output, session) {
     
   })
   
-  output$plotgraph2<-renderPlot({
+  output$plotgraph2<-shiny::renderPlot({
     print(plotInput())
     })
   
-   output$downloadPlot <- downloadHandler(
+   output$downloadPlot <- shiny::downloadHandler(
      filename = function() { paste("upset", '.png', sep='') },
      content = function(file) {
        png(file)
@@ -303,7 +292,6 @@ server <- function(input, output, session) {
                      paging=TRUE,
                      searching=TRUE,
                      fixedColumns=TRUE,
-                     autoWidth=TRUE,
                      ordering=TRUE,
                      dom = 'Bfrtip',
                      buttons=c("copy", "csv", "pdf", "excel"),
