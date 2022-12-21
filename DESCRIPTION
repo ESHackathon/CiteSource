@@ -30,8 +30,7 @@ Suggests:
     knitr,
     rmarkdown,
     DT,
-    htmltools,
-    tidyverse
+    htmltools
 VignetteBuilder: knitr    
 Config/testthat/edition: 3
 Imports: 
