@@ -210,7 +210,6 @@ server <- function(input, output, session) {
       val <- NA
     }
     
-    print(val)
     
     rv$df[info$row, info$col+1] <- val
 

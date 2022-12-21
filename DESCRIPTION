@@ -54,5 +54,6 @@ Imports:
     ggnewscale,
     gt,
     glue,
-    gtExtras
+    gtExtras,
+    shiny
 

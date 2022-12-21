@@ -3,7 +3,7 @@
 #' Running this function will launch the CiteSource shiny
 #' @return CiteSource shiny app
 #' @param app CiteSource 
-#' @importFrom magrittr `%>%`
+#' @importFrom magrittr %>%
 #' @export
 
 runShiny <- function(app="CiteSource"){
