@@ -110,7 +110,8 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                                 shiny::tabsetPanel(
                                                   shiny::tabPanel("Plot overlap as a heatmap matrix", plotly::plotlyOutput("plotgraph1")),
                                                   shiny::tabPanel("Plot overlap as an upset plot", downloadButton("downloadPlot"),
-                                                                  shiny::plotOutput("plotgraph2"))
+                                                                  shiny::plotOutput("plotgraph2")),
+                                                  shiny::tabPanel("Review individual records", DT::dataTableOutput("reviewTab"))
                                                 ))))
                                    )))),
                  
@@ -120,9 +121,8 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                 shiny::fluidRow(
                             column(12,
                             mainPanel(
-                              DT::dataTableOutput("exportTbl")
-                              #,
-                              #downloadButton("downloadData", "Download bibtex")
+                              downloadButton("downloadData", "Download csv"),
+                              downloadButton("downloadData2", "Download bibtex")
                             )
                           ))
                  )
@@ -280,36 +280,34 @@ server <- function(input, output, session) {
        png(file)
        print(plotInput())
        dev.off()
-        }
-  )
+        })
+   output$reviewTab<-DT::renderDataTable({
+     citations<-rv$unique
+     citations$source<-rv$unique$cite_source
+     record_level_table(citations=citations,return = "DT")
+   })
    
   #### Export tab ####
-   output$exportTbl<-DT::renderDataTable(
-     DT::datatable(rv$unique,
-                   extensions = 'Buttons',
-                   options=list(
-                     paging=TRUE,
-                     searching=TRUE,
-                     fixedColumns=TRUE,
-                     ordering=TRUE,
-                     dom = 'Bfrtip',
-                     buttons=c("copy", "csv", "pdf", "excel"),
-                     class="display"
-                   ))
-   )
+   
    # # Downloadable bibtex ----
-   # output$downloadData <- downloadHandler(
-   #   filename = function() {
-   #     paste("bib", ".bib", sep = "")
-   #   },
-   #   content = function(file) {
-   #     rv$unique %>% 
-   #       select(!c(duplicate_id, cite_source, cite_string, cite_label,
-   #                 record_id, record_ids)) %>% 
-   #       bib2df::df2bib(., file="bib.bib") 
-   #     
-   #   }
-   # )
+   output$downloadData <- downloadHandler(
+     
+     filename = function() {
+       paste("data-", Sys.Date(), ".csv", sep="")
+     },
+     content = function(file) {
+       write.csv(rv$unique, file)
+     }
+   )
+   output$downloadData2 <- downloadHandler(
+     
+     filename = function() {
+       paste("data-", Sys.Date(), ".bib", sep="")
+     },
+     content = function(file) {
+       export_bib(rv$unique, file)
+     }
+   )
    
   
 }
