@@ -11,7 +11,20 @@ NULL
 
 # Use magrittr rather than base R pipe to be compatible with older R versions
 # And data pronoun .data to avoid issues/warnings due to dplyr non-standard evaluation
-#' @importFrom magrittr `%>%`
+#' Pipe operator
+#'
+#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %>%
+#' @usage lhs \%>\% rhs
+#' @param lhs A value or the magrittr placeholder.
+#' @param rhs A function call using the magrittr semantics.
+#' @return The result of calling `rhs(lhs)`.
+NULL
 #' @importFrom rlang .data :=
 NULL
 
