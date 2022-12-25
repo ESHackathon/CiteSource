@@ -33,7 +33,6 @@ knitr::opts_chunk$set(
 
 ```{r}
 library(CiteSource)
-library(tidyverse)
 
 # listRIS citation files in folder
 citation_files <- list.files(path= "../tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
