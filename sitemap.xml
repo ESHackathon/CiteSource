@@ -67,6 +67,9 @@
     <loc>http://www.eshackathon.org/CiteSource/reference/index.html</loc>
   </url>
   <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/pipe.html</loc>
+  </url>
+  <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/plot_contributions.html</loc>
   </url>
   <url>
@@ -86,5 +89,8 @@
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/reimport_ris.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/runShiny.html</loc>
   </url>
 </urlset>
