@@ -235,7 +235,7 @@ cite_source <- cite_label <- type <- NULL
 #' across different screening stages.
 #'
 #' @param data A tibble with one hit per row, with variables indicating meta-data of interest.
-#' @param facets Variable in data used for facets (i.e. sub-plots). Defaults to source (i.e. cite_source)
+#' @param facets Variable in data used for facets (i.e. sub-plots). Defaults to source (i.e. cite_source). Specify NULL to refrain from faceting.
 #' @param bars Variable in data used for bars. Defaults to label (i.e. cite_label)
 #' @param color Color used to fill bars. Default to `unique`
 #' @param center Logical. Should one color be above and one below the axis?
@@ -256,16 +256,17 @@ cite_source <- cite_label <- type <- NULL
 #'    color_order = c("unique", "duplicated"))
 #'
 plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep", totals_in_legend = TRUE) {
-  facets <- rlang::enquo(facets)
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
 
-  if (!rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data.")
+  if (!is.null(facets)) facets <- rlang::enquo(facets)
+  
+  
   if (!rlang::as_name(bars) %in% colnames(data)) stop("Column ", rlang::as_name(bars), " not found in data.")
   if (!rlang::as_name(color) %in% colnames(data)) stop("Column ", rlang::as_name(color), " not found in data.")
-
-
-
+ 
+   if (!is.null(facets) && !rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data.")
+  
 
   if (!(length(color_order) == 1 && color_order == "keep")) {
     data <- data %>%
@@ -285,8 +286,10 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
   if (!center) {
    p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
       ggplot2::geom_bar() +
-      ggplot2::facet_grid(ggplot2::vars(!!facets)) +
       ggplot2::labs(y = "Citations")
+   
+   if (!is.null(facets)) p <-  p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
+   
   } else {
     vals <- levels(data %>% dplyr::select(!!color) %>% dplyr::pull() %>% forcats::as_factor())
 
@@ -303,11 +306,12 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
  p <-   ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") +
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
-      ggplot2::facet_grid(cols = ggplot2::vars(!!facets)) +
       ggplot2::labs(y = "Citations") +
       ggplot2::scale_y_continuous(labels = abs) +
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) + # make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5)
+ 
+ if (!is.null(facets)) p <-  p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
   }
   
   if (totals_in_legend == TRUE) {

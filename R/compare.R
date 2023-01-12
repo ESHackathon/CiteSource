@@ -1,10 +1,11 @@
 #' Count number of unique and non-unique citations from different sources, labels, and strings
 #' @export
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
+#' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 
-count_unique <- function(unique_data) {
-  unique_data %>%
+count_unique <- function(unique_data, include_references = FALSE) {
+  out <- unique_data %>%
     dplyr::filter(!.data$cite_source == "") %>%
     dplyr::select(.data$duplicate_id, .data$cite_source,  .data$cite_label,  .data$cite_string, tidyselect::any_of("record_ids")) %>% 
     tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
@@ -15,6 +16,13 @@ count_unique <- function(unique_data) {
                   type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))) %>%
     dplyr::ungroup() %>%
     unique()
+  
+  if (include_references == TRUE) {
+    out %>% dplyr::left_join(unique_data %>% dplyr::select(-all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
+  } else {
+    out
+  }
+  
 }
 
 #' Compare duplicate citations across sources, labels, and strings
@@ -22,9 +30,10 @@ count_unique <- function(unique_data) {
 #' @export
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
 #' @param comp_type Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.
+#' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with sources/labels/strings as columns
 
-compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels")) {
+compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
   
   out <- list()
   
@@ -88,8 +97,13 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   
   if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
   
-  purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
-  
+  out <- purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
+
+  if (include_references == TRUE) {
+    out %>% dplyr::left_join(unique_data %>% dplyr::select(-all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
+  } else {
+    out
+  }
 }
 
 

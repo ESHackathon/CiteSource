@@ -30,7 +30,10 @@ Suggests:
     knitr,
     rmarkdown,
     DT,
-    htmltools
+    htmltools,
+    shinyWidgets,
+    shinyalert,
+    shinybusy
 VignetteBuilder: knitr    
 Config/testthat/edition: 3
 Imports: 
@@ -56,8 +59,3 @@ Imports:
     glue,
     gtExtras,
     shiny
-Suggests:    
-    shinyWidgets,
-    shinyalert,
-    shinybusy
-

@@ -120,16 +120,12 @@ plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
 ### Bar plot of numbers of records
 
-Bar plots can be another way of looking at overlap and uniqueness of databases contributions to a topic. We can use the output from the `count_unique` function to produce a bar plot with *ggplot*. Here we see a bar plot of the numbers of shared (pink) and unique (green), or unshared, records by database.  
+Bar plots can be another way of looking at overlap and uniqueness of databases contributions to a topic. We can use `plot_contributions` function to produce a bar plot, and then use any `ggplot2`-functions to format it further.  
 
 ```{r}
 #Generate bar plot of unique citations PER database as NUMBER
-n_unique %>% 
-  select(cite_source, duplicate_id, unique) %>% #remove label /other cols to prevent duplicated rows
-  ggplot(aes(fill=unique, x=cite_source)) + 
-  geom_bar(position="stack", stat="count") +
-  xlab("") + ylab("Number of citations")
-
+plot_contributions(n_unique, bars = cite_source, facets = NULL) +
+  labs(x = "", fill = "", title = "Contribution by source")
 ```
 
 ### Bar plot of percentages of records
@@ -138,18 +134,21 @@ We can also look at proportions. Interestingly, Lens seems to have the greatest 
 
 
 ```{r}
-#Generate bar plot of unique citations PER database as PERCENTAGE
+# Starting from the plot_contributions function
+p <- plot_contributions(n_unique, bars = cite_source, facets = NULL) 
+p$layers <- NULL
+p + geom_bar(position = "fill") + 
+  scale_y_continuous(labels = scales::percent)
+
+# Starting from scratch
 n_unique %>% 
-  select(cite_source, duplicate_id, unique) %>% #remove label /other cols to prevent duplicated rows
-  unique() %>% 
-  group_by(cite_source, unique) %>%
-  count(unique, cite_source) %>%
+  count(cite_source, type) %>% 
   group_by(cite_source) %>%
   mutate(perc = n / sum(n)) %>%
-  ggplot(aes(fill=unique, x=cite_source, y=perc)) + 
-  geom_bar(position="stack", stat="identity") +
-  xlab("") + ylab("Number of citations")
-
+  ggplot(aes(fill = type, x = cite_source, y=perc)) + 
+  geom_bar(stat="identity") +
+  xlab("") + ylab("Share of citations") +
+  scale_y_continuous(labels = scales::percent)
 ```
 
 ### Bar plot with labels
@@ -159,38 +158,22 @@ And one more option: a labeled bar plot with dodged bars. This is useful if we h
 ```{r}
 #Generate dodged bar plot Unique/Crossover PER Source with labels
 n_unique %>%
-  select(cite_source, unique) %>% 
   ggplot(aes(fill=unique, x=cite_source)) + 
   geom_bar(position=position_dodge(width=0.5)) +
   xlab("") + ylab("Number of citations") +
-  geom_text(stat="count", aes(label=..count..))
+  geom_text(stat="count", aes(label=after_stat(count)))
 
 ```
 
 ## Analyzing unique contributions
 
-When we're trying to get a sense of relative database coverage for a particular topic, in other words what a database contributes to a search on a topic compared to other databases, we might want to look more closely at the records that are only found in that database and not appearing anywhere else. We can again make use of the output of the `count_unique` function. We use the *dplyr* function `filter` to find the unique records contributed by single sources. We then use the `inner_join` function to regain the bibliographic data by merging on record IDs with the unique_citations dataframe we generated above in the deduplication process.
+When we're trying to get a sense of relative database coverage for a particular topic, in other words what a database contributes to a search on a topic compared to other databases, we might want to look more closely at the records that are only found in that database and not appearing anywhere else. We can again make use of the output of the `count_unique` function, this time also requesting the full references. We use the *dplyr* function `filter` to find the unique records contributed by single sources.
 
 ```{r}
-#Get unique records from each source and add bibliographic data
-unique_lens <- n_unique %>% filter(cite_source=="lens", unique == TRUE) %>% inner_join(unique_citations, by = "duplicate_id")
+#Get unique records from each source with bibliographic data
 
-unique_psycinfo <- n_unique %>% 
-  filter(cite_source=="psycinfo", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-unique_pubmed <- n_unique %>% 
-  filter(cite_source=="pubmed", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-unique_crimjust <- n_unique %>% 
-  filter(cite_source=="crimjust", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-unique_scopus <- n_unique %>% 
-  filter(cite_source=="scopus", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
+unique_records <- count_unique(unique_citations, include_references = TRUE) %>% filter(unique == TRUE) 
+unique_records %>% count(cite_source)
 ```
 
 ### Analyze journal titles 
@@ -199,7 +182,8 @@ Now we can take a deeper dive into the unique records contributed by each source
 
 ```{r}
 #Analyze journal titles for unique records
-scopus_journals <- unique_scopus %>% 
+scopus_journals <- unique_records %>% 
+  filter(cite_source == "scopus") %>% 
   group_by(journal) %>% 
   summarise(count = n()) %>%
   arrange(desc(count))
@@ -215,7 +199,9 @@ We may also want to look at publication years of unique records. For example, pe
 
 ```{r, results=FALSE}
 #Group by year, count and produced a line graph
-unique_scopus %>% group_by(year) %>% 
+unique_records %>% 
+  filter(cite_source == "scopus") %>% 
+  group_by(year) %>% 
   summarise(count = n()) %>%  
   ggplot(aes(year, count, group=1)) +
   geom_line() +
@@ -226,16 +212,16 @@ unique_scopus %>% group_by(year) %>%
 We can also compare publication years of unique records across each database by using the `facet_wrap` feature of *ggplot*.
 
 ```{r, message=FALSE}
-#Combine all unique record dataframes into a single dataframe. Note that we'll leave Criminal Justice Abstracts out since there is only one unique record.
-all_unique <- bind_rows(unique_scopus,unique_lens,unique_pubmed,unique_psycinfo)
 
 #Group by year and source, count and produced a faceted line graph
-all_unique %>% group_by(cite_source.x, year) %>% 
+unique_records %>% 
+  mutate(year = as.numeric(year)) %>% 
+  group_by(cite_source, year) %>% 
   summarise(count = n()) %>%  
   ggplot(aes(year, count, group=1)) +
   geom_line() +
   geom_point() +
-  facet_wrap(~ cite_source.x) +
+  facet_wrap(~ cite_source) +
   xlab("Publication year") + ylab("Unique records")
 
 ```
