@@ -14,7 +14,9 @@ tags$head(tags$style(
 
 # Define UI for data upload app ----
 ui <- shiny::navbarPage("CiteSource", id = "tabs",
-                 
+                       header = tagList(
+                          shinybusy::add_busy_spinner(spin = "circle")
+                          ),
                  # Home tab
                  shiny::tabPanel('Home',
                                  shiny::navlistPanel(
@@ -149,7 +151,6 @@ server <- function(input, output, session) {
     if (is.null(input$file)) {
       return(NULL)
     } else {
-      browser()
       #upload files one-by-one
       path_list <- input$file$datapath
       rv$upload_number <- 0
@@ -230,13 +231,20 @@ server <- function(input, output, session) {
   
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups,{
-    
-    dedup_results <- dedup_citations(rv$upload_df, merge_citations = TRUE)
+    last_message <- NULL
+    dedup_results <- withCallingHandlers(
+      dedup_citations(rv$upload_df, merge_citations = TRUE),
+      message = function(m) {
+        if (!is.null(last_message)) removeNotification(last_message)
+        last_message <<- showNotification(m$message, duration = NULL, type = "message")
+      }
+    )
     rv$unique <- dedup_results$unique
         
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
     n_duplicate <-n_citations - n_unique
+    if (!is.null(last_message)) removeNotification(last_message)
     
       shinyalert::shinyalert("Deduplication complete", 
                    paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Compare citations across sources,

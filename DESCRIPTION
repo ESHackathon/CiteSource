@@ -56,4 +56,8 @@ Imports:
     glue,
     gtExtras,
     shiny
+Suggests:    
+    shinyWidgets,
+    shinyalert,
+    shinybusy
 
