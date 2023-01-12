@@ -6,7 +6,7 @@
 \usage{
 dedup_citations(
   raw_citations,
-  manual_dedup = TRUE,
+  manual_dedup = FALSE,
   merge_citations = FALSE,
   preferred_source = NULL
 )
@@ -21,7 +21,7 @@ dedup_citations(
 \item{preferred_source}{citation source user wants to preferentially retain in dataset}
 }
 \value{
-A list of 2 dataframes - unique citations and citations to be manually deduplicated if option selected
+A list of 2 dataframes - unique citations and citations to be manually deduplicated if that option is selected
 }
 \description{
 This function deduplicates citation data. Note that duplicates are assumed to published
