@@ -29,11 +29,11 @@ CiteSource provides users with the ability to deduplicate references while maint
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
 
 ```{r eval = FALSE}
-#Install the remotes packages to enable installation from GitHub
+# Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
 library(remotes)
 
-#Install CiteSource
+# Install CiteSource
 remotes::install_github("ESHackathon/CiteSource")
 ```
 
@@ -49,21 +49,25 @@ Users can import multiple RIS or bibtex files into CiteSource, which the user ca
 
 ```{r read}
 
-#Indicate location of citation files
-citation_files <- list.files(path= "db_exports", pattern = "\\.ris", full.names = TRUE)
+# Indicate location of citation files
+citation_files <- list.files(path = "db_exports", pattern = "\\.ris", full.names = TRUE)
 
 citation_files
 
 
-#Read citation files and store. Labels is used to compare stages of review.
+# Read citation files and store. Labels is used to compare stages of review.
 
 citations <- read_citations(citation_files,
-                           cite_sources = c("CAB", "EconLit", NA, 
-                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),
-                            cite_labels = c("search", "search", "Final", 
-                                            "search","search","search","Screened", "search","search"),
-                            tag_naming = "best_guess")
-
+  cite_sources = c(
+    "CAB", "EconLit", NA,
+    "GreenFile", "McK", "RM", NA, "WoS", "WoSE"
+  ),
+  cite_labels = c(
+    "search", "search", "Final",
+    "search", "search", "search", "Screened", "search", "search"
+  ),
+  tag_naming = "best_guess"
+)
 ```
 
 
@@ -73,19 +77,17 @@ CiteSource allows users to merge duplicates while maintaining information in the
 
 ```{r dedup}
 
-#Deduplicate records while maintaining source information and label information.
+# Deduplicate records while maintaining source information and label information.
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 
 unique_citations <- dedup_results$unique
 
-#Count number of unique and non-unique citations from different sources and labels
+# Count number of unique and non-unique citations from different sources and labels
 n_unique <- count_unique(unique_citations)
 
-#Create dataframe indicating occurrence of records across sources, labels and/or strings
+# Create dataframe indicating occurrence of records across sources, labels and/or strings
 complete_comparison <- compare_sources(unique_citations)
 label_comparison <- compare_sources(unique_citations, comp_type = "labels")
-
-
 ```
 
 ## Source or method analysis
@@ -105,7 +107,6 @@ plot_source_overlap_heatmap(complete_comparison, plot_type = "percentages")
 ```{r upset plot}
 
 plot_source_overlap_upset(complete_comparison, decreasing = c(TRUE, TRUE))
-
 ```
 
 ## Review stage analysis
@@ -119,7 +120,6 @@ This can be done either with a bar plot ...
 ```{r contributions-bars}
 
 plot_contributions(n_unique, center = TRUE)
-
 ```
 
 ... or with separate heatmaps.
@@ -127,7 +127,6 @@ plot_contributions(n_unique, center = TRUE)
 ```{r contributions-heat, fig.height=10}
 
 plot_source_overlap_heatmap(complete_comparison, facets = "label")
-
 ```
 
 ## Documentation and output

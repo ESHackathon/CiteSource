@@ -28,12 +28,13 @@ library(dplyr)
 # Deduplication issue 54
 
 ```{r}
-#Indicate location of citation files
-citation_files <- list.files(path= "troubled_data", pattern = "\\.ris", full.names = TRUE)
+# Indicate location of citation files
+citation_files <- list.files(path = "troubled_data", pattern = "\\.ris", full.names = TRUE)
 
 citations <- read_citations(citation_files,
-                            cite_sources = c("WoS", "WoS_early"),
-                            tag_naming = "best_guess")
+  cite_sources = c("WoS", "WoS_early"),
+  tag_naming = "best_guess"
+)
 
 
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
@@ -42,13 +43,14 @@ dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 ## Resolved: Issue 51
 
 ```{r}
-#Indicate location of citation files
-citation_files <- list.files(path= "troubled_data", pattern = "\\.ris", full.names = TRUE)
+# Indicate location of citation files
+citation_files <- list.files(path = "troubled_data", pattern = "\\.ris", full.names = TRUE)
 
-#Read citation files
+# Read citation files
 citations <- read_citations(citation_files,
-                            cite_sources = c("WoS", "WoS_Early"),
-                            tag_naming = "best_guess")
+  cite_sources = c("WoS", "WoS_Early"),
+  tag_naming = "best_guess"
+)
 
 citations %>% count(cite_source)
 
@@ -56,11 +58,10 @@ dedup_results <- dedup_citations(citations, manual_dedup = FALSE, merge_citation
 
 unique_citations <- dedup_results$unique
 
-#Create dataframe indicating occurrence of records across sources or labels
+# Create dataframe indicating occurrence of records across sources or labels
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 plot_source_overlap_heatmap(source_comparison)
-
 ```
 
 

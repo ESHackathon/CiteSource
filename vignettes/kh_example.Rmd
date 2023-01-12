@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
   warning = FALSE,
   fig.width = 6,
   fig.height = 6
-  )
+)
 ```
 
 ## 1. Import
@@ -35,19 +35,20 @@ knitr::opts_chunk$set(
 library(CiteSource)
 
 # listRIS citation files in folder
-citation_files <- list.files(path= "../tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path = "../tests/testthat/data/example_ris_with_labels", pattern = "\\.ris", full.names = TRUE)
 
 # read in citations and specify sources, labels (no strings relevant here)
 citations <- read_citations(citation_files,
-                            cite_sources = c("DIM", NA,"LENS", NA, "WOS"),
-                            cite_labels = c("search",  "final", "search", "screen", "search"),
-                            tag_naming = "best_guess")
+  cite_sources = c("DIM", NA, "LENS", NA, "WOS"),
+  cite_labels = c("search", "final", "search", "screen", "search"),
+  tag_naming = "best_guess"
+)
 ```
 
 ## 2. Deduplication
 
 ```{r}
-# deduplicate citations 
+# deduplicate citations
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 
 # get unique citations
@@ -70,8 +71,8 @@ complete_comparison <- compare_sources(unique_citations)
 ### Existing plots
 
 ```{r}
-#Faceted bar
-plot_contributions(n_unique, center = TRUE, bar_order = c('search','screen','final'))
+# Faceted bar
+plot_contributions(n_unique, center = TRUE, bar_order = c("search", "screen", "final"))
 
 # heatmap of sources
 plot_source_overlap_heatmap(complete_comparison)
@@ -90,78 +91,87 @@ library(ggplot2)
 library(dplyr)
 
 # making cite_label a factor in a certain order to reflect SR process - search, screen, final
-n_unique$cite_label = factor(n_unique$cite_label, levels=c('search','screen','final'))
+n_unique$cite_label <- factor(n_unique$cite_label, levels = c("search", "screen", "final"))
 
 # bar plot unique labels PER database
 n_unique %>%
   select(cite_label, cite_source, unique, duplicate_id) %>%
-  ggplot(aes(fill=unique, x=cite_label)) + 
-  geom_bar(position="stack", stat="count") +
+  ggplot(aes(fill = unique, x = cite_label)) +
+  geom_bar(position = "stack", stat = "count") +
   facet_grid(vars(cite_source)) +
-  xlab("") + ylab("Number of citations")
+  xlab("") +
+  ylab("Number of citations")
 
 # bar plot unique labels PER database (flipped)
 n_unique %>%
   select(cite_label, cite_source, unique, duplicate_id) %>%
-  ggplot(aes(fill=unique, x=cite_label)) + 
-  geom_bar(position="stack", stat="count") +
+  ggplot(aes(fill = unique, x = cite_label)) +
+  geom_bar(position = "stack", stat = "count") +
   facet_grid(~cite_source) +
-  xlab("") + ylab("Number of citations")
+  xlab("") +
+  ylab("Number of citations")
 
 # bar plot unique citations PER database as PERCENTAGE
-n_unique %>% 
-  select(cite_source, duplicate_id, unique) %>% #remove label /other cols to prevent duplicated rows
-  unique() %>% 
+n_unique %>%
+  select(cite_source, duplicate_id, unique) %>% # remove label /other cols to prevent duplicated rows
+  unique() %>%
   group_by(cite_source, unique) %>%
   count(unique, cite_source) %>%
   group_by(cite_source) %>%
   mutate(perc = n / sum(n)) %>%
-  ggplot(aes(fill=unique, x=cite_source, y=perc)) + 
-  geom_bar(position="stack", stat="identity") +
-  xlab("") + ylab("Number of citations")
+  ggplot(aes(fill = unique, x = cite_source, y = perc)) +
+  geom_bar(position = "stack", stat = "identity") +
+  xlab("") +
+  ylab("Number of citations")
 
 # bar plot database PER label
 n_unique %>%
-  select(cite_label, cite_source, unique, duplicate_id) %>% 
-  ggplot(aes(fill=unique, x=cite_source)) + 
-  geom_bar(position="stack", stat="count") +
+  select(cite_label, cite_source, unique, duplicate_id) %>%
+  ggplot(aes(fill = unique, x = cite_source)) +
+  geom_bar(position = "stack", stat = "count") +
   facet_grid(~cite_label) +
-  xlab("") + ylab("Number of citations")
-  
+  xlab("") +
+  ylab("Number of citations")
+
 ## stacked bar Uniqe/Crossover Per Source - across Label (label as factor specified)
 n_unique %>%
-  select(cite_label, cite_source, unique, duplicate_id) %>% 
-  ggplot(aes(fill=unique, x=cite_source)) + 
-  geom_bar(position="stack", stat="count") +
-  facet_grid(~factor(cite_label, levels=c("search", "screened", "final"))) +
-  xlab("Source") + ylab("Number of citations")
+  select(cite_label, cite_source, unique, duplicate_id) %>%
+  ggplot(aes(fill = unique, x = cite_source)) +
+  geom_bar(position = "stack", stat = "count") +
+  facet_grid(~ factor(cite_label, levels = c("search", "screened", "final"))) +
+  xlab("Source") +
+  ylab("Number of citations")
 
 ## dodged bar Uniqe/Crossover PER Source
 n_unique %>%
-  select(cite_label, cite_source, unique) %>% 
-  ggplot(aes(fill=unique, x=cite_source)) + 
-  geom_bar(position=position_dodge(width=0.5), stat="count") +
-  xlab("") + ylab("Number of citations")
+  select(cite_label, cite_source, unique) %>%
+  ggplot(aes(fill = unique, x = cite_source)) +
+  geom_bar(position = position_dodge(width = 0.5), stat = "count") +
+  xlab("") +
+  ylab("Number of citations")
 
-## dodged bar Label count PER Source 
+## dodged bar Label count PER Source
 n_unique %>%
   select(cite_source, cite_label, unique) %>%
-  ggplot(aes(fill=cite_label, x=cite_source)) + 
-  geom_bar(position=position_dodge2(revers=TRUE, width = 0.9), stat="count") +
-  xlab("") + ylab("Number of citations")+
+  ggplot(aes(fill = cite_label, x = cite_source)) +
+  geom_bar(position = position_dodge2(revers = TRUE, width = 0.9), stat = "count") +
+  xlab("") +
+  ylab("Number of citations") +
   guides(fill = guide_legend(reverse = TRUE))
 
 # stacked bar labels PER database
 n_unique %>%
   select(cite_label, cite_source, unique, duplicate_id) %>%
-  ggplot(aes(fill=cite_label, x=cite_source)) + 
-  geom_bar(position="stack", stat="count") +
-  xlab("") + ylab("Number of citations")
+  ggplot(aes(fill = cite_label, x = cite_source)) +
+  geom_bar(position = "stack", stat = "count") +
+  xlab("") +
+  ylab("Number of citations")
 
 # stacked bar database PER label
 n_unique %>%
   select(cite_label, cite_source, unique, duplicate_id) %>%
-  ggplot(aes(fill=cite_source, x=cite_label)) + 
-  geom_bar(position="stack", stat="count") +
-  xlab("") + ylab("Number of citations")
+  ggplot(aes(fill = cite_source, x = cite_label)) +
+  geom_bar(position = "stack", stat = "count") +
+  xlab("") +
+  ylab("Number of citations")
 ```

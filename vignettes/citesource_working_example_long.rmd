@@ -29,11 +29,11 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 
 
 ```{r eval = FALSE}
-#Install the remotes packages to enable installation from GitHub
+# Install the remotes packages to enable installation from GitHub
 install.packages("remotes")
 library(remotes)
 
-#Install CiteSource
+# Install CiteSource
 remotes::install_github("ESHackathon/CiteSource")
 ```
 
@@ -49,39 +49,45 @@ Users can import multiple RIS or bibtex files into CiteSource, which the user ca
 
 ```{r}
 
-#Indicate location of citation files
+# Indicate location of citation files
 ## NOTE that short and long versions are separate in the working_example data folder
-citation_files <- list.files(path=file.path("../tests/testthat/data", "working_example/long"), pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path = file.path("../tests/testthat/data", "working_example/long"), pattern = "\\.ris", full.names = TRUE)
 
 citation_files
 
 
-#Read citation files and store. Labels is used to compare stages of review.
-##with all files seperate
+# Read citation files and store. Labels is used to compare stages of review.
+## with all files seperate
 
 ## long version with all RM and McK broken out -> good example for seeing how heatmap is squeezed & limitations on upset plot due to high # of combinations
 ## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves
 citations <- read_citations(citation_files,
-                            cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
-                                            "GreenFile", "McK", "McK", "RMB", "RML", "RMPul", "RMPur", "RMR", "RMDFM",       
-                                            "RMPES", NA, "WoS", "WoSE"),
-                            cite_strings = c(NA, NA, NA, NA,
-                                             NA,"McKE", "MCKI", "B", "L", "Pul", "Pur", "RMR", "DFM",
-                                             "PES", NA, NA, NA),
-                            cite_labels = c("search", "search", "search", "Final", 
-                                            "search","search","search","search","search","search","search","search","search",
-                                            "search","Screened","search","search"),
-                            tag_naming = "best_guess")
+  cite_sources = c(
+    "AGRIS", "CAB", "EconLit", NA,
+    "GreenFile", "McK", "McK", "RMB", "RML", "RMPul", "RMPur", "RMR", "RMDFM",
+    "RMPES", NA, "WoS", "WoSE"
+  ),
+  cite_strings = c(
+    NA, NA, NA, NA,
+    NA, "McKE", "MCKI", "B", "L", "Pul", "Pur", "RMR", "DFM",
+    "PES", NA, NA, NA
+  ),
+  cite_labels = c(
+    "search", "search", "search", "Final",
+    "search", "search", "search", "search", "search", "search", "search", "search", "search",
+    "search", "Screened", "search", "search"
+  ),
+  tag_naming = "best_guess"
+)
 
 ## short version with combined RM and McK files
 
-#citations <- read_citations(citation_files,
-#                          cite_sources = c("AGRIS", "CAB", "EconLit", NA, 
+# citations <- read_citations(citation_files,
+#                          cite_sources = c("AGRIS", "CAB", "EconLit", NA,
 #                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),
-#                            cite_labels = c("search","search", "search", "Final", 
+#                            cite_labels = c("search","search", "search", "Final",
 #                                            "search","search","search","Screened", "search","search"),
 #                            tag_naming = "best_guess")
-
 ```
 
 
@@ -91,18 +97,16 @@ CiteSource allows users to merge duplicates while maintaining information in the
 
 ```{r}
 
-#Deduplicate records while maintaining source information and label information.
+# Deduplicate records while maintaining source information and label information.
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 
 unique_citations <- dedup_results$unique
 
-#Count number of unique and non-unique citations from different sources and labels
+# Count number of unique and non-unique citations from different sources and labels
 n_unique <- count_unique(unique_citations)
 
-#Create dataframe indicating occurrence of records across sources
+# Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-
-
 ```
 
 ## Source or method analysis
@@ -115,8 +119,7 @@ When teams are selecting databases for inclusion in a review it can be extremely
 
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
 
-my_heatmap 
-
+my_heatmap
 ```
 
 
@@ -127,7 +130,6 @@ my_heatmap
 my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
 my_upset_plot
-
 ```
 
 ### Report contributions of different sources in table
@@ -142,7 +144,6 @@ Such summaries can also be created for search strings, if a different grouping i
 
 ```{r}
 citation_summary_table(unique_citations, comparison_type = "strings", screening_label = "Final")
-
 ```
 
 
@@ -154,11 +155,12 @@ Once the title and abstract screening has been completed or once the final paper
 
 ```{r}
 
-my_contributions <- plot_contributions(n_unique, center = TRUE, 
-                                       bar_order = c('search', 'Screened', 'Final'))
+my_contributions <- plot_contributions(n_unique,
+  center = TRUE,
+  bar_order = c("search", "Screened", "Final")
+)
 
 my_contributions
-
 ```
 
 ## Documentation and output
@@ -168,13 +170,11 @@ In addition to the above visualizations, it may be useful to export datasets for
 ### Export deduplicated files
 
 ```{r}
-
 ```
 
 
 ### Generate a search summary table
 
 ```{r}
-
 ```
 

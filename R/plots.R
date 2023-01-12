@@ -62,7 +62,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
     data$facet <- "1"
     data <- list(data)
   }
-  
+
   data <- purrr::map(data, function(df) {
     df <- df %>% dplyr::select(dplyr::all_of(sources_order))
     purrr::map_dfr(names(df), function(source) {
@@ -97,12 +97,13 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
     if (length(unique(data$facet)) > 1) {
       p <- p +
-        ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) + 
-        ggplot2::theme(aspect.ratio = 1, legend.position = "none",
-                         strip.background = ggplot2::element_rect(
-                           color="black", fill="darkgrey"
-                         )
-                       ) + ggplot2::scale_fill_gradient(low = "white")
+        ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) +
+        ggplot2::theme(
+          aspect.ratio = 1, legend.position = "none",
+          strip.background = ggplot2::element_rect(
+            color = "black", fill = "darkgrey"
+          )
+        ) + ggplot2::scale_fill_gradient(low = "white")
       # Removed legends here because they do not appear in correct order - maybe worth fixing in the future
       facets <- unique(data$facet)
 
@@ -123,8 +124,6 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       ggplot2::scale_y_discrete(limits = sources_order) +
       ggplot2::labs(x = "", y = "", fill = "Records")
   } else if (plot_type == "percentages") {
-    
-    
     data <- purrr::map(data, function(df) {
       diag <- diag(as.matrix(df))
       df <- df / diag
@@ -158,7 +157,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       ggplot2::geom_text(ggplot2::aes(label = fmt_pct(.data$shares), fill = NULL)) +
       ggplot2::labs(
         x = "", y = "", fill = "Overlap",
-        caption = "Note: Percentages indicate share of records in row also found in column, 
+        caption = "Note: Percentages indicate share of records in row also found in column,
        number of results in each database is shown on the diagonal"
       ) +
       ggplot2::scale_x_discrete(limits = rev(sources_order), guide = ggplot2::guide_axis(angle = 45)) +
@@ -168,11 +167,12 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
 
     if (length(unique(data$facet)) > 1) {
-      p <- p + ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) + 
-        ggplot2::theme(aspect.ratio = 1,  
-                       strip.background = ggplot2::element_rect(
-          color="black", fill="darkgrey"
-        )
+      p <- p + ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) +
+        ggplot2::theme(
+          aspect.ratio = 1,
+          strip.background = ggplot2::element_rect(
+            color = "black", fill = "darkgrey"
+          )
         )
     }
     p
@@ -220,7 +220,8 @@ plot_source_overlap_upset <- function(data, groups = "source", nsets = NULL, set
 
   if (nsets > 5) message("Plotting a large number of groups. Consider reducing nset or sub-setting the data.")
 
-  data %>% data.frame() %>% 
+  data %>%
+    data.frame() %>%
     dplyr::transmute(dplyr::across(tidyselect::vars_select_helpers$where(is.logical), as.numeric)) %>%
     UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
@@ -252,21 +253,23 @@ cite_source <- cite_label <- type <- NULL
 #'   type = c("unique", "duplicated")[rbinom(100, 1, .7) + 1]
 #' )
 #'
-#' plot_contributions(data, center = TRUE, bar_order = c("2022", "2021", "2020"), 
-#'    color_order = c("unique", "duplicated"))
+#' plot_contributions(data,
+#'   center = TRUE, bar_order = c("2022", "2021", "2020"),
+#'   color_order = c("unique", "duplicated")
+#' )
 #'
 plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep", totals_in_legend = TRUE) {
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
 
   if (!is.null(facets)) facets <- rlang::enquo(facets)
-  
-  
+
+
   if (!rlang::as_name(bars) %in% colnames(data)) stop("Column ", rlang::as_name(bars), " not found in data.")
   if (!rlang::as_name(color) %in% colnames(data)) stop("Column ", rlang::as_name(color), " not found in data.")
- 
-   if (!is.null(facets) && !rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data.")
-  
+
+  if (!is.null(facets) && !rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data.")
+
 
   if (!(length(color_order) == 1 && color_order == "keep")) {
     data <- data %>%
@@ -284,12 +287,11 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
   }
 
   if (!center) {
-   p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
       ggplot2::geom_bar() +
       ggplot2::labs(y = "Citations")
-   
-   if (!is.null(facets)) p <-  p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
-   
+
+    if (!is.null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
   } else {
     vals <- levels(data %>% dplyr::select(!!color) %>% dplyr::pull() %>% forcats::as_factor())
 
@@ -303,30 +305,28 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       .5 * data_sum$n, -.5 * data_sum$n
     ) # add label positions for geom_text
 
- p <-   ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") +
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::labs(y = "Citations") +
       ggplot2::scale_y_continuous(labels = abs) +
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) + # make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5)
- 
- if (!is.null(facets)) p <-  p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
+
+    if (!is.null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
   }
-  
+
   if (totals_in_legend == TRUE) {
-    
     get_total <- function(type) {
-      
       for (i in seq_along(type)) {
-        type[i] <- glue::glue("{type[i]}\n(N = {formatC(sum(data$type == type[i]), big.mark = ",")})")
+        type[i] <- glue::glue("{type[i]}\n(N = {formatC(sum(data$type == type[i]), big.mark = ", ")})")
       }
-      
+
       type
     }
-    
+
     p <- p + ggplot2::scale_fill_discrete(labels = scales::trans_format("identity", get_total))
   }
-  
+
   p
 }

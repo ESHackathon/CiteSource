@@ -67,7 +67,7 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                  
                  shiny::tabPanel("Deduplicate",
                           
-                            # Action button: identify duplicates in uploaded datset
+                            # Action button: identify duplicates in uploaded dataset
                             shinyWidgets::actionBttn(
                               'identify_dups', 'Identify duplicate citations',
                               style = "pill",
