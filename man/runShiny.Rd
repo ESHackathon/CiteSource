@@ -7,11 +7,11 @@
 runShiny(app = "CiteSource")
 }
 \arguments{
-\item{app}{CiteSource}
+\item{app}{Defaults to CiteSource - possibly other apps will be included in the future}
 }
 \value{
 CiteSource shiny app
 }
 \description{
-Running this function will launch the CiteSource shiny
+Running this function will launch the CiteSource shiny app
 }
