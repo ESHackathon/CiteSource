@@ -8,10 +8,9 @@
 #' @param manual_dedup Logical value. Do you want to retrieve dataframe for manual deduplication?
 #' @param merge_citations Logical value. Do you want to merge matching citations?
 #' @param preferred_source citation source user wants to preferentially retain in dataset
-#' @return A list of 2 dataframes - unique citations and citations to be manually deduplicated if option selected
+#' @return A list of 2 dataframes - unique citations and citations to be manually deduplicated if that option is selected
 
-dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=FALSE, preferred_source=NULL) {
-  
+dedup_citations <- function(raw_citations, manual_dedup = FALSE, merge_citations=FALSE, preferred_source=NULL) {
   message("formatting data...")
   raw_citations <- add_cols(raw_citations, c("record_id", "cite_label","cite_source","cite_string"))
   
@@ -40,6 +39,8 @@ dedup_citations <- function(raw_citations, manual_dedup = TRUE, merge_citations=
   if(manual_dedup == TRUE){
     
     manual_dedup <- get_manual_dedup_list(maybe_pairs, formatted_citations, pairs)
+  } else {
+    manual_dedup <- NULL
   }
   
   if(merge_citations == TRUE){
