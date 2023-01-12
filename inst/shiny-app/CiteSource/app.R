@@ -22,12 +22,10 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                      htmltools::includeMarkdown('www/about.md')
                             ),
                             shiny::tabPanel(title = 'Use Cases',
-                                     column(9,
-                                            'instructions text'),
-                                     column(1,
-                                            tags$img(height=150,src='https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png'))
-                            )
-                          )
+                                    
+                                            htmltools::includeMarkdown('www/use-cases.md')
+                                    
+                          ))
                  ),
                  
                  # File upload tab
@@ -151,7 +149,7 @@ server <- function(input, output, session) {
     if (is.null(input$file)) {
       return(NULL)
     } else {
-      
+      browser()
       #upload files one-by-one
       path_list <- input$file$datapath
       rv$upload_number <- 0
@@ -170,15 +168,15 @@ server <- function(input, output, session) {
       
       #create a dataframe summarising inputs
       df <- data.frame('file' = input$file, 
-                       'source' = suggested_source,
+                       'suggested_source' = suggested_source,
                        'label' = rep("", length(input$file$datapath)),
                        'string' = rep("", length(input$file$datapath)))
       
-      upload_df <- dplyr::left_join(upload_df, df, by=c("cite_source"="source")) %>%
-        dplyr::select(-source, -label, -string) %>%
+      upload_df <- dplyr::left_join(upload_df, df, by=c("cite_source"="suggested_source")) %>%
+        dplyr::select(-label, -string) %>%
         dplyr::select(cite_source, cite_label, cite_string, everything()) 
       
-      df <- dplyr::left_join(upload_length, df, by="source") %>%
+      df <- dplyr::left_join(upload_length, df, by=c("source" = "suggested_source")) %>%
         dplyr::select(file.name,records, source, label, string)
 
       rv$df <- dplyr::bind_rows(rv$df, df)
