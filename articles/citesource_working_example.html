@@ -103,10 +103,10 @@ complete metadata is used in the main record.</p>
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Install the remotes packages to enable installation from GitHub</span></span>
+<code class="sourceCode R"><span><span class="co"># Install the remotes packages to enable installation from GitHub</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Install CiteSource</span></span>
+<span><span class="co"># Install CiteSource</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ESHackathon/CiteSource"</span><span class="op">)</span></span></code></pre></div>
 <p>After installation, you can load the package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -135,7 +135,7 @@ over the course of title/abstract screening and full text screening.</p>
 <h3 id="indicate-location-files">Indicate location files<a class="anchor" aria-label="anchor" href="#indicate-location-files"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/short"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/short"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">citation_files</span></span>
 <span><span class="co">#&gt;  [1] "../tests/testthat/data/working_example/short/AGRIS.ris"    </span></span>
@@ -159,11 +159,16 @@ and RM represent a consolidation of multiple citation files, to see
 these citation files, view the long version of this vignette.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
-<span>                           cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
-<span>                                            <span class="st">"GreenFile"</span>, <span class="st">"McK"</span>, <span class="st">"RM"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span><span class="op">)</span>,</span>
-<span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>,<span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>, </span>
-<span>                                            <span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"Screened"</span>, <span class="st">"search"</span>,<span class="st">"search"</span><span class="op">)</span>,</span>
-<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
+<span>  cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>,</span>
+<span>    <span class="st">"GreenFile"</span>, <span class="st">"McK"</span>, <span class="st">"RM"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>,</span>
+<span>    <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Screened"</span>, <span class="st">"search"</span>, <span class="st">"search"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  tag_naming <span class="op">=</span> <span class="st">"best_guess"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;             file cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1      AGRIS.ris       AGRIS          NA     search        12</span></span>
@@ -242,7 +247,7 @@ stripped of their abstracts to avoid any copyright issues.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">my_heatmap</span> </span></code></pre></div>
+<span><span class="va">my_heatmap</span></span></code></pre></div>
 <p><img src="citesource_working_example_files/figure-html/unnamed-chunk-8-1.png" width="960"></p>
 </div>
 <div class="section level3">
@@ -286,8 +291,10 @@ overlapping/unique records from each source or method.</p>
 <h3 id="assess-contribution-of-sources-by-review-stage">Assess contribution of sources by review stage<a class="anchor" aria-label="anchor" href="#assess-contribution-of-sources-by-review-stage"></a>
 </h3>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                                       bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>, <span class="st">'Screened'</span>, <span class="st">'Final'</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>, <span class="st">"Screened"</span>, <span class="st">"Final"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_contributions</span></span></code></pre></div>
 <p><img src="citesource_working_example_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>

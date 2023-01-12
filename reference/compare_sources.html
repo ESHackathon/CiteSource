@@ -60,7 +60,11 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compare_sources</span><span class="op">(</span><span class="va">unique_data</span>, comp_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sources"</span>, <span class="st">"strings"</span>, <span class="st">"labels"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compare_sources</span><span class="op">(</span></span>
+<span>  <span class="va">unique_data</span>,</span>
+<span>  comp_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sources"</span>, <span class="st">"strings"</span>, <span class="st">"labels"</span><span class="op">)</span>,</span>
+<span>  include_references <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,6 +75,10 @@
 
 <dt>comp_type</dt>
 <dd><p>Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.</p></dd>
+
+
+<dt>include_references</dt>
+<dd><p>Should bibliographic detail be included in return?</p></dd>
 
 </dl></div>
     <div class="section level2">

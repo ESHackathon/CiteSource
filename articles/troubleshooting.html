@@ -89,12 +89,13 @@
 <h2 id="deduplication-issue-54">Deduplication issue 54<a class="anchor" aria-label="anchor" href="#deduplication-issue-54"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Indicate location of citation files</span></span>
-<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span> <span class="st">"troubled_data"</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Indicate location of citation files</span></span>
+<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"troubled_data"</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
-<span>                            cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WoS"</span>, <span class="st">"WoS_early"</span><span class="op">)</span>,</span>
-<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
+<span>  cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WoS"</span>, <span class="st">"WoS_early"</span><span class="op">)</span>,</span>
+<span>  tag_naming <span class="op">=</span> <span class="st">"best_guess"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;            file cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1 WoS_Early.ris         WoS          NA         NA      2639</span></span>
@@ -110,13 +111,14 @@
 <h3 id="resolved-issue-51">Resolved: Issue 51<a class="anchor" aria-label="anchor" href="#resolved-issue-51"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Indicate location of citation files</span></span>
-<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span> <span class="st">"troubled_data"</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Indicate location of citation files</span></span>
+<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"troubled_data"</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Read citation files</span></span>
+<span><span class="co"># Read citation files</span></span>
 <span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
-<span>                            cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WoS"</span>, <span class="st">"WoS_Early"</span><span class="op">)</span>,</span>
-<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
+<span>  cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WoS"</span>, <span class="st">"WoS_Early"</span><span class="op">)</span>,</span>
+<span>  tag_naming <span class="op">=</span> <span class="st">"best_guess"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;            file cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1 WoS_Early.ris         WoS          NA         NA      2639</span></span>
@@ -137,7 +139,7 @@
 <span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span>
 <span></span>
-<span><span class="co">#Create dataframe indicating occurrence of records across sources or labels</span></span>
+<span><span class="co"># Create dataframe indicating occurrence of records across sources or labels</span></span>
 <span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span></code></pre></div>

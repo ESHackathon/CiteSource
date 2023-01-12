@@ -105,11 +105,11 @@ complete metadata is used in the main record.</p>
 <p>Use the following code to install CiteSource. Currently, CiteSource
 lives on GitHub and needs to be installed with the remotes package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Install the remotes packages to enable installation from GitHub</span></span>
+<code class="sourceCode R"><span><span class="co"># Install the remotes packages to enable installation from GitHub</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Install CiteSource</span></span>
+<span><span class="co"># Install CiteSource</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ESHackathon/CiteSource"</span><span class="op">)</span></span></code></pre></div>
 <p>After installation, you can load the package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -127,9 +127,9 @@ Search results from databases can be imported along with screened
 records and final included studies.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#Indicate location of citation files</span></span>
+<span><span class="co"># Indicate location of citation files</span></span>
 <span><span class="co">## NOTE that short and long versions are separate in the working_example data folder</span></span>
-<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/long"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"../tests/testthat/data"</span>, <span class="st">"working_example/long"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">citation_files</span></span>
 <span><span class="co">#&gt;  [1] "../tests/testthat/data/working_example/long/AGRIS.ris"        </span></span>
@@ -151,22 +151,29 @@ records and final included studies.</p>
 <span><span class="co">#&gt; [17] "../tests/testthat/data/working_example/long/WoS_later.ris"</span></span>
 <span></span>
 <span></span>
-<span><span class="co">#Read citation files and store. Labels is used to compare stages of review.</span></span>
-<span><span class="co">##with all files seperate</span></span>
+<span><span class="co"># Read citation files and store. Labels is used to compare stages of review.</span></span>
+<span><span class="co">## with all files seperate</span></span>
 <span></span>
 <span><span class="co">## long version with all RM and McK broken out -&gt; good example for seeing how heatmap is squeezed &amp; limitations on upset plot due to high # of combinations</span></span>
 <span><span class="co">## Good example for later tagging RM versions in site_string since they are the same method (previous reviews), but different sources themselves</span></span>
 <span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span><span class="va">citation_files</span>,</span>
-<span>                            cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>, </span>
-<span>                                            <span class="st">"GreenFile"</span>, <span class="st">"McK"</span>, <span class="st">"McK"</span>, <span class="st">"RMB"</span>, <span class="st">"RML"</span>, <span class="st">"RMPul"</span>, <span class="st">"RMPur"</span>, <span class="st">"RMR"</span>, <span class="st">"RMDFM"</span>,       </span>
-<span>                                            <span class="st">"RMPES"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span><span class="op">)</span>,</span>
-<span>                            cite_strings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>,</span>
-<span>                                             <span class="cn">NA</span>,<span class="st">"McKE"</span>, <span class="st">"MCKI"</span>, <span class="st">"B"</span>, <span class="st">"L"</span>, <span class="st">"Pul"</span>, <span class="st">"Pur"</span>, <span class="st">"RMR"</span>, <span class="st">"DFM"</span>,</span>
-<span>                                             <span class="st">"PES"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
-<span>                            cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>, </span>
-<span>                                            <span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,<span class="st">"search"</span>,</span>
-<span>                                            <span class="st">"search"</span>,<span class="st">"Screened"</span>,<span class="st">"search"</span>,<span class="st">"search"</span><span class="op">)</span>,</span>
-<span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
+<span>  cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"AGRIS"</span>, <span class="st">"CAB"</span>, <span class="st">"EconLit"</span>, <span class="cn">NA</span>,</span>
+<span>    <span class="st">"GreenFile"</span>, <span class="st">"McK"</span>, <span class="st">"McK"</span>, <span class="st">"RMB"</span>, <span class="st">"RML"</span>, <span class="st">"RMPul"</span>, <span class="st">"RMPur"</span>, <span class="st">"RMR"</span>, <span class="st">"RMDFM"</span>,</span>
+<span>    <span class="st">"RMPES"</span>, <span class="cn">NA</span>, <span class="st">"WoS"</span>, <span class="st">"WoSE"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  cite_strings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>,</span>
+<span>    <span class="cn">NA</span>, <span class="st">"McKE"</span>, <span class="st">"MCKI"</span>, <span class="st">"B"</span>, <span class="st">"L"</span>, <span class="st">"Pul"</span>, <span class="st">"Pur"</span>, <span class="st">"RMR"</span>, <span class="st">"DFM"</span>,</span>
+<span>    <span class="st">"PES"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"Final"</span>,</span>
+<span>    <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>, <span class="st">"search"</span>,</span>
+<span>    <span class="st">"search"</span>, <span class="st">"Screened"</span>, <span class="st">"search"</span>, <span class="st">"search"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  tag_naming <span class="op">=</span> <span class="st">"best_guess"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1          AGRIS.ris       AGRIS        &lt;NA&gt;     search        12</span></span>
@@ -189,10 +196,10 @@ records and final included studies.</p>
 <span></span>
 <span><span class="co">## short version with combined RM and McK files</span></span>
 <span></span>
-<span><span class="co">#citations &lt;- read_citations(citation_files,</span></span>
-<span><span class="co">#                          cite_sources = c("AGRIS", "CAB", "EconLit", NA, </span></span>
+<span><span class="co"># citations &lt;- read_citations(citation_files,</span></span>
+<span><span class="co">#                          cite_sources = c("AGRIS", "CAB", "EconLit", NA,</span></span>
 <span><span class="co">#                                            "GreenFile", "McK", "RM", NA, "WoS", "WoSE"),</span></span>
-<span><span class="co">#                            cite_labels = c("search","search", "search", "Final", </span></span>
+<span><span class="co">#                            cite_labels = c("search","search", "search", "Final",</span></span>
 <span><span class="co">#                                            "search","search","search","Screened", "search","search"),</span></span>
 <span><span class="co">#                            tag_naming = "best_guess")</span></span></code></pre></div>
 </div>
@@ -205,7 +212,7 @@ information about the origin of the records is not lost in the
 deduplication process.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#Deduplicate records while maintaining source information and label information.</span></span>
+<span><span class="co"># Deduplicate records while maintaining source information and label information.</span></span>
 <span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; formatting data...</span></span>
 <span><span class="co">#&gt; identifying potential duplicates...</span></span>
@@ -214,10 +221,10 @@ deduplication process.</p>
 <span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span>
 <span></span>
-<span><span class="co">#Count number of unique and non-unique citations from different sources and labels</span></span>
+<span><span class="co"># Count number of unique and non-unique citations from different sources and labels</span></span>
 <span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Create dataframe indicating occurrence of records across sources</span></span>
+<span><span class="co"># Create dataframe indicating occurrence of records across sources</span></span>
 <span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -239,7 +246,7 @@ comparison as well as strategy and methodology comparison.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">my_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">my_heatmap</span> </span></code></pre></div>
+<span><span class="va">my_heatmap</span></span></code></pre></div>
 <p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 <div class="section level3">
@@ -266,13 +273,13 @@ source. To keep it simple, this can be restricted to a specific number
 <span><span class="co">#&gt; indicates the full search stage, this might indicate that you ommitted a source,</span></span>
 <span><span class="co">#&gt; or that the deduplication did not go right. Please treat results with caution</span></span>
 <span><span class="co">#&gt; until you fix this, e.g., by using export_csv and then reimport_csv.</span></span></code></pre></div>
-<div id="hvcinweycl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="fbtcynrubv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 html {
   font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hvcinweycl .gt_table {
+#fbtcynrubv .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -297,7 +304,7 @@ html {
   border-left-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_heading {
+#fbtcynrubv .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -309,12 +316,12 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_caption {
+#fbtcynrubv .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hvcinweycl .gt_title {
+#fbtcynrubv .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -326,7 +333,7 @@ html {
   border-bottom-width: 0;
 }
 
-#hvcinweycl .gt_subtitle {
+#fbtcynrubv .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -338,13 +345,13 @@ html {
   border-top-width: 0;
 }
 
-#hvcinweycl .gt_bottom_border {
+#fbtcynrubv .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_col_headings {
+#fbtcynrubv .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -359,7 +366,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_col_heading {
+#fbtcynrubv .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -379,7 +386,7 @@ html {
   overflow-x: hidden;
 }
 
-#hvcinweycl .gt_column_spanner_outer {
+#fbtcynrubv .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -391,15 +398,15 @@ html {
   padding-right: 4px;
 }
 
-#hvcinweycl .gt_column_spanner_outer:first-child {
+#fbtcynrubv .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hvcinweycl .gt_column_spanner_outer:last-child {
+#fbtcynrubv .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hvcinweycl .gt_column_spanner {
+#fbtcynrubv .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -411,7 +418,7 @@ html {
   width: 100%;
 }
 
-#hvcinweycl .gt_group_heading {
+#fbtcynrubv .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -437,7 +444,7 @@ html {
   text-align: left;
 }
 
-#hvcinweycl .gt_empty_group_heading {
+#fbtcynrubv .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #BEBEBE;
@@ -452,15 +459,15 @@ html {
   vertical-align: middle;
 }
 
-#hvcinweycl .gt_from_md > :first-child {
+#fbtcynrubv .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hvcinweycl .gt_from_md > :last-child {
+#fbtcynrubv .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hvcinweycl .gt_row {
+#fbtcynrubv .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -479,7 +486,7 @@ html {
   overflow-x: hidden;
 }
 
-#hvcinweycl .gt_stub {
+#fbtcynrubv .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -492,7 +499,7 @@ html {
   padding-right: 5px;
 }
 
-#hvcinweycl .gt_stub_row_group {
+#fbtcynrubv .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -506,11 +513,11 @@ html {
   vertical-align: top;
 }
 
-#hvcinweycl .gt_row_group_first td {
+#fbtcynrubv .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hvcinweycl .gt_summary_row {
+#fbtcynrubv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -520,16 +527,16 @@ html {
   padding-right: 5px;
 }
 
-#hvcinweycl .gt_first_summary_row {
+#fbtcynrubv .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_first_summary_row.thick {
+#fbtcynrubv .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hvcinweycl .gt_last_summary_row {
+#fbtcynrubv .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -539,7 +546,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_grand_summary_row {
+#fbtcynrubv .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -549,7 +556,7 @@ html {
   padding-right: 5px;
 }
 
-#hvcinweycl .gt_first_grand_summary_row {
+#fbtcynrubv .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -559,11 +566,11 @@ html {
   border-top-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_striped {
+#fbtcynrubv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hvcinweycl .gt_table_body {
+#fbtcynrubv .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -572,7 +579,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_footnotes {
+#fbtcynrubv .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -586,7 +593,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_footnote {
+#fbtcynrubv .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -595,7 +602,7 @@ html {
   padding-right: 5px;
 }
 
-#hvcinweycl .gt_sourcenotes {
+#fbtcynrubv .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -609,7 +616,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#hvcinweycl .gt_sourcenote {
+#fbtcynrubv .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -617,64 +624,64 @@ html {
   padding-right: 5px;
 }
 
-#hvcinweycl .gt_left {
+#fbtcynrubv .gt_left {
   text-align: left;
 }
 
-#hvcinweycl .gt_center {
+#fbtcynrubv .gt_center {
   text-align: center;
 }
 
-#hvcinweycl .gt_right {
+#fbtcynrubv .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hvcinweycl .gt_font_normal {
+#fbtcynrubv .gt_font_normal {
   font-weight: normal;
 }
 
-#hvcinweycl .gt_font_bold {
+#fbtcynrubv .gt_font_bold {
   font-weight: bold;
 }
 
-#hvcinweycl .gt_font_italic {
+#fbtcynrubv .gt_font_italic {
   font-style: italic;
 }
 
-#hvcinweycl .gt_super {
+#fbtcynrubv .gt_super {
   font-size: 65%;
 }
 
-#hvcinweycl .gt_footnote_marks {
+#fbtcynrubv .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#hvcinweycl .gt_asterisk {
+#fbtcynrubv .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hvcinweycl .gt_indent_1 {
+#fbtcynrubv .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hvcinweycl .gt_indent_2 {
+#fbtcynrubv .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hvcinweycl .gt_indent_3 {
+#fbtcynrubv .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hvcinweycl .gt_indent_4 {
+#fbtcynrubv .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hvcinweycl .gt_indent_5 {
+#fbtcynrubv .gt_indent_5 {
   text-indent: 25px;
 }
 
@@ -846,13 +853,13 @@ grouping is to be explored.</p>
 <span><span class="co">#&gt; indicates the full search stage, this might indicate that you ommitted a source,</span></span>
 <span><span class="co">#&gt; or that the deduplication did not go right. Please treat results with caution</span></span>
 <span><span class="co">#&gt; until you fix this, e.g., by using export_csv and then reimport_csv.</span></span></code></pre></div>
-<div id="igqupbehbp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="pkdalgpxip" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 html {
   font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#igqupbehbp .gt_table {
+#pkdalgpxip .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -877,7 +884,7 @@ html {
   border-left-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_heading {
+#pkdalgpxip .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -889,12 +896,12 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_caption {
+#pkdalgpxip .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#igqupbehbp .gt_title {
+#pkdalgpxip .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -906,7 +913,7 @@ html {
   border-bottom-width: 0;
 }
 
-#igqupbehbp .gt_subtitle {
+#pkdalgpxip .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -918,13 +925,13 @@ html {
   border-top-width: 0;
 }
 
-#igqupbehbp .gt_bottom_border {
+#pkdalgpxip .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_col_headings {
+#pkdalgpxip .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -939,7 +946,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_col_heading {
+#pkdalgpxip .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -959,7 +966,7 @@ html {
   overflow-x: hidden;
 }
 
-#igqupbehbp .gt_column_spanner_outer {
+#pkdalgpxip .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -971,15 +978,15 @@ html {
   padding-right: 4px;
 }
 
-#igqupbehbp .gt_column_spanner_outer:first-child {
+#pkdalgpxip .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#igqupbehbp .gt_column_spanner_outer:last-child {
+#pkdalgpxip .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#igqupbehbp .gt_column_spanner {
+#pkdalgpxip .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -991,7 +998,7 @@ html {
   width: 100%;
 }
 
-#igqupbehbp .gt_group_heading {
+#pkdalgpxip .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1017,7 +1024,7 @@ html {
   text-align: left;
 }
 
-#igqupbehbp .gt_empty_group_heading {
+#pkdalgpxip .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #BEBEBE;
@@ -1032,15 +1039,15 @@ html {
   vertical-align: middle;
 }
 
-#igqupbehbp .gt_from_md > :first-child {
+#pkdalgpxip .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#igqupbehbp .gt_from_md > :last-child {
+#pkdalgpxip .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#igqupbehbp .gt_row {
+#pkdalgpxip .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -1059,7 +1066,7 @@ html {
   overflow-x: hidden;
 }
 
-#igqupbehbp .gt_stub {
+#pkdalgpxip .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -1072,7 +1079,7 @@ html {
   padding-right: 5px;
 }
 
-#igqupbehbp .gt_stub_row_group {
+#pkdalgpxip .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1086,11 +1093,11 @@ html {
   vertical-align: top;
 }
 
-#igqupbehbp .gt_row_group_first td {
+#pkdalgpxip .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#igqupbehbp .gt_summary_row {
+#pkdalgpxip .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1100,16 +1107,16 @@ html {
   padding-right: 5px;
 }
 
-#igqupbehbp .gt_first_summary_row {
+#pkdalgpxip .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_first_summary_row.thick {
+#pkdalgpxip .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#igqupbehbp .gt_last_summary_row {
+#pkdalgpxip .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1119,7 +1126,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_grand_summary_row {
+#pkdalgpxip .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1129,7 +1136,7 @@ html {
   padding-right: 5px;
 }
 
-#igqupbehbp .gt_first_grand_summary_row {
+#pkdalgpxip .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1139,11 +1146,11 @@ html {
   border-top-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_striped {
+#pkdalgpxip .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#igqupbehbp .gt_table_body {
+#pkdalgpxip .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1152,7 +1159,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_footnotes {
+#pkdalgpxip .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1166,7 +1173,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_footnote {
+#pkdalgpxip .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1175,7 +1182,7 @@ html {
   padding-right: 5px;
 }
 
-#igqupbehbp .gt_sourcenotes {
+#pkdalgpxip .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1189,7 +1196,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#igqupbehbp .gt_sourcenote {
+#pkdalgpxip .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1197,64 +1204,64 @@ html {
   padding-right: 5px;
 }
 
-#igqupbehbp .gt_left {
+#pkdalgpxip .gt_left {
   text-align: left;
 }
 
-#igqupbehbp .gt_center {
+#pkdalgpxip .gt_center {
   text-align: center;
 }
 
-#igqupbehbp .gt_right {
+#pkdalgpxip .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#igqupbehbp .gt_font_normal {
+#pkdalgpxip .gt_font_normal {
   font-weight: normal;
 }
 
-#igqupbehbp .gt_font_bold {
+#pkdalgpxip .gt_font_bold {
   font-weight: bold;
 }
 
-#igqupbehbp .gt_font_italic {
+#pkdalgpxip .gt_font_italic {
   font-style: italic;
 }
 
-#igqupbehbp .gt_super {
+#pkdalgpxip .gt_super {
   font-size: 65%;
 }
 
-#igqupbehbp .gt_footnote_marks {
+#pkdalgpxip .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#igqupbehbp .gt_asterisk {
+#pkdalgpxip .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#igqupbehbp .gt_indent_1 {
+#pkdalgpxip .gt_indent_1 {
   text-indent: 5px;
 }
 
-#igqupbehbp .gt_indent_2 {
+#pkdalgpxip .gt_indent_2 {
   text-indent: 10px;
 }
 
-#igqupbehbp .gt_indent_3 {
+#pkdalgpxip .gt_indent_3 {
   text-indent: 15px;
 }
 
-#igqupbehbp .gt_indent_4 {
+#pkdalgpxip .gt_indent_4 {
   text-indent: 20px;
 }
 
-#igqupbehbp .gt_indent_5 {
+#pkdalgpxip .gt_indent_5 {
   text-indent: 25px;
 }
 
@@ -1492,8 +1499,10 @@ overlapping/unique records from each source or method.</p>
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                                       bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'search'</span>, <span class="st">'Screened'</span>, <span class="st">'Final'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">my_contributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  bar_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"search"</span>, <span class="st">"Screened"</span>, <span class="st">"Final"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_contributions</span></span></code></pre></div>
 <p><img src="citesource_working_example_long_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
