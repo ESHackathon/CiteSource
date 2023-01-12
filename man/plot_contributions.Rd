@@ -19,7 +19,7 @@ plot_contributions(
 \arguments{
 \item{data}{A tibble with one hit per row, with variables indicating meta-data of interest.}
 
-\item{facets}{Variable in data used for facets (i.e. sub-plots). Defaults to source (i.e. cite_source)}
+\item{facets}{Variable in data used for facets (i.e. sub-plots). Defaults to source (i.e. cite_source). Specify NULL to refrain from faceting.}
 
 \item{bars}{Variable in data used for bars. Defaults to label (i.e. cite_label)}
 

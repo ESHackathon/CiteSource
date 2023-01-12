@@ -4,10 +4,12 @@
 \alias{count_unique}
 \title{Count number of unique and non-unique citations from different sources, labels, and strings}
 \usage{
-count_unique(unique_data)
+count_unique(unique_data, include_references = FALSE)
 }
 \arguments{
 \item{unique_data}{from ASySD, merged unique rows with duplicate IDs}
+
+\item{include_references}{Should bibliographic detail be included in return?}
 }
 \value{
 dataframe with indicators of where a citation appears, with source/label/string as column
