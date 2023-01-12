@@ -30,7 +30,8 @@ included as custom fields (if they were initially provided for any of the citati
 }
 \examples{
 if (interactive()) {
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
+  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+  export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
 }
+
 }

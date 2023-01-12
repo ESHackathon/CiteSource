@@ -42,8 +42,9 @@ can easily be combined.
 }
 \examples{
 if (interactive()) {
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-export_ris(dedup_results$unique, "citations.ris")
-unique_citations2 <- reimport_ris("citations.ris")
+  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+  export_ris(dedup_results$unique, "citations.ris")
+  unique_citations2 <- reimport_ris("citations.ris")
 }
+
 }

@@ -36,9 +36,10 @@ into one long tibble with one record per line.
 }
 \examples{
 if (interactive()) {
- read_citations(c("res.ris", "res.bib"),
- cite_sources = c("CINAHL", "MEDLINE"),
- cite_strings = c("Search1", "Search2"),
- cite_labels = c("raw", "screened"))
- }
+  read_citations(c("res.ris", "res.bib"),
+    cite_sources = c("CINAHL", "MEDLINE"),
+    cite_strings = c("Search1", "Search2"),
+    cite_labels = c("raw", "screened")
+  )
+}
 }
