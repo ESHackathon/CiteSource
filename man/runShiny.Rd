@@ -4,10 +4,12 @@
 \alias{runShiny}
 \title{A wrapper function to run Shiny Apps from \code{CiteSource}.}
 \usage{
-runShiny(app = "CiteSource")
+runShiny(app = "CiteSource", offer_install = interactive())
 }
 \arguments{
 \item{app}{Defaults to CiteSource - possibly other apps will be included in the future}
+
+\item{offer_install}{Should user be prompted to install required packages if they are missing?}
 }
 \value{
 CiteSource shiny app
