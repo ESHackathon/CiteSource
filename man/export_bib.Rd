@@ -25,7 +25,8 @@ beware that \strong{any \code{note} field that might be included in \code{citati
 }
 \examples{
 if (interactive()) {
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
+  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+  export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
 }
+
 }

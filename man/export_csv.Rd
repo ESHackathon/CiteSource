@@ -20,7 +20,8 @@ Note that \emph{existing files are overwritten without warning.}
 }
 \examples{
 if (interactive()) {
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-export_csv(dedup_results$unique, "cite_sources.csv", separate = "cite_source")
+  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+  export_csv(dedup_results$unique, "cite_sources.csv", separate = "cite_source")
 }
+
 }
