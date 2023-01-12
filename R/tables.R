@@ -428,24 +428,24 @@ generate_apa_citation <- function(authors, year) {
     })
 
     citations_still_ambiguous <- citations_ambiguous %>%
-      dplyr::filter((duplicated(citation) | (duplicated(citation, fromLast = TRUE))))
+      dplyr::filter((duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE))))
 
     citations_unambiguous <- dplyr::bind_rows(citations_unambiguous, citations_ambiguous %>%
-      dplyr::filter(!(duplicated(citation) | (duplicated(citation, fromLast = TRUE)))))
+      dplyr::filter(!(duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE)))))
 
     # If some of Case 2 were in fact Case 1s (e.g., more than 2 authors with same names), they need to be further disambiguated
     citations_still_ambiguous <- citations_still_ambiguous %>%
-      dplyr::group_by(citation) %>%
+      dplyr::group_by(.data$citation) %>%
       dplyr::mutate(letter = letters[1:dplyr::n()]) %>%
       dplyr::rowwise() %>%
-      dplyr::mutate(citation = stringr::str_replace(citation, "([:digit:])\\)", glue::glue("\\1{letter})"))) %>%
+      dplyr::mutate(citation = stringr::str_replace(.data$citation, "([:digit:])\\)", glue::glue("\\1{letter})"))) %>%
       dplyr::ungroup()
 
     citations_unambiguous <- dplyr::bind_rows(citations_unambiguous, citations_still_ambiguous)
   }
   citations_unambiguous %>%
     dplyr::left_join(tibble::tibble(id), ., by = "id") %>%
-    dplyr::pull(citation)
+    dplyr::pull(.data$citation)
 }
 
 
@@ -490,7 +490,7 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
     )
   # Merge initials to names
   citations$initialed_names <- citations %>%
-    dplyr::select(last_names, initials) %>%
+    dplyr::select("last_names", "initials") %>%
     as.list() %>%
     purrr::transpose() %>%
     purrr::map(~ paste(.x[[1]], .x[[2]], sep = ", "))
