@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: document-and-check
+name: R-CMD-check
 
 jobs:
   document-and-dispatch:
