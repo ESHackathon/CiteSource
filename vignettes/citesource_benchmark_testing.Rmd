@@ -1,0 +1,100 @@
+---
+title: "CiteSource - Example: Benchmark Testing"
+
+author: "Trevor Riley"
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CiteSource - Example: Benchmark Testing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  fig.width = 6,
+  fig.height = 6
+  )
+```
+
+## About the package
+
+CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, “cite_source”, “cite_label” and “tag_naming”. In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
+
+## About this vignette
+
+When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search, the process can often be a very time consuming. 
+
+This vignette will provide an example of how one may use CiteSource not only to speed up the process of benchmarking, but use benchmarking as a way to iterate the development of search strings and strategies. 
+
+## 1. Installation of packages and loading libraries
+
+Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the ggplot2 and dplyr packages.
+
+```{r, results = FALSE, message=FALSE, warning=FALSE}
+#Install the remotes packages to enable installation from GitHub
+#install.packages("remotes")
+#library(remotes)
+
+#Install CiteSource
+#remotes::install_github("ESHackathon/CiteSource")
+
+#Load the necessary libraries
+library(CiteSource)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+```
+## Import files from multiple sources
+
+Users can import multiple RIS or bibtex files into CiteSource, which the user can label with source information such as database or platform. 
+
+```{r}
+#Import citation files from folder
+citation_files <- list.files(path= "benchmark_data", pattern = "\\.ris", full.names = TRUE)
+
+#Read in citations and specify sources. Note that labels and strings are not relevant for this use case.
+citations <- read_citations(citation_files,
+                            cite_sources = c("crimjust", "lens", "psycinfo", "pubmed", "scopus"),
+                            tag_naming = "best_guess")
+```
+
+## Deduplication and source information
+
+CiteSource allows users to merge duplicates while maintaining information in the cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. The next few steps produce the dataframes that we can use in subsequent analyses.
+
+```{r, results = FALSE, message=FALSE, warning=FALSE}
+#Deduplicate citations 
+dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+
+#Get unique citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.
+unique_citations <- dedup_results$unique
+
+#Count number of unique and non-unique citations from different sources and labels. 
+n_unique <- count_unique(unique_citations)
+
+#For each unique citation, determine which sources were present
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+
+```
+
+## Upset plot to compare discovery of benchmarking articles
+
+An upset plot is a useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. 
+
+```{r}
+#Generate a source comparison upset plot.
+plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
+```
+
+### Search summary table for analyzing individual article discovery
+
+```{r}
+citation_summary_table(unique_citations)
+
+```
