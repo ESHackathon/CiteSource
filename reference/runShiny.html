@@ -24,6 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/citesource_benchmark_testing.html">CiteSource - Example: Benchmark Testing</a>
     <a class="dropdown-item" href="../articles/citesource_example.html">CiteSource - Example workflow</a>
     <a class="dropdown-item" href="../articles/citesource_vignette.html">CiteSource</a>
     <a class="dropdown-item" href="../articles/citesource_vignette_db-topic-coverage.html">CiteSource - Example: Comparing Database Topic Coverage</a>
@@ -60,13 +61,17 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runShiny</span><span class="op">(</span>app <span class="op">=</span> <span class="st">"CiteSource"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runShiny</span><span class="op">(</span>app <span class="op">=</span> <span class="st">"CiteSource"</span>, offer_install <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>app</dt>
 <dd><p>Defaults to CiteSource - possibly other apps will be included in the future</p></dd>
+
+
+<dt>offer_install</dt>
+<dd><p>Should user be prompted to install required packages if they are missing?</p></dd>
 
 </dl></div>
     <div class="section level2">
