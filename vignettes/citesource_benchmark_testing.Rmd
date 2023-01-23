@@ -56,10 +56,12 @@ Users can import multiple RIS or bibtex files into CiteSource, which the user ca
 ```{r}
 #Import citation files from folder
 citation_files <- list.files(path= "benchmark_data", pattern = "\\.ris", full.names = TRUE)
+citation_files
 
 #Read in citations and specify sources. Note that labels and strings are not relevant for this use case.
 citations <- read_citations(citation_files,
-                            cite_sources = c("crimjust", "lens", "psycinfo", "pubmed", "scopus"),
+                            cite_sources = c("Benchmark","Search1", "Search2", "Search2", "Search2", "Search2", "Search3", "Search3", "Search3", "Search3", "Search3", "Search4", "Search4", "Search4", "Search5", "Search5", "Search5", "Search5", "Search5","Search5", "Search5", "Search5", "Search6","Search6", "Search6", "Search6" ),
+                           cite_labels = c("BenchMark", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search", "search"),
                             tag_naming = "best_guess")
 ```
 
@@ -92,9 +94,11 @@ plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
 ```
 
-### Search summary table for analyzing individual article discovery
+### Review individual records
 
 ```{r}
-citation_summary_table(unique_citations)
+unique_citations %>%
+  filter(stringr::str_detect(cite_label, "BenchMark")) %>%
+  record_level_table(return = "DT")
 
 ```
