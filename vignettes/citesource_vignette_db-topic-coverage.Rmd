@@ -180,6 +180,12 @@ When we're trying to get a sense of relative database coverage for a particular 
 # Get unique records from each source with bibliographic data
 
 unique_records <- count_unique(unique_citations, include_references = TRUE) %>% filter(unique == TRUE)
+
+# Write this dataframe to a csv file to examine the various titles contributed uniquely by each source.
+
+#write.csv(unique_records, "unique_records.csv")
+
+# Print table of unique records by source
 unique_records %>% count(cite_source)
 ```
 
