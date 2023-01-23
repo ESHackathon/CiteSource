@@ -23,7 +23,13 @@ knitr::opts_chunk$set(
 
 ## About the package
 
-CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, “cite_source”, “cite_label” and “tag_naming”. In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
+CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where only one record is selected to be retained, CiteSource retains each duplicate record and merges metadata into a single, primary record. The primary record maintains user-customized metadata in three fields, "Cite_Source", "Cite_String" and "Cite_Label". During the merging process, select metadata fields are also compared for completeness as well as length (currently DOI & Abstract). CiteSource applies the more complete (based on length) metadata to the main record.
+
+CiteSource is an R package and Shiny app that is currently in development. Work on this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis & Meta-Analysis in R Conference - ESMARConf 2022. Learn more @ https://esmarconf.org/
+
+CiteSource was created under the General Public License v3 (GPL3) find more information on GPL @ https://www.gnu.org/licenses/gpl-3.0.html
+
+The CiteSource Shiny app is available @ https://estech.shinyapps.io/citesource/ (please note that the shiny app is still under development)
 
 ## About this vignette
 
