@@ -92,7 +92,18 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ## Upset plot to compare discovery of benchmarking articles
 
-An upset plot is a useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. 
+An upset plot is a useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. Using this data we'll outline a few potential uses of this data, when looking at the discovery of benchmarking articles.
+
+Expanding a list of benchmarking articles-
+We have uploaded 55 benchmarking articles. Of these 55 articles we can see that all but 6 have been found across the six searches. We can see the number benchmarking articles that were discovered by each string as well as the number of articles that were shared between searches. 
+
+Looking at the first column we can see that 9 benchmarking articles were found across every search. One may hypthesize that the 140 citations that follow in the second column may have a high number of relevant articles due to the fact that they were also discovered across the 6 searches. If a researcher was interested in building a larger group of benchmarking articles, it's possible that they may want to review these articles first.
+
+Excluding a search due to low precision-
+Looking at the plot we can see that search #5 has the largest number of results, well over 6k. Of these, 5,964 are unique to that search. We can also see that search #5 discovers 3 benchmarking articles that would have otherwise not been found had the search not been employed. While a researcher may want to ensure that they capture the highest number of benchmarking articles, the addition of ~6k articles may not be efficient when the result is only 3 benchmarking articles. Instead of including this search in their final strategy, they may consider reviewing the three articles that were found by this search and work to adjust their other searches instead.
+
+Another decision in this case may be to drop search #4 and #6 as each of these strings do not contribute uniquely to the discovery of any benchmarking articles. While the data backs up this decision, there may also be more to consider. For example, if benchmarking articles are bias for any known reason, certain search strategies may be employed with an understanding that benchmarking data may not accurately reflect their potential contribution. (ex. benchmarking articles were gathered from previous systematic reviews that focused on a specific geographic region and the current review is global in nature). 
+
 
 ```{r}
 #Generate a source comparison upset plot.
