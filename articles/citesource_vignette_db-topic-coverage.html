@@ -311,6 +311,12 @@ find the unique records contributed by single sources.</p>
 <code class="sourceCode R"><span><span class="co"># Get unique records from each source with bibliographic data</span></span>
 <span></span>
 <span><span class="va">unique_records</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span>, include_references <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">unique</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Write this dataframe to a csv file to examine the various titles contributed uniquely by each source.</span></span>
+<span></span>
+<span><span class="co">#write.csv(unique_records, "unique_records.csv")</span></span>
+<span></span>
+<span><span class="co"># Print table of unique records by source</span></span>
 <span><span class="va">unique_records</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">cite_source</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 2</span></span></span>
 <span><span class="co">#&gt;   cite_source     n</span></span>
