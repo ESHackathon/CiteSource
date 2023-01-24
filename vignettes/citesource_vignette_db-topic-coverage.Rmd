@@ -134,20 +134,15 @@ We can also look at proportions. Interestingly, Lens seems to have the greatest 
 ```{r}
 # Starting from the plot_contributions function
 p <- plot_contributions(n_unique, bars = cite_source, facets = NULL)
+
+# Reset plot layers
 p$layers <- NULL
+
+# Use ggplot to make plot adjustments
 p + geom_bar(position = "fill") +
   scale_y_continuous(labels = scales::percent)
 
-# Starting from scratch
-n_unique %>%
-  count(cite_source, type) %>%
-  group_by(cite_source) %>%
-  mutate(perc = n / sum(n)) %>%
-  ggplot(aes(fill = type, x = cite_source, y = perc)) +
-  geom_bar(stat = "identity") +
-  xlab("") +
-  ylab("Share of citations") +
-  scale_y_continuous(labels = scales::percent)
+
 ```
 
 ### Bar plot with labels
@@ -157,19 +152,16 @@ And one more option: a labeled bar plot with dodged bars. This is useful if we h
 ```{r}
 # Generate dodged bar plot Unique/Crossover PER Source with labels
 p <- plot_contributions(n_unique, bars = cite_source, facets = NULL)
+
+# Reset plot layers
 p$layers <- NULL
+
+# Use ggplot to make plot adjustments
 p + geom_bar(position = position_dodge(width = 0.5)) +
   xlab("") +
   ylab("Number of citations") +
   geom_text(stat = "count", aes(label = after_stat(count)))
 
-# Starting from scratch
-n_unique %>%
-  ggplot(aes(fill = unique, x = cite_source)) +
-  geom_bar(position = position_dodge(width = 0.5)) +
-  xlab("") +
-  ylab("Number of citations") +
-  geom_text(stat = "count", aes(label = after_stat(count)))
 ```
 
 ## Analyzing unique contributions
