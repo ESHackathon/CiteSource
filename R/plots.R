@@ -258,17 +258,18 @@ cite_source <- cite_label <- type <- NULL
 #'   color_order = c("unique", "duplicated")
 #' )
 #'
-plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, center = FALSE, bar_order = "keep", facet_order = "keep", color_order = "keep", totals_in_legend = TRUE) {
+plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, 
+                               center = FALSE, bar_order = "keep", facet_order = "keep", 
+                               color_order = "keep", totals_in_legend = TRUE) {
+  
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
-
-  if (!is.null(facets)) facets <- rlang::enquo(facets)
-
+  facets <- rlang::enquo(facets)
 
   if (!rlang::as_name(bars) %in% colnames(data)) stop("Column ", rlang::as_name(bars), " not found in data.")
   if (!rlang::as_name(color) %in% colnames(data)) stop("Column ", rlang::as_name(color), " not found in data.")
 
-  if (!is.null(facets) && !rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data.")
+  if (!rlang::quo_is_null(facets) && !rlang::as_name(facets) %in% colnames(data)) stop("Column ", rlang::as_name(facets), " not found in data.")
 
 
   if (!(length(color_order) == 1 && color_order == "keep")) {
@@ -291,7 +292,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::geom_bar() +
       ggplot2::labs(y = "Citations")
 
-    if (!is.null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
+    if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
   } else {
     vals <- levels(data %>% dplyr::select(!!color) %>% dplyr::pull() %>% forcats::as_factor())
 
@@ -313,7 +314,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) + # make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5)
 
-    if (!is.null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
+    if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
   }
 
   if (totals_in_legend == TRUE) {

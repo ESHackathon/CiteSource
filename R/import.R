@@ -132,8 +132,8 @@ read_citations <- function(files,
     report <- data.frame(
       file = basename(files),
       cite_source = cite_sources,
-      cite_string = ifelse(is.null(cite_strings), NA, cite_strings),
-      cite_label = ifelse(is.null(cite_labels), NA, cite_labels),
+      cite_string = if (is.null(cite_strings)) NA_character_ else cite_strings,
+      cite_label = if (is.null(cite_labels)) NA_character_ else cite_labels,
       citations = ref_counts
     )
 
