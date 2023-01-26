@@ -44,7 +44,7 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
       tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
       unique() %>%
       tidyr::pivot_wider(
-        id_col = .data$duplicate_id, names_prefix = "source__", names_from = .data$cite_source, values_from = .data$cite_source,
+        id_cols = .data$duplicate_id, names_prefix = "source__", names_from = .data$cite_source, values_from = .data$cite_source,
         values_fn = function(x) TRUE,
         values_fill = FALSE
       )
@@ -59,7 +59,7 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
       tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
       unique() %>%
       tidyr::pivot_wider(
-        id_col = .data$duplicate_id, names_prefix = "string__", names_from = .data$cite_string, values_from = .data$cite_string,
+        id_cols = .data$duplicate_id, names_prefix = "string__", names_from = .data$cite_string, values_from = .data$cite_string,
         values_fn = function(x) TRUE,
         values_fill = FALSE
       )
@@ -74,7 +74,7 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
       tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
       unique() %>%
       tidyr::pivot_wider(
-        id_col = .data$duplicate_id, names_prefix = "label__", names_from = .data$cite_label,
+        id_cols = .data$duplicate_id, names_prefix = "label__", names_from = .data$cite_label,
         values_from = .data$cite_label,
         values_fn = function(x) TRUE,
         values_fill = FALSE
