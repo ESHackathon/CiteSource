@@ -27,7 +27,7 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
         tidyr::separate_rows(1, sep = ", ", convert = TRUE) %>%
         unique() %>%
         tidyr::pivot_wider(
-          id_col = .data$duplicate_id, names_prefix = paste0(stringr::str_remove(x, "cite_"), "_"),
+          id_cols = .data$duplicate_id, names_prefix = paste0(stringr::str_remove(x, "cite_"), "_"),
           names_from = 1, values_from = c(.data$record_ids),
           values_fn = function(x) TRUE,
           values_fill = FALSE
