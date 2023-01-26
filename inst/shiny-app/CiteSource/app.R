@@ -176,6 +176,12 @@ server <- function(input, output, session) {
       upload_df <- dplyr::left_join(upload_df, df, by=c("cite_source"="suggested_source")) %>%
         dplyr::select(-label, -string) %>%
         dplyr::select(cite_source, cite_label, cite_string, everything()) 
+       
+      # make sure required cols are present
+      required_cols <- c("title", "doi", "label","isbn","source",
+                     "year", "journal", "pages", "volume", "number",
+                     "abstract")
+      upload_df[required_cols[!(required_cols %in% colnames(upload_df))]] = NA
       
       df <- dplyr::left_join(upload_length, df, by=c("source" = "suggested_source")) %>%
         dplyr::select(file.name,records, source, label, string)
