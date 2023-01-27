@@ -79,7 +79,7 @@
       <img src="" class="logo" alt=""><h1>CiteSource - Example: Validating Usefullness of Databases Pre-Screening</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-01-24</h4>
+            <h4 data-toc-skip class="date">2023-01-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_vignette_db-pre-screen_validation.Rmd" class="external-link"><code>vignettes/citesource_vignette_db-pre-screen_validation.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_vignette_db-pre-screen_validation.Rmd</code></div>
@@ -168,10 +168,10 @@ platform.</p>
 <span>                            tag_naming <span class="op">=</span> <span class="st">"best_guess"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;              file cite_source cite_string cite_label citations</span></span>
-<span><span class="co">#&gt; 1   benchmark.ris        &lt;NA&gt;          NA  benchmark        13</span></span>
-<span><span class="co">#&gt; 2 psycinfo_64.ris    psycinfo          NA  benchmark        64</span></span>
-<span><span class="co">#&gt; 3   pubmed_46.ris      pubmed          NA  benchmark        46</span></span>
-<span><span class="co">#&gt; 4      WoS_79.ris         wos          NA  benchmark        79</span></span></code></pre></div>
+<span><span class="co">#&gt; 1   benchmark.ris        &lt;NA&gt;        &lt;NA&gt;  benchmark        13</span></span>
+<span><span class="co">#&gt; 2 psycinfo_64.ris    psycinfo        &lt;NA&gt;     search        64</span></span>
+<span><span class="co">#&gt; 3   pubmed_46.ris      pubmed        &lt;NA&gt;     search        46</span></span>
+<span><span class="co">#&gt; 4      WoS_79.ris         wos        &lt;NA&gt;     search        79</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="deduplication-and-source-information">Deduplication and source information<a class="anchor" aria-label="anchor" href="#deduplication-and-source-information"></a>
@@ -306,13 +306,13 @@ screening_label = c(“benchmark”))</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Generate search summary table</span></span>
 <span><span class="fu"><a href="../reference/citation_summary_table.html">citation_summary_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, screening_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"benchmark"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div id="lbaeuffslm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tydqfaiyhk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 html {
   font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#lbaeuffslm .gt_table {
+#tydqfaiyhk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -337,7 +337,7 @@ html {
   border-left-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_heading {
+#tydqfaiyhk .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -349,12 +349,12 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_caption {
+#tydqfaiyhk .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#lbaeuffslm .gt_title {
+#tydqfaiyhk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -366,7 +366,7 @@ html {
   border-bottom-width: 0;
 }
 
-#lbaeuffslm .gt_subtitle {
+#tydqfaiyhk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -378,13 +378,13 @@ html {
   border-top-width: 0;
 }
 
-#lbaeuffslm .gt_bottom_border {
+#tydqfaiyhk .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_col_headings {
+#tydqfaiyhk .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -399,7 +399,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_col_heading {
+#tydqfaiyhk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -419,7 +419,7 @@ html {
   overflow-x: hidden;
 }
 
-#lbaeuffslm .gt_column_spanner_outer {
+#tydqfaiyhk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -431,15 +431,15 @@ html {
   padding-right: 4px;
 }
 
-#lbaeuffslm .gt_column_spanner_outer:first-child {
+#tydqfaiyhk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lbaeuffslm .gt_column_spanner_outer:last-child {
+#tydqfaiyhk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lbaeuffslm .gt_column_spanner {
+#tydqfaiyhk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -451,7 +451,7 @@ html {
   width: 100%;
 }
 
-#lbaeuffslm .gt_group_heading {
+#tydqfaiyhk .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -477,7 +477,7 @@ html {
   text-align: left;
 }
 
-#lbaeuffslm .gt_empty_group_heading {
+#tydqfaiyhk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #BEBEBE;
@@ -492,15 +492,15 @@ html {
   vertical-align: middle;
 }
 
-#lbaeuffslm .gt_from_md > :first-child {
+#tydqfaiyhk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lbaeuffslm .gt_from_md > :last-child {
+#tydqfaiyhk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lbaeuffslm .gt_row {
+#tydqfaiyhk .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -519,7 +519,7 @@ html {
   overflow-x: hidden;
 }
 
-#lbaeuffslm .gt_stub {
+#tydqfaiyhk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -532,7 +532,7 @@ html {
   padding-right: 5px;
 }
 
-#lbaeuffslm .gt_stub_row_group {
+#tydqfaiyhk .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -546,11 +546,11 @@ html {
   vertical-align: top;
 }
 
-#lbaeuffslm .gt_row_group_first td {
+#tydqfaiyhk .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#lbaeuffslm .gt_summary_row {
+#tydqfaiyhk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -560,16 +560,16 @@ html {
   padding-right: 5px;
 }
 
-#lbaeuffslm .gt_first_summary_row {
+#tydqfaiyhk .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_first_summary_row.thick {
+#tydqfaiyhk .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#lbaeuffslm .gt_last_summary_row {
+#tydqfaiyhk .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -579,7 +579,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_grand_summary_row {
+#tydqfaiyhk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -589,7 +589,7 @@ html {
   padding-right: 5px;
 }
 
-#lbaeuffslm .gt_first_grand_summary_row {
+#tydqfaiyhk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -599,11 +599,11 @@ html {
   border-top-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_striped {
+#tydqfaiyhk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lbaeuffslm .gt_table_body {
+#tydqfaiyhk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -612,7 +612,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_footnotes {
+#tydqfaiyhk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -626,7 +626,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_footnote {
+#tydqfaiyhk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -635,7 +635,7 @@ html {
   padding-right: 5px;
 }
 
-#lbaeuffslm .gt_sourcenotes {
+#tydqfaiyhk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -649,7 +649,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#lbaeuffslm .gt_sourcenote {
+#tydqfaiyhk .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -657,64 +657,64 @@ html {
   padding-right: 5px;
 }
 
-#lbaeuffslm .gt_left {
+#tydqfaiyhk .gt_left {
   text-align: left;
 }
 
-#lbaeuffslm .gt_center {
+#tydqfaiyhk .gt_center {
   text-align: center;
 }
 
-#lbaeuffslm .gt_right {
+#tydqfaiyhk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lbaeuffslm .gt_font_normal {
+#tydqfaiyhk .gt_font_normal {
   font-weight: normal;
 }
 
-#lbaeuffslm .gt_font_bold {
+#tydqfaiyhk .gt_font_bold {
   font-weight: bold;
 }
 
-#lbaeuffslm .gt_font_italic {
+#tydqfaiyhk .gt_font_italic {
   font-style: italic;
 }
 
-#lbaeuffslm .gt_super {
+#tydqfaiyhk .gt_super {
   font-size: 65%;
 }
 
-#lbaeuffslm .gt_footnote_marks {
+#tydqfaiyhk .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#lbaeuffslm .gt_asterisk {
+#tydqfaiyhk .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#lbaeuffslm .gt_indent_1 {
+#tydqfaiyhk .gt_indent_1 {
   text-indent: 5px;
 }
 
-#lbaeuffslm .gt_indent_2 {
+#tydqfaiyhk .gt_indent_2 {
   text-indent: 10px;
 }
 
-#lbaeuffslm .gt_indent_3 {
+#tydqfaiyhk .gt_indent_3 {
   text-indent: 15px;
 }
 
-#lbaeuffslm .gt_indent_4 {
+#tydqfaiyhk .gt_indent_4 {
   text-indent: 20px;
 }
 
-#lbaeuffslm .gt_indent_5 {
+#tydqfaiyhk .gt_indent_5 {
   text-indent: 25px;
 }
 

@@ -80,7 +80,7 @@
                         <h4 data-toc-skip class="author">Trevor
 Riley</h4>
             
-            <h4 data-toc-skip class="date">2023-01-24</h4>
+            <h4 data-toc-skip class="date">2023-01-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_working_example_long.rmd" class="external-link"><code>vignettes/citesource_working_example_long.rmd</code></a></small>
       <div class="d-none name"><code>citesource_working_example_long.rmd</code></div>
@@ -181,18 +181,18 @@ records and final included studies.</p>
 <span><span class="co">#&gt; 1          AGRIS.ris       AGRIS        &lt;NA&gt;     search        12</span></span>
 <span><span class="co">#&gt; 2            CAB.ris         CAB        &lt;NA&gt;     search       687</span></span>
 <span><span class="co">#&gt; 3        EconLit.ris     EconLit        &lt;NA&gt;     search        50</span></span>
-<span><span class="co">#&gt; 4          Final.ris        &lt;NA&gt;        &lt;NA&gt;     search       243</span></span>
+<span><span class="co">#&gt; 4          Final.ris        &lt;NA&gt;        &lt;NA&gt;      Final       243</span></span>
 <span><span class="co">#&gt; 5      GreenFile.ris   GreenFile        &lt;NA&gt;     search       139</span></span>
-<span><span class="co">#&gt; 6        McK_exc.ris         McK        &lt;NA&gt;     search      2099</span></span>
-<span><span class="co">#&gt; 7        McK_inc.ris         McK        &lt;NA&gt;     search       562</span></span>
-<span><span class="co">#&gt; 8      RM_Bowler.ris         RMB        &lt;NA&gt;     search        70</span></span>
-<span><span class="co">#&gt; 9     RM_Leisher.ris         RML        &lt;NA&gt;     search        17</span></span>
-<span><span class="co">#&gt; 10     RM_Pullin.ris       RMPul        &lt;NA&gt;     search        98</span></span>
-<span><span class="co">#&gt; 11       RM_Puri.ris       RMPur        &lt;NA&gt;     search       118</span></span>
-<span><span class="co">#&gt; 12        RM_Roe.ris         RMR        &lt;NA&gt;     search       188</span></span>
-<span><span class="co">#&gt; 13 RM_Sammii_DFM.ris       RMDFM        &lt;NA&gt;     search        19</span></span>
-<span><span class="co">#&gt; 14 RM_Sammii_PES.ris       RMPES        &lt;NA&gt;     search        20</span></span>
-<span><span class="co">#&gt; 15          TiAb.ris        &lt;NA&gt;        &lt;NA&gt;     search      1574</span></span>
+<span><span class="co">#&gt; 6        McK_exc.ris         McK        McKE     search      2099</span></span>
+<span><span class="co">#&gt; 7        McK_inc.ris         McK        MCKI     search       562</span></span>
+<span><span class="co">#&gt; 8      RM_Bowler.ris         RMB           B     search        70</span></span>
+<span><span class="co">#&gt; 9     RM_Leisher.ris         RML           L     search        17</span></span>
+<span><span class="co">#&gt; 10     RM_Pullin.ris       RMPul         Pul     search        98</span></span>
+<span><span class="co">#&gt; 11       RM_Puri.ris       RMPur         Pur     search       118</span></span>
+<span><span class="co">#&gt; 12        RM_Roe.ris         RMR         RMR     search       188</span></span>
+<span><span class="co">#&gt; 13 RM_Sammii_DFM.ris       RMDFM         DFM     search        19</span></span>
+<span><span class="co">#&gt; 14 RM_Sammii_PES.ris       RMPES         PES     search        20</span></span>
+<span><span class="co">#&gt; 15          TiAb.ris        &lt;NA&gt;        &lt;NA&gt;   Screened      1574</span></span>
 <span><span class="co">#&gt; 16     WoS_early.ris         WoS        &lt;NA&gt;     search      2550</span></span>
 <span><span class="co">#&gt; 17     WoS_later.ris        WoSE        &lt;NA&gt;     search       738</span></span>
 <span></span>
@@ -270,18 +270,18 @@ source. To keep it simple, this can be restricted to a specific number
 (<code>top_n</code>) of sources.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/citation_summary_table.html">citation_summary_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, screening_label <span class="op">=</span> <span class="st">"Final"</span>, top_n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in compare_sources(citations, c("labels", comparison_type)): Beware: 198</span></span>
-<span><span class="co">#&gt; records were not included in label__search but in other labels. *If* this label</span></span>
-<span><span class="co">#&gt; indicates the full search stage, this might indicate that you ommitted a source,</span></span>
-<span><span class="co">#&gt; or that the deduplication did not go right. Please treat results with caution</span></span>
-<span><span class="co">#&gt; until you fix this, e.g., by using export_csv and then reimport_csv.</span></span></code></pre></div>
-<div id="ztstlwgiti" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<span><span class="co">#&gt; Warning in compare_sources(citations, c("labels", comparison_type)): Beware:</span></span>
+<span><span class="co">#&gt; 198 records were not included in label__search but in other labels. *If* this</span></span>
+<span><span class="co">#&gt; label indicates the full search stage, this might indicate that you ommitted a</span></span>
+<span><span class="co">#&gt; source, or that the deduplication did not go right. Please treat results with</span></span>
+<span><span class="co">#&gt; caution until you fix this, e.g., by using export_csv and then reimport_csv.</span></span></code></pre></div>
+<div id="gzizwtjwqn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 html {
   font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ztstlwgiti .gt_table {
+#gzizwtjwqn .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -306,7 +306,7 @@ html {
   border-left-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_heading {
+#gzizwtjwqn .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -318,12 +318,12 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_caption {
+#gzizwtjwqn .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ztstlwgiti .gt_title {
+#gzizwtjwqn .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -335,7 +335,7 @@ html {
   border-bottom-width: 0;
 }
 
-#ztstlwgiti .gt_subtitle {
+#gzizwtjwqn .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -347,13 +347,13 @@ html {
   border-top-width: 0;
 }
 
-#ztstlwgiti .gt_bottom_border {
+#gzizwtjwqn .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_col_headings {
+#gzizwtjwqn .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -368,7 +368,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_col_heading {
+#gzizwtjwqn .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -388,7 +388,7 @@ html {
   overflow-x: hidden;
 }
 
-#ztstlwgiti .gt_column_spanner_outer {
+#gzizwtjwqn .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -400,15 +400,15 @@ html {
   padding-right: 4px;
 }
 
-#ztstlwgiti .gt_column_spanner_outer:first-child {
+#gzizwtjwqn .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ztstlwgiti .gt_column_spanner_outer:last-child {
+#gzizwtjwqn .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ztstlwgiti .gt_column_spanner {
+#gzizwtjwqn .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -420,7 +420,7 @@ html {
   width: 100%;
 }
 
-#ztstlwgiti .gt_group_heading {
+#gzizwtjwqn .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -446,7 +446,7 @@ html {
   text-align: left;
 }
 
-#ztstlwgiti .gt_empty_group_heading {
+#gzizwtjwqn .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #BEBEBE;
@@ -461,15 +461,15 @@ html {
   vertical-align: middle;
 }
 
-#ztstlwgiti .gt_from_md > :first-child {
+#gzizwtjwqn .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ztstlwgiti .gt_from_md > :last-child {
+#gzizwtjwqn .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ztstlwgiti .gt_row {
+#gzizwtjwqn .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -488,7 +488,7 @@ html {
   overflow-x: hidden;
 }
 
-#ztstlwgiti .gt_stub {
+#gzizwtjwqn .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -501,7 +501,7 @@ html {
   padding-right: 5px;
 }
 
-#ztstlwgiti .gt_stub_row_group {
+#gzizwtjwqn .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -515,11 +515,11 @@ html {
   vertical-align: top;
 }
 
-#ztstlwgiti .gt_row_group_first td {
+#gzizwtjwqn .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ztstlwgiti .gt_summary_row {
+#gzizwtjwqn .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -529,16 +529,16 @@ html {
   padding-right: 5px;
 }
 
-#ztstlwgiti .gt_first_summary_row {
+#gzizwtjwqn .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_first_summary_row.thick {
+#gzizwtjwqn .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ztstlwgiti .gt_last_summary_row {
+#gzizwtjwqn .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -548,7 +548,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_grand_summary_row {
+#gzizwtjwqn .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -558,7 +558,7 @@ html {
   padding-right: 5px;
 }
 
-#ztstlwgiti .gt_first_grand_summary_row {
+#gzizwtjwqn .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -568,11 +568,11 @@ html {
   border-top-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_striped {
+#gzizwtjwqn .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ztstlwgiti .gt_table_body {
+#gzizwtjwqn .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -581,7 +581,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_footnotes {
+#gzizwtjwqn .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -595,7 +595,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_footnote {
+#gzizwtjwqn .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -604,7 +604,7 @@ html {
   padding-right: 5px;
 }
 
-#ztstlwgiti .gt_sourcenotes {
+#gzizwtjwqn .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -618,7 +618,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ztstlwgiti .gt_sourcenote {
+#gzizwtjwqn .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -626,64 +626,64 @@ html {
   padding-right: 5px;
 }
 
-#ztstlwgiti .gt_left {
+#gzizwtjwqn .gt_left {
   text-align: left;
 }
 
-#ztstlwgiti .gt_center {
+#gzizwtjwqn .gt_center {
   text-align: center;
 }
 
-#ztstlwgiti .gt_right {
+#gzizwtjwqn .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ztstlwgiti .gt_font_normal {
+#gzizwtjwqn .gt_font_normal {
   font-weight: normal;
 }
 
-#ztstlwgiti .gt_font_bold {
+#gzizwtjwqn .gt_font_bold {
   font-weight: bold;
 }
 
-#ztstlwgiti .gt_font_italic {
+#gzizwtjwqn .gt_font_italic {
   font-style: italic;
 }
 
-#ztstlwgiti .gt_super {
+#gzizwtjwqn .gt_super {
   font-size: 65%;
 }
 
-#ztstlwgiti .gt_footnote_marks {
+#gzizwtjwqn .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#ztstlwgiti .gt_asterisk {
+#gzizwtjwqn .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ztstlwgiti .gt_indent_1 {
+#gzizwtjwqn .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ztstlwgiti .gt_indent_2 {
+#gzizwtjwqn .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ztstlwgiti .gt_indent_3 {
+#gzizwtjwqn .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ztstlwgiti .gt_indent_4 {
+#gzizwtjwqn .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ztstlwgiti .gt_indent_5 {
+#gzizwtjwqn .gt_indent_5 {
   text-indent: 25px;
 }
 
@@ -850,18 +850,18 @@ tbody tr:last-child {
 grouping is to be explored.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/citation_summary_table.html">citation_summary_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, comparison_type <span class="op">=</span> <span class="st">"strings"</span>, screening_label <span class="op">=</span> <span class="st">"Final"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in compare_sources(citations, c("labels", comparison_type)): Beware: 198</span></span>
-<span><span class="co">#&gt; records were not included in label__search but in other labels. *If* this label</span></span>
-<span><span class="co">#&gt; indicates the full search stage, this might indicate that you ommitted a source,</span></span>
-<span><span class="co">#&gt; or that the deduplication did not go right. Please treat results with caution</span></span>
-<span><span class="co">#&gt; until you fix this, e.g., by using export_csv and then reimport_csv.</span></span></code></pre></div>
-<div id="djnrrywxgl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<span><span class="co">#&gt; Warning in compare_sources(citations, c("labels", comparison_type)): Beware:</span></span>
+<span><span class="co">#&gt; 198 records were not included in label__search but in other labels. *If* this</span></span>
+<span><span class="co">#&gt; label indicates the full search stage, this might indicate that you ommitted a</span></span>
+<span><span class="co">#&gt; source, or that the deduplication did not go right. Please treat results with</span></span>
+<span><span class="co">#&gt; caution until you fix this, e.g., by using export_csv and then reimport_csv.</span></span></code></pre></div>
+<div id="mlfvrieswg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 html {
   font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#djnrrywxgl .gt_table {
+#mlfvrieswg .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -886,7 +886,7 @@ html {
   border-left-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_heading {
+#mlfvrieswg .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -898,12 +898,12 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_caption {
+#mlfvrieswg .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#djnrrywxgl .gt_title {
+#mlfvrieswg .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -915,7 +915,7 @@ html {
   border-bottom-width: 0;
 }
 
-#djnrrywxgl .gt_subtitle {
+#mlfvrieswg .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -927,13 +927,13 @@ html {
   border-top-width: 0;
 }
 
-#djnrrywxgl .gt_bottom_border {
+#mlfvrieswg .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_col_headings {
+#mlfvrieswg .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -948,7 +948,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_col_heading {
+#mlfvrieswg .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -968,7 +968,7 @@ html {
   overflow-x: hidden;
 }
 
-#djnrrywxgl .gt_column_spanner_outer {
+#mlfvrieswg .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -980,15 +980,15 @@ html {
   padding-right: 4px;
 }
 
-#djnrrywxgl .gt_column_spanner_outer:first-child {
+#mlfvrieswg .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#djnrrywxgl .gt_column_spanner_outer:last-child {
+#mlfvrieswg .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#djnrrywxgl .gt_column_spanner {
+#mlfvrieswg .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1000,7 +1000,7 @@ html {
   width: 100%;
 }
 
-#djnrrywxgl .gt_group_heading {
+#mlfvrieswg .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1026,7 +1026,7 @@ html {
   text-align: left;
 }
 
-#djnrrywxgl .gt_empty_group_heading {
+#mlfvrieswg .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #BEBEBE;
@@ -1041,15 +1041,15 @@ html {
   vertical-align: middle;
 }
 
-#djnrrywxgl .gt_from_md > :first-child {
+#mlfvrieswg .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#djnrrywxgl .gt_from_md > :last-child {
+#mlfvrieswg .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#djnrrywxgl .gt_row {
+#mlfvrieswg .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -1068,7 +1068,7 @@ html {
   overflow-x: hidden;
 }
 
-#djnrrywxgl .gt_stub {
+#mlfvrieswg .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -1081,7 +1081,7 @@ html {
   padding-right: 5px;
 }
 
-#djnrrywxgl .gt_stub_row_group {
+#mlfvrieswg .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1095,11 +1095,11 @@ html {
   vertical-align: top;
 }
 
-#djnrrywxgl .gt_row_group_first td {
+#mlfvrieswg .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#djnrrywxgl .gt_summary_row {
+#mlfvrieswg .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1109,16 +1109,16 @@ html {
   padding-right: 5px;
 }
 
-#djnrrywxgl .gt_first_summary_row {
+#mlfvrieswg .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_first_summary_row.thick {
+#mlfvrieswg .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#djnrrywxgl .gt_last_summary_row {
+#mlfvrieswg .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1128,7 +1128,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_grand_summary_row {
+#mlfvrieswg .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1138,7 +1138,7 @@ html {
   padding-right: 5px;
 }
 
-#djnrrywxgl .gt_first_grand_summary_row {
+#mlfvrieswg .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1148,11 +1148,11 @@ html {
   border-top-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_striped {
+#mlfvrieswg .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#djnrrywxgl .gt_table_body {
+#mlfvrieswg .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1161,7 +1161,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_footnotes {
+#mlfvrieswg .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1175,7 +1175,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_footnote {
+#mlfvrieswg .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1184,7 +1184,7 @@ html {
   padding-right: 5px;
 }
 
-#djnrrywxgl .gt_sourcenotes {
+#mlfvrieswg .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1198,7 +1198,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#djnrrywxgl .gt_sourcenote {
+#mlfvrieswg .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1206,64 +1206,64 @@ html {
   padding-right: 5px;
 }
 
-#djnrrywxgl .gt_left {
+#mlfvrieswg .gt_left {
   text-align: left;
 }
 
-#djnrrywxgl .gt_center {
+#mlfvrieswg .gt_center {
   text-align: center;
 }
 
-#djnrrywxgl .gt_right {
+#mlfvrieswg .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#djnrrywxgl .gt_font_normal {
+#mlfvrieswg .gt_font_normal {
   font-weight: normal;
 }
 
-#djnrrywxgl .gt_font_bold {
+#mlfvrieswg .gt_font_bold {
   font-weight: bold;
 }
 
-#djnrrywxgl .gt_font_italic {
+#mlfvrieswg .gt_font_italic {
   font-style: italic;
 }
 
-#djnrrywxgl .gt_super {
+#mlfvrieswg .gt_super {
   font-size: 65%;
 }
 
-#djnrrywxgl .gt_footnote_marks {
+#mlfvrieswg .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#djnrrywxgl .gt_asterisk {
+#mlfvrieswg .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#djnrrywxgl .gt_indent_1 {
+#mlfvrieswg .gt_indent_1 {
   text-indent: 5px;
 }
 
-#djnrrywxgl .gt_indent_2 {
+#mlfvrieswg .gt_indent_2 {
   text-indent: 10px;
 }
 
-#djnrrywxgl .gt_indent_3 {
+#mlfvrieswg .gt_indent_3 {
   text-indent: 15px;
 }
 
-#djnrrywxgl .gt_indent_4 {
+#mlfvrieswg .gt_indent_4 {
   text-indent: 20px;
 }
 
-#djnrrywxgl .gt_indent_5 {
+#mlfvrieswg .gt_indent_5 {
   text-indent: 25px;
 }
 
