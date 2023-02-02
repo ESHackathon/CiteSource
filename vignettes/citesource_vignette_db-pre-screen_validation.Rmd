@@ -1,12 +1,12 @@
 ---
-title: "CiteSource - Example: Validating Usefullness of Databases Pre-Screening"
+title: "CiteSource - Example: Assessing Usefulness of Databases for Evidence Synthesis"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Example: Validating Usefullness of Databases Pre-Screening}
+  %\VignetteIndexEntry{CiteSource - Example: Assessing Usefulness of Databases for Evidence Synthesis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,17 +21,14 @@ knitr::opts_chunk$set(
   fig.height = 6
   )
 ```
-## About the package
-
-CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, “cite_source”, “cite_label” and “tag_naming”. In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
 
 ## About this vignette
 
-In the process of developing search strategies for evidence synthesis, it is standard practice to test different versions of a search in the main database and examine the records gained and lost with changes to the search string and to test different searches against a set of already known relevant studies (i.e., benchmark studies). In this way, the right balance between precision and sensitivity can be acheived prior to screening.
+In the process of developing search strategies for evidence synthesis, it is standard practice to test different versions of a search in the main database and examine the records gained and lost with changes to the search string and to test different searches against a set of already known relevant studies (i.e., benchmark studies). In this way, the right balance between precision and sensitivity can be achieved prior to screening.
 
-Until now, this within-database testing has been the primary method of pre-screening search validation. With CiteSource, we can now test search strategies across databases, to assess the usefullness of certain databases in a search before finalizing our database set. This adds another layer of pre-screening search validation that can further improve precision/sensitivity. This vignette provides a workflow for testing a search strategie across multiple databases and against a set of benchmark studies.
+Until now, this within-database testing has been the primary method of pre-screening search validation. With CiteSource, we can now test search strategies across databases, to assess the usefulness of certain databases in a search before finalizing our database set. This adds another layer of pre-screening search validation that can further improve precision and sensitivity. This vignette provides a workflow for testing a search strategy across multiple databases and against a set of benchmark studies.
 
-In this example, we are running a search about lonliness and gambling addiction. We developed a search strategy for PsycInfo, our main database. Now, we'd like to see if searching other databases like Web of Science and PubMed add useful records and help us find more of our benchmark studies. 
+In this example, we are running a search about loneliness and gambling addiction. We developed a search strategy for PsycInfo, our main database. Now, we'd like to see if searching other databases like Web of Science and PubMed add useful records and help us find more of our benchmark studies. 
 
 ## 1. Installation of packages and loading libraries
 
@@ -49,7 +46,6 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 library(CiteSource)
 library(ggplot2)
 library(dplyr)
-library(knitr)
 ```
 
 ## Import files from multiple sources
@@ -95,7 +91,7 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ### Heatmap by number of records
 
-A heatmap can tell us the total number of records retrieved from each database, and can be used to compare the number of overlapping records found in each pair of databases. In this example, we can see that Scopus yielded the highest number of records on gambling harms, and Criminal Justics Abstracts the least.
+A heatmap can tell us the total number of records retrieved from each database, and can be used to compare the number of overlapping records found in each pair of databases. In this example, we can see that Web of Science yielded the highest number of records on gambling addiction and loneliness, and PubMed the least.
 
 
 ```{r}
@@ -106,7 +102,7 @@ plot_source_overlap_heatmap(source_comparison)
 
 ### Heatmap by percentage of records
 
-Another way of visualizing this is a heatmap with percent overlap. We can use the `plot_type` argument to produce a percentage heatmap as follows. The total number of records appears in gray. The percentages indicate the share of records in a row also found in a column. For example, here we see that 67% of the records in Scopus were also found in PubMed. Conversely, 97% of records in PubMed were found in Scopus.
+Another way of visualizing this is a heatmap with percent overlap. We can use the `plot_type` argument to produce a percentage heatmap as follows. The total number of records appears in gray. The percentages indicate the share of records in a row also found in a column. For example, here we see that 55% of the records in Web of Science were also found in PsycInfo Conversely, 44% of records in PsycInfo were found in Web of Science.
 
 ```{r}
 #Generate heatmap with percent overlap
@@ -117,7 +113,7 @@ plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
 
 ## Plot an upset plot to compare source overlap
 
-An upset plot is another way of visualizing overlap and provides a bit more detail about the number of shared and unique records. Here, we can see that Scopus had the most unique records not found in any other database (n=35), and Criminal Justice Abstracts only had one unique record. Six records were found in every database. 
+An upset plot is another way of visualizing overlap and provides a bit more detail about the number of shared and unique records. Here, we can see that Web of Science had the most unique records not found in any other database (n=29), and PubMed only had four unique records. Twenty-four records were found in every database. 
 
 ```{r}
 #Generate a source comparison upset plot.
@@ -136,8 +132,7 @@ Bar plots can be another way of looking at overlap and uniqueness of database co
 #Generate bar plot of unique citations PER database and their contribution to the benchmark studies
 
 plot_contributions(n_unique,
-  center = TRUE,
-  bar_order = c("search", "Screened", "Final")
+  center = TRUE, facets = "cite_source"
 )
 
 ```
@@ -159,27 +154,63 @@ unique_wos <- n_unique %>%
   filter(cite_source=="wos", unique == TRUE) %>%
   inner_join(unique_citations, by = "duplicate_id")
 
-#To save these dataframes to a csv file for review, use write.csv
+#To save these dataframes to a csv file for review, use the export_csv function from CiteSource
 
-#write.csv(unique_pubmed, "unique_pubmed.csv")
+#export_csv(unique_pubmed, "pubmed.csv")
+
+```
+
+### Record-Level Table
+
+Another way to inspect the contribution of benchmark studies by each source is to use the *CiteSource* function `record_level_table`. We can filter our unique_citations dataframe to only the benchmark studies and output a convenient table that shows us which databases contained those studies. 
+
+```{r}
+#Get benchmark studies from unique_citations dataframe
+
+unique_citations %>%
+  dplyr::filter(cite_label=="benchmark") %>%
+  record_level_table(return = "DT")
+
 ```
 
 ### Search Summary Table 
 
 A search summary table can also be useful to assess each database for unique contributions to a set of benchmark studies and to calculate their sensitivity and precision scores. The *CiteSource* function `citation_summary_table` produces a useful table containing these numbers.
 
-#Note: getting an error here: Error in dplyr::summarise(., `:=`(!!comparison_type, "Total"), dplyr::across(tidyselect::where(is.numeric), : 
-
-ℹ The error occurred in group 2: stage = "search".
-Caused by error in `across()`:
-! 'where' is not an exported object from 'namespace:tidyselect'
-citation_summary_table(unique_citations, screening_label = c("benchmark"))
 
 ```{r}
 #Generate search summary table
 citation_summary_table(unique_citations, screening_label = c("benchmark"))
 
 
+```
+
+## Exporting for further analysis
+
+We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save in a convenient format for subsequent use. *CiteSource* offers a set of export functions called `export_csv`, `export_ris` or `export_bib` that will save any of our dataframes as a .csv file, .ris file or bibtex file, respectively. You can also reimport exported csv files to pick up a project or analysis without having to start from scratch, or after making manual adjustments to a file. 
+
+Generate a .csv file. The separate argument can be used to create separate columns for cite_source, cite_label or cite_string to facilitate analysis.
+
+```{r}
+#export_csv(unique_citations, filename = "unique-by-source.csv", separate = "cite_source")
+```
+
+Generate a .ris file and indicate custom field location for cite_source, cite_label or cite_string. In this example, we'll be using Zotero, so we put cite_source in the DB field (which will appear as the Archive field in Zotero) and cite_labels into N1, creating an associated Zotero note file.
+
+```{r}
+#export_ris(unique_citations, filename = "unique_citations.ris", source_field = "DB", label_field = "N1")
+```
+
+Generate a bibtex file and include data from cite_source, cite_label or cite_string.
+
+```{r}
+#export_bib(unique_citations, filename = "unique_citations.bib", include = c("sources", "labels", "strings"))
+```
+
+Reimport a file generated with export_csv. 
+
+```{r}
+#reimport_csv("unique-by-source.csv")
 ```
 
 ## In summary
