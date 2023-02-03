@@ -26,8 +26,15 @@ record_level_table <- function(citations, include = "sources", include_empty = T
       DT = "&#10004;"
     )
   }
+  
   sources <- compare_sources(citations, comp_type = include)
 
+  if (nrow(sources) == 0) {
+    warning("Citations provided contain no information on ", include, ". NA will be displayed, but check whether you intended to do a different comparison")
+  sources <- tibble::tibble(duplicate_id = citations$duplicate_id)
+   sources[[paste0(stringr::str_sub(include, 1, -2), "__NA")]] <- TRUE
+  }
+  
   if (!include_empty == TRUE) {
     citations <- citations %>% dplyr::filter(.data$duplicate_id %in% sources$duplicate_id)
   }
@@ -82,8 +89,6 @@ record_level_table <- function(citations, include = "sources", include_empty = T
           htmltools::tags$td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
         )
       )
-
-      browser()
 
       citations %>%
         dplyr::select(-"duplicate_id", -"reference") %>%
