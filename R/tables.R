@@ -83,6 +83,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
         )
       )
 
+      browser()
 
       citations %>%
         dplyr::select(-"duplicate_id", -"reference") %>%
@@ -92,7 +93,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
           extensions = "Buttons",
           options = list(
             columnDefs = list(
-              list(visible = FALSE, targets = c(0, 3, (4:(4 + ncol(to_display))))),
+              list(visible = FALSE, targets = c(0, 3:(3 + ncol(to_display)))),
               list(orderable = FALSE, className = "details-control", targets = 1)
             ),
             dom = "Bfrtip",
@@ -100,7 +101,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
               list("print", list(
                 extend = "csv", filename = "CiteSource_record_summary",
                 text = "Download csv",
-                exportOptions = list(columns = c(0, 2:(2 + ncol(to_display))))
+                exportOptions = list(columns = c(0, 2:(3 + ncol(to_display))))
               ))
           ), container = sketch,
           callback = DT::JS("
@@ -312,16 +313,15 @@ generate_apa_citation <- function(authors, year) {
   # Extract last names and initials
   processed_names <- tibble::tibble(id = id, authors = authors, year = year) %>%
     mutate(
-      last_names = stringr::str_replace_all(authors, "(,.*? and)", "__") %>% stringr::str_remove(",.*$") %>% stringr::str_split("__ "),
-      initials = stringr::str_replace_all(authors, "( and.*?, )", "__") %>% stringr::str_remove("^.*?,") %>%
-        stringr::str_split("__") %>% purrr::map(~ .x %>%
-          stringr::str_remove_all("\\.") %>%
-          stringr::str_trim() %>%
-          stringr::str_split(pattern = " ") %>%
-          purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
-          purrr::map(stringr::str_c, collapse = ". ") %>%
-          purrr::flatten_chr() %>%
-          paste0("."))
+      last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
+      initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
+        stringr::str_remove_all("\\.") %>%
+        stringr::str_trim() %>%
+        stringr::str_split(pattern = " ") %>%
+        purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
+        purrr::map(stringr::str_c, collapse = ". ") %>%
+        purrr::flatten_chr() %>%
+        paste0("."))
     )
 
   # If last name does not uniquely describe authors, first author should be disambiguated in APA style
@@ -330,9 +330,13 @@ generate_apa_citation <- function(authors, year) {
   # False negative where same initial refers to different names
   # Appears to be best balance for now - further options and instructions could be provided
 
+  # Need this to ensure that last_names and initialed_names retain same length
+
+
   last_name <- processed_names %>%
     dplyr::pull(.data$last_names) %>%
     unlist()
+
   initialed_name_list <- processed_names %>%
     dplyr::select("last_names", "initials") %>%
     as.list() %>%
@@ -472,22 +476,21 @@ generate_apa_citation <- function(authors, year) {
 
 generate_apa_reference <- function(authors, year, title, source, volume, issue, doi, weblink, return_html = FALSE, format_journal_case = TRUE) {
   id <- seq_along(authors)
-
   # Extract last names and initials
   citations <- tibble::tibble(id, authors, year, title, source, volume, issue, doi, weblink) %>%
-    dplyr::mutate(dplyr::across(.fns = ~ dplyr::na_if(.x, ""))) %>%
+    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ dplyr::na_if(.x, ""))) %>%
     mutate(
-      last_names = stringr::str_replace_all(authors, "(,.*? and)", "__") %>% stringr::str_remove(",.*$") %>% stringr::str_split("__ "),
-      initials = stringr::str_replace_all(authors, "( and.*?, )", "__") %>% stringr::str_remove("^.*?,") %>%
-        stringr::str_split("__") %>% purrr::map(~ .x %>%
-          stringr::str_remove_all("\\.") %>%
-          stringr::str_trim() %>%
-          stringr::str_split(pattern = " ") %>%
-          purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
-          purrr::map(stringr::str_c, collapse = ". ") %>%
-          purrr::flatten_chr() %>%
-          paste0("."))
+      last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
+      initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
+                                                                                    stringr::str_remove_all("\\.") %>%
+                                                                                    stringr::str_trim() %>%
+                                                                                    stringr::str_split(pattern = " ") %>%
+                                                                                    purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
+                                                                                    purrr::map(stringr::str_c, collapse = ". ") %>%
+                                                                                    purrr::flatten_chr() %>%
+                                                                                    paste0("."))
     )
+  
   # Merge initials to names
   citations$initialed_names <- citations %>%
     dplyr::select("last_names", "initials") %>%
