@@ -1,5 +1,3 @@
-#' @internal
-
 # Licensed under the MIT licence
 # YEAR: 2020
 # COPYRIGHT HOLDER: usethis authors
