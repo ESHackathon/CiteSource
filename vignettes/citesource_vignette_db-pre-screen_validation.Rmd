@@ -168,7 +168,7 @@ Another way to inspect the contribution of benchmark studies by each source is t
 #Get benchmark studies from unique_citations dataframe
 
 unique_citations %>%
-  dplyr::filter(str_detect(cite_label, "benchmark")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "benchmark")) %>%
   record_level_table(return = "DT")
 
 ```
