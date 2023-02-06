@@ -83,7 +83,7 @@
       <img src="" class="logo" alt=""><h1>CiteSource - Example: Assessing Usefulness of Databases for Evidence Synthesis</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-02-04</h4>
+            <h4 data-toc-skip class="date">2023-02-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_vignette_db-pre-screen_validation.Rmd" class="external-link"><code>vignettes/citesource_vignette_db-pre-screen_validation.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_vignette_db-pre-screen_validation.Rmd</code></div>
@@ -242,8 +242,7 @@ database to our benchmark set. In this example….</p>
 <code class="sourceCode R"><span><span class="co">#Generate bar plot of unique citations PER database and their contribution to the benchmark studies</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_contributions.html">plot_contributions</a></span><span class="op">(</span><span class="va">n_unique</span>,</span>
-<span>  center <span class="op">=</span> <span class="cn">TRUE</span>, facets <span class="op">=</span> <span class="st">"cite_source"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="citesource_vignette_db-pre-screen_validation_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
 </div>
 <div class="section level2">
@@ -291,8 +290,8 @@ that shows us which databases contained those studies.</p>
 <span><span class="va">unique_citations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">cite_label</span>, <span class="st">"benchmark"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/record_level_table.html">record_level_table</a></span><span class="op">(</span>return <span class="op">=</span> <span class="st">"DT"</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-776c291981cdd2d37e9f" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-776c291981cdd2d37e9f">{"x":{"filter":"none","vertical":false,"class":"display","extensions":["Buttons"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13"],["&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;"],["Akbieva et al. (2016)","Bernhard et al. (2007)","Blanco Miguel (2016)","Botterill et al. (2016)","Ciccarelli et al. (2022)","Cosenza et al. (2022)","Edgren et al. (2016)","McQuade & Gill (2012)","Mohamed et al. (2023)","Porter et al. (2004)","Sirola et al. (2019)","Spence-Thomas & Thomas (2003)","Trevorrow & Moore (1998)"],["Akbieva, Z., Damadaeva, A., Magomedova, S. & Ibragimova, K. (2016). Interaction of The Loneliness Phenomenon and Gambling Addiction. <i>Research Journal Of Pharmaceutical Biological And Chemical Sciences<\/i><i>, 7<\/i>(5). ","Bernhard, B. J., Dickens, D. R. & Shapiro, P. D. (2007). Gambling alone? A study of solitary and social gambling in America. <i>Unlv Gaming Research & Review Journal<\/i><i>, 11<\/i>(2). <a href = \"https://search.ebscohost.com/login.aspx?direct=true&db=psyh&AN=2007-17475-001&site=ehost-live&scope=site\">https://search.ebscohost.com/login.aspx?direct=true&db=psyh&AN=2007-17475-001&site=ehost-live&scope=site<\/a>","Blanco Miguel, P. (2016). Dealing with the negative consequences of gambling addiction. <i>Cuadernos De Trabajo Social<\/i><i>, 29<\/i>(2). <a href = \"https://doi.org/10.5209/CUTS.48858\">https://doi.org/10.5209/CUTS.48858<\/a>","Botterill, E., Gill, P., McLaren, S. & Gomez, R. (2016). Marital Status and Problem Gambling Among Australian Older Adults: The Mediating Role of Loneliness. <i>Journal Of Gambling Studies<\/i><i>, 32<\/i>(3). <a href = \"https://doi.org/10.1007/s10899-015-9575-5\">https://doi.org/10.1007/s10899-015-9575-5<\/a>","Ciccarelli, M., Nigro, G., Pizzini, B., Sacco, M., Griffiths, M. & Cosenza, M. (2022). Young, stressed, and blind-minded: An experimental investigation of the routes from loneliness to adolescent problem gambling. <i>, 11<\/i>. ","Cosenza, M., Ciccarelli, M., Pizzini, B., Griffiths, M. D., Sacco, M. & Nigro, G. (2022). The role of loneliness, negative affectivity, mentalization, and alcohol use in adolescent gambling. <i>Mediterranean Journal Of Clinical Psychology<\/i><i>, 10<\/i>(3). ","Edgren, R., Castren, S., Jokela, M. & Salonen, A. (2016). At-risk and problem gambling among Finnish youth: The examination of risky alcohol consumption, tobacco smoking, mental health and loneliness as gender-specific correlates. <i>Nordic Studies On Alcohol And Drugs<\/i><i>, 33<\/i>(1). <a href = \"https://doi.org/10.1515/nsad-2016-0005\">https://doi.org/10.1515/nsad-2016-0005<\/a>","McQuade, A. & Gill, P. (2012). The role of loneliness and self-control in predicting problem gambling behaviour. <i>Gambling Research: Journal Of The National Association For Gambling Studies (Australia)<\/i><i>, 24<\/i>(1). ","Mohamed, M., Rukh, G., Schioth, H., Vadlin, S., Olofsdotter, S., Aslund, C. & Nilsson, K. (2023). Worsened Anxiety and Loneliness Influenced Gaming and Gambling during the COVID-19 Pandemic. <i>Journal Of Clinical Medicine<\/i><i>, 12<\/i>(1). <a href = \"https://doi.org/10.3390/jcm12010249\">https://doi.org/10.3390/jcm12010249<\/a>","Porter, J., Ungar, J., Frisch, G. R. & Chopra, R. (2004). Loneliness and life dissatisfaction in gamblers. <i>Journal Of Gambling Issues<\/i>(11). <a href = \"https://doi.org/10.4309/jgi.2004.11.13\">https://doi.org/10.4309/jgi.2004.11.13<\/a>","Sirola, A., Kaakinen, M., Savolainen, F. & Oksanen, A. (2019). Loneliness and online gambling-community participation of young social media users. <i>Computers In Human Behavior<\/i><i>, 95<\/i>. <a href = \"https://doi.org/10.1016/j.chb.2019.01.023\">https://doi.org/10.1016/j.chb.2019.01.023<\/a>","Spence-Thomas, R. & Thomas, T. (2003). The impact of social isolation and loneliness in a problem gambling population. <i>, 55<\/i>. ","Trevorrow, K. & Moore, S. (1998). The association between loneliness, social isolation and women's electronic gaming machine gambling. <i>Journal Of Gambling Studies<\/i><i>, 14<\/i>(3). <a href = \"https://doi.org/10.1023/a:1022057609568\">https://doi.org/10.1023/a:1022057609568<\/a>"],[true,null,true,true,null,null,true,null,true,null,true,null,null],[false,null,false,true,null,null,false,null,true,null,false,null,null],["&#10004;",null,"&#10004;","&#10004;",null,null,"&#10004;",null,"&#10004;",null,"&#10004;",null,null],["&#x2717;",null,"&#x2717;","&#10004;",null,null,"&#x2717;",null,"&#10004;",null,"&#x2717;",null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th rowspan=\"2\" colspan=\"2\">&nbsp;<\/th>\n      <th rowspan=\"2\" colspan=\"2\">Citation<\/th>\n      <th colspan=\"4\">Source<\/th>\n    <\/tr>\n    <tr>\n      <th>wos<\/th>\n      <th>pubmed<\/th>\n      <th>wos <\/th>\n      <th>pubmed <\/th>\n    <\/tr>\n  <\/thead>\n  <tfoot>\n    <td colspan=\"8\">Click on the &oplus; to view the full reference<\/td>\n  <\/tfoot>\n<\/table>","options":{"columnDefs":[{"visible":false,"targets":[0,3,4,5]},{"orderable":false,"className":"details-control","targets":1},{"orderable":false,"targets":0}],"dom":"Bfrtip","buttons":["print",{"extend":"csv","filename":"CiteSource_record_summary","text":"Download csv","exportOptions":{"columns":[0,2,3,4,5]}}],"order":[],"autoWidth":false,"orderClasses":false},"callback":"function(table) {\n\n              table.column(1).nodes().to$().css({cursor: 'pointer'});\n              var format = function(d) {\n                return '<div style=\"background-color:#eee; padding: .5em;\">' +\n                        d[3];\n              };\n              table.on('click', 'td.details-control', function() {\n                var td = $(this), row = table.row(td.closest('tr'));\n                if (row.child.isShown()) {\n                  row.child.hide();\n                  td.html('&oplus;');\n                } else {\n                  row.child(format(row.data())).show();\n                  td.html('&CircleMinus;');\n                }\n              });\n}"},"evals":["callback"],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-a2b34186ee2a3e144f3a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a2b34186ee2a3e144f3a">{"x":{"filter":"none","vertical":false,"class":"display","extensions":["Buttons"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13"],["&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;"],["Akbieva et al. (2016)","Bernhard et al. (2007)","Blanco Miguel (2016)","Botterill et al. (2016)","Ciccarelli et al. (2022)","Cosenza et al. (2022)","Edgren et al. (2016)","McQuade & Gill (2012)","Mohamed et al. (2023)","Porter et al. (2004)","Sirola et al. (2019)","Spence-Thomas & Thomas (2003)","Trevorrow & Moore (1998)"],["Akbieva, Z., Damadaeva, A., Magomedova, S. & Ibragimova, K. (2016). Interaction of The Loneliness Phenomenon and Gambling Addiction. <i>Research Journal Of Pharmaceutical Biological And Chemical Sciences<\/i><i>, 7<\/i>(5). ","Bernhard, B. J., Dickens, D. R. & Shapiro, P. D. (2007). Gambling alone? A study of solitary and social gambling in America. <i>Unlv Gaming Research & Review Journal<\/i><i>, 11<\/i>(2). <a href = \"https://search.ebscohost.com/login.aspx?direct=true&db=psyh&AN=2007-17475-001&site=ehost-live&scope=site\">https://search.ebscohost.com/login.aspx?direct=true&db=psyh&AN=2007-17475-001&site=ehost-live&scope=site<\/a>","Blanco Miguel, P. (2016). Dealing with the negative consequences of gambling addiction. <i>Cuadernos De Trabajo Social<\/i><i>, 29<\/i>(2). <a href = \"https://doi.org/10.5209/CUTS.48858\">https://doi.org/10.5209/CUTS.48858<\/a>","Botterill, E., Gill, P., McLaren, S. & Gomez, R. (2016). Marital Status and Problem Gambling Among Australian Older Adults: The Mediating Role of Loneliness. <i>Journal Of Gambling Studies<\/i><i>, 32<\/i>(3). <a href = \"https://doi.org/10.1007/s10899-015-9575-5\">https://doi.org/10.1007/s10899-015-9575-5<\/a>","Ciccarelli, M., Nigro, G., Pizzini, B., Sacco, M., Griffiths, M. & Cosenza, M. (2022). Young, stressed, and blind-minded: An experimental investigation of the routes from loneliness to adolescent problem gambling. <i>, 11<\/i>. ","Cosenza, M., Ciccarelli, M., Pizzini, B., Griffiths, M. D., Sacco, M. & Nigro, G. (2022). The role of loneliness, negative affectivity, mentalization, and alcohol use in adolescent gambling. <i>Mediterranean Journal Of Clinical Psychology<\/i><i>, 10<\/i>(3). ","Edgren, R., Castren, S., Jokela, M. & Salonen, A. (2016). At-risk and problem gambling among Finnish youth: The examination of risky alcohol consumption, tobacco smoking, mental health and loneliness as gender-specific correlates. <i>Nordic Studies On Alcohol And Drugs<\/i><i>, 33<\/i>(1). <a href = \"https://doi.org/10.1515/nsad-2016-0005\">https://doi.org/10.1515/nsad-2016-0005<\/a>","McQuade, A. & Gill, P. (2012). The role of loneliness and self-control in predicting problem gambling behaviour. <i>Gambling Research: Journal Of The National Association For Gambling Studies (Australia)<\/i><i>, 24<\/i>(1). ","Mohamed, M., Rukh, G., Schioth, H., Vadlin, S., Olofsdotter, S., Aslund, C. & Nilsson, K. (2023). Worsened Anxiety and Loneliness Influenced Gaming and Gambling during the COVID-19 Pandemic. <i>Journal Of Clinical Medicine<\/i><i>, 12<\/i>(1). <a href = \"https://doi.org/10.3390/jcm12010249\">https://doi.org/10.3390/jcm12010249<\/a>","Porter, J., Ungar, J., Frisch, G. R. & Chopra, R. (2004). Loneliness and life dissatisfaction in gamblers. <i>Journal Of Gambling Issues<\/i>(11). <a href = \"https://doi.org/10.4309/jgi.2004.11.13\">https://doi.org/10.4309/jgi.2004.11.13<\/a>","Sirola, A., Kaakinen, M., Savolainen, F. & Oksanen, A. (2019). Loneliness and online gambling-community participation of young social media users. <i>Computers In Human Behavior<\/i><i>, 95<\/i>. <a href = \"https://doi.org/10.1016/j.chb.2019.01.023\">https://doi.org/10.1016/j.chb.2019.01.023<\/a>","Spence-Thomas, R. & Thomas, T. (2003). The impact of social isolation and loneliness in a problem gambling population. <i>, 55<\/i>. ","Trevorrow, K. & Moore, S. (1998). The association between loneliness, social isolation and women's electronic gaming machine gambling. <i>Journal Of Gambling Studies<\/i><i>, 14<\/i>(3). <a href = \"https://doi.org/10.1023/a:1022057609568\">https://doi.org/10.1023/a:1022057609568<\/a>"],[true,null,true,true,null,null,true,null,true,null,true,null,null],[false,null,false,true,null,null,false,null,true,null,false,null,null],["&#10004;",null,"&#10004;","&#10004;",null,null,"&#10004;",null,"&#10004;",null,"&#10004;",null,null],["&#x2717;",null,"&#x2717;","&#10004;",null,null,"&#x2717;",null,"&#10004;",null,"&#x2717;",null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th rowspan=\"2\" colspan=\"2\">&nbsp;<\/th>\n      <th rowspan=\"2\" colspan=\"2\">Citation<\/th>\n      <th colspan=\"4\">Source<\/th>\n    <\/tr>\n    <tr>\n      <th>wos<\/th>\n      <th>pubmed<\/th>\n      <th>wos <\/th>\n      <th>pubmed <\/th>\n    <\/tr>\n  <\/thead>\n  <tfoot>\n    <td colspan=\"8\">Click on the &oplus; to view the full reference<\/td>\n  <\/tfoot>\n<\/table>","options":{"columnDefs":[{"visible":false,"targets":[0,3,4,5]},{"orderable":false,"className":"details-control","targets":1},{"orderable":false,"targets":0}],"dom":"Bfrtip","buttons":["print",{"extend":"csv","filename":"CiteSource_record_summary","text":"Download csv","exportOptions":{"columns":[0,2,3,4,5]}}],"order":[],"autoWidth":false,"orderClasses":false},"callback":"function(table) {\n\n              table.column(1).nodes().to$().css({cursor: 'pointer'});\n              var format = function(d) {\n                return '<div style=\"background-color:#eee; padding: .5em;\">' +\n                        d[3];\n              };\n              table.on('click', 'td.details-control', function() {\n                var td = $(this), row = table.row(td.closest('tr'));\n                if (row.child.isShown()) {\n                  row.child.hide();\n                  td.html('&oplus;');\n                } else {\n                  row.child(format(row.data())).show();\n                  td.html('&CircleMinus;');\n                }\n              });\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
 <div class="section level3">
 <h3 id="search-summary-table">Search Summary Table<a class="anchor" aria-label="anchor" href="#search-summary-table"></a>
@@ -305,13 +304,13 @@ these numbers.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Generate search summary table</span></span>
 <span><span class="fu"><a href="../reference/citation_summary_table.html">citation_summary_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, screening_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"benchmark"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div id="ruviiyvrpr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="czyezcrdle" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 html {
   font-family: Chivo, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ruviiyvrpr .gt_table {
+#czyezcrdle .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -336,7 +335,7 @@ html {
   border-left-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_heading {
+#czyezcrdle .gt_heading {
   background-color: #FFFFFF;
   text-align: left;
   border-bottom-color: #FFFFFF;
@@ -348,12 +347,12 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_caption {
+#czyezcrdle .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ruviiyvrpr .gt_title {
+#czyezcrdle .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -365,7 +364,7 @@ html {
   border-bottom-width: 0;
 }
 
-#ruviiyvrpr .gt_subtitle {
+#czyezcrdle .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -377,13 +376,13 @@ html {
   border-top-width: 0;
 }
 
-#ruviiyvrpr .gt_bottom_border {
+#czyezcrdle .gt_bottom_border {
   border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_col_headings {
+#czyezcrdle .gt_col_headings {
   border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -398,7 +397,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_col_heading {
+#czyezcrdle .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -418,7 +417,7 @@ html {
   overflow-x: hidden;
 }
 
-#ruviiyvrpr .gt_column_spanner_outer {
+#czyezcrdle .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -430,15 +429,15 @@ html {
   padding-right: 4px;
 }
 
-#ruviiyvrpr .gt_column_spanner_outer:first-child {
+#czyezcrdle .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ruviiyvrpr .gt_column_spanner_outer:last-child {
+#czyezcrdle .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ruviiyvrpr .gt_column_spanner {
+#czyezcrdle .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -450,7 +449,7 @@ html {
   width: 100%;
 }
 
-#ruviiyvrpr .gt_group_heading {
+#czyezcrdle .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -476,7 +475,7 @@ html {
   text-align: left;
 }
 
-#ruviiyvrpr .gt_empty_group_heading {
+#czyezcrdle .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #BEBEBE;
@@ -491,15 +490,15 @@ html {
   vertical-align: middle;
 }
 
-#ruviiyvrpr .gt_from_md > :first-child {
+#czyezcrdle .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ruviiyvrpr .gt_from_md > :last-child {
+#czyezcrdle .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ruviiyvrpr .gt_row {
+#czyezcrdle .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -518,7 +517,7 @@ html {
   overflow-x: hidden;
 }
 
-#ruviiyvrpr .gt_stub {
+#czyezcrdle .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 80%;
@@ -531,7 +530,7 @@ html {
   padding-right: 5px;
 }
 
-#ruviiyvrpr .gt_stub_row_group {
+#czyezcrdle .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -545,11 +544,11 @@ html {
   vertical-align: top;
 }
 
-#ruviiyvrpr .gt_row_group_first td {
+#czyezcrdle .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ruviiyvrpr .gt_summary_row {
+#czyezcrdle .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -559,16 +558,16 @@ html {
   padding-right: 5px;
 }
 
-#ruviiyvrpr .gt_first_summary_row {
+#czyezcrdle .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_first_summary_row.thick {
+#czyezcrdle .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ruviiyvrpr .gt_last_summary_row {
+#czyezcrdle .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -578,7 +577,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_grand_summary_row {
+#czyezcrdle .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -588,7 +587,7 @@ html {
   padding-right: 5px;
 }
 
-#ruviiyvrpr .gt_first_grand_summary_row {
+#czyezcrdle .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -598,11 +597,11 @@ html {
   border-top-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_striped {
+#czyezcrdle .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ruviiyvrpr .gt_table_body {
+#czyezcrdle .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -611,7 +610,7 @@ html {
   border-bottom-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_footnotes {
+#czyezcrdle .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -625,7 +624,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_footnote {
+#czyezcrdle .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -634,7 +633,7 @@ html {
   padding-right: 5px;
 }
 
-#ruviiyvrpr .gt_sourcenotes {
+#czyezcrdle .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -648,7 +647,7 @@ html {
   border-right-color: #D3D3D3;
 }
 
-#ruviiyvrpr .gt_sourcenote {
+#czyezcrdle .gt_sourcenote {
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -656,64 +655,64 @@ html {
   padding-right: 5px;
 }
 
-#ruviiyvrpr .gt_left {
+#czyezcrdle .gt_left {
   text-align: left;
 }
 
-#ruviiyvrpr .gt_center {
+#czyezcrdle .gt_center {
   text-align: center;
 }
 
-#ruviiyvrpr .gt_right {
+#czyezcrdle .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ruviiyvrpr .gt_font_normal {
+#czyezcrdle .gt_font_normal {
   font-weight: normal;
 }
 
-#ruviiyvrpr .gt_font_bold {
+#czyezcrdle .gt_font_bold {
   font-weight: bold;
 }
 
-#ruviiyvrpr .gt_font_italic {
+#czyezcrdle .gt_font_italic {
   font-style: italic;
 }
 
-#ruviiyvrpr .gt_super {
+#czyezcrdle .gt_super {
   font-size: 65%;
 }
 
-#ruviiyvrpr .gt_footnote_marks {
+#czyezcrdle .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#ruviiyvrpr .gt_asterisk {
+#czyezcrdle .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ruviiyvrpr .gt_indent_1 {
+#czyezcrdle .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ruviiyvrpr .gt_indent_2 {
+#czyezcrdle .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ruviiyvrpr .gt_indent_3 {
+#czyezcrdle .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ruviiyvrpr .gt_indent_4 {
+#czyezcrdle .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ruviiyvrpr .gt_indent_5 {
+#czyezcrdle .gt_indent_5 {
   text-indent: 25px;
 }
 
