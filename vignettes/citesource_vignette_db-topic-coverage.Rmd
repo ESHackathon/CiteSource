@@ -266,6 +266,6 @@ Reimport a file generated with export_csv.
 #reimport_csv("unique-by-source.csv")
 ```
 
-##In summary
+## In summary
 
 We can use CiteSource to evaluate coverage of different databases for a specific topic. In this example, we found that Scopus has the most content on gambling harms including the most unique content and the best coverage for earlier years. Lens also contributes a proportionally large amount of unique records, perhaps representing gray literature. An analysis of this sort can help determine which databases might be useful to search for an evidence synthesis project on a topic, or may be used to inform collection development decisions.
