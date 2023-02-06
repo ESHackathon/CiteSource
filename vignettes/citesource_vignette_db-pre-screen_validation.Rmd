@@ -132,8 +132,7 @@ Bar plots can be another way of looking at overlap and uniqueness of database co
 #Generate bar plot of unique citations PER database and their contribution to the benchmark studies
 
 plot_contributions(n_unique,
-  center = TRUE, facets = "cite_source"
-)
+  center = TRUE)
 
 ```
 
