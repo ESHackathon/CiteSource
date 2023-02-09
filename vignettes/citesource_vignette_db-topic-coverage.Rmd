@@ -1,5 +1,5 @@
 ---
-title: "CComparing Database Topic Coverage"
+title: "Comparing Database Topic Coverage"
 
 author: ""
 

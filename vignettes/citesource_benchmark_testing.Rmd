@@ -1,12 +1,12 @@
 ---
-title: "Use Case: Benchmark Testing"
+title: "Benchmark Testing"
 
 author: "Trevor Riley"
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Use Case: Benchmark Testing}
+  %\VignetteIndexEntry{Benchmark Testing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,12 +1,12 @@
 ---
-title: "CiteSource - Short working example"
+title: "Source Analysis Across Screening Phases"
 
 author: "Trevor Riley"
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Short working example}
+  %\VignetteIndexEntry{Source Analysis Across Screening Phases}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
