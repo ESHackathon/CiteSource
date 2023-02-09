@@ -1,12 +1,12 @@
 ---
-title: "CiteSource - Example: Assessing Usefulness of Databases for Evidence Synthesis"
+title: "Assessing Usefulness of Databases for Evidence Synthesis"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Example: Assessing Usefulness of Databases for Evidence Synthesis}
+  %\VignetteIndexEntry{Assessing Usefulness of Databases for Evidence Synthesis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -30,7 +30,7 @@ Until now, this within-database testing has been the primary method of pre-scree
 
 In this example, we are running a search about loneliness and gambling addiction. We developed a search strategy for PsycInfo, our main database. Now, we'd like to see if searching other databases like Web of Science and PubMed add useful records and help us find more of our benchmark studies. 
 
-## 1. Installation of packages and loading libraries
+## Installation of packages and loading libraries
 
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the ggplot2 and dplyr packages.
 
