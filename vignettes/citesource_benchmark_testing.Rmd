@@ -1,12 +1,12 @@
 ---
-title: "CiteSource - Example: Benchmark Testing"
+title: "Use Case: Benchmark Testing"
 
 author: "Trevor Riley"
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Example: Benchmark Testing}
+  %\VignetteIndexEntry{Use Case: Benchmark Testing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,17 +20,6 @@ knitr::opts_chunk$set(
   fig.height = 6
   )
 ```
-
-## About the package
-
-CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where only one record is selected to be retained, CiteSource retains each duplicate record and merges metadata into a single, primary record. The primary record maintains user-customized metadata in three fields, "Cite_Source", "Cite_String" and "Cite_Label". During the merging process, select metadata fields are also compared for completeness as well as length (currently DOI & Abstract). CiteSource applies the more complete (based on length) metadata to the main record.
-
-CiteSource is an R package and Shiny app that is currently in development. Work on this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis & Meta-Analysis in R Conference - ESMARConf 2022. Learn more @ https://esmarconf.org/
-
-CiteSource was created under the General Public License v3 (GPL3) find more information on GPL @ https://www.gnu.org/licenses/gpl-3.0.html
-
-The CiteSource Shiny app is available @ https://estech.shinyapps.io/citesource/ (please note that the shiny app is still under development)
-
 ## About this vignette
 
 When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search, the process can often be a very time consuming. 
@@ -55,7 +44,7 @@ library(ggplot2)
 library(dplyr)
 library(knitr)
 ```
-## Import files from multiple sources
+## 2. Import files from multiple sources
 
 Users can import multiple RIS or bibtex files into CiteSource, which the user can label with source information such as database or platform. 
 
@@ -71,7 +60,7 @@ citations <- read_citations(citation_files,
                             tag_naming = "best_guess")
 ```
 
-## Deduplication and source information
+## 3. Deduplication and source information
 
 CiteSource allows users to merge duplicates while maintaining information in the cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. The next few steps produce the dataframes that we can use in subsequent analyses.
 
@@ -90,7 +79,7 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ```
 
-## Upset plot to compare discovery of benchmarking articles
+## 4. Upset plot to compare discovery of benchmarking articles
 
 An upset plot is a useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. Using this data we'll outline a few potential uses of this data, when looking at the discovery of benchmarking articles.
 
@@ -111,7 +100,7 @@ plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
 ```
 
-### Review individual records
+## 5. Reviewing the record table
 
 ```{r}
 unique_citations %>%
