@@ -6,7 +6,8 @@
 [![R-CMD-check](https://github.com/ESHackathon/CiteSource/workflows/R-CMD-check/badge.svg)](https://github.com/ESHackathon/CiteSource/actions)
 <!-- badges: end -->
 
-**About CiteSource**
+**About**
+
 CiteSource was developed in order to provide researchers the ability to examine the utility and efficacy of literature resources and search methodologies. The idea behind CiteSource is simply allowing users to deduplicate citation records, while maintaining customizable metadata about the citation.
 
 Customizable metadata can include anything from a resource name (ex.Web of Science, LENS.org, PubMed), a method (database search, handsearching, citation snowballing), a variation used within a method (WoS string #1, Wos string #2, WoS string #3), a research phase (search, Ti/Ab screening, Full-text Screening), or a unique group of citations (benchmarking articles, articles from a previous review, articles with specific a affiliation). 
@@ -16,15 +17,18 @@ The CiteSource deduplication process is better described as record merging proce
 Once records are deduplicated, users are able to easily create plots and tables in order to answer specific questions or to simply explore the data to an effort to develop new hypotheses. Examples of analysis may include how many unique records a specific source contributed or how the traditional method of developing a search string and applying it across databases fared against a new AI discovery tool in discovering relevant articles. Users may want to understand the overlap in records between two different search strings or evaluate the impact of including Google Scholar in a review. Before searching, a user may even develop a targeted search to better understand the topical coverage across databases they intend to search, and once the search has been developed, how particular source, string, or method performed in discovering benchmarking articles. 
 
 **Vignettes**
+
 Vignettes covering various use cases can be found on the CiteSource web page https://www.eshackathon.org/CiteSource/. 
 
-**Feedback**
-If you would like to develop a vignette or would like to provide comments/suggestions, reach out to us on the CiteSource discussion page https://github.com/ESHackathon/CiteSource/discussions.
-
 **Development and license**
+
 Development of this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis & Meta-Analysis in R Conference - ESMARConf 2022. to learn more about this awesome conference and hackathon please visit @ https://esmarconf.org/
 
 CiteSource was created under the General Public License (>=v3) find more information on GPL @ https://www.gnu.org/licenses/gpl-3.0.html
+
+**Feedback**
+
+If you would like to develop a vignette or would like to provide comments/suggestions, reach out to us on the CiteSource discussion page https://github.com/ESHackathon/CiteSource/discussions.
 
 
 **Use Case Overview**
