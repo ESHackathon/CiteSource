@@ -3,15 +3,13 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   citesource_benchmark_testing: citesource_benchmark_testing.html
-  citesource_example: citesource_example.html
   citesource_vignette: citesource_vignette.html
   citesource_vignette_db-pre-screen_validation: citesource_vignette_db-pre-screen_validation.html
   citesource_vignette_db-topic-coverage: citesource_vignette_db-topic-coverage.html
   citesource_working_example: citesource_working_example.html
-  citesource_working_example_long: citesource_working_example_long.html
   kh_example: kh_example.html
   troubleshooting: troubleshooting.html
-last_built: 2023-02-09T13:53Z
+last_built: 2023-02-09T14:07Z
 urls:
   reference: http://www.eshackathon.org/CiteSource/reference
   article: http://www.eshackathon.org/CiteSource/articles
