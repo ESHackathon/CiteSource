@@ -1,12 +1,12 @@
 ---
-title: "CiteSource - Example: Comparing Database Topic Coverage"
+title: "CComparing Database Topic Coverage"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource - Example: Comparing Database Topic Coverage}
+  %\VignetteIndexEntry{Comparing Database Topic Coverage}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 CiteSource can be used to examine topical overlap between databases. In this example, we are interested in the overlap among databases, both multi-disciplinary and subject-specific, for the literature on the harmful effects of gambling addiction. To assess this, we ran a very specific search for the term "gambling harm*" in the title and abstract fields of the following databases: Lens, Scopus, Criminal Justice Abstracts, PsycInfo and Medline.   
 
-## 1. Installation of packages and loading libraries
+## Installation of packages and loading libraries
 
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the ggplot2 and dplyr packages.
 
