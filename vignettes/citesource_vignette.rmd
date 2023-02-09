@@ -1,12 +1,12 @@
 ---
-title: "CiteSource"
+title: "About the package"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CiteSource}
+  %\VignetteIndexEntry{About the package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,18 +15,27 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  warning = FALSE,
-  fig.width = 6,
-  fig.height = 6
+  fig.width = 10,
+  fig.height = 10
 )
 ```
 
 ## About the package 
 
-CiteSource provides users with the ability to deduplicate references while maintaining customizable metadata. Instead of the traditional deduplication method where records are removed and only one record is selected to be retained, CiteSource retains each duplicate record while merging metadata into a single main record. This main record maintains user-customized metadata in three fields, "cite_source", "cite_label" and "tag_naming". In the merging process, select metadata fields are also automatically compared (currently DOI & Abstract) and the most complete metadata is used in the main record.
+CiteSource was developed in order to provide researchers the ability to examine the utility and efficacy of literature resources and search methodologies. The idea behind CiteSource is simply allowing users to deduplicate citation records, while maintaining customizable metadata about the citation.
+
+Customizable metadata can include anything from a resource name (ex.Web of Science, LENS.org, PubMed), a method (database search, handsearching, citation snowballing), a variation used within a method (WoS string #1, Wos string #2, WoS string #3), a research phase (search, Ti/Ab screening, Full-text Screening), or a unique group of citations (benchmarking articles, articles from a previous review, articles with specific a affiliation). 
+
+The CiteSource deduplication process is better described as record merging process due to the fact that the customizable metadata from duplicate records is maintained through the creation of a single, primary record. Beyond the merging of customizable metadata, the primary record is created by using the most complete metadata available in the DOI and Abstract fields. This means that when a primary record is created users know that it represents the most complete metatadata between the original records.
+
+Once records are deduplicated, users are able to easily create plots and tables in order to answer specific questions or to simply explore the data to an effort to develop new hypotheses. Examples of questions may include how many unique records a specific source contributed or how the traditional method of developing a search string and applying it across databases fared against a new AI discovery tool in discovering relevant articles. Users may want to understand the overlap in records between two different search strings or evaluate the impact of including Google Scholar in a review. Before searching, a user may even develop a targeted search to better understand the topical coverage across databases they intend to search, and once the search has been developed, how particular source, string, or method performed in discovering benchmarking articles. 
+
+## Customized metadata
+
+CiteSource gives users the ability to add customized metadata to three different fields. These fields are "cite_source", "cite_string", and "cite_label", however, users are able to use these fields to enter any metadata associated with their inquiry. Currently only cite_string and cite_label are utilized for plot and table creation, further development that utilizes cite_string is planned.
 
 ## Installation
-Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. 
+Use the following code to install CiteSource. Currently, CiteSource lives on GitHub and needs to be installed with the remotes package. In the future we will be working to make the package available via CRAN.
 
 ```{r eval = FALSE}
 # Install the remotes packages to enable installation from GitHub
@@ -37,112 +46,12 @@ library(remotes)
 remotes::install_github("ESHackathon/CiteSource")
 ```
 
-After installation, you can load the package.
+## Data reuse and exporting
 
-```{r}
-library(CiteSource)
-```
+## Development and license
+Development of this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis & Meta-Analysis in R Conference - ESMARConf 2022. to learn more about this awesome conference and hackathon please visit @ https://esmarconf.org/
 
-## Import files from multiple sources
+CiteSource was created under the General Public License (>=v3) find more information on GPL @ https://www.gnu.org/licenses/gpl-3.0.html
 
-Users can import multiple RIS or bibtex files into CiteSource, which the user can label with source information such as database or platform. A second metadata field called 'cite_labels' can be used to specify other attributes. For example, a common use of CiteSource may be to examine the origin of records at different screening stages of a review. Search results from databases can be imported along with screened records and final included studies. 
-
-```{r read}
-
-# Indicate location of citation files
-citation_files <- list.files(path = "db_exports", pattern = "\\.ris", full.names = TRUE)
-
-citation_files
-
-
-# Read citation files and store. Labels is used to compare stages of review.
-
-citations <- read_citations(citation_files,
-  cite_sources = c(
-    "CAB", "EconLit", NA,
-    "GreenFile", "McK", "RM", NA, "WoS", "WoSE"
-  ),
-  cite_labels = c(
-    "search", "search", "Final",
-    "search", "search", "search", "Screened", "search", "search"
-  ),
-  tag_naming = "best_guess"
-)
-```
-
-
-## Deduplicate while maintaining source information
-
-CiteSource allows users to merge duplicates while maintaining information in the cite_label and cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. 
-
-```{r dedup}
-
-# Deduplicate records while maintaining source information and label information.
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-
-unique_citations <- dedup_results$unique
-
-# Count number of unique and non-unique citations from different sources and labels
-n_unique <- count_unique(unique_citations)
-
-# Create dataframe indicating occurrence of records across sources, labels and/or strings
-complete_comparison <- compare_sources(unique_citations)
-label_comparison <- compare_sources(unique_citations, comp_type = "labels")
-```
-
-## Source or method analysis
-
-When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
-
-### Plot overlap as a heatmap matrix
-
-```{r heatmap}
-plot_source_overlap_heatmap(complete_comparison)
-plot_source_overlap_heatmap(complete_comparison, plot_type = "percentages")
-```
-
-
-### Plot overlap as an upset plot
-
-```{r upset plot}
-
-plot_source_overlap_upset(complete_comparison, decreasing = c(TRUE, TRUE))
-```
-
-## Review stage analysis
-
-Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
-
-### Assess contribution of sources by review stage
-
-This can be done either with a bar plot ...
-
-```{r contributions-bars}
-
-plot_contributions(n_unique, center = TRUE)
-```
-
-... or with separate heatmaps.
-
-```{r contributions-heat, fig.height=10}
-
-plot_source_overlap_heatmap(complete_comparison, facets = "label")
-```
-
-## Documentation and output
-
-In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. The `export_csv` function in CiteSource will generate a .csv file that includes original record metadata (like title, authors, etc.) and the sources and labels applied to the files upon import. The presence of a record in a given source is provided as binary TRUE/FALSE variables appended to the end of the dataframe.
-
-CiteSource also provides an option to export your records as an .RIS file that can be read into a citation manager. Source information is added to the DB field, while label and string information is added to custom fields 7 and 8, respectively.
-
-```{r export}
-export_csv(unique_citations, "cite_sources.csv", separate = "cite_source")
-CiteSource::export_ris(unique_citations, "cite_sources.ris")
-```
-
-
-### Generate a search summary table
-
-Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.). These tables can be published as supplementary matrial with a review to provide a reader more context about the sources that were searched and their contributions to the review. The ability to generate a search summary table is a feature that will be coming in a future version of CiteSource.
-
-
+## Shiny App
+The CiteSource Shiny app is currently being developed and will be available @ https://estech.shinyapps.io/citesource/.
