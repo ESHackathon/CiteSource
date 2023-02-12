@@ -53,9 +53,9 @@ Imports:
     tidyr,
     tidyselect,
     UpSetR,
-    utf8
+    utf8,
+    DT
 Suggests: 
-    DT,
     htmltools,
     knitr,
     rmarkdown,
