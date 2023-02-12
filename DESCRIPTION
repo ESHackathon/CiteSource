@@ -34,6 +34,7 @@ URL: https://www.eshackathon.org/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
 Imports: 
     dplyr,
+    DT,
     forcats,
     ggnewscale,
     ggplot2,
@@ -54,7 +55,6 @@ Imports:
     tidyselect,
     UpSetR,
     utf8,
-    DT
 Suggests: 
     htmltools,
     knitr,
