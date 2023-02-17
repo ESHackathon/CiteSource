@@ -44,7 +44,6 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 
 #Load the necessary libraries
 library(CiteSource)
-library(ggplot2)
 library(dplyr)
 ```
 
@@ -143,14 +142,16 @@ As we do when testing different search strategies in a single database, we can l
 
 ```{r}
 #Get unique records from each source and add bibliographic data
-unique_psycinfo <- n_unique %>% filter(cite_source=="psycinfo", unique == TRUE) %>% inner_join(unique_citations, by = "duplicate_id")
+unique_psycinfo <- n_unique %>% 
+  dplyr::filter(cite_source=="psycinfo", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
 
 unique_pubmed <- n_unique %>% 
-  filter(cite_source=="pubmed", unique == TRUE) %>%
+  dplyr::filter(cite_source=="pubmed", unique == TRUE) %>%
   inner_join(unique_citations, by = "duplicate_id")
 
 unique_wos <- n_unique %>% 
-  filter(cite_source=="wos", unique == TRUE) %>%
+  dplyr::filter(cite_source=="wos", unique == TRUE) %>%
   inner_join(unique_citations, by = "duplicate_id")
 
 #To save these dataframes to a csv file for review, use the export_csv function from CiteSource
