@@ -60,7 +60,7 @@ citation_files <- list.files(path= "valid_data", pattern = "\\.ris", full.names 
 
 citation_files
 
-#Read in citations and specify sources. Here we note the sources of our three database searches and then add labels cooresponding to their status as benchmark studies or as a database search.
+#Read in citations and specify sources. Here we note the sources of our three database searches and then add labels corresponding to their status as benchmark studies or as a database search.
 citations <- read_citations(citation_files,
                             cite_sources = c(NA, "psycinfo", "pubmed", "wos"),
                             cite_labels = c("benchmark", "search", "search", "search"),
