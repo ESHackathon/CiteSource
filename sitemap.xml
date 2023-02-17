@@ -46,6 +46,9 @@
     <loc>http://www.eshackathon.org/CiteSource/reference/dedup_citations.html</loc>
   </url>
   <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/detect_.html</loc>
+  </url>
+  <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/export_bib.html</loc>
   </url>
   <url>
@@ -56,6 +59,12 @@
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/merge_columns.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/parse_.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/pipe.html</loc>
@@ -83,5 +92,11 @@
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/runShiny.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/synthesisr_read_refs.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/write_refs.html</loc>
   </url>
 </urlset>
