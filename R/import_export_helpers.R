@@ -808,6 +808,7 @@ write_refs <- function(
 #' databases and merge them to a common format.
 #'
 #' @format A data frame with 226 obs of 12 variables
+#' @noRd
 #'
 #' \describe{
 #'  \item{code}{code used in search results}
