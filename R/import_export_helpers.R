@@ -86,7 +86,7 @@ synthesisr_read_refs <- function(
 # ' @param verbose If TRUE, prints status updates.
 # ' @return Returns a data.frame or list of assembled search results.
 
-#' @describeIn read_refs Import a single file
+#' @describeIn synthesisr_read_refs Import a single file
 read_ref <- function(
     filename,
     tag_naming = "best_guess",
@@ -150,7 +150,6 @@ read_ref <- function(
 #' @description Text in standard formats - such as imported via \code{\link{readLines}} - can be parsed using a variety of standard formats. Use \code{\link{detect_parser}} to determine which is the most appropriate parser for your situation.
 #' @param x A character vector containing bibliographic information in ris format.
 #' @return Returns an object of class \code{bibliography} (ris, bib, or pubmed formats) or \code{data.frame} (csv or tsv).
-#' @example inst/examples/parse_.R
 #' @name parse_
 NULL
 
@@ -721,7 +720,6 @@ write_ris <- function(x,
 #' @param tag_naming what naming convention should be used to write RIS files? See details for options.
 #' @param file Either logical indicating whether a file should be written (defaulting to FALSE), or a character giving the name of the file to be written.
 #' @return Returns a character vector containing bibliographic information in the specified format if \code{file} is FALSE, or saves output to a file if TRUE.
-#' @example inst/examples/parse_.R
 write_refs <- function(
     x,
     format = "ris",
@@ -801,29 +799,31 @@ write_refs <- function(
 ##             Other helpers (code lookup / detect)             ##
 ##################################################################
 
-#' Bibliographic code lookup for search results assembly
-#'
-#' A data frame that can be used to look up common
-#' codes for different bibliographic fields across
-#' databases and merge them to a common format.
-#'
-#' @format A data frame with 226 obs of 12 variables
-#' @noRd
-#'
-#' \describe{
-#'  \item{code}{code used in search results}
-#'  \item{order}{the order in which to rank fields in assembled results}
-#'  \item{category_description}{type of bibliographic data}
-#'  \item{entry_description}{description of field}
-#'  \item{field}{bibliographic field that codes correspond to}
-#'  \item{ris_generic}{logical: If the code is used in generic ris files}
-#'  \item{ris_wos}{logical: If the code is used in Web of Science ris files}
-#'  \item{ris_pubmed}{logical: If the code is used in PubMed ris files}
-#'  \item{ris_scopus}{logical: If the code is used in Scopus ris files}
-#'  \item{ris_asp}{logical: If the code is used in Academic Search Premier ris files}
-#'  \item{ris_ovid}{logical: If the code is used in Ovid ris files}
-#'  \item{ris_synthesisr}{logical: If the code used in synthesisr imports & exports}}
-#'
+# TODO - document synthesisr_code_lookup - but for that it apparently needs to be external data,
+# and not quite clear how that is then accessible to the package, without exporting it to user ...
+
+# @name synthesisr_code_lookup
+# Bibliographic code lookup for search results assembly
+#
+# A data frame that can be used to look up common
+# codes for different bibliographic fields across
+# databases and merge them to a common format.
+#
+# @format A data frame with 226 obs of 12 variables
+#
+# \describe{
+#  \item{code}{code used in search results}
+#  \item{order}{the order in which to rank fields in assembled results}
+#  \item{category_description}{type of bibliographic data}
+#  \item{entry_description}{description of field}
+#  \item{field}{bibliographic field that codes correspond to}
+#  \item{ris_generic}{logical: If the code is used in generic ris files}
+#  \item{ris_wos}{logical: If the code is used in Web of Science ris files}
+#  \item{ris_pubmed}{logical: If the code is used in PubMed ris files}
+#  \item{ris_scopus}{logical: If the code is used in Scopus ris files}
+#  \item{ris_asp}{logical: If the code is used in Academic Search Premier ris files}
+#  \item{ris_ovid}{logical: If the code is used in Ovid ris files}
+#  \item{ris_synthesisr}{logical: If the code used in synthesisr imports & exports}}
 "synthesisr_code_lookup"
 
 # Unclear which of the detect functions are actually needed here - but they are not exported, so prob not an issue
@@ -836,7 +836,6 @@ write_refs <- function(
 #' @param tags A character vector containing RIS tags.
 #' @param df a data.frame containing bibliographic data
 #' @return \code{detect_parser} and \code{detect_delimiter} return a length-1 character; \code{detect_year} returns a character vector listing estimated publication years; and \code{detect_lookup} returns a \code{data.frame}.
-#' @example inst/examples/detect_.R
 #' @name detect_
 NULL
 
@@ -1012,7 +1011,6 @@ detect_year <- function(df){
 # ' @description Takes an imported data.frame and rearranges it to match lookup codes.
 # ' @param df A data.frame that contains bibliographic information.
 # ' @return Returns a data.frame rearranged and coded to match standard bibliographic fields, with unrecognized fields appended.
-# ' @example inst/examples/match_columns.R
 match_columns <- function(df){
   # figure out which columns match known tags
   hits <- as.numeric(match(synthesisr::code_lookup$code, colnames(df)))
@@ -1039,7 +1037,6 @@ match_columns <- function(df){
 #' @param x Either a data.frame or a list of data.frames.
 #' @param y A data.frame, optional if x is a list.
 #' @return Returns a single data.frame with all the input data frames merged.
-#' @example inst/examples/merge_columns.R
 merge_columns <- function(
     x, # either a data.frame or a list of the same
     y # a data.frame, optional
@@ -1101,7 +1098,6 @@ remove_factors <- function(z){
   return(z)
 }
 
-#' @rdname bibliography-class
 as.data.frame.bibliography <- function(x, ...){
   # Solves https://github.com/mjwestgate/synthesisr/issues/25 - but could likely be faster
   x <- purrr::map(x, \(x) {
@@ -1145,7 +1141,6 @@ as.data.frame.bibliography <- function(x, ...){
 }
 
 # Cleans data.frames into synthesisr format
-#' @rdname clean_
 clean_df <- function(data){
   colnames(data) <- clean_colnames(colnames(data))
   if(any(colnames(data) == "author")){
@@ -1156,7 +1151,6 @@ clean_df <- function(data){
 
 
 # Standardize author delimiters
-#' @rdname clean_
 clean_authors <- function(x){
   if(any(grepl("\\sand\\s|\\sAND\\s|\\s&\\s", x))){
     x <- gsub("\\sAND\\s|\\s&\\s", " and ", x)
@@ -1169,7 +1163,6 @@ clean_authors <- function(x){
 
 
 # Clean common issues with column names
-#' @rdname clean_
 clean_colnames <- function(
     x # colnames
 ){
@@ -1188,7 +1181,6 @@ clean_colnames <- function(
   return(x)
 }
 
-#' @rdname bibliography-class
 as.bibliography <- function(x, ...){
   
   if(!inherits(x, "data.frame")) {
