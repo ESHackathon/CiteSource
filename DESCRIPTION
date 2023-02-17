@@ -19,7 +19,7 @@ Authors@R: c(
     person("Neal", "Haddaway", , "nealhaddaway@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0003-3902-2234")),
     person("Martin", "Westgate", role = "cph", comment = "Author of included synthesisr fragments"),
-    person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments"),       
+    person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments")      
   )
 Description: CiteSource provides users with the ability to deduplicate
     references while maintaining customizable metadata. Instead of the
