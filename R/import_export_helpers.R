@@ -5,6 +5,10 @@
 # Copright 2020, Martin Westgate and Eliza Grames
 # Licenced under GPL-3
 
+#' @importFrom stats xtabs
+#' @importFrom utils head read.table tail write.table
+NULL
+
 ##################################################################
 ##                       Import functions                       ##
 ##################################################################
@@ -78,9 +82,9 @@ synthesisr_read_refs <- function(
   }
 }
 
-# ' Internal function called by read_refs for each file
+# ' Internal function called by synthesisr_read_refs for each file
 # '
-# ' @description This is the underlying workhorse function that imports bibliographic files; primarily intended to be called from read_refs.
+# ' @description This is the underlying workhorse function that imports bibliographic files; primarily intended to be called from synthesisr_read_refs.
 # ' @param filename A path to a filename containing search results to import.
 # ' @param return_df If TRUE, returns a data.frame; if FALSE, returns a list.
 # ' @param verbose If TRUE, prints status updates.
@@ -229,7 +233,7 @@ parse_pubmed <- function(x){
 
 
 #' @rdname parse_
-#' @param tag_naming What format are ris tags in? Defaults to "best_guess" See \code{\link{read_refs}} for a list of accepted arguments.
+#' @param tag_naming What format are ris tags in? Defaults to "best_guess" See \code{\link{synthesisr_read_refs}} for a list of accepted arguments.
 parse_ris <- function(x, tag_naming = "best_guess"){
   
   x <- prep_ris(x, detect_delimiter(x), type = "generic")
@@ -739,7 +743,7 @@ write_refs <- function(
     stop("format must be either 'ris' or 'bib'")
   }
   
-  # check output format - consistent with read_refs
+  # check output format - consistent with synthesisr_read_refs
   if(format == "ris"){
     valid_tags <- c("best_guess", "none", "wos", "scopus", "ovid", "asp", "synthesisr")
     if(inherits(tag_naming, "character")){
@@ -924,10 +928,10 @@ detect_delimiter <- function(x){
 detect_lookup <- function(
     tags # a vector of strings representing ris tags
 ){
-  rows <- which(synthesisr::code_lookup$code %in% tags)
+  rows <- which(synthesisr_code_lookup$code %in% tags)
   ris_list <- split(
-    synthesisr::code_lookup[rows, grepl("ris_", colnames(synthesisr::code_lookup))],
-    synthesisr::code_lookup$code[rows]
+    synthesisr_code_lookup[rows, grepl("ris_", colnames(synthesisr_code_lookup))],
+    synthesisr_code_lookup$code[rows]
   )
   ris_matrix <- do.call(
     rbind,
@@ -939,23 +943,23 @@ detect_lookup <- function(
   generic_proportion <- ris_sums[1] / nrow(ris_matrix)
   # default to ris_generic if everything else is bad
   if(best_proportion < 0.75 & generic_proportion > best_proportion){
-    match_df <- synthesisr::code_lookup[synthesisr::code_lookup$ris_generic, ]
+    match_df <- synthesisr_code_lookup[synthesisr_code_lookup$ris_generic, ]
   }else{ # i.e. if the 'best' match performs perfectly
     if(best_proportion > 0.99){ # i.e. a perfect match
-      match_df <- synthesisr::code_lookup[
-        synthesisr::code_lookup[, names(best_match)],
+      match_df <- synthesisr_code_lookup[
+        synthesisr_code_lookup[, names(best_match)],
         
       ]
     }else{ # otherwise use the best choice, then generic to fill gaps
       rows_best <- which(
-        synthesisr::code_lookup[, names(best_match)] &
-          synthesisr::code_lookup$code %in% names(which(ris_matrix[, names(best_match)]))
+        synthesisr_code_lookup[, names(best_match)] &
+          synthesisr_code_lookup$code %in% names(which(ris_matrix[, names(best_match)]))
       )
       rows_generic <- which(
-        synthesisr::code_lookup$ris_generic &
-          synthesisr::code_lookup$code %in% names(which(!ris_matrix[, names(best_match)]))
+        synthesisr_code_lookup$ris_generic &
+          synthesisr_code_lookup$code %in% names(which(!ris_matrix[, names(best_match)]))
       )
-      match_df <- synthesisr::code_lookup[c(rows_best, rows_generic), ]
+      match_df <- synthesisr_code_lookup[c(rows_best, rows_generic), ]
     }
   }
   
@@ -1013,10 +1017,10 @@ detect_year <- function(df){
 # ' @return Returns a data.frame rearranged and coded to match standard bibliographic fields, with unrecognized fields appended.
 match_columns <- function(df){
   # figure out which columns match known tags
-  hits <- as.numeric(match(synthesisr::code_lookup$code, colnames(df)))
-  newcolnames <- synthesisr::code_lookup$field[
+  hits <- as.numeric(match(synthesisr_code_lookup$code, colnames(df)))
+  newcolnames <- synthesisr_code_lookup$field[
     match(colnames(df),
-          synthesisr::code_lookup$code)
+          synthesisr_code_lookup$code)
   ]
   colnames(df)[!is.na(newcolnames)] <- newcolnames[!is.na(newcolnames)]
   
