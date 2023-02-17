@@ -453,8 +453,10 @@ parse_bibtex <- function(x){
   # split by reference
   x_split <- split(x[-row_id], group_vec[-row_id])
   length_vals <- unlist(lapply(x_split, length))
-  x_split <- x_split[which(length_vals > 3)]
   
+  # Changed this to > 1 based on https://github.com/mjwestgate/synthesisr/issues/26
+  # Not sure if this introduces new issues
+  x_split <- x_split[which(length_vals > 1)]
   x_final <- lapply(x_split, function(z){
     
     # first use a stringent lookup term to locate only tagged rows
@@ -727,7 +729,7 @@ write_refs <- function(
     file = FALSE # either logical or a character (i.e. a file name)
 ){
   # check input data
-  if(!any(c("bibliography", "data.frame") == class(x))) {
+  if (inherits(x, "data.frame") || inherits(x, "bibliography")) {
     stop("write_bibliography only accepts objects of class 'data.frame' or 'bibliography'")
   }
   if(inherits(x, "data.frame")){
@@ -796,7 +798,7 @@ write_refs <- function(
 }
 
 ##################################################################
-##                       Others                                 ##
+##             Other helpers (code lookup / detect)             ##
 ##################################################################
 
 #' Bibliographic code lookup for search results assembly
@@ -823,3 +825,389 @@ write_refs <- function(
 #'
 "synthesisr_code_lookup"
 
+# Unclear which of the detect functions are actually needed here - but they are not exported, so prob not an issue
+# At least `detect_parse` is essential
+
+#' Detect file formatting information
+#'
+#' @description Bibliographic data can be stored in a number of different file types, meaning that detecting consistent attributes of those files is necessary if they are to be parsed accurately. These functions attempt to identify some of those key file attributes. Specifically, \code{detect_parser} determines which \code{\link{parse_}} function to use; \code{detect_delimiter} and \code{detect_lookup} identify different attributes of RIS files; and \code{detect_year} attempts to fill gaps in publication years from other information stored in a \code{data.frame}.
+#' @param x A character vector containing bibliographic data
+#' @param tags A character vector containing RIS tags.
+#' @param df a data.frame containing bibliographic data
+#' @return \code{detect_parser} and \code{detect_delimiter} return a length-1 character; \code{detect_year} returns a character vector listing estimated publication years; and \code{detect_lookup} returns a \code{data.frame}.
+#' @example inst/examples/detect_.R
+#' @name detect_
+NULL
+
+# internal function to calculate the proportion of lines that contain a particular regex
+# called by detect_parser
+proportion_delimited <- function(x, regex){
+  delimiter_count <- unlist(lapply(
+    gregexpr(regex, x, perl = TRUE),
+    function(a){length(which(a > 0))}
+  ))
+  full_lines <- nchar(x, type = "bytes") > 0
+  proportion <- length(which(delimiter_count > 0)) / length(which(full_lines))
+  return(proportion)
+}
+
+
+#' @rdname detect_
+detect_parser <- function(x){
+  
+  # calculate proportional of lines containing likely tags
+  proportions <- unlist(lapply(
+    c(
+      ",(\"|[[:alnum:]])",
+      "\t",
+      "\\{|\\}",
+      "(^[[:upper:]]{2,4}\\s*(-|:)\\s)|(^([[:upper:]]{2}|[[:upper:]][[:digit:]])\\s*(-|:){0,2}\\s*)"
+    ),
+    function(a, z){proportion_delimited(z, a)},
+    z = x
+  ))
+  
+  # if any are detection, pick the most likely one
+  if(any(proportions > 0.2)){
+    result <- switch(
+      c("comma", "tab", "bibtex", "ris")[which.max(proportions)],
+      "comma" = "parse_csv",
+      "tab" = "parse_tsv",
+      "bibtex" = "parse_bibtex",
+      "ris" = {
+        if(length(which(grepl("PMID", x))) > 0){
+          "parse_pubmed"
+        }else{
+          "parse_ris"
+        }
+      }
+    )
+  }else{
+    result <- "unknown"
+  }
+  return(result)
+}
+
+
+#' @rdname detect_
+detect_delimiter <- function(x){
+  if(any(grepl("^ER", x))){
+    delimiter <- "endrow"
+  }else{
+    # special break: same character repeated >6 times, no other characters
+    char_list <- strsplit(x, "")
+    char_break_test <- unlist(
+      lapply(char_list,
+             function(a){length(unique(a)) == 1 & length(a > 6)}
+      )
+    )
+    if(any(char_break_test)){
+      delimiter <- "character"
+    }else{
+      # use space as a ref break (last choice)
+      space_break_check <- unlist(lapply(
+        char_list,
+        function(a){all(a == "" | a == " ")}
+      ))
+      if(any(space_break_check)){
+        delimiter <- "space"
+      }else{
+        stop("import failed: unknown reference delimiter")
+      }
+    }
+  }
+  return(delimiter)
+}
+
+
+#' @rdname detect_
+detect_lookup <- function(
+    tags # a vector of strings representing ris tags
+){
+  rows <- which(synthesisr::code_lookup$code %in% tags)
+  ris_list <- split(
+    synthesisr::code_lookup[rows, grepl("ris_", colnames(synthesisr::code_lookup))],
+    synthesisr::code_lookup$code[rows]
+  )
+  ris_matrix <- do.call(
+    rbind,
+    lapply(ris_list, function(a){apply(a, 2, any)})
+  )
+  ris_sums <- apply(ris_matrix, 2, sum)
+  best_match <- which.max(ris_sums[-1])
+  best_proportion <- ris_sums[best_match + 1] / nrow(ris_matrix)
+  generic_proportion <- ris_sums[1] / nrow(ris_matrix)
+  # default to ris_generic if everything else is bad
+  if(best_proportion < 0.75 & generic_proportion > best_proportion){
+    match_df <- synthesisr::code_lookup[synthesisr::code_lookup$ris_generic, ]
+  }else{ # i.e. if the 'best' match performs perfectly
+    if(best_proportion > 0.99){ # i.e. a perfect match
+      match_df <- synthesisr::code_lookup[
+        synthesisr::code_lookup[, names(best_match)],
+        
+      ]
+    }else{ # otherwise use the best choice, then generic to fill gaps
+      rows_best <- which(
+        synthesisr::code_lookup[, names(best_match)] &
+          synthesisr::code_lookup$code %in% names(which(ris_matrix[, names(best_match)]))
+      )
+      rows_generic <- which(
+        synthesisr::code_lookup$ris_generic &
+          synthesisr::code_lookup$code %in% names(which(!ris_matrix[, names(best_match)]))
+      )
+      match_df <- synthesisr::code_lookup[c(rows_best, rows_generic), ]
+    }
+  }
+  
+  return(match_df[, c("code", "order", "field")])
+}
+
+
+# internal function for detect_year
+guess_year <- function(x){
+  number_lookup <- regexpr("[[:alnum:]]{4}", as.character(x))
+  if(any(number_lookup > 0)){
+    x <- x[number_lookup > 0]
+    result_vec <- unlist(lapply(seq_along(x), function(a){
+      substr(x[a], start = number_lookup[a], stop = number_lookup[a] + 3)
+    }))
+    # return(max(as.numeric(result)))
+    result <- names(sort(xtabs(~result_vec), decreasing = TRUE)[1])
+    return(result)
+  }else{
+    return(NA)
+  }
+}
+
+#' @rdname detect_
+detect_year <- function(df){
+  if(!inherits(df, "data.frame")){
+    stop(print("detect_year expects an object of class data.frame as input"))
+  }
+  lc_colnames <- tolower(colnames(df))
+  dates <- grepl("date", lc_colnames) & !grepl("access", lc_colnames)
+  if(any(dates)){
+    if(any(colnames(df) == "year")) {
+      result <- df$year
+    }else{
+      result <- rep(NA, nrow(df))
+    }
+    na_rows <- is.na(result)
+    if(any(na_rows)){
+      result[na_rows] <- unlist(lapply(
+        split(df[na_rows, dates], seq_along(na_rows)),
+        guess_year
+      ))
+    }
+  }else{
+    result <- rep(NA, nrow(df))
+  }
+  return(result)
+}
+
+# internal function used by parse_csv and parse_tsv
+# ' Matches imported data to reference codes
+# '
+# ' @description Takes an imported data.frame and rearranges it to match lookup codes.
+# ' @param df A data.frame that contains bibliographic information.
+# ' @return Returns a data.frame rearranged and coded to match standard bibliographic fields, with unrecognized fields appended.
+# ' @example inst/examples/match_columns.R
+match_columns <- function(df){
+  # figure out which columns match known tags
+  hits <- as.numeric(match(synthesisr::code_lookup$code, colnames(df)))
+  newcolnames <- synthesisr::code_lookup$field[
+    match(colnames(df),
+          synthesisr::code_lookup$code)
+  ]
+  colnames(df)[!is.na(newcolnames)] <- newcolnames[!is.na(newcolnames)]
+  
+  # rearrange data in standard(ish) order
+  if(any(is.na(hits))){
+    hits <- hits[!is.na(hits)]
+  }
+  
+  # retain columns even if they did not match lookup
+  retain <- append(hits, seq(1, length(df), 1)[!(seq(1, length(df), 1) %in% hits)])
+  
+  return(df[,retain])
+}
+
+#' Bind two or more data frames with different columns
+#'
+#' @description Takes two or more data.frames with different column names or different column orders and binds them to a single data.frame.
+#' @param x Either a data.frame or a list of data.frames.
+#' @param y A data.frame, optional if x is a list.
+#' @return Returns a single data.frame with all the input data frames merged.
+#' @example inst/examples/merge_columns.R
+merge_columns <- function(
+    x, # either a data.frame or a list of the same
+    y # a data.frame, optional
+){
+  if(missing(x)){
+    stop("object x is missing with no default")
+  }
+  
+  if(!(inherits(x, "data.frame") || inherits(x, "list"))) {
+    stop("object x must be either a data.frame or a list")    
+  }
+
+  
+  if(!(inherits(x, "data.frame"))){
+    if(missing(y)){
+      stop("If x is a data.frame, then y must be supplied")
+    }
+    x <- list(x, y)
+  }else{ # i.e. for lists
+    if(!all(unlist(lapply(x, class)) == "data.frame")){
+      stop("x must only contain data.frames")
+    }
+  }
+  
+  x <- lapply(x, remove_factors)
+  
+  col_names_all <- unique(unlist(lapply(x, colnames)))
+  
+  result_list <- lapply(x, function(a, cn){
+    missing_names <- !(cn %in% colnames(a))
+    if(any(missing_names)){
+      new_names <- cn[missing_names]
+      result <- data.frame(
+        c(a, sapply(new_names, function(b){NA})),
+        stringsAsFactors = FALSE)
+      return(result[, cn])
+    }else{
+      return(a[, cn])
+    }
+  },
+  cn = col_names_all
+  )
+  
+  return(do.call(rbind, result_list))
+  
+}
+
+# internal functions called by merge_columns
+# ' Remove factors from an object
+# '
+# ' @description This function converts factors to characters to avoid errors with levels.
+# ' @param z A data.frame
+# ' @return Returns the input data.frame with all factors converted to character.
+# ' @examples remove_factors(list(as.factor(c("a", "b"))))
+remove_factors <- function(z){
+  z[] <- lapply(z, function(x){
+    if(is.factor(x)){as.character(x)}else{x}
+  })
+  return(z)
+}
+
+#' @rdname bibliography-class
+as.data.frame.bibliography <- function(x, ...){
+  # Solves https://github.com/mjwestgate/synthesisr/issues/25 - but could likely be faster
+  x <- purrr::map(x, \(x) {
+    x[lengths(x) == 0] <- NA
+    x
+  })
+  cols <- unique(unlist(lapply(x, names)))
+  # cols <- cols[which(cols != "further_info")]
+  
+  x_list <- lapply(x, function(a, cols){
+    result <- lapply(cols, function(b, lookup){
+      if(any(names(lookup) == b)){
+        data_tr <- lookup[[b]]
+        if(length(data_tr) > 1){
+          data_tr <- paste0(data_tr, collapse = " and ")
+        }
+        return(data_tr)
+      }else{
+        return(NA)
+      }
+    },
+    lookup = a)
+    names(result) <- cols
+    return(
+      as.data.frame(
+        result,
+        stringsAsFactors=FALSE
+      )
+    )
+  },
+  cols = cols
+  )
+  
+  x_dframe <- data.frame(
+    do.call(rbind, x_list),
+    stringsAsFactors = FALSE
+  )
+  rownames(x_dframe) <- NULL
+  
+  return(x_dframe)
+}
+
+# Cleans data.frames into synthesisr format
+#' @rdname clean_
+clean_df <- function(data){
+  colnames(data) <- clean_colnames(colnames(data))
+  if(any(colnames(data) == "author")){
+    data$author <- clean_authors(data$author)
+  }
+  return(data)
+}
+
+
+# Standardize author delimiters
+#' @rdname clean_
+clean_authors <- function(x){
+  if(any(grepl("\\sand\\s|\\sAND\\s|\\s&\\s", x))){
+    x <- gsub("\\sAND\\s|\\s&\\s", " and ", x)
+  }else{
+    x <- gsub(",(?=\\s[[:alpha:]]{2,})", " and ", x, perl = TRUE)
+  }
+  x <- gsub("\\s{2, }", " ", x)
+  return(x)
+}
+
+
+# Clean common issues with column names
+#' @rdname clean_
+clean_colnames <- function(
+    x # colnames
+){
+  if(inherits(x, "data.frame")){
+    x <- colnames(x)
+  }
+  x <- sub("^(X|Y|Z)\\.+", "", x) # remove leading X
+  x <- sub("^[[:punct:]]*", "", x) # leading punctuation
+  x <- sub("[[:punct:]]*$", "", x) # trailing punctuation
+  x <- gsub("\\.+", "_", x) # replace 1 or more dots with underscore
+  non_codes <- nchar(x) > 2 # for colnames with nchar > 2, convert to lower case
+  x[non_codes] <- tolower(x[non_codes])
+  x <- sub("authors", "author", x) # remove plural authors
+  x <- make.unique(x, sep = "_")
+  x <- gsub(" ", "_", x)
+  return(x)
+}
+
+#' @rdname bibliography-class
+as.bibliography <- function(x, ...){
+  
+  if(!inherits(x, "data.frame")) {
+    stop("as.bibliography can only be called for objects of class 'data.frame'")
+  }
+  
+  x_list <- lapply(
+    split(x, seq_len(nrow(x))),
+    function(a){
+      a <- as.list(a)
+      if(any(names(a) == "author")){
+        a$author <- strsplit(a$author, " and ")[[1]]
+      }
+      if(any(names(a) == "keywords")){
+        a$keywords <- strsplit(a$keywords, " and ")[[1]]
+      }
+      return(a)
+    }
+  )
+  names(x_list) <- seq_len(nrow(x))
+  class(x_list) <- "bibliography"
+  return(x_list)
+}
