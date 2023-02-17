@@ -5,7 +5,7 @@
 #'
 #' @param files List of file names
 #' @param ref_list List of references
-#'
+#' 
 #' @keywords internal
 #'
 
@@ -36,7 +36,7 @@ check_unique_search_meta <- function(files, ref_list) {
 #' @param cite_strings Optional. The search string used (or another grouping to analyse) - vector with one value per file
 #' @param cite_labels Optional. An additional label per file, for instance the stage of search - vector with one value per file
 #' @param verbose Should number of reference and allocation of labels be reported?
-#' @inheritParams synthesisr::read_refs
+#' @inheritParams synthesisr_read_refs
 #' @return A tibble with one row per citation
 #' @examples
 #' if (interactive()) {
@@ -65,10 +65,6 @@ read_citations <- function(files,
                            cite_labels = NULL,
                            verbose = TRUE,
                            tag_naming = "best_guess") {
-  if (!is.null(utils::packageDescription("synthesisr")$Repository) && utils::packageDescription("synthesisr")$Repository == "CRAN" && !utils::packageVersion("synthesisr") > "0.3.0") {
-    rlang::warn("NB: There is a bug in synthesisr 0.3.0 on CRAN that can lead to issues here. Best update to Github dev version or a newer version.", .frequency = "regularly", .frequency_id = "synthesisr-version")
-  }
-
 
   if (is.null(cite_sources)) {
     cite_sources <- purrr::map_chr(files, ~ tools::file_path_sans_ext(basename(.x)))
@@ -101,10 +97,9 @@ read_citations <- function(files,
 
   # Need to import files separately to add origin, platform, and searches
   ref_list <- lapply(files,
-    synthesisr::read_refs,
+    synthesisr_read_refs,
     tag_naming = tag_naming
   )
-
 
   # Drop empty citations
   ref_list <- lapply(
@@ -145,3 +140,5 @@ read_citations <- function(files,
     purrr::map(tibble::as_tibble) %>%
     purrr::reduce(dplyr::bind_rows)
 }
+
+
