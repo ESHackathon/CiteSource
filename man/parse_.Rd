@@ -22,7 +22,7 @@ parse_tsv(x)
 \arguments{
 \item{x}{A character vector containing bibliographic information in ris format.}
 
-\item{tag_naming}{What format are ris tags in? Defaults to "best_guess" See \code{\link{read_refs}} for a list of accepted arguments.}
+\item{tag_naming}{What format are ris tags in? Defaults to "best_guess" See \code{\link{synthesisr_read_refs}} for a list of accepted arguments.}
 }
 \value{
 Returns an object of class \code{bibliography} (ris, bib, or pubmed formats) or \code{data.frame} (csv or tsv).
