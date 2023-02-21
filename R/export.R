@@ -89,100 +89,13 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
       string_field, "cite_string_include", TRUE,
       label_field, "cite_label_include", TRUE
     ),
-    synthesisr::code_lookup %>% dplyr::filter(.data$ris_synthesisr)
+    synthesisr_code_lookup %>% dplyr::filter(.data$ris_synthesisr)
   ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
 
-  # Should be able to pass custom tibble here - but
-  # currently that does not work: https://github.com/mjwestgate/synthesisr/issues/23
-  environment(new_write_ris) <- asNamespace("synthesisr")
-  utils::assignInNamespace("write_ris", new_write_ris, ns = "synthesisr")
-
   # Currently, write_refs does not accept tibbles, thus converted
-  synthesisr::write_refs(as.data.frame(citations), file = filename, tag_naming = synthesisr_codes)
+  write_refs(as.data.frame(citations), file = filename, tag_naming = synthesisr_codes)
 }
 
-#' Changed synthesisr function
-#' @keywords internal
-#' @noRd
-
-new_write_ris <- function(x,
-                          tag_naming = "synthesisr") {
-  if (is.character(tag_naming)) {
-    lookup_df <- synthesisr::code_lookup[
-      synthesisr::code_lookup[, paste0("ris_", tag_naming)],
-      c("code", "field")
-    ]
-  } else {
-    lookup_df <- tag_naming[c("code", "field")]
-  }
-
-
-
-  result <- lapply(x, function(a, lookup) {
-    # convert to tagged vector
-    b <- do.call(c, a)
-    b <- b[!is.na(b)]
-    b <- data.frame(
-      tag = c(names(b), "end"),
-      entry = c(b, ""),
-      stringsAsFactors = FALSE
-    )
-    rownames(b) <- NULL
-    b$tag <- gsub("[[:digit:]]", "", b$tag)
-
-    # page information needs to be treated separately
-    if (any(b$tag == "pages")) {
-      page_row <- which(b$tag == "pages")
-      page_text <- b$entry[page_row]
-      if (grepl("-", page_text)) {
-        text_lookup <- list(
-          regexpr("^[[:digit:]]+", page_text),
-          regexpr("-[[:digit:]]+", page_text)
-        )
-        if (all(text_lookup > 0)) {
-          text_cleaned <- unlist(lapply(
-            text_lookup,
-            function(b) {
-              substr(page_text, b, b + attr(b, "match.length") - 1)
-            }
-          ))
-          new_rows <- data.frame(
-            tag = c("startpage", "endpage"),
-            entry = gsub("[[:punct:]]", "", text_cleaned),
-            stringsAsFactors = FALSE
-          )
-          b <- as.data.frame(rbind(
-            b[c(1:(page_row - 1)), ],
-            new_rows,
-            b[c((page_row + 1):nrow(b)), ]
-          ))
-        }
-      }
-    }
-    b$order <- seq_len(nrow(b))
-
-    # substitute tags for ris format versions
-    b <- merge(
-      lookup,
-      b,
-      by.x = "field",
-      by.y = "tag",
-      all.x = FALSE,
-      all.y = FALSE
-    )
-    b <- b[order(b$order), c(2:3)]
-
-    # concatenate rows, return a vector of strings
-    return(
-      c(paste(b$code, b$entry, sep = "  - "), "ER  - ", "")
-    )
-  },
-  lookup = lookup_df
-  )
-
-  export <- do.call(c, result)
-  return(export)
-}
 
 #' Export deduplicated citations to .bib file
 #'
@@ -222,7 +135,5 @@ export_bib <- function(citations, filename = "citations.bib", include = c("sourc
   citations <- citations %>%
     dplyr::select(-dplyr::starts_with("cite_"), -tidyselect::any_of(c("duplicate_id", "record_ids", "record_id")))
 
-  synthesisr::write_refs(as.data.frame(citations), format = "bib", file = filename)
+  write_refs(as.data.frame(citations), format = "bib", file = filename)
 }
-
-# citations <- citations %>% dplyr::select(-tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "duplicate_id", "record_ids", "record_id")))

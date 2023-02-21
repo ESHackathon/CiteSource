@@ -11,7 +11,7 @@
 runShiny <- function(app = "CiteSource", offer_install = interactive()) {
 
   # Check that required packages are installed
-  req_packages <- c("shiny", "shinyalert", "shinybusy", "shinyWidgets", "notapakcage")
+  req_packages <- c("shiny", "shinyalert", "shinybusy", "shinyWidgets")
   if (!all(available <- purrr::map_lgl(req_packages, ~ requireNamespace(.x, quietly = TRUE)))) {
     if (offer_install == TRUE) { 
       message("Some packages required for the CiteSource shiny app are missing. The following need to be installed: ",

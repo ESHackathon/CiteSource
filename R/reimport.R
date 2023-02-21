@@ -49,7 +49,7 @@ reimport_csv <- function(filename) {
 #' @param string_field Character. Which RIS field should cite_strings be read from? NULL to set to missing
 #' @param tag_naming Synthesisr option specifying how RIS tags should be replaced with names. This should not
 #' be changed when using this function to reimport a file exported from CiteSource. If you import your own
-#' RIS, check `names(synthesisr::code_lookup)` and select any of the options that start with `ris_`
+#' RIS, check `names(CiteSource:::synthesisr_code_lookup)` and select any of the options that start with `ris_`
 #' @param verbose Should confirmation message be displayed?
 #' @export
 #' @examples
@@ -60,12 +60,9 @@ reimport_csv <- function(filename) {
 #' }
 #'
 reimport_ris <- function(filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8", tag_naming = "ris_synthesisr", verbose = TRUE) {
-  if (!is.null(utils::packageDescription("synthesisr")$Repository) && utils::packageDescription("synthesisr")$Repository == "CRAN" && !utils::packageVersion("synthesisr") > "0.3.0") {
-    rlang::warn("NB: There is a bug in synthesisr 0.3.0 on CRAN that can lead to issues here. Best update to Github dev version or a newer version.", .frequency = "regularly", .frequency_id = "synthesisr-version")
-  }
 
-  if (!tag_naming %in% names(synthesisr::code_lookup)) {
-    stop("tag_naming must be one of ", names(synthesisr::code_lookup) %>% stringr::str_subset("^ris_") %>%
+  if (!tag_naming %in% names(synthesisr_code_lookup)) {
+    stop("tag_naming must be one of ", names(synthesisr_code_lookup) %>% stringr::str_subset("^ris_") %>%
       glue::glue_collapse(sep = ", ", last = " or "))
   }
 
@@ -85,12 +82,12 @@ reimport_ris <- function(filename = "citations.ris", source_field = "DB", label_
 
   synthesisr_codes <- dplyr::bind_rows(
     custom_codes,
-    synthesisr::code_lookup %>% dplyr::filter(.data[[tag_naming]])
+    synthesisr_code_lookup %>% dplyr::filter(.data[[tag_naming]])
   ) %>%
     dplyr::filter(!is.na(.data$code)) %>%
     dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
 
-  citations <- synthesisr::read_ref(filename, tag_naming = synthesisr_codes)
+  citations <- read_ref(filename, tag_naming = synthesisr_codes)
 
 
   if (!"cite_source" %in% names(citations)) {

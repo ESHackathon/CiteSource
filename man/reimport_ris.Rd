@@ -24,7 +24,7 @@ reimport_ris(
 
 \item{tag_naming}{Synthesisr option specifying how RIS tags should be replaced with names. This should not
 be changed when using this function to reimport a file exported from CiteSource. If you import your own
-RIS, check \code{names(synthesisr::code_lookup)} and select any of the options that start with \code{ris_}}
+RIS, check \code{names(CiteSource:::synthesisr_code_lookup)} and select any of the options that start with \code{ris_}}
 
 \item{verbose}{Should confirmation message be displayed?}
 }

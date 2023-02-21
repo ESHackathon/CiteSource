@@ -17,7 +17,9 @@ Authors@R: c(
     person("Chris", "Pritchard", , "chris.pritchard@ntu.ac.uk", role = "aut",
            comment = c(ORCID = "0000-0002-1143-9751")),
     person("Neal", "Haddaway", , "nealhaddaway@gmail.com", role = "aut",
-           comment = c(ORCID = "0000-0003-3902-2234"))
+           comment = c(ORCID = "0000-0003-3902-2234")),
+    person("Martin", "Westgate", role = "cph", comment = "Author of included synthesisr fragments"),
+    person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments")      
   )
 Description: CiteSource provides users with the ability to deduplicate
     references while maintaining customizable metadata. Instead of the
@@ -49,7 +51,6 @@ Imports:
     scales,
     snakecase,
     stringr,
-    synthesisr,
     tibble,
     tidyr,
     tidyselect,
@@ -70,3 +71,5 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Depends: 
+    R (>= 2.10)
