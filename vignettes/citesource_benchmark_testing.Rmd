@@ -1,7 +1,7 @@
 ---
 title: "Benchmark Testing"
 
-author: "Trevor Riley"
+author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search, the process can often be a very time consuming. 
 
-This vignette will provide an example of how one may use CiteSource not only to speed up the process of benchmarking, but use benchmarking as a way to iterate the development of search strings and strategies. 
+This vignette will provide an example of how one may use CiteSource not only to speed up the process of benchmarking, as well as iterate the development of search strings and search strategies. 
 
 ## 1. Installation of packages and loading libraries
 
@@ -104,7 +104,7 @@ plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
 ```{r}
 unique_citations %>%
-  filter(stringr::str_detect(cite_label, "BenchMark")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "BenchMark")) %>%
   record_level_table(return = "DT")
 
 ```
