@@ -22,11 +22,13 @@ knitr::opts_chunk$set(
 ```
 ## About this vignette
 
-In order to complete a reliable systematic search one must include multiple resources to ensure the inclusion of all relevant studies. The exact number of sources that are necessary for a thorough search can vary depending on the topic, type of review, etc. A various methods such aslong with the selection and search of traditional literature sources, other methods such as hand search relevant journals, citation chasing/snowballing, searching websites, etc. can be used along side the traditional database searching in order to minimize the risk of missing important studies. 
+In order to complete a reliable systematic search one must include multiple resources to ensure the inclusion of all relevant studies. The exact number of sources that are necessary for a thorough search can vary depending on the topic, type of review, etc. A long with the selection and search of traditional literature sources, other methods such as hand search relevant journals, citation chasing/snowballing, searching websites, etc. can be used in order to minimize the risk of missing relevant studies. 
 
-But how important is that extra database? How much return are you getting from the weeks worth of combing through websites? Did that open resource perform just perform as well as the one your library pays 100k/year? Did it do even better? How much time could you save if you had these answers? Wouldn't knowing the answers to these questions give us a better understanding of HOW to conduct our searches? Wouldn't it be great it we could speed the process of evidence synthesis without impacting its quality, better yet, improve it and make it faster?
+But how important is that extra database? How much return are you getting from the weeks worth of combing through websites? Did that open resource perform just perform as well as (or better than) the one your library/institution pays 500k/year for? How much time could you save if you had these answers? Wouldn't knowing the answers to these questions give us a better understanding of HOW to conduct our searches? Wouldn't it be great it we could speed the process of evidence synthesis without impacting its quality, better yet, improve it and make the process faster?
 
-These were some of the main questions that our team wanted to help to answer by building CiteSource. The goal of this vignette (which we'd love your feedback on) is to show you how you can begin to gather information on how sources and methods have impacted a review. The data in this vignette is based on (a subset of data) from an actual review. In it, we'll walk through how CiteSource can import original search results and compare those information sources, methods, and how they contributed to the final review. 
+These were some of the main questions that our team wanted to help to answer by building CiteSource. The goal of this vignette (which we'd love your feedback on) is to show you how you can begin to gather information on how sources and methods have impacted a review. The data in this vignette is based on a subset of data from an actual project. In it, we'll walk through how CiteSource can import original search results and compare those information sources, methods, and see how they contributed to the final review. 
+
+If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our discussion board on github! https://github.com/ESHackathon/CiteSource/discussions/100
 
 ## CiteSource Installation
 ```{r}
@@ -76,9 +78,6 @@ citations <- read_citations(citation_files,
                       cite_sources = c("AGRIS", "CAB", "EconLit", NA,
                                        "GreenFile", "McK", "RM", NA, 
                                        "WoS", "WoS"),
-                      cite_strings = c(NA, NA, NA, NA,
-                                       NA, NA, NA, NA,
-                                       "WoS1", "WoS2"),
                       cite_labels = c("search", "search", "search", "Final",
                                       "search", "search", "search", "Screened", 
                                       "search", "search"),
