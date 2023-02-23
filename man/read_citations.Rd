@@ -5,10 +5,11 @@
 \title{Import citations from file}
 \usage{
 read_citations(
-  files,
+  files = NULL,
   cite_sources = NULL,
   cite_strings = NULL,
   cite_labels = NULL,
+  metadata = NULL,
   verbose = TRUE,
   tag_naming = "best_guess"
 )
@@ -22,6 +23,8 @@ Should be .bib or .ris files}
 \item{cite_strings}{Optional. The search string used (or another grouping to analyse) - vector with one value per file}
 
 \item{cite_labels}{Optional. An additional label per file, for instance the stage of search - vector with one value per file}
+
+\item{metadata}{A tibble with file names and metadata for each file. Can be specified as an \emph{alternative} to files, cite_sources, cite_strings and cite_labels.}
 
 \item{verbose}{Should number of reference and allocation of labels be reported?}
 
@@ -41,5 +44,16 @@ if (interactive()) {
     cite_strings = c("Search1", "Search2"),
     cite_labels = c("raw", "screened")
   )
+  
+  # or equivalently
+  
+  metadata_tbl <- tibble::tribble(
+   ~files,     ~cite_sources, ~cite_strings, ~cite_labels, 
+  "res.ris",  "CINAHL",      "Search1",     "raw", 
+  "res.bib",  "MEDLINE",     "Search2",     "screened"
+  )
+  
+  read_citations(metadata = metadata_tbl)
+  
 }
 }
