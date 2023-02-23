@@ -6,7 +6,10 @@
 #'
 #' @param citations Dataframe with unique citations, resulting from `dedup_citations()`
 #' @param filename Name (and path) of file, should end in .csv
-#' @param separate Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to faciliate further analysis.
+#' @param separate Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to facilitate further analysis.
+#' @param trim_abstracts Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel, 
+#' which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
+#' NULL to retain abstracts as they are.
 #'
 #' @export
 #' @examples
@@ -14,8 +17,8 @@
 #'   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 #'   export_csv(dedup_results$unique, "cite_sources.csv", separate = "cite_source")
 #' }
-#'
-export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
+
+export_csv <- function(citations, filename = "citations.csv", separate = NULL, trim_abstracts = 32000) {
   if (tolower(tools::file_ext(filename)) != "csv") warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
 
   if (!is.null(separate)) {
@@ -34,6 +37,10 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL) {
         ) %>%
         dplyr::select(tidyselect::starts_with(paste0(stringr::str_remove(x, "cite_"))))
     })
+    
+    if (!is.null(trim_abstracts)) {
+      citations <- citations %>% dplyr::mutate(abstract = stringr::str_sub(abstract, 1, trim_abstracts))
+    }
 
     citations <- citations %>%
       dplyr::select(-tidyselect::all_of(separate)) %>%
