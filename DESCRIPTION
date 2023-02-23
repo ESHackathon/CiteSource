@@ -21,16 +21,13 @@ Authors@R: c(
     person("Martin", "Westgate", role = "cph", comment = "Author of included synthesisr fragments"),
     person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments")      
   )
-Description: CiteSource provides users with the ability to deduplicate
-    references while maintaining customizable metadata. Instead of the
-    traditional deduplication method where only one record is selected to
-    be retained, CiteSource retains each duplicate record and merges
-    metadata into a single, primary record. The primary record maintains
-    user-customized metadata in three fields, "cite_source", "cite_label"
-    and "tag_naming". During the merging process, select metadata fields
-    are also compared for completeness as well as length (currently DOI &
-    Abstract). CiteSource applies the more complete (based on length)
-    metadata to the main record.
+Description: CiteSource was developed in order to provide researchers the ability to 
+             examine the utility and efficacy of literature resources and search 
+             methodologies. The package provides users with the ability to deduplicate
+             references while maintaining customizable metadata. The resulting data 
+             can be analyzed using predeveloped plots and tables, including a summary 
+             table. Users are also able to export and reimport data in .ris, and csv. 
+             files. The package includes a shiny application for interactive use.
 License: GPL (>= 3)
 URL: https://www.eshackathon.org/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
