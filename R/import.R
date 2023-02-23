@@ -35,6 +35,7 @@ check_unique_search_meta <- function(files, ref_list) {
 #' @param cite_sources The origin of the citation files (e.g. "Scopus", "WOS", "Medline") - vector with one value per file, defaults to file names.
 #' @param cite_strings Optional. The search string used (or another grouping to analyse) - vector with one value per file
 #' @param cite_labels Optional. An additional label per file, for instance the stage of search - vector with one value per file
+#' @param metadata A tibble with file names and metadata for each file. Can be specified as an *alternative* to files, cite_sources, cite_strings and cite_labels. 
 #' @param verbose Should number of reference and allocation of labels be reported?
 #' @inheritParams synthesisr_read_refs
 #' @return A tibble with one row per citation
@@ -45,9 +46,20 @@ check_unique_search_meta <- function(files, ref_list) {
 #'     cite_strings = c("Search1", "Search2"),
 #'     cite_labels = c("raw", "screened")
 #'   )
+#'   
+#'   # or equivalently
+#'   
+#'   metadata_tbl <- tibble::tribble(
+#'    ~files,     ~cite_sources, ~cite_strings, ~cite_labels, 
+#'   "res.ris",  "CINAHL",      "Search1",     "raw", 
+#'   "res.bib",  "MEDLINE",     "Search2",     "screened"
+#'   )
+#'   
+#'   read_citations(metadata = metadata_tbl)
+#'   
 #' }
 #' @export
-#'
+
 
 # TODO: allow user to specify citation fields to serve as cite_sources, cite_strings or cite_labels
 
@@ -59,13 +71,27 @@ check_unique_search_meta <- function(files, ref_list) {
 # JSON metadata in line with the search history standard. If specified
 # search_json is ignored.
 
-read_citations <- function(files,
+read_citations <- function(files = NULL,
                            cite_sources = NULL,
                            cite_strings = NULL,
                            cite_labels = NULL,
+                           metadata = NULL,
                            verbose = TRUE,
                            tag_naming = "best_guess") {
 
+  if (is.null(files) && is.null(metadata)) stop("Either files or metadata must be specified.")
+  if (!is.null(files) && !is.null(metadata)) stop("files and metadata cannot both be specified.")
+  
+  if (!is.null(metadata)) {
+    if (!is.data.frame(metadata)) stop("metadata must be a tibble/dataframe.")
+    if (!("files" %in% colnames(metadata))) stop("metadata must contain at least a `files` column")
+    files <- metadata[["files"]]
+    cite_sources <- metadata[["cite_sources"]]
+    cite_strings <- metadata[["cite_strings"]]
+    cite_labels <- metadata[["cite_labels"]]
+  }
+  
+  
   if (is.null(cite_sources)) {
     cite_sources <- purrr::map_chr(files, ~ tools::file_path_sans_ext(basename(.x)))
 
