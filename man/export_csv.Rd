@@ -4,14 +4,23 @@
 \alias{export_csv}
 \title{Export deduplicated citations with source data as csv file}
 \usage{
-export_csv(citations, filename = "citations.csv", separate = NULL)
+export_csv(
+  citations,
+  filename = "citations.csv",
+  separate = NULL,
+  trim_abstracts = 32000
+)
 }
 \arguments{
 \item{citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
 
 \item{filename}{Name (and path) of file, should end in .csv}
 
-\item{separate}{Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to faciliate further analysis.}
+\item{separate}{Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to facilitate further analysis.}
+
+\item{trim_abstracts}{Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel,
+which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
+NULL to retain abstracts as they are.}
 }
 \description{
 This function saves deduplicated citations as a csv file for further analysis and/or reporting.
@@ -23,5 +32,4 @@ if (interactive()) {
   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
   export_csv(dedup_results$unique, "cite_sources.csv", separate = "cite_source")
 }
-
 }
