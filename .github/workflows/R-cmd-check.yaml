@@ -25,12 +25,12 @@ jobs:
         run: sudo apt-get install libcurl4-openssl-dev libnode-dev
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, any::roxygen2
+          extra-packages: any::rcmdcheck, any::roxygen2, any::devtools
           needs: check
       - name: Update date
         run: Rscript -e 'descr <- readLines("DESCRIPTION")' -e 'descr <- stringr::str_replace(descr, "^Date.*$", paste("Date:", Sys.Date()))' -e 'writeLines(descr, "DESCRIPTION")' 
       - name: Document
-        run: Rscript -e 'roxygen2::roxygenise()'
+        run: Rscript -e 'roxygen2::roxygenise(); devtools::build_manual()'
         
       - name: commit
         run: |
