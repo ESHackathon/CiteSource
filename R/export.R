@@ -39,7 +39,7 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
     })
     
     if (!is.null(trim_abstracts)) {
-      citations <- citations %>% dplyr::mutate(abstract = stringr::str_sub(abstract, 1, trim_abstracts))
+      citations <- citations %>% dplyr::mutate(abstract = stringr::str_sub(.data$abstract, 1, trim_abstracts))
     }
 
     citations <- citations %>%

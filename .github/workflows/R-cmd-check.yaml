@@ -27,10 +27,14 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::roxygen2, any::devtools
           needs: check
+      - uses: xu-cheng/texlive-action/full@v1
       - name: Update date
         run: Rscript -e 'descr <- readLines("DESCRIPTION")' -e 'descr <- stringr::str_replace(descr, "^Date.*$", paste("Date:", Sys.Date()))' -e 'writeLines(descr, "DESCRIPTION")' 
       - name: Document
-        run: Rscript -e 'roxygen2::roxygenise(); devtools::build_manual()'
+        run: Rscript -e 'roxygen2::roxygenise()'
+      - name: Manual
+        continue-on-error: true
+        run: Rscript -e 'devtools::build_manual()'
         
       - name: commit
         run: |
