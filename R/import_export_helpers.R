@@ -744,7 +744,7 @@ write_refs <- function(
     file = FALSE # either logical or a character (i.e. a file name)
     ) {
   # check input data
-  if (inherits(x, "data.frame") || inherits(x, "bibliography")) {
+  if (!(inherits(x, "data.frame") || inherits(x, "bibliography"))) {
     stop("write_bibliography only accepts objects of class 'data.frame' or 'bibliography'")
   }
   if (inherits(x, "data.frame")) {
