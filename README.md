@@ -72,7 +72,7 @@ Basic logic for metadata selection (Filled/Empty + Length)
 
 **Library Collection Development**
 
-As the community continues to apply this analysis to resources, this information would be extremely valuable to researchers and librarians outside of teh Evidence Synthesis community. From the library's perspective this tool could have a substantial impact on collection development decisions and resource recommendations. 
+As the community continues to apply this analysis to resources, this information would be extremely valuable to researchers and librarians outside of the Evidence Synthesis community. From the library's perspective this tool could have a substantial impact on collection development decisions and resource recommendations. 
 
 Examples:
 Database Coverage: Compare coverage of databases on specific research topics - What percent of results are duplicated in current subscriptions? What percent are unique? 
