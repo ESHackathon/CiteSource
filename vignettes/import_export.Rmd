@@ -25,7 +25,7 @@ If you want to provide the metadata in a more readable format, you can use a dat
 
 ```{r}
 
-file_path <- "../tests/testthat/data/working_example/short/"
+file_path <- "../vignettes/working_example_data/"
 
 metadata_tbl <- tibble::tribble(
   ~files,           ~cite_sources, ~cite_labels, 
