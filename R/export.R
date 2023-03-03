@@ -94,7 +94,8 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
       ~code, ~field, ~ris_synthesisr,
       source_field, "cite_source_include", TRUE,
       string_field, "cite_string_include", TRUE,
-      label_field, "cite_label_include", TRUE
+      label_field, "cite_label_include", TRUE,
+      "duplicate_id", "AN", TRUE
     ),
     synthesisr_code_lookup %>% dplyr::filter(.data$ris_synthesisr)
   ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
