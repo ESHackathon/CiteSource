@@ -44,6 +44,7 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 library(CiteSource)
 library(ggplot2)
 library(dplyr)
+library(knitr)
 ```
 ## 2. Import files from multiple sources
 
