@@ -90,7 +90,7 @@ metadata_tbl <- tibble::tribble(
   "Search6_4.ris",    "search6",       "search",
 ) %>% 
 # Append the file path to each file name in the 'files' column
-mutate(files = paste0(file_path, files))
+dplyr::mutate(files = paste0(file_path, files))
 # Read in citations using metadata table
 citations <- read_citations(metadata = metadata_tbl)
 ```

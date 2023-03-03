@@ -40,7 +40,7 @@ metadata_tbl <- tibble::tribble(
    "WoS_early.ris",  "WoS",         "search",    
    "WoS_later.ris",  "WoS",         "search"
 ) %>% 
-  mutate(files = paste0(file_path, files))
+dplyr::mutate(files = paste0(file_path, files))
 
 citations <- read_citations(metadata = metadata_tbl)
 
