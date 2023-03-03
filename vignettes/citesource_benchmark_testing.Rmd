@@ -58,7 +58,7 @@ citation_files <- list.files(path = "benchmark_data", pattern = "\\.ris", full.n
 citation_files
 
 # Set the path to the directory containing the citation files
-file_path <- "../vignettes/benchmark_data"
+file_path <- "../vignettes/benchmark_data/"
 
 # Create a tibble that contains metadata about the citation files
 metadata_tbl <- tibble::tribble(
@@ -73,6 +73,7 @@ metadata_tbl <- tibble::tribble(
   "Search3_2.ris",    "search3",       "search",  
   "Search3_3.ris",    "search3",       "search",    
   "Search3_4.ris",    "search3",       "search",
+  "Search3_5.ris",    "search3",       "search",
   "Search4_1.ris",    "search4",       "search",
   "Search4_2.ris",    "search4",       "search",
   "Search4_3.ris",    "search4",       "search",
