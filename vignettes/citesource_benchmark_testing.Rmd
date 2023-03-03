@@ -44,7 +44,6 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 library(CiteSource)
 library(ggplot2)
 library(dplyr)
-library(knitr)
 ```
 ## 2. Import files from multiple sources
 
@@ -138,7 +137,7 @@ This record table is helpful in reviewing which citations were found across each
 ```{r}
 
 unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "BenchMark")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "Benchmark")) %>%
   record_level_table(return = "DT")
 
 ```
