@@ -87,7 +87,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
   # Move source_type to the front - should be there unless there was an import issue
   # but these are common - see https://github.com/mjwestgate/synthesisr/issues/24
   citations <- citations %>%
-    dplyr::select("source_type", "duplicate_id", dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "record_ids", "record_id")))
+    dplyr::select("source_type", "duplicate_id", dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "record_id")))
 
   synthesisr_codes <- dplyr::bind_rows(
     tibble::tribble(
@@ -95,7 +95,8 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
       source_field, "cite_source_include", TRUE,
       string_field, "cite_string_include", TRUE,
       label_field, "cite_label_include", TRUE,
-      "AN", "duplicate_id", TRUE
+      "C1", "duplicate_id", TRUE,
+      "C2", "record_ids", TRUE
     ),
     synthesisr_code_lookup %>% dplyr::filter(.data$ris_synthesisr)
   ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
