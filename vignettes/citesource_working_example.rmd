@@ -46,7 +46,7 @@ library(CiteSource)
 library(dplyr)
 ```
 
-## Import Reference Files and Custom Metadata
+## 2. Import Reference Files and Custom Metadata
 
 Users can import multiple RIS or bibtex files into CiteSource, which they can label with three custom metadata fields, Cite_Source, Cite_String, and Cite_Label. 
 
@@ -56,7 +56,7 @@ The second field, Cite_Label, can be used to apply yet another variable. This la
 
 As a note, CiteSource does provide a third metadata field ,Cite_String, which can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results. This field is not used in this vignette.
 
-### Indicate location files
+### Indicate file location
 ```{r}
 #Import citation files from a folder
 citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
@@ -73,7 +73,7 @@ In this case, the "cite_labels" tag is being used to tag files with "search" (th
 
 The tag "cite_strings" is the third customizable field, however, it currently is currently not used in any of the package plots or tables. Future development is planned in order to integrate this it. The field is active and can still be used to document any variable users would like to track.
 
-## 2. Import files from multiple sources
+## 2. Tagging Sources
 
 Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. 
 
@@ -106,7 +106,7 @@ citations <- read_citations(metadata = metadata_tbl)
 ```
 
 
-## Deduplicate and identify crossover records
+## 3. Deduplication & Identifying Crossover Records
 
 CiteSource allows users to merge duplicates while maintaining information in the cite_labels, cite_sources, and cite_strings fields. 
 
@@ -117,18 +117,16 @@ Note that duplicates are assumed to published in the same source, so pre-prints 
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 
 unique_citations <- dedup_results$unique
-```
-### Count number of unique and non-unique citations from different sources and labels
-```{r}
-n_unique <- count_unique(unique_citations)
-```
 
-### Create dataframe indicating occurrence of records across sources
-```{r}
+# Count number of unique and non-unique citations from different sources and labels
+n_unique <- count_unique(unique_citations)
+
+# Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ```
 
-## Source & method analysis
+
+## 4. Analyzing Sources & Methods
 
 When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
 
@@ -159,11 +157,11 @@ my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRU
 my_upset_plot
 ```
 
-## Analyzing records after screening
+## 5. Analyzing records after screening
 
 Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
 
-### Assess contribution of sources by review stage
+### Assessing contribution of sources by review stage
 ```{r}
 my_contributions <- plot_contributions(n_unique,
   center = TRUE,
@@ -173,7 +171,8 @@ my_contributions <- plot_contributions(n_unique,
 my_contributions
 ```
 
-## Analyzing Precision/Sensitivity 
+
+### Analyzing Precision/Sensitivity 
 
 In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.) 
 
@@ -182,7 +181,7 @@ citation_summary_table(unique_citations, screening_label = c("Screened", "Final"
 
 ```
 
-### Citation Record Table
+### Creating a Citation Record Table
 
 Another useful table that can be exported as a .csv is the record-level table. This table allows users to quickly identify which individual citations were present/absent from each source. The source tag is the default (include = "sources"), but can be replaced or expanded with 'labels' and/or 'strings'
 ```{r}
@@ -191,7 +190,7 @@ unique_citations %>%
   record_level_table(return = "DT")
 ```
   
-### Exporting for further analysis
+## 6. Exporting for further analysis
 
 We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save in a convenient format for subsequent use. *CiteSource* offers a set of export functions called `export_csv`, `export_ris` or `export_bib` that will save any of our dataframes as a .csv file, .ris file or bibtex file, respectively. 
 
