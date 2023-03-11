@@ -33,7 +33,7 @@ If you have any questions, feedback, ideas, etc. about this vignette or others b
 
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the ggplot2 and dplyr packages.
 
-```{r, results = FALSE, message=FALSE, warning=FALSE}
+```{r, results = FALSE, message=FALSE}
 #Install the remotes packages to enable installation from GitHub
 #install.packages("remotes")
 #library(remotes)
@@ -73,7 +73,7 @@ In this case, the "cite_labels" tag is being used to tag files with "search" (th
 
 The tag "cite_strings" is the third customizable field, however, it currently is currently not used in any of the package plots or tables. Future development is planned in order to integrate this it. The field is active and can still be used to document any variable users would like to track.
 
-## 2. Tagging Sources
+## 3. Tagging Sources
 
 Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. 
 
@@ -106,7 +106,7 @@ citations <- read_citations(metadata = metadata_tbl)
 ```
 
 
-## 3. Deduplication & Identifying Crossover Records
+## 4. Deduplication & Identifying Crossover Records
 
 CiteSource allows users to merge duplicates while maintaining information in the cite_labels, cite_sources, and cite_strings fields. 
 
@@ -126,7 +126,7 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ```
 
 
-## 4. Analyzing Sources & Methods
+## 5. Analyzing Sources & Methods
 
 When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
 
@@ -157,7 +157,7 @@ my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRU
 my_upset_plot
 ```
 
-## 5. Analyzing records after screening
+## 6. Analyzing records after screening
 
 Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
 
@@ -170,7 +170,6 @@ my_contributions <- plot_contributions(n_unique,
 
 my_contributions
 ```
-
 
 ### Analyzing Precision/Sensitivity 
 
@@ -190,7 +189,7 @@ unique_citations %>%
   record_level_table(return = "DT")
 ```
   
-## 6. Exporting for further analysis
+## 7. Exporting for further analysis
 
 We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save in a convenient format for subsequent use. *CiteSource* offers a set of export functions called `export_csv`, `export_ris` or `export_bib` that will save any of our dataframes as a .csv file, .ris file or bibtex file, respectively. 
 
