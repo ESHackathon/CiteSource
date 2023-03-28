@@ -201,7 +201,7 @@ unique_year_funplot
 ```{r}
 #further work needed to integrate Unique_citations into this plot, as this is very manual, but great as an example as to how the three custom fields can be visualized. In this case Strings/Sources/Timeline (Inclusion/Exclusion)
 
-library(networkd3)
+library(networkD3)
 
 # Define nodes
 nodes <- data.frame(
