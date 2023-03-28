@@ -170,6 +170,9 @@ my_contributions
 # Filter the "all_unique" dataset to only include records with a valid year
 # Create a new column to represent the year
 # Group the data by source and year and calculate the count of records for each group
+
+library(ggplot2)
+
 year_data <- all_unique %>% 
   dplyr::mutate(year = as.numeric(year)) %>%  # Convert "year" column to numeric format
   dplyr::filter(!is.na(year) & year != "") %>%  # Remove rows where "year" is missing or empty
