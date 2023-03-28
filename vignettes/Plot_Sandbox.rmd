@@ -201,6 +201,8 @@ unique_year_funplot
 ```{r}
 #further work needed to integrate Unique_citations into this plot, as this is very manual, but great as an example as to how the three custom fields can be visualized. In this case Strings/Sources/Timeline (Inclusion/Exclusion)
 
+library(networkd3)
+
 # Define nodes
 nodes <- data.frame(
   name = c("AG 1", "AG 2", "AGRIS", 
@@ -249,6 +251,7 @@ links <- rbind(links, data.frame(
   target = c(12, 13),
   value = c(NA, NA)
 ))
+
 
 
 # Create Sankey diagram
