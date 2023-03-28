@@ -39,6 +39,7 @@ If you have any questions, feedback, ideas, etc. about this vignette or others b
 #Load the necessary libraries
 library(CiteSource)
 library(dplyr)
+library(ggplot2)
 ```
 
 ## 2. Import Reference Files and Custom Metadata
