@@ -308,16 +308,25 @@ display_gt_table <- function(data, caption) {
       heading.subtitle.font.size = px(14)
     )                                   # Set table styling options
 }
-
-# Display top 10 journals for each source
-
-display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
-display_gt_table(EconLit_journals[1:10, ], "Top 10 Journals by Unique Citations EconLit")
-display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
-display_gt_table(Method1_journals[1:10, ], "Top 10 Journals by Unique Citations Method 1")
-display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations Method 2")
-
 ```
+
+### Display top 10 journals for each source
+```{r}
+display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
+```
+```{r}
+display_gt_table(EconLit_journals[1:10, ], "Top 10 Journals by Unique Citations EconLit")
+```
+```{r}
+display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
+```
+```{r}
+display_gt_table(Method1_journals[1:10, ], "Top 10 Journals by Unique Citations Method 1")
+```
+```{r}
+display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations Method 2")
+```
+
 ### Citation Summary Table
 ```{r}
 # Citation summary table
