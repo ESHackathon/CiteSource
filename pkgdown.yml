@@ -2,11 +2,12 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
+  Plot_Sandbox: Plot_Sandbox.html
   citesource_benchmark_testing: citesource_benchmark_testing.html
   citesource_vignette_db-pre-screen_validation: citesource_vignette_db-pre-screen_validation.html
   citesource_vignette_db-topic-coverage: citesource_vignette_db-topic-coverage.html
   citesource_working_example: citesource_working_example.html
-last_built: 2023-03-28T15:18Z
+last_built: 2023-03-28T21:26Z
 urls:
   reference: http://www.eshackathon.org/CiteSource/reference
   article: http://www.eshackathon.org/CiteSource/articles
