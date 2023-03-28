@@ -41,6 +41,7 @@ Imports:
     gt,
     gtExtras,
     magrittr,
+    networkD3,
     parallel,
     plotly,
     purrr,
