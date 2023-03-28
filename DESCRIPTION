@@ -42,6 +42,7 @@ Imports:
     gtExtras,
     magrittr,
     parallel,
+    plotly,
     purrr,
     RecordLinkage,
     rlang,
