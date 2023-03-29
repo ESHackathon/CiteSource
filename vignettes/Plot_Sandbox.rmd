@@ -95,7 +95,7 @@ n_unique <- count_unique(unique_citations)
 # Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ```
-## Pull unique records from each source
+### Pull unique records from each source
 ```{r}
 #Get unique records from each source and add bibliographic data
 unique_AGRIS <- n_unique %>% 
@@ -128,8 +128,8 @@ all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
 ```
 
 
-### 4.PLOTS
-## Heatmaps
+## 4.PLOTS
+### Heatmaps
 ```{r}
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
 
@@ -143,7 +143,7 @@ my_heatmap_percent
 
 ```
 
-## Upset plots
+### Upset plots
 ```{r}
 # Citation duplication across multitiple resources
 
@@ -153,7 +153,7 @@ my_upset_plot
 ```
 
 
-## Bar Plots
+### Unique/Crossover Bar Plots
 ```{r}
 # Unique vs. Duplicate sources across Search/TiAb Screening/Final Inclusion
 
@@ -165,7 +165,7 @@ my_contributions <- plot_contributions(n_unique,
 my_contributions
 ```
 
-## Publication year bar plots
+### Publication year bar plots
 ```{r}
 
 # Filter the "all_unique" dataset to only include records with a valid year
@@ -189,7 +189,7 @@ unique_yearplot <- ggplot(year_data, aes(x=year, y=count, fill = cite_source.x))
 unique_yearplot
 ```
 
-## interactive publication year bar plot
+### interactive publication year bar plot
 ```{r}
 # Creating an interactive plot with plotly
 library(plotly)
@@ -199,7 +199,7 @@ unique_year_funplot <- ggplotly(unique_yearplot, tooltip = c("cite_source.x", "y
 unique_year_funplot
 ```
 
-## Sankey plot idea
+### Sankey plot idea
 ```{r}
 #further work needed to integrate Unique_citations into this plot, as this is very manual, but great as an example as to how the three custom fields can be visualized. In this case Strings/Sources/Timeline (Inclusion/Exclusion)
 
@@ -312,7 +312,7 @@ display_gt_table <- function(data, caption) {
 }
 ```
 
-## Top 10 journals for each source
+### Top 10 journals for each source
 ```{r}
 display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
 ```
@@ -329,7 +329,7 @@ display_gt_table(Method1_journals[1:10, ], "Top 10 Journals by Unique Citations 
 display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations Method 2")
 ```
 
-## Citation Summary Table
+### Citation Summary Table
 ```{r}
 # Citation summary table
 
@@ -337,7 +337,7 @@ citation_summary_table(unique_citations, screening_label = c("Screened", "Final"
 
 ```
 
-## Citation Record Table
+### Citation Record Table
 ```{r}
 # Citation Record Table
 
