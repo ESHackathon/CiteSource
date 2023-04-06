@@ -86,24 +86,6 @@
 <p>dataframe with indicators of where a citation appears, with sources/labels/strings as columns</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create sample data</span></span></span>
-<span class="r-in"><span><span class="va">sample_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  duplicate_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  cite_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"A"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  cite_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label_1"</span>, <span class="st">"label_2"</span>, <span class="st">"label_1"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  cite_string <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"string_1"</span>, <span class="st">"string_2"</span>, <span class="st">"string_1"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  record_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rec_1"</span>, <span class="st">"rec_2"</span>, <span class="st">"rec_3"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Run compare_sources on sample data</span></span></span>
-<span class="r-in"><span><span class="va">result_compare</span> <span class="op">&lt;-</span> <span class="fu">compare_sources</span><span class="op">(</span><span class="va">sample_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result_compare_with_references</span> <span class="op">&lt;-</span> <span class="fu">compare_sources</span><span class="op">(</span><span class="va">sample_data</span>, include_references <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result_compare_sources_labels</span> <span class="op">&lt;-</span> <span class="fu">compare_sources</span><span class="op">(</span><span class="va">sample_data</span>, comp_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sources"</span>, <span class="st">"labels"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result_compare_strings_labels</span> <span class="op">&lt;-</span> <span class="fu">compare_sources</span><span class="op">(</span><span class="va">sample_data</span>, comp_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"strings"</span>, <span class="st">"labels"</span><span class="op">)</span><span class="op">)</span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
