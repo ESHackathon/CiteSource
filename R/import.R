@@ -1,30 +1,3 @@
-#' Check whether each file contains results from unique database
-#'
-#' If filenames are to be used to name databases, users should be aware if
-#' one file contains results from more than one database.
-#'
-#' @param files List of file names
-#' @param ref_list List of references
-#' 
-#' @keywords internal
-#'
-
-# TODO: decide whether to use or remove this function
-
-check_unique_search_meta <- function(files, ref_list) {
-  # Iterate over ref list, check whether contents in a field are unique
-  # If not, warn the user
-  if (FALSE) {
-    warning(paste(
-      "Beware: ", files[i], "contains multiple values in field",
-      ref_field, ". However, they will all be labeled as coming from the
-            same database"
-    ))
-  }
-}
-
-
-
 #' Import citations from file
 #'
 #' This function imports RIS and Bibtex files with citations and merges them

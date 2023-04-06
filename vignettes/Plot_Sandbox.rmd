@@ -1,0 +1,350 @@
+---
+title: "Plot Sandbox"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plot Sandbox}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10,
+  fig.height = 10,
+  warning = FALSE
+)
+```
+## About this vignette
+
+This vignette is a bit of a sandbox for the experimentation with plots! Currently it is using the working example data (same data used in the "Source Analysis Across Screening Phases" vignette). This Vignette includes plots that are already built into CiteSource along with plots that we are exploring.
+
+If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our discussion board on github! https://github.com/ESHackathon/CiteSource/discussions/100
+
+## 1. Installation of packages and loading libraries
+
+```{r, results = FALSE, message=FALSE}
+#Install the remotes packages to enable installation from GitHub
+#install.packages("remotes")
+#library(remotes)
+
+#Install CiteSource
+#remotes::install_github("ESHackathon/CiteSource")
+
+#Load the necessary libraries
+library(CiteSource)
+library(dplyr)
+library(ggplot2)
+```
+
+## 2. Import Reference Files and Custom Metadata
+
+```{r}
+#Import citation files from a folder
+citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
+
+#Print citation_files to double check the order in which R imported our files.
+citation_files
+```
+
+
+## 3. Tagging Sources & Deduplication
+
+For this vignette we'll be using the same sources from the "Source Analysis Across Screening Phases" vignette as it's one of the larger sets of citations.
+
+```{r}
+# Import citation files from folder
+citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
+
+# Print list of citation files to console
+citation_files
+
+# Set the path to the directory containing the citation files
+file_path <- "../vignettes/working_example_data/"
+
+metadata_tbl <- tibble::tribble(
+  ~files,           ~cite_sources, ~cite_labels, 
+   "AGRIS.ris",      "AGRIS",       "search",    
+   "CAB.ris",        "CAB",         "search",    
+   "EconLit.ris",    "EconLit",     "search",    
+   "Final.ris",       NA,           "Final",     
+   "GreenFile.ris",  "GreenFile",   "search",    
+   "McK.ris",        "Method1",     "search",    
+   "RM.ris",         "Method2",     "search",    
+   "TiAb.ris",        NA,           "Screened",  
+   "WoS_early.ris",  "WoS",         "search",    
+   "WoS_later.ris",  "WoS",         "search"
+) %>% 
+
+dplyr::mutate(files = paste0(file_path, files))
+citations <- read_citations(metadata = metadata_tbl)
+
+# Deduplication & Identifying Crossover Records
+dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+
+unique_citations <- dedup_results$unique
+
+# Count number of unique and non-unique citations from different sources and labels
+n_unique <- count_unique(unique_citations)
+
+# Create dataframe indicating occurrence of records across sources
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+```
+### Pull unique records from each source
+```{r}
+#Get unique records from each source and add bibliographic data
+unique_AGRIS <- n_unique %>% 
+  dplyr::filter(cite_source=="AGRIS", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
+
+unique_CAB <- n_unique %>% 
+  dplyr::filter(cite_source=="CAB", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
+
+unique_EconLit <- n_unique %>% 
+  dplyr::filter(cite_source=="EconLit", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
+
+unique_WoS <- n_unique %>% 
+  dplyr::filter(cite_source=="WoS", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
+
+unique_Method1 <- n_unique %>% 
+  dplyr::filter(cite_source=="Method1", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
+
+unique_Method2 <- n_unique %>% 
+  dplyr::filter(cite_source=="Method2", unique == TRUE) %>%
+  inner_join(unique_citations, by = "duplicate_id")
+
+all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
+                        unique_WoS, unique_Method1, unique_Method2)
+
+```
+
+
+## 4.PLOTS
+### Heatmaps
+```{r}
+my_heatmap <- plot_source_overlap_heatmap(source_comparison)
+
+my_heatmap
+
+# Plot overlap as a heatmap matrix as percentage
+
+my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
+
+my_heatmap_percent
+
+```
+
+### Upset plots
+```{r}
+# Citation duplication across multitiple resources
+
+my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
+my_upset_plot
+```
+
+
+### Unique/Crossover Bar Plots
+```{r}
+# Unique vs. Duplicate sources across Search/TiAb Screening/Final Inclusion
+
+my_contributions <- plot_contributions(n_unique,
+  center = TRUE,
+  bar_order = c("search", "Screened", "Final")
+)
+
+my_contributions
+```
+
+### Publication year bar plots
+```{r}
+
+# Filter the "all_unique" dataset to only include records with a valid year
+# Create a new column to represent the year
+# Group the data by source and year and calculate the count of records for each group
+year_data <- all_unique %>% 
+  dplyr::mutate(year = as.numeric(year)) %>%  # Convert "year" column to numeric format
+  dplyr::filter(!is.na(year) & year != "") %>%  # Remove rows where "year" is missing or empty
+  group_by(cite_source.x, year) %>%  # Group data by "cite_source.x" and "year"
+  summarise(count = n(), .groups = "drop")  # Calculate the number of records in each group
+
+# Create a bar plot to visualize the filtered and grouped data
+unique_yearplot <- ggplot(year_data, aes(x=year, y=count, fill = cite_source.x)) +
+  geom_bar(position = "stack", stat = "identity") +  # Create a stacked bar plot with actual count values
+  scale_x_continuous(breaks = seq(min(year_data$year), max(year_data$year), by = 5)) +  # Set x-axis breaks to every 5 years
+  coord_cartesian(ylim = c(0, 950)) +  # Set y-axis limits to ensure all bars are visible
+  xlab("Publication year") +  # Add x-axis label
+  ylab("Unique records") +  # Add y-axis label
+  labs(fill = "Source")  # Add legend label for the fill color
+
+unique_yearplot
+```
+
+### interactive publication year bar plot
+```{r}
+# Creating an interactive plot with plotly
+library(plotly)
+
+unique_year_funplot <- ggplotly(unique_yearplot, tooltip = c("cite_source.x", "year", "count"), dynamicTicks = TRUE)
+
+unique_year_funplot
+```
+
+### Sankey plot idea
+```{r}
+#further work needed to integrate Unique_citations into this plot, as this is very manual, but great as an example as to how the three custom fields can be visualized. In this case Strings/Sources/Timeline (Inclusion/Exclusion)
+
+library(networkD3)
+
+# Define nodes
+nodes <- data.frame(
+  name = c("AG 1", "AG 2", "AGRIS", 
+           "CAB 1", "CAB 2", "CAB",
+           "EL 1", "EL 2", "EconLit", 
+           "WoS 1", "WoS 2", "WoS", 
+           "Method 1", "Method 2", 
+           "TI/AB Included", "Final Included", "Excluded", "NA"),
+  id = 0:17
+)
+
+# Define links
+links <- data.frame(
+  source = c(0, 1, 3, 4, 6, 7, 9, 10),
+  target = c(2, 2, 5, 5, 8, 8, 11, 11),
+  value = c(100, 150, 100, 150, 100, 150, 100, 100)
+)
+
+# Add links for the second column nodes (including Method 1 and Method 2) flowing into TI/AB Included and Excluded
+links <- rbind(links, data.frame(
+  source = c(2, 5, 8, 11, 2, 5, 8, 11, 12, 12, 13, 13),
+  target = c(14, 14, 14, 14, 16, 16, 16, 16, 14, 16, 14, 16),
+  value = c(50, 50, 50, 50, 200, 200, 200, 150, 50, 50, 50, 50)
+))
+
+# Add links for TI/AB Included flowing into Final Included and Excluded
+links <- rbind(links, data.frame(
+  source = c(14),
+  target = c(15),
+  value = c(100)
+))
+
+links <- rbind(links, data.frame(
+  source = c(14),
+  target = c(16),
+  value = c(200)
+))
+
+nodes <- rbind(nodes, data.frame(
+  name = c("", ""),
+  id = 17:18
+))
+
+links <- rbind(links, data.frame(
+  source = c(17, 17),
+  target = c(12, 13),
+  value = c(NA, NA)
+))
+
+
+
+# Create Sankey diagram
+sankey<-sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  units = "",
+  fontSize = 12,
+  nodeWidth = 20,
+  iterations = 0
+)
+sankey
+```
+
+## 5. TABLES
+### Unique Journal Count per Source 
+```{r}
+library(gt)
+#Exploritory Plot - The following table and functions are not yet integrated into CiteSource
+
+# Create a function to group by journal, count unique citations, and arrange in descending order
+# This function takes a data frame as input, and returns a processed data frame
+process_journals <- function(data) {
+  data %>%
+    group_by(journal) %>%          # Group the data by journal
+    summarise(count = n()) %>%
+    dplyr::filter(journal != "") %>%  # Filter out any blank journal titles
+    arrange(desc(count))             # Arrange the journals in descending order of count
+}
+
+# Process Journal Titles
+AGRIS_journals <- process_journals(unique_AGRIS)
+CAB_journals <- process_journals(unique_CAB) 
+EconLit_journals <- process_journals(unique_EconLit) 
+WoS_journals <- process_journals(unique_WoS)
+Method1_journals <- process_journals(unique_Method1)
+Method2_journals <- process_journals(unique_Method2)
+
+# Create a function to display a gt table
+# This function takes a data frame and a caption as input, and returns a gt table
+display_gt_table <- function(data, caption) {
+  data %>%
+    gt() %>%
+    tab_header(title = caption) %>%  # Set the table title to the provided caption
+    cols_label(journal = "Journal", count = "Unique Citations") %>%  # Set column labels
+    tab_options(
+      table.width = px(600),
+      table.font.size = px(12),
+      heading.title.font.size = px(16),
+      heading.subtitle.font.size = px(14)
+    )                                   # Set table styling options
+}
+```
+
+### Top 10 journals for each source
+```{r}
+display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
+```
+```{r}
+display_gt_table(EconLit_journals[1:10, ], "Top 10 Journals by Unique Citations EconLit")
+```
+```{r}
+display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
+```
+```{r}
+display_gt_table(Method1_journals[1:10, ], "Top 10 Journals by Unique Citations Method 1")
+```
+```{r}
+display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations Method 2")
+```
+
+### Citation Summary Table
+```{r}
+# Citation summary table
+
+citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+
+```
+
+### Citation Record Table
+```{r}
+# Citation Record Table
+
+unique_citations %>%
+  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
+  record_level_table(return = "DT")
+
+```
+
+
