@@ -3,6 +3,11 @@
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
+#' @examples
+#' unique_data <- ... # Load or create sample data here
+#' result <- count_unique(unique_data)
+#' result_with_references <- count_unique(unique_data, include_references = TRUE)
+
 
 count_unique <- function(unique_data, include_references = FALSE) {
   out <- unique_data %>%
@@ -33,6 +38,10 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #' @param comp_type Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with sources/labels/strings as columns
+#' @examples
+#' unique_data <- ... # Load or create sample data here
+#' result <- compare_sources(unique_data)
+#' result_with_references <- compare_sources(unique_data, include_references = TRUE)
 
 compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
   out <- list()
@@ -109,16 +118,3 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
   }
 }
 
-
-
-#   unique_data$author <- gsub(",.*", "", unique_data$author)
-#
-#   #TODO: does this need to be made unique? It seems that there can be multiple records with same author-year?
-#   pub_id <- unique_data %>%
-#     dplyr::select(.data$author, .data$year, .data$duplicate_id) %>%
-#     dplyr::mutate(pub_id = paste0(.data$author, "-", .data$year)) %>%
-#     dplyr::select(-.data$author, -.data$year, .data$pub_id, dplyr::everything())
-#
-#   db_comparison <-  dplyr::left_join(db_comparison, pub_id, by="duplicate_id")
-# }
-#
