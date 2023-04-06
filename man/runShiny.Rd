@@ -18,7 +18,7 @@ CiteSource shiny app
 Running this function will launch the CiteSource shiny app
 }
 \examples{
-\dontrun{
+if (interactive()) {
   # To run the CiteSource Shiny app:
   runShiny()
 }

@@ -11,14 +11,12 @@
 #' users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.
 #' @export
 #' @examples
-#' # Load a sample data set
-#' data("sample_citations")
-#'
-#' # Deduplicate the citations
-#' deduped_citations <- dedup_citations(sample_citations)
+#' if (interactive()){
+#' deduped_citations <- dedup_citations(citations)
 #'
 #' # Generate the record-level table
 #' record_table <- record_level_table(deduped_citations)
+#' }
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")

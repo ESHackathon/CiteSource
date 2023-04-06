@@ -8,7 +8,7 @@
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' \dontrun{
+#' if (interactive()) {
 #'   # To run the CiteSource Shiny app:
 #'   runShiny()
 #' }

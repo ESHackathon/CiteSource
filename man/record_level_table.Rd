@@ -34,12 +34,10 @@ A tibble or DataTable containing the per-record table that shows which sources (
 Creates a per-record table that shows which sources (and/or labels/strings) each item was found in.
 }
 \examples{
-# Load a sample data set
-data("sample_citations")
-
-# Deduplicate the citations
-deduped_citations <- dedup_citations(sample_citations)
+if (interactive()){
+deduped_citations <- dedup_citations(citations)
 
 # Generate the record-level table
 record_table <- record_level_table(deduped_citations)
+}
 }

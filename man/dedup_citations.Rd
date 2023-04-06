@@ -27,3 +27,8 @@ A list of 2 dataframes - unique citations and citations to be manually deduplica
 This function deduplicates citation data. Note that duplicates are assumed to published
 in the same source, so pre-prints and similar results will not be identified here.
 }
+\examples{
+if (interactive()) {
+dedup_citations(citations, merge_citations=TRUE)
+} 
+}
