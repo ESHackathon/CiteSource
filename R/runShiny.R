@@ -7,6 +7,11 @@
 #' @param offer_install Should user be prompted to install required packages if they are missing?
 #' @importFrom magrittr %>%
 #' @export
+#' @examples
+#' \dontrun{
+#'   # To run the CiteSource Shiny app:
+#'   runShiny()
+#' }
 
 runShiny <- function(app = "CiteSource", offer_install = interactive()) {
 
