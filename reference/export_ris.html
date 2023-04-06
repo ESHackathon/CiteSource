@@ -76,7 +76,7 @@ included as custom fields (if they were initially provided for any of the citati
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>citations</dt>
-<dd><p>Dataframe with unique citations, resulting from <code><a href="dedup_citations.html">dedup_citations()</a></code></p></dd>
+<dd><p>Dataframe with unique citations, resulting from <code>dedup_citations()</code></p></dd>
 
 
 <dt>filename</dt>
@@ -99,7 +99,7 @@ included as custom fields (if they were initially provided for any of the citati
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">export_ris</span><span class="op">(</span><span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span>, <span class="st">"cite_sources.ris"</span>, string_field <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
