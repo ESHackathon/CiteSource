@@ -86,6 +86,16 @@
 <p>dataframe with indicators of where a citation appears, with sources/labels/strings as columns</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">unique_data</span> <span class="op">&lt;-</span> <span class="va">...</span> <span class="co"># Load or create sample data here</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> '...' used in an incorrect context</span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">compare_sources</span><span class="op">(</span><span class="va">unique_data</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::select(., .data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")):</span> object 'unique_data' not found</span>
+<span class="r-in"><span><span class="va">result_with_references</span> <span class="op">&lt;-</span> <span class="fu">compare_sources</span><span class="op">(</span><span class="va">unique_data</span>, include_references <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::select(., .data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")):</span> object 'unique_data' not found</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
