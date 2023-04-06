@@ -17,3 +17,9 @@ CiteSource shiny app
 \description{
 Running this function will launch the CiteSource shiny app
 }
+\examples{
+\dontrun{
+  # To run the CiteSource Shiny app:
+  runShiny()
+}
+}
