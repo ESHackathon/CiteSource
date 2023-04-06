@@ -94,26 +94,6 @@ in the same source, so pre-prints and similar results will not be identified her
 <p>A list of 2 dataframes - unique citations and citations to be manually deduplicated if that option is selected</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load a sample citation dataset</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"citation_data"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>data set ‘citation_data’ not found</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Deduplicate citations without manual deduplication and without merging matching citations</span></span></span>
-<span class="r-in"><span><span class="va">deduplicated_citations</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">citation_data</span>, manual_dedup <span class="op">=</span> <span class="cn">FALSE</span>, merge_citations <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cname %in% names(raw_citations):</span> object 'citation_data' not found</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access the unique citations</span></span></span>
-<span class="r-in"><span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">deduplicated_citations</span><span class="op">$</span><span class="va">unique</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'deduplicated_citations' not found</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access the citations that require manual deduplication</span></span></span>
-<span class="r-in"><span><span class="va">manual_dedup_citations</span> <span class="op">&lt;-</span> <span class="va">deduplicated_citations</span><span class="op">$</span><span class="va">manual_dedup</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'deduplicated_citations' not found</span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
