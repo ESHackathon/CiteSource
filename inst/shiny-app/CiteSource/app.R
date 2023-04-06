@@ -308,7 +308,8 @@ server <- function(input, output, session) {
         last_message <<- showNotification(m$message, duration = NULL, type = "message")
       }
     )
-    rv$unique <- dedup_results$unique
+
+    rv$unique <- dedup_results
         
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
