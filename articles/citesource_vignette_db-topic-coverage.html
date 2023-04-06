@@ -153,7 +153,7 @@ next few steps produce the dataframes that we can use in subsequent
 analyses.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Deduplicate citations </span></span>
-<span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Get unique citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.</span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span>
