@@ -27,6 +27,19 @@ users to download a .csv file; in that file, presence and absence is always indi
 
 \item{indicator_absence}{How should it be indicated that a value is \emph{not} present in a source/label/string? Defaults to FALSE in tibbles and a cross in DT tables}
 }
+\value{
+A tibble or DataTable containing the per-record table that shows which sources (and/or labels/strings) each item was found in.
+}
 \description{
 Creates a per-record table that shows which sources (and/or labels/strings) each item was found in.
+}
+\examples{
+# Load a sample data set
+data("sample_citations")
+
+# Deduplicate the citations
+deduped_citations <- dedup_citations(sample_citations)
+
+# Generate the record-level table
+record_table <- record_level_table(deduped_citations)
 }
