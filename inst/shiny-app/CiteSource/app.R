@@ -366,12 +366,12 @@ server <- function(input, output, session) {
     } 
     # for each unique citation, which sources/ strings/ labels are present
     source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
-    plot_source_overlap_heatmap(source_comparison)
+    plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
   })
   
   plotInput <- reactive({
-    source_comparison <- CiteSource::compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
-    plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+    source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
+    plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
     
   })
   
