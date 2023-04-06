@@ -66,7 +66,6 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                  ),
                  
                  shiny::tabPanel("Deduplicate",
-                          
                             # Action button: identify duplicates in uploaded dataset
                             shinyWidgets::actionBttn(
                               'identify_dups', 'Identify duplicate citations',
@@ -91,31 +90,74 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                               # Sidebar panel for inputs ----
                                               shiny::sidebarPanel(id="sidebar",
                                                            
-                                                           # COME BACK TO IN V2?
-                                                           # 'Select sources',
-                                                           # uiOutput('checkbox1'),
-                                                           # hr(),
-                                                           # 'Select tags',
-                                                           # uiOutput('checkbox2')),
-                                              
                                               shinyWidgets::prettyRadioButtons(
                                                 inputId = "comp_type",
                                                 label = "Chose a comparison",
                                                 inline = TRUE,
                                                 choices = c("sources",
                                                             "labels", "strings"),
-                                                status="primary")),
-                                              
+                                                status="primary"),
+                                              selectInput(inputId = 'sources_visual', 
+                                                          'Sources to include', 
+                                                          list(), 
+                                                          multiple = TRUE, 
+                                                          selectize=TRUE),                                              
+                                              selectInput(inputId = 'labels_visual', 
+                                                          'Labels to include', 
+                                                          list(), 
+                                                          multiple = TRUE, 
+                                                          selectize=TRUE),
+                                              selectInput(inputId = 'strings_visual', 
+                                                          'Strings to include', 
+                                                          list(), 
+                                                          multiple = TRUE, 
+                                                          selectize=TRUE)                                            
+                                              ),
+                                                                                            
                                               shiny::mainPanel(
                                                 shiny::tabsetPanel(
                                                   shiny::tabPanel("Plot overlap as a heatmap matrix", plotly::plotlyOutput("plotgraph1")),
                                                   shiny::tabPanel("Plot overlap as an upset plot", downloadButton("downloadPlot"),
-                                                                  shiny::plotOutput("plotgraph2")),
-                                                  shiny::tabPanel("Review individual records", DT::dataTableOutput("reviewTab"))
+                                                                  shiny::plotOutput("plotgraph2"))
                                                 ))))
                                    )))),
                  
-                 
+                # Tables tab
+                shiny::tabPanel("Tables",
+                                shiny::fluidRow(
+                                  column(12,
+                                         shiny::fluidRow(
+                                           column(12,
+                                                  # Sidebar layout with input and output definitions ----
+                                                  shiny::sidebarLayout(
+                                                    
+                                                    # Sidebar panel for inputs ----
+                                                    shiny::sidebarPanel(id="sidebar",
+                                                                        
+                                                                        selectInput(inputId = 'sources_tables', 
+                                                                                    'Sources to include', 
+                                                                                    list(), 
+                                                                                    multiple = TRUE, 
+                                                                                    selectize=TRUE),                                              
+                                                                        selectInput(inputId = 'labels_tables', 
+                                                                                    'Labels to include', 
+                                                                                    list(), 
+                                                                                    multiple = TRUE, 
+                                                                                    selectize=TRUE),
+                                                                        selectInput(inputId = 'strings_tables', 
+                                                                                    'Strings to include', 
+                                                                                    list(), 
+                                                                                    multiple = TRUE, 
+                                                                                    selectize=TRUE)                                            
+                                                    ),
+                                                    
+                                                    shiny::mainPanel(
+                                                      shiny::tabsetPanel(
+                                                        shiny::tabPanel("Review individual records", DT::dataTableOutput("reviewTab")),
+                                                        shiny::tabPanel("View summary table", gt::gt_output("summaryTab"))
+                                                      ))))
+                                         )))),
+                
                  # Export tab
                 shiny::tabPanel("Export",
                                 shiny::fluidRow(
@@ -193,7 +235,7 @@ server <- function(input, output, session) {
   })
   
   
-  # # display summary input table - summary of files added
+  ## display summary input table - summary of files added
   output$tbl_out <- DT::renderDataTable({
     DT::datatable(rv$df, 
                   editable = TRUE,
@@ -201,7 +243,21 @@ server <- function(input, output, session) {
                                  searching = FALSE),
                   rownames = FALSE)
   })
-  
+
+  ## Update filters
+  observe({
+    if (!is.null(rv$unique)) {
+      shiny::updateSelectInput(inputId = "sources_visual", choices = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      shiny::updateSelectInput(inputId = "labels_visual", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      shiny::updateSelectInput(inputId = "strings_visual", choices = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+    }
+    if (!is.null(rv$unique)) {
+      shiny::updateSelectInput(inputId = "sources_tables", choices = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      shiny::updateSelectInput(inputId = "labels_tables", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      shiny::updateSelectInput(inputId = "strings_tables", choices = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+    }
+  })
+    
   # when file upload table is edited, edit reactive value upload df
   shiny::observeEvent(input$tbl_out_cell_edit, {
     
@@ -237,6 +293,14 @@ server <- function(input, output, session) {
   
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups,{
+    if (nrow(rv$upload_df) == 0) {
+      shinyalert::shinyalert("Data needed", 
+                             "Please import your citations first.", 
+                             type = "error")
+      # Stop plotting
+      req(FALSE)  
+    }
+    
     last_message <- NULL
     dedup_results <- withCallingHandlers(
       dedup_citations(rv$upload_df, merge_citations = TRUE),
@@ -268,21 +332,57 @@ server <- function(input, output, session) {
   #### end section ####
   
   #### Visualise tab ####
-  output$plotgraph1<-plotly::renderPlotly({
-    n_unique <- count_unique(rv$unique)
+  
+  unique_filtered_visual <- reactive({
+    sources <- input$sources_visual %>% paste(collapse = "|")
+    strings <- input$strings_visual %>% paste(collapse = "|")
+    labels <- input$labels_visual %>% paste(collapse = "|")
+    if (sources == "") sources <- ".*"
+    if (strings == "") strings <- ".*"
+    if (labels == "") labels <- ".*"
+    out <- rv$unique %>% 
+      dplyr::filter(.data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
+                    .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
+                    .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
+      )
     
+    out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>% 
+      purrr::map_chr(~paste(.x, collapse = ", "))
+    out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>% 
+      purrr::map_chr(~paste(.x, collapse = ", "))
+    out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>% 
+      purrr::map_chr(~paste(.x, collapse = ", "))
+    
+    out
+  })
+  
+  output$plotgraph1<-plotly::renderPlotly({
+    if (nrow(rv$unique) == 0) {
+      shinyalert::shinyalert("Data needed", 
+                             "Please import and deduplicate your citations first.", 
+                             type = "error")
+      # Stop plotting
+      req(FALSE)  
+    } 
     # for each unique citation, which sources/ strings/ labels are present
-    source_comparison <- compare_sources(rv$unique, comp_type = input$comp_type)
+    source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
     plot_source_overlap_heatmap(source_comparison)
   })
   
   plotInput <- reactive({
-    source_comparison <- CiteSource::compare_sources(rv$unique, comp_type = input$comp_type)
+    source_comparison <- CiteSource::compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
     plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
     
   })
   
   output$plotgraph2<-shiny::renderPlot({
+    if (nrow(rv$unique) == 0) {
+      shinyalert::shinyalert("Data needed", 
+                             "Please import and deduplicate your citations first.", 
+                             type = "error")
+      # Stop plotting
+      req(FALSE)  
+    } 
     print(plotInput())
     })
   
@@ -293,12 +393,57 @@ server <- function(input, output, session) {
        print(plotInput())
        dev.off()
         })
-   output$reviewTab<-DT::renderDataTable({
-     citations<-rv$unique
-     citations$source<-rv$unique$cite_source
-     record_level_table(citations=citations,return = "DT")
+   
+   #### Table tab ####
+   
+   unique_filtered_table <- reactive({
+     sources <- input$sources_tables %>% paste(collapse = "|")
+     strings <- input$strings_tables %>% paste(collapse = "|")
+     labels <- input$labels_tables %>% paste(collapse = "|")
+     if (sources == "") sources <- ".*"
+     if (strings == "") strings <- ".*"
+     if (labels == "") labels <- ".*"
+     out <- rv$unique %>% 
+       dplyr::filter(.data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
+                     .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
+                     .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
+       )
+     
+     out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>% 
+       purrr::map_chr(~paste(.x, collapse = ", "))
+     out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>% 
+       purrr::map_chr(~paste(.x, collapse = ", "))
+     out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>% 
+       purrr::map_chr(~paste(.x, collapse = ", "))
+     
+     out
    })
    
+   output$reviewTab <- DT::renderDataTable({
+     if (nrow(rv$unique) == 0) {
+       shinyalert::shinyalert("Data needed", 
+                              "Please import and deduplicate your citations first.", 
+                              type = "error")
+       # Stop plotting
+       req(FALSE)  
+     }
+     citations<-unique_filtered_table()
+     citations$source <- citations$cite_source
+     record_level_table(citations=citations,return = "DT")
+   })
+
+   output$summaryTab <- gt::render_gt({
+     if (nrow(rv$unique) == 0) {
+       shinyalert::shinyalert("Data needed", 
+                              "Please import and deduplicate your citations first.", 
+                              type = "error")
+       # Stop plotting
+       req(FALSE)  
+     }
+     citation_summary_table(unique_filtered_table())
+   })
+   
+      
   #### Export tab ####
    
    # # Downloadable bibtex ----
