@@ -23,19 +23,3 @@ dataframe with indicators of where a citation appears, with sources/labels/strin
 \description{
 Compare duplicate citations across sources, labels, and strings
 }
-\examples{
-# Create sample data
-sample_data <- data.frame(
-  duplicate_id = c(1, 1, 2),
-  cite_source = c("A", "B", "A"),
-  cite_label = c("label_1", "label_2", "label_1"),
-  cite_string = c("string_1", "string_2", "string_1"),
-  record_ids = c("rec_1", "rec_2", "rec_3")
-)
-
-# Run compare_sources on sample data
-result_compare <- compare_sources(sample_data)
-result_compare_with_references <- compare_sources(sample_data, include_references = TRUE)
-result_compare_sources_labels <- compare_sources(sample_data, comp_type = c("sources", "labels"))
-result_compare_strings_labels <- compare_sources(sample_data, comp_type = c("strings", "labels"))
-}
