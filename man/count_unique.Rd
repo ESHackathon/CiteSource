@@ -17,3 +17,8 @@ dataframe with indicators of where a citation appears, with source/label/string 
 \description{
 Count number of unique and non-unique citations from different sources, labels, and strings
 }
+\examples{
+unique_data <- ... # Load or create sample data here
+result <- count_unique(unique_data)
+result_with_references <- count_unique(unique_data, include_references = TRUE)
+}
