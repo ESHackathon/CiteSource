@@ -1,7 +1,7 @@
 #' Record-level table
 #'
 #' Creates a per-record table that shows which sources (and/or labels/strings) each item was found in.
-#'
+#' @return A tibble or DataTable containing the per-record table that shows which sources (and/or labels/strings) each item was found in.
 #' @param citations A deduplicated tibble as returned by `dedup_citations()`.
 #' @param include Which metadata should be included in the table? Defaults to 'sources', can be replaced or expanded with 'labels' and/or 'strings'
 #' @param include_empty Should records with empty metadata (e.g., no information on 'sources') be included in the table? Defaults to FALSE.
@@ -10,6 +10,15 @@
 #' @param return Either a `tibble` that can be exported, e.g. as a csv, or a DataTable (`DT`) that allows for interactive exploration. Note that the DataTable allows
 #' users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.
 #' @export
+#' @examples
+#' # Load a sample data set
+#' data("sample_citations")
+#'
+#' # Deduplicate the citations
+#' deduped_citations <- dedup_citations(sample_citations)
+#'
+#' # Generate the record-level table
+#' record_table <- record_level_table(deduped_citations)
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
@@ -138,13 +147,23 @@ record_level_table <- function(citations, include = "sources", include_empty = T
 #'
 #' Create a summary table to show the contribution of each source and the overall performance of the search. For this to work,
 #' labels need to be used that contrast a "search" stage with one or more later stages.
-#'
+#' 
+#' @return A tibble containing the contribution summary table, which shows the contribution of each source and the overall performance of the search
 #' @param citations A deduplicated tibble as returned by `dedup_citations()`.
 #' @param comparison_type Either "sources" to summarise and assess sources or "strings" to consider strings.
 #' @param search_label One or multiple labels that identify initial search results (default: "search") - if multiple labels are provided, they are merged.
 #' @param screening_label One or multiple label that identify screened records (default: "final") - if multiple are provided, each is compared to the search stage.
 #' @param top_n Number of sources/strings to display, based on the number of total records they contributed at the search stage. Note that calculations and totals will still be based on all citations. Defaults to NULL, then all sources/strings are displayed.
 #' @export
+#' @examples
+#' # Load a sample data set
+#' data("sample_citations")
+#'
+#' # Deduplicate the citations
+#' deduped_citations <- dedup_citations(sample_citations)
+#'
+#' # Generate the citation summary table
+#' summary_table <- citation_summary_table(deduped_citations)
 
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
   if (!comparison_type %in% c("sources", "strings")) stop('comparison_type needs to be "sources" or "strings"')
@@ -334,7 +353,6 @@ generate_apa_citation <- function(authors, year) {
   # False positives where some sources contain two names (or initials) while others include 1
   # False negative where same initial refers to different names
   # Appears to be best balance for now - further options and instructions could be provided
-
   # Need this to ensure that last_names and initialed_names retain same length
 
 
