@@ -80,9 +80,9 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="fu">CiteSource</span><span class="fu">::</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="fu">CiteSource</span><span class="fu">::</span><span class="va">examplecitations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> 'citations' is not an exported object from 'namespace:CiteSource'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> 'examplecitations' is not an exported object from 'namespace:CiteSource'</span>
 <span class="r-in"><span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dedup_results' not found</span>
 <span class="r-in"><span><span class="fu">count_unique</span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span></span>
