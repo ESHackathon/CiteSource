@@ -119,15 +119,15 @@ my_contributions
 
 
 ```{r}
-citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+#citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
 
 ```
 
 
 ```{r}
-unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
-  record_level_table(return = "DT")
+#unique_citations %>%
+#  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
+#  record_level_table(return = "DT")
 ```
   
 
