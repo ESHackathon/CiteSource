@@ -45,6 +45,8 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #' compare_sources(unique_citations, comp_type = "sources")
 #' }
 
+
+
 compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
   out <- list()
 
