@@ -18,13 +18,22 @@ dedup_citations <- function(raw_citations, manual_dedup = FALSE, merge_citations
   message("formatting data...")
   raw_citations <- add_cols(raw_citations, c("record_id", "cite_label", "cite_source", "cite_string"))
 
-  # rename columns
-  raw_citations$record_id <- raw_citations$record_id <- ""
-  raw_citations$journal <- raw_citations$source
-  raw_citations$number <- raw_citations$issue
-  raw_citations$pages <- raw_citations$start_page
-  raw_citations$isbn <- raw_citations$issn
-
+  # initialize/reset record_id
+  raw_citations$record_id <- ""
+  
+  # rename or coalesce columns
+  targets <- c("journal", "number", "pages", "isbn")
+  sources <- c("source", "issue", "start_page", "issn")
+  raw_citations <- add_cols(raw_citations, sources)
+  
+  for (i in seq_along(targets)) {
+    if (targets[i] %in% names(raw_citations)) {
+      raw_citations[[targets[i]]] <- dplyr::coalesce(raw_citations[[targets[i]]], raw_citations[[sources[i]]])
+    }  else {
+      raw_citations[[targets[i]]] <- raw_citations[[sources[i]]]
+    }
+  }
+  
   raw_citations_with_id <- add_id_citations(raw_citations)
 
   formatted_citations <- format_citations(raw_citations_with_id)
