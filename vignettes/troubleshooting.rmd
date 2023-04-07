@@ -66,10 +66,15 @@ metadata_tbl <- tibble::tribble(
 ) %>% 
 
 dplyr::mutate(files = paste0(file_path, files))
+
 citations <- read_citations(metadata = metadata_tbl)
 ```
 
-
+```{r echo=TRUE, results='asis'}
+# Load the knitr package
+library(DT)
+datatable(citations, options = list(pageLength = 10))
+```
 
 
 ```{r}
