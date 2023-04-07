@@ -1,5 +1,5 @@
 ---
-title: "Source Analysis Across Screening Phases"
+title: "troubleshooting"
 
 author: ""
 
@@ -22,16 +22,7 @@ knitr::opts_chunk$set(
 ```
 ## About this vignette
 
-In order to complete a reliable systematic search one must include multiple resources to ensure the inclusion of all relevant studies. The exact number of sources that are necessary for a thorough search can vary depending on the topic, type of review, etc. A long with the selection and search of traditional literature sources, other methods such as hand search relevant journals, citation chasing/snowballing, searching websites, etc. can be used in order to minimize the risk of missing relevant studies. 
-But how important is that extra database? How much return are you getting from the weeks worth of combing through websites? Did that open resource perform just perform as well as (or better than) the one your library/institution pays 500k/year for? How much time could you save if you had these answers? Wouldn't knowing the answers to these questions give us a better understanding of HOW to conduct our searches? Wouldn't it be great it we could speed the process of evidence synthesis without impacting its quality, better yet, improve it and make the process faster?
-
-These were some of the main questions that our team wanted to help to answer by building CiteSource. The goal of this vignette (which we'd love your feedback on) is to show you how you can begin to gather information on how sources and methods have impacted a review. The data in this vignette is based on a subset of data from an actual project. In it, we'll walk through how CiteSource can import original search results and compare those information sources, methods, and see how they contributed to the final review. 
-
-If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our discussion board on github! https://github.com/ESHackathon/CiteSource/discussions/100
-
-## 1. Installation of packages and loading libraries
-
-Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the ggplot2 and dplyr packages.
+This vignette is strictly for internal troubleshooting
 
 ```{r, results = FALSE, message=FALSE}
 #Install the remotes packages to enable installation from GitHub
@@ -46,36 +37,14 @@ library(CiteSource)
 library(dplyr)
 ```
 
-## 2. Import Reference Files and Custom Metadata
 
-Users can import multiple RIS or bibtex files into CiteSource, which they can label with three custom metadata fields, Cite_Source, Cite_String, and Cite_Label. 
-
-Using the Cite_Source field, the user can label individual files with source information such as database or platform. Beyond source information, users may also use the Cite_Source field to provide search results using various search methodologies. 
-
-The second field, Cite_Label, can be used to apply yet another variable. This label was intended to be used in combination with the previous two, in order to track the inclusion or exclusion of citations over the course of title/abstract screening and full text screening.
-
-As a note, CiteSource does provide a third metadata field ,Cite_String, which can be used to specify another attribute or variable. For example, a use of Cite_Source and Cite_String may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results. This field is not used in this vignette.
-
-### Indicate file location
 ```{r}
 #Import citation files from a folder
-citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path = file.path("../vignettes/troubleshooting"), pattern = "\\.ris", full.names = TRUE)
 
 #Print citation_files to double check the order in which R imported our files.
 citation_files
 ```
-
-
-### Read citation files
-In this example we read in the citaiton files and tag the citation files with the resource they came using "cite_sources". The two citation files labeled NA represent the file from included papers after title/abstract screening and the file of the included papers after full-text screening. 
-
-In this case, the "cite_labels" tag is being used to tag files with "search" (the initial search results), screened (included papers after TI/AB screening), or "Final" (papers included after full-text screening).
-
-The tag "cite_strings" is the third customizable field, however, it currently is currently not used in any of the package plots or tables. Future development is planned in order to integrate this it. The field is active and can still be used to document any variable users would like to track.
-
-## 3. Tagging Sources
-
-Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. 
 
 ```{r}
 # Import citation files from folder
@@ -85,20 +54,15 @@ citation_files <- list.files(path = "working_example_data", pattern = "\\.ris", 
 citation_files
 
 # Set the path to the directory containing the citation files
-file_path <- "../vignettes/working_example_data/"
+file_path <- "../vignettes/troubleshooting/"
 
 metadata_tbl <- tibble::tribble(
   ~files,           ~cite_sources, ~cite_labels, 
-   "AGRIS.ris",      "AGRIS",       "search",    
-   "CAB.ris",        "CAB",         "search",    
-   "EconLit.ris",    "EconLit",     "search",    
-   "Final.ris",       NA,           "Final",     
-   "GreenFile.ris",  "GreenFile",   "search",    
-   "McK.ris",        "Method1",     "search",    
-   "RM.ris",         "Method2",     "search",    
-   "TiAb.ris",        NA,           "Screened",  
-   "WoS_early.ris",  "WoS",         "search",    
-   "WoS_later.ris",  "WoS",         "search"
+   "ProcessedDIM.ris",   "DIM",       "processed",    
+   "ProcessedLENS.ris",  "LENS",      "processed",    
+   "RAWDIM.ris",         "DIM",       "raw",    
+   "RAWLENS.ris",        "LENS",      "raw",     
+
 ) %>% 
 
 dplyr::mutate(files = paste0(file_path, files))
@@ -106,11 +70,6 @@ citations <- read_citations(metadata = metadata_tbl)
 ```
 
 
-## 4. Deduplication & Identifying Crossover Records
-
-CiteSource allows users to merge duplicates while maintaining information in the cite_labels, cite_sources, and cite_strings fields. 
-
-Note that duplicates are assumed to published in the same source, so pre-prints and similar results will not be identified.
 
 
 ```{r}
@@ -126,24 +85,14 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ```
 
 
-## 5. Analyzing Sources & Methods
 
-When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
-
-### Plot overlap as a heatmap matrix
-CiteSource performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to that each source at the top of the source's column. The heatmap also provides a count of citations that were found at the intersection of each source. 
-
-In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.
-
-CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues. 
 ```{r}
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
 
 my_heatmap
 ```
 
-### Plot overlap as a heatmap matrix as percentage
-The following heatmap provides the an overview of the overlapping citations by percent of each source's count. For example the EconLit source contains 50 citations, of those 50 we can see on the previous heatmap that 8 of these citations were also in the source WoSE, which represents 16% of the citations from EconLit. On the other hand the same 8 citations only represent .3% of the total citations from WoSE. (currently this chart is set to display only whole numbers - we are considering changing this to display to the first decimal)
+
 ```{r}
 my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
 
@@ -157,11 +106,7 @@ my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRU
 my_upset_plot
 ```
 
-## 6. Analyzing records after screening
 
-Once the title and abstract screening has been completed or once the final papers have been selected, users can analyze the contributions of each source or search method to these screening phases to better understand their impact on the review. By using the "cite_source" data along with the "cite_label" data, users can analyze the number of overlapping/unique records from each source or method.
-
-### Assessing contribution of sources by review stage
 ```{r}
 my_contributions <- plot_contributions(n_unique,
   center = TRUE,
@@ -171,49 +116,37 @@ my_contributions <- plot_contributions(n_unique,
 my_contributions
 ```
 
-### Analyzing Precision/Sensitivity 
 
-In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.) 
 
 ```{r}
 citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
 
 ```
 
-### Creating a Citation Record Table
 
-Another useful table that can be exported as a .csv is the record-level table. This table allows users to quickly identify which individual citations were present/absent from each source. The source tag is the default (include = "sources"), but can be replaced or expanded with 'labels' and/or 'strings'
 ```{r}
 unique_citations %>%
   dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
   record_level_table(return = "DT")
 ```
   
-## 7. Exporting for further analysis
 
-We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save in a convenient format for subsequent use. *CiteSource* offers a set of export functions called `export_csv`, `export_ris` or `export_bib` that will save any of our dataframes as a .csv file, .ris file or bibtex file, respectively. 
-
-You can also reimport exported csv files to pick up a project or analysis without having to start from scratch, or after making manual adjustments (such as adding missing abstract data) to a file. 
-
-Generate a .csv file. The separate argument can be used to create separate columns for cite_source, cite_label or cite_string to facilitate analysis.
 
 ```{r}
 #export_csv(unique_citations, filename = "citesource_working_example.csv", separate = "cite_source")
 ```
 
-Generate a .ris file and indicate custom field location for cite_source, cite_label or cite_string. In this example, we'll be using EndNote, so we put cite_sources in the DB field, which will appear as the *Name of Database* field in EndNote and cite_labels into C5, which will appear as the *Custom 5* metadata field in EndNote.
 
 ```{r}
 #export_ris(unique_citations, filename = "citesource_working_example.ris", source_field = "DB", label_field = "C5")
 ```
 
-Generate a bibtex file and include data from cite_source, cite_label or cite_string.
+
 
 ```{r}
 #export_bib(unique_citations, filename = "citesource_working_example.bib", include = c("sources", "labels", "strings"))
 ```
 
-In order to reimport a .csv or a .ris you can use the follwowing. Here is an example of how you would reimport the file if it were on your desktop
 
 ```{r}
 #citesource_working_example <-reimport_csv("citesource_working_example.csv")
