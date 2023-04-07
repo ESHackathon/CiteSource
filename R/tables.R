@@ -13,11 +13,8 @@
 #' @examples
 #' if (interactive()){
 #' deduped_citations <- dedup_citations(citations)
-#'
-#' # Generate the record-level table
 #' record_table <- record_level_table(deduped_citations)
 #' }
-
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
 
@@ -153,15 +150,6 @@ record_level_table <- function(citations, include = "sources", include_empty = T
 #' @param screening_label One or multiple label that identify screened records (default: "final") - if multiple are provided, each is compared to the search stage.
 #' @param top_n Number of sources/strings to display, based on the number of total records they contributed at the search stage. Note that calculations and totals will still be based on all citations. Defaults to NULL, then all sources/strings are displayed.
 #' @export
-#' @examples
-#' # Load a sample data set
-#' data("sample_citations")
-#'
-#' # Deduplicate the citations
-#' deduped_citations <- dedup_citations(sample_citations)
-#'
-#' # Generate the citation summary table
-#' summary_table <- citation_summary_table(deduped_citations)
 
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
   if (!comparison_type %in% c("sources", "strings")) stop('comparison_type needs to be "sources" or "strings"')

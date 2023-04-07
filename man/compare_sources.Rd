@@ -29,4 +29,3 @@ dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 unique_citations <- dedup_results$unique
 compare_sources(unique_citations, comp_type = "sources")
 }
-}

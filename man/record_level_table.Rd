@@ -36,8 +36,5 @@ Creates a per-record table that shows which sources (and/or labels/strings) each
 \examples{
 if (interactive()){
 deduped_citations <- dedup_citations(citations)
-
-# Generate the record-level table
 record_table <- record_level_table(deduped_citations)
-}
 }

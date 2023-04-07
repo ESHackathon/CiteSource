@@ -14,7 +14,6 @@
 #' dedup_citations(citations, merge_citations=TRUE)
 #' } 
 
-
 dedup_citations <- function(raw_citations, manual_dedup = FALSE, merge_citations = FALSE, preferred_source = NULL) {
   message("formatting data...")
   raw_citations <- add_cols(raw_citations, c("record_id", "cite_label", "cite_source", "cite_string"))

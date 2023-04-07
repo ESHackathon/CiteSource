@@ -4,11 +4,10 @@
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 #' @examples
-#' dedup_results <- dedup_citations(CiteSource::citations, merge_citations = TRUE)
+#' if (interactive()){
+#' dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 #' unique_citations <- dedup_results$unique
-#' count_unique(unique_citations)
-#' 
-
+#' count_unique(unique_citations)}
 
 count_unique <- function(unique_data, include_references = FALSE) {
   out <- unique_data %>%
@@ -39,7 +38,7 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #' @param comp_type Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with sources/labels/strings as columns
-#' @examples
+#' @examples 
 #' if (interactive()){
 #' dedup_results <- dedup_citations(citations, merge_citations = TRUE)
 #' unique_citations <- dedup_results$unique

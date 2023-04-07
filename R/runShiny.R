@@ -12,7 +12,6 @@
 #'   # To run the CiteSource Shiny app:
 #'   runShiny()
 #' }
-
 runShiny <- function(app = "CiteSource", offer_install = interactive()) {
 
   # Check that required packages are installed
