@@ -19,12 +19,14 @@ compare_sources(
 }
 \value{
 dataframe with indicators of where a citation appears, with sources/labels/strings as columns
-if (interactive()){
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-unique_citations <- dedup_results$unique
-compare_sources(unique_citations, comp_type = "sources")
-}
 }
 \description{
 Compare duplicate citations across sources, labels, and strings
+}
+\examples{
+if (interactive()){
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations <- dedup_results$unique
+compare_sources(unique_citations, comp_type = "sources")
+}
 }
