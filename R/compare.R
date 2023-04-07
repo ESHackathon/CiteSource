@@ -3,7 +3,10 @@
 #' @param unique_data from ASySD, merged unique rows with duplicate IDs
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
-
+#' @examples
+#' dedup_results <- dedup_citations(CiteSource::citations, merge_citations = TRUE)
+#' unique_citations <- dedup_results$unique
+#' count_unique(unique_citations)
 
 count_unique <- function(unique_data, include_references = FALSE) {
   out <- unique_data %>%
