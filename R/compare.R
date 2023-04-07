@@ -38,11 +38,17 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with sources/labels/strings as columns
 #' @examples 
-#' if (interactive()){
-#' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#' unique_citations <- dedup_results$unique
-#' compare_sources(unique_citations, comp_type = "sources")
+#' if (interactive()) {
+#'   # Load example data from the package
+#'   data("examplecitations", package = "CiteSource")
+#' 
+#'   # Deduplicate citations and compare sources
+#'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+#'   unique_citations <- dedup_results$unique
+#'   compare_sources(unique_citations, comp_type = "sources")
 #' }
+
+
 
 compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
   out <- list()
