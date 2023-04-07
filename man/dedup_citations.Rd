@@ -28,15 +28,7 @@ This function deduplicates citation data. Note that duplicates are assumed to pu
 in the same source, so pre-prints and similar results will not be identified here.
 }
 \examples{
-# Load a sample citation dataset
-data("citation_data")
-
-# Deduplicate citations without manual deduplication and without merging matching citations
-deduplicated_citations <- dedup_citations(citation_data, manual_dedup = FALSE, merge_citations = FALSE)
-
-# Access the unique citations
-unique_citations <- deduplicated_citations$unique
-
-# Access the citations that require manual deduplication
-manual_dedup_citations <- deduplicated_citations$manual_dedup
+if (interactive()) {
+dedup_citations(citations, merge_citations=TRUE)
+} 
 }

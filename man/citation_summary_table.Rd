@@ -30,13 +30,3 @@ A tibble containing the contribution summary table, which shows the contribution
 Create a summary table to show the contribution of each source and the overall performance of the search. For this to work,
 labels need to be used that contrast a "search" stage with one or more later stages.
 }
-\examples{
-# Load a sample data set
-data("sample_citations")
-
-# Deduplicate the citations
-deduped_citations <- dedup_citations(sample_citations)
-
-# Generate the citation summary table
-summary_table <- citation_summary_table(deduped_citations)
-}

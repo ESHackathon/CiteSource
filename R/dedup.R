@@ -10,17 +10,9 @@
 #' @param preferred_source citation source user wants to preferentially retain in dataset
 #' @return A list of 2 dataframes - unique citations and citations to be manually deduplicated if that option is selected
 #' @examples
-#' # Load a sample citation dataset
-#' data("citation_data")
-#'
-#' # Deduplicate citations without manual deduplication and without merging matching citations
-#' deduplicated_citations <- dedup_citations(citation_data, manual_dedup = FALSE, merge_citations = FALSE)
-#'
-#' # Access the unique citations
-#' unique_citations <- deduplicated_citations$unique
-#'
-#' # Access the citations that require manual deduplication
-#' manual_dedup_citations <- deduplicated_citations$manual_dedup
+#' if (interactive()) {
+#' dedup_citations(citations, merge_citations=TRUE)
+#' } 
 
 dedup_citations <- function(raw_citations, manual_dedup = FALSE, merge_citations = FALSE, preferred_source = NULL) {
   message("formatting data...")

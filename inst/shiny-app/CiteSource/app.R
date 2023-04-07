@@ -1,4 +1,3 @@
-
 options(shiny.maxRequestSize=30*1024^2)
 # Set background colour
 tags$head(tags$style(

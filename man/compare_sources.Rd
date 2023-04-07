@@ -24,7 +24,9 @@ dataframe with indicators of where a citation appears, with sources/labels/strin
 Compare duplicate citations across sources, labels, and strings
 }
 \examples{
-unique_data <- ... # Load or create sample data here
-result <- compare_sources(unique_data)
-result_with_references <- compare_sources(unique_data, include_references = TRUE)
+if (interactive()){
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations <- dedup_results$unique
+compare_sources(unique_citations, comp_type = "sources")
+}
 }
