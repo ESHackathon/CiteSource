@@ -83,7 +83,13 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>dataframe with indicators of where a citation appears, with sources/labels/strings as columns</p>
+<p>dataframe with indicators of where a citation appears, with sources/labels/strings as columns
+if (interactive())
+dedup_results &lt;- dedup_citations(citations, merge_citations = TRUE)
+unique_citations &lt;- dedup_results$unique
+compare_sources(unique_citations, comp_type = "sources")</p>
+
+
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
