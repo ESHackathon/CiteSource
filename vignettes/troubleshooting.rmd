@@ -68,94 +68,24 @@ metadata_tbl <- tibble::tribble(
 dplyr::mutate(files = paste0(file_path, files))
 
 citations <- read_citations(metadata = metadata_tbl)
+
 ```
 
 ```{r echo=TRUE, results='asis'}
 # Load the knitr package
 library(DT)
-datatable(citations, options = list(pageLength = 10))
+datatable(citations %>% select(-abstract), options = list(pageLength = 10))
 ```
 
 
 ```{r}
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+dedup_results_raw <- dedup_citations(citations %>% filter(cite_label == "raw"), merge_citations = TRUE)
+dedup_results_processed <- dedup_citations(citations %>% filter(cite_label == "processed"), merge_citations = TRUE)
 
-unique_citations <- dedup_results$unique
+unique_citations_raw <- dedup_results_raw$unique
+unique_citations_processed <- dedup_results_processed$unique
 
 # Count number of unique and non-unique citations from different sources and labels
-n_unique <- count_unique(unique_citations)
-
-# Create dataframe indicating occurrence of records across sources
-source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+if (nrow(unique_citations_raw) == nrow(unique_citations_processed)) message("Deduplication likely identical")
 ```
 
-
-
-```{r}
-my_heatmap <- plot_source_overlap_heatmap(source_comparison)
-
-my_heatmap
-```
-
-
-```{r}
-my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
-
-my_heatmap_percent
-```
-
-### Plot overlap as an upset plot
-```{r}
-my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-
-my_upset_plot
-```
-
-
-```{r}
-my_contributions <- plot_contributions(n_unique,
-  center = TRUE,
-  bar_order = c("search", "Screened", "Final")
-)
-
-my_contributions
-```
-
-
-
-```{r}
-#citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
-
-```
-
-
-```{r}
-#unique_citations %>%
-#  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
-#  record_level_table(return = "DT")
-```
-  
-
-
-```{r}
-#export_csv(unique_citations, filename = "citesource_working_example.csv", separate = "cite_source")
-```
-
-
-```{r}
-#export_ris(unique_citations, filename = "citesource_working_example.ris", source_field = "DB", label_field = "C5")
-```
-
-
-
-```{r}
-#export_bib(unique_citations, filename = "citesource_working_example.bib", include = c("sources", "labels", "strings"))
-```
-
-
-```{r}
-#citesource_working_example <-reimport_csv("citesource_working_example.csv")
-
-#citesource_working_example <-reimport_ris("citesource_working_example.ris")
-
-```
