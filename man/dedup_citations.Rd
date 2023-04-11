@@ -29,6 +29,13 @@ in the same source, so pre-prints and similar results will not be identified her
 }
 \examples{
 if (interactive()) {
-dedup_citations(citations, merge_citations=TRUE)
-} 
+  # Load example data from the package
+  file_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+  examplecitations <- readRDS(file_path)
+
+  # Deduplicate citations and compare sources
+  dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+  unique_citations <- dedup_results$unique
+  compare_sources(unique_citations, comp_type = "sources")
+}
 }
