@@ -12,7 +12,7 @@
 #' @examples
 #' if (interactive()) {
 #'   # Load example data from the package
-#'   file_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#'   file_path <- system.file("data", "examplecitations.rds", package = "CiteSource")
 #'   examplecitations <- readRDS(file_path)
 #'
 #'   # Deduplicate citations and compare sources
@@ -20,6 +20,9 @@
 #'   unique_citations <- dedup_results$unique
 #'   compare_sources(unique_citations, comp_type = "sources")
 #' }
+
+
+
 
 dedup_citations <- function(raw_citations, manual_dedup = FALSE, merge_citations = FALSE, preferred_source = NULL) {
   message("formatting data...")

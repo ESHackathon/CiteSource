@@ -30,7 +30,7 @@ in the same source, so pre-prints and similar results will not be identified her
 \examples{
 if (interactive()) {
   # Load example data from the package
-  file_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+  file_path <- system.file("data", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(file_path)
 
   # Deduplicate citations and compare sources
