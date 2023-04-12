@@ -4,8 +4,15 @@
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 #' @examples
-#' dedup_results <- dedup_citations(CiteSource::examplecitations, merge_citations = TRUE)
+#' # Load example data from the package
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
+#'
+#' # Deduplicate citations
+#' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #' unique_citations <- dedup_results$unique
+#'
+#' # Count unique and non-unique citations
 #' count_unique(unique_citations)
 
 count_unique <- function(unique_data, include_references = FALSE) {
@@ -37,17 +44,17 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #' @param comp_type Specify which fields are to be included. One or more of "sources", "strings" or "labels" - defaults to all.
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with sources/labels/strings as columns
-#' @examples 
+#' @examples
 #' if (interactive()) {
 #'   # Load example data from the package
-#'   data("examplecitations", package = "CiteSource")
-#' 
+#'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#'   examplecitations <- readRDS(examplecitations_path)
+#'
 #'   # Deduplicate citations and compare sources
 #'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #'   unique_citations <- dedup_results$unique
 #'   compare_sources(unique_citations, comp_type = "sources")
 #' }
-
 
 
 compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {

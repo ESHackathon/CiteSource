@@ -30,8 +30,10 @@ included as custom fields (if they were initially provided for any of the citati
 }
 \examples{
 if (interactive()) {
-  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+  # Load example data from the package
+  examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+  examplecitations <- readRDS(examplecitations_path)
+  dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
   export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
 }
-
 }

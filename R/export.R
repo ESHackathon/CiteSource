@@ -10,13 +10,17 @@
 #' @param trim_abstracts Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel, 
 #' which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 #' NULL to retain abstracts as they are.
-#'
 #' @export
 #' @examples
 #' if (interactive()) {
-#'   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+#'   # Load example data from the package
+#'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#'   examplecitations <- readRDS(examplecitations_path)
+#'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #'   export_csv(dedup_results$unique, "cite_sources.csv", separate = "cite_source")
 #' }
+
+
 
 export_csv <- function(citations, filename = "citations.csv", separate = NULL, trim_abstracts = 32000) {
   if (tolower(tools::file_ext(filename)) != "csv") warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
@@ -61,14 +65,16 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
 #' @param source_field Character. Which RIS field should cite_sources be saved to? NULL to exclude.
 #' @param label_field Character. Which RIS field should cite_labels be saved to? NULL to exclude.
 #' @param string_field Character. Which RIS field should cite_strings be saved to? NULL to exclude.
-#'
 #' @export
 #' @examples
 #' if (interactive()) {
-#'   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+#'   # Load example data from the package
+#'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#'   examplecitations <- readRDS(examplecitations_path)
+#'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #'   export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
 #' }
-#'
+
 export_ris <- function(citations, filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8") {
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
 
@@ -116,14 +122,16 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 #' @param citations Dataframe with unique citations, resulting from `dedup_citations()`
 #' @param filename Name (and path) of file, should end in .ris
 #' @param include Character. One or more of sources, labels or strings
-#'
 #' @export
 #' @examples
 #' if (interactive()) {
-#'   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+#'   # Load example data from the package
+#'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#'   examplecitations <- readRDS(examplecitations_path)
+#'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #'   export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
 #' }
-#'
+
 export_bib <- function(citations, filename = "citations.bib", include = c("sources", "labels", "strings")) {
   if (tolower(tools::file_ext(filename)) != "bib") warning("Function saves a BibTex file, so filename should (usually) end in .bib. For now, name is used as provided.")
 

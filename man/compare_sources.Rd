@@ -26,7 +26,8 @@ Compare duplicate citations across sources, labels, and strings
 \examples{
 if (interactive()) {
   # Load example data from the package
-  data("examplecitations", package = "CiteSource")
+  examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+  examplecitations <- readRDS(examplecitations_path)
 
   # Deduplicate citations and compare sources
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)

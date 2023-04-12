@@ -28,14 +28,11 @@ This function deduplicates citation data. Note that duplicates are assumed to pu
 in the same source, so pre-prints and similar results will not be identified here.
 }
 \examples{
-if (interactive()) {
-  # Load example data from the package
-  file_path <- system.file("data", "examplecitations.rds", package = "CiteSource")
-  examplecitations <- readRDS(file_path)
+# Load example data from the package
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations <- readRDS(examplecitations_path)
 
-  # Deduplicate citations and compare sources
-  dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  unique_citations <- dedup_results$unique
-  compare_sources(unique_citations, comp_type = "sources")
-}
+# Deduplicate citations and compare sources
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations <- dedup_results$unique
 }

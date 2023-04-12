@@ -10,18 +10,13 @@
 #' @param preferred_source citation source user wants to preferentially retain in dataset
 #' @return A list of 2 dataframes - unique citations and citations to be manually deduplicated if that option is selected
 #' @examples
-#' if (interactive()) {
-#'   # Load example data from the package
-#'   file_path <- system.file("data", "examplecitations.rds", package = "CiteSource")
-#'   examplecitations <- readRDS(file_path)
+#' # Load example data from the package
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
 #'
-#'   # Deduplicate citations and compare sources
-#'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#'   unique_citations <- dedup_results$unique
-#'   compare_sources(unique_citations, comp_type = "sources")
-#' }
-
-
+#' # Deduplicate citations and compare sources
+#' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+#' unique_citations <- dedup_results$unique
 
 
 dedup_citations <- function(raw_citations, manual_dedup = FALSE, merge_citations = FALSE, preferred_source = NULL) {
