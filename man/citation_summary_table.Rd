@@ -30,3 +30,18 @@ A tibble containing the contribution summary table, which shows the contribution
 Create a summary table to show the contribution of each source and the overall performance of the search. For this to work,
 labels need to be used that contrast a "search" stage with one or more later stages.
 }
+\examples{
+if (interactive()) {
+# Load example data from the package
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations <- readRDS(examplecitations_path)
+
+# Deduplicate citations and compare sources
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations<-dedup_results$unique
+unique_citations |> 
+dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+record_level_table(return = "DT")
+citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+}
+}

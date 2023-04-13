@@ -10,6 +10,19 @@
 #' @param return Either a `tibble` that can be exported, e.g. as a csv, or a DataTable (`DT`) that allows for interactive exploration. Note that the DataTable allows
 #' users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.
 #' @export
+#' @examples
+#' if (interactive()) {
+#' # Load example data from the package
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
+#'
+#' # Deduplicate citations and compare sources
+#' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+#' unique_citations<-dedup_results$unique
+#' unique_citations |> 
+#' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+#' record_level_table(return = "DT")
+#' }
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
@@ -146,6 +159,20 @@ record_level_table <- function(citations, include = "sources", include_empty = T
 #' @param screening_label One or multiple label that identify screened records (default: "final") - if multiple are provided, each is compared to the search stage.
 #' @param top_n Number of sources/strings to display, based on the number of total records they contributed at the search stage. Note that calculations and totals will still be based on all citations. Defaults to NULL, then all sources/strings are displayed.
 #' @export
+#' @examples
+#' if (interactive()) {
+#' # Load example data from the package
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
+#'
+#' # Deduplicate citations and compare sources
+#' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+#' unique_citations<-dedup_results$unique
+#' unique_citations |> 
+#' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+#' record_level_table(return = "DT")
+#' citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+#' }
 
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
   if (!comparison_type %in% c("sources", "strings")) stop('comparison_type needs to be "sources" or "strings"')
