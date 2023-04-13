@@ -110,6 +110,7 @@ count_databases <- function(df, db_colname) {
     dplyr::pull(!!sym(db_colname)) %>%
     strsplit(", ") %>%
     unlist() %>%
+    trimws() %>%
     table() %>%
     as.data.frame() %>%
     dplyr::rename_with(~ gsub(" ", "_", .x, fixed = TRUE))
