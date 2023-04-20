@@ -4,11 +4,7 @@
 #' @param include_references Should bibliographic detail be included in return?
 #' @return dataframe with indicators of where a citation appears, with source/label/string as column
 #' @examples
-#' # Load example data from the package
-#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
-#' examplecitations <- readRDS(examplecitations_path)
-#'
-#' # Deduplicate citations
+#' data("examplecitations")
 #' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #' unique_citations <- dedup_results$unique
 #'

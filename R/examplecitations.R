@@ -1,0 +1,45 @@
+#' @title examplecitations
+#' @description An example of citation dataset from three different sources
+#' @format A data frame with 100 rows and 38 variables:
+#' \describe{
+#'   \item{\code{A2}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{A3}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{year}}{character Publication year}
+#'   \item{\code{title}}{character Publication title}
+#'   \item{\code{abstract}}{character Publication abstract}
+#'   \item{\code{doi}}{character Publication digitial object identifier}
+#'   \item{\code{accession_zr}}{character Publication code in source database}
+#'   \item{\code{url}}{character Publication url}
+#'   \item{\code{conference_date}}{character Conference date if publication is Conference paper}
+#'   \item{\code{supertaxa}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{ID}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{ZZ}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{source_type}}{character Journal or conference paper etc.}
+#'   \item{\code{source}}{character Journal name}
+#'   \item{\code{volume}}{character Journal volume}
+#'   \item{\code{issue}}{character Journal issue}
+#'   \item{\code{start_page}}{character Journal start page}
+#'   \item{\code{author}}{character Publication author}
+#'   \item{\code{chemicals}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{notes}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{cite_source}}{character Database Source (added by user in CiteSource)}
+#'   \item{\code{cite_label}}{character Search label (added by user in CiteSource)}
+#'   \item{\code{date_generated}}{character Date record generated}
+#'   \item{\code{keywords}}{character Publication keywords}
+#'   \item{\code{issn}}{character Journal issn number}
+#'   \item{\code{publisher}}{character Journal publisher}
+#'   \item{\code{ET}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{L1}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{end_page}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{place_published}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{M3}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{PI}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{article_number}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{C6}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{edition}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{A1}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{CL}}{character COLUMN_DESCRIPTION}
+#'   \item{\code{CP}}{character COLUMN_DESCRIPTION} 
+#'}
+#' @details DETAILS
+"examplecitations"

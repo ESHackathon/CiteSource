@@ -18,11 +18,7 @@ dataframe with indicators of where a citation appears, with source/label/string 
 Count number of unique and non-unique citations from different sources, labels, and strings
 }
 \examples{
-# Load example data from the package
-examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
-examplecitations <- readRDS(examplecitations_path)
-
-# Deduplicate citations
+data("examplecitations")
 dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 unique_citations <- dedup_results$unique
 
