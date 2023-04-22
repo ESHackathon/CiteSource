@@ -18,6 +18,19 @@ jobs:
     needs: R-CMD-check
     if: (github.event_name == 'push')
     uses: prisma-flowdiagram/r-workflows/.github/workflows/pkgdown.yml@v1
+  deploy-latest:
+    needs: pkgdown
+    if: (github.event_name == 'push')
+    uses: prisma-flowdiagram/r-workflows/.github/workflows/deploy.yml@v1
+    with:
+      install-package: true
+      rsconnect-account-name: "drmatt"
+      rsconnect-app-name: "CiteSource_latest"
+      working-directory: "./inst/shiny-app/CiteSource"
+      environment: "latest"
+    secrets:
+      rsconnect-account-token: ${{ secrets.TOKEN }}
+      rsconnect-account-secret: ${{ secrets.SECRET }}
   deploy-release:
     needs: R-CMD-check
     if: github.event_name == 'release'
