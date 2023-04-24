@@ -1,3 +1,12 @@
+library(shiny)
+library(dplyr)
+library(CiteSource)
+library(stringi)
+library(shinybusy)
+library(htmltools)
+#options(repos = c(CRAN = "https://cloud.r-project.org"))
+#devtools::install_version("MASS", "7.3-51.1")  # Resolve incompatibility with shinyapps.io deployment 
+
 options(shiny.maxRequestSize=30*1024^2)
 # Set background colour
 tags$head(tags$style(
