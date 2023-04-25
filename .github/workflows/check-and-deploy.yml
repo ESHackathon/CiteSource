@@ -14,10 +14,10 @@ jobs:
   # R-CMD-Check:
   #   if: (github.event_name != 'issue_comment')
   #   uses: prisma-flowdiagram/r-workflows/.github/workflows/R-CMD-check.yml@v1
-  # pkgdown:
-  #   needs: R-CMD-check
-  #   if: (github.event_name == 'push')
-  #   uses: prisma-flowdiagram/r-workflows/.github/workflows/pkgdown.yml@v1
+   pkgdown:
+     needs: R-CMD-check
+     if: (github.event_name == 'push')
+     uses: prisma-flowdiagram/r-workflows/.github/workflows/pkgdown.yml@v1
   deploy-latest:
     needs: pkgdown
     if: (github.event_name == 'push')
