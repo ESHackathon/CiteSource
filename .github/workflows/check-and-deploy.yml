@@ -11,13 +11,13 @@ on:
       - master
 name: Check & Deploy
 jobs:
-  # R-CMD-Check:
-  #   if: (github.event_name != 'issue_comment')
-  #   uses: prisma-flowdiagram/r-workflows/.github/workflows/R-CMD-check.yml@v1
-   pkgdown:
-     needs: R-CMD-check
-     if: (github.event_name == 'push')
-     uses: prisma-flowdiagram/r-workflows/.github/workflows/pkgdown.yml@v1
+  R-CMD-Check:
+    if: (github.event_name != 'issue_comment')
+    uses: prisma-flowdiagram/r-workflows/.github/workflows/R-CMD-check.yml@v1
+  pkgdown:
+    needs: R-CMD-check
+    if: (github.event_name == 'push')
+    uses: prisma-flowdiagram/r-workflows/.github/workflows/pkgdown.yml@v1
   deploy-latest:
     needs: pkgdown
     if: (github.event_name == 'push')
@@ -57,28 +57,28 @@ jobs:
           reaction: rocket
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-  # get-pull-ref:
-  #   runs-on: ubuntu-latest
-  #   needs: check-pr-deploy
-  #   if: github.event_name == 'issue_comment'
-  #   outputs:
-  #     repository: ${{ steps.get-repo.outputs.repository }}
-  #     ref: ${{ fromJson(steps.get-repo.outputs.data).head.ref }}
-  #   steps:
-  #     - name: get-pull-request-ref
-  #       id: get-repo
-  #       uses: octokit/request-action@v2.x
-  #       with:
-  #         route: GET /repos/:repository/pulls/:issue_id
-  #         repository: ${{ github.repository }}
-  #         issue_id: ${{ github.event.issue.number }}
-  #       env:
-  #         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-  # R-CMD-check-PR:
-  #   needs: [check-pr-deploy,get-pull-ref]
-  #   if: needs.check-pr-deploy.outputs.triggered == 'true'
-  #   uses: prisma-flowdiagram/r-workflows/.github/workflows/R-CMD-check.yml@v1
-  #   with:
-  #     repository: ${{ needs.get-pull-ref.outputs.repository || github.repository }}
-  #     ref: ${{ needs.get-pull-ref.outputs.ref || github.ref }}
+  get-pull-ref:
+    runs-on: ubuntu-latest
+    needs: check-pr-deploy
+    if: github.event_name == 'issue_comment'
+    outputs:
+      repository: ${{ steps.get-repo.outputs.repository }}
+      ref: ${{ fromJson(steps.get-repo.outputs.data).head.ref }}
+    steps:
+      - name: get-pull-request-ref
+        id: get-repo
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/:repository/pulls/:issue_id
+          repository: ${{ github.repository }}
+          issue_id: ${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+  R-CMD-check-PR:
+    needs: [check-pr-deploy,get-pull-ref]
+    if: needs.check-pr-deploy.outputs.triggered == 'true'
+    uses: prisma-flowdiagram/r-workflows/.github/workflows/R-CMD-check.yml@v1
+    with:
+      repository: ${{ needs.get-pull-ref.outputs.repository || github.repository }}
+      ref: ${{ needs.get-pull-ref.outputs.ref || github.ref }}
   
