@@ -11,18 +11,16 @@
 #' users to download a .csv file; in that file, presence and absence is always indicated as TRUE and FALSE to prevent issues with character encodings.
 #' @export
 #' @examples
-#' if (interactive()) {
 #' # Load example data from the package
 #' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 #' examplecitations <- readRDS(examplecitations_path)
 #'
 #' # Deduplicate citations and compare sources
 #' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#' unique_citations<-dedup_results$unique
+#' unique_citations <- dedup_results$unique
 #' unique_citations |> 
 #' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
 #' record_level_table(return = "DT")
-#' }
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
@@ -369,13 +367,12 @@ generate_apa_citation <- function(authors, year) {
     dplyr::pull(.data$last_names) %>%
     unlist()
 
-  initialed_name_list <- processed_names %>%
-    dplyr::select("last_names", "initials") %>%
-    as.list() %>%
-    purrr::transpose() %>%
-    purrr::map(~ paste(.x[[2]], .x[[1]]))
+  initialed_name <- purrr::map2(
+    dplyr::pull(processed_names, .data$initials), 
+    dplyr::pull(processed_names, .data$last_names),
+    ~ paste(.x, .y)
+  ) %>% unlist()
 
-  initialed_name <- initialed_name_list %>% unlist()
   authors <- tibble::tibble(last_name, initialed_name)
   duplicated_last_names <- last_name[duplicated(last_name)]
   # Identify which last names appear with different initials
@@ -385,13 +382,13 @@ generate_apa_citation <- function(authors, year) {
     dplyr::summarise(disambiguate = dplyr::n_distinct(.data$initialed_name) > 1) %>%
     dplyr::filter(.data$disambiguate == TRUE) %>%
     dplyr::pull(.data$last_name)
-
   # Replace those last names with initials
-  for (i in seq_along(processed_names$last_names)) {
-    if (processed_names$last_names[[i]][[1]] %in% to_disambiguate) {
-      processed_names$last_names[[i]][[1]] <- initialed_name_list[[i]][[1]]
-    }
-  }
+processed_names$last_names <- 
+  purrr::map2(processed_names$last_names, processed_names$initials, \(last_names, initials) {
+    last_names[last_names %in% to_disambiguate] <- 
+      paste(initials[last_names %in% to_disambiguate], last_names[last_names %in% to_disambiguate])
+    last_names
+  })
 
   # Create simple citations
   citations <- processed_names %>%
@@ -423,8 +420,8 @@ generate_apa_citation <- function(authors, year) {
 
       # Case 1: multiple publications by same author(s) in same year - add letters
       if (dplyr::n_distinct(group$author_names) == 1) {
-        group %>%
-          dplyr::mutate(year = paste0(year, letters[1:dplyr::n()])) %>%
+        group <- group %>%
+          dplyr::mutate(year = paste0(year, letters[seq_len(dplyr::n())])) %>%
           dplyr::rowwise() %>%
           dplyr::mutate(
             N_authors = length(.data$last_names),
@@ -438,19 +435,16 @@ generate_apa_citation <- function(authors, year) {
       } else {
         # Case 2: distinct authors
         # Find maximum number of common authors
-        pairs <- utils::combn(group$last_names, 2)
-        common <- numeric()
-        for (i in seq_len(ncol(pairs))) {
-          first <- pairs[[1, i]]
-          second <- pairs[[2, i]]
-          len <- min(length(first), length(second))
-          comparison <- suppressWarnings(first[1:len] == second[1:len])
-          # Common authors: either those before first divergence, or all
-          common <- c(common, dplyr::coalesce(which(comparison == FALSE)[1] - 1, length(comparison)))
-        }
-        common <- max(common)
-
-        group %>%
+        common <- group$last_names %>%
+          utils::combn(2, simplify = FALSE) %>%
+          purrr::map_int(~{
+            len <- min(length(.x[[1]]), length(.x[[2]]))
+            comparison <- .x[[1]][1:len] == .x[[2]][1:len]
+            ifelse(any(!comparison), which(!comparison)[1] - 1, len)
+          }) %>%
+          max()
+        
+        group <- group %>%
           dplyr::rowwise() %>%
           dplyr::mutate(citation = dplyr::case_when(
             (common < 5 | .data$N_authors < 5) & N_authors < common + 3 ~ glue::glue("{glue::glue_collapse(last_names, ', ', last = ' & ')} ({year})"),
@@ -461,6 +455,7 @@ generate_apa_citation <- function(authors, year) {
           )) %>%
           dplyr::ungroup()
       }
+      group
     })
 
     citations_still_ambiguous <- citations_ambiguous %>%
@@ -472,7 +467,7 @@ generate_apa_citation <- function(authors, year) {
     # If some of Case 2 were in fact Case 1s (e.g., more than 2 authors with same names), they need to be further disambiguated
     citations_still_ambiguous <- citations_still_ambiguous %>%
       dplyr::group_by(.data$citation) %>%
-      dplyr::mutate(letter = letters[1:dplyr::n()]) %>%
+      dplyr::mutate(letter = letters[seq_len(dplyr::n())]) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(citation = stringr::str_replace(.data$citation, "([:digit:])\\)", glue::glue("\\1{letter})"))) %>%
       dplyr::ungroup()
