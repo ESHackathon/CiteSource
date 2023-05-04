@@ -308,6 +308,8 @@ server <- function(input, output, session) {
         last_message <<- showNotification(m$message, duration = NULL, type = "message")
       }
     )
+    
+    browser()
 
     rv$unique <- dedup_results
         

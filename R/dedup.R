@@ -32,7 +32,9 @@ dedup_citations <- function(raw_citations) {
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
   
-  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE)
+  browser()
+  
+  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string")
   
   unique_post_dedup <- dedup_results$unique
   unique_post_dedup$cite_source = unique_post_dedup$source
