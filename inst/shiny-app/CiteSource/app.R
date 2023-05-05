@@ -357,13 +357,15 @@ server <- function(input, output, session) {
     
     last_message <- NULL
     dedup_results <- withCallingHandlers(
-      dedup_citations(rv$upload_df, merge_citations = TRUE),
+      dedup_citations(rv$upload_df),
       message = function(m) {
         if (!is.null(last_message)) removeNotification(last_message)
         last_message <<- showNotification(m$message, duration = NULL, type = "message")
       }
     )
-    rv$unique <- dedup_results$unique
+    
+
+    rv$unique <- dedup_results
         
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
