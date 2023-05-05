@@ -25,8 +25,10 @@ beware that \strong{any \code{note} field that might be included in \code{citati
 }
 \examples{
 if (interactive()) {
-  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+  # Load example data from the package
+  examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+  examplecitations <- readRDS(examplecitations_path)
+  dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
   export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
 }
-
 }

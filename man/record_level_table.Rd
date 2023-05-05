@@ -34,12 +34,14 @@ A tibble or DataTable containing the per-record table that shows which sources (
 Creates a per-record table that shows which sources (and/or labels/strings) each item was found in.
 }
 \examples{
-# Load a sample data set
-data("sample_citations")
+# Load example data from the package
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate the citations
-deduped_citations <- dedup_citations(sample_citations)
-
-# Generate the record-level table
-record_table <- record_level_table(deduped_citations)
+# Deduplicate citations and compare sources
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations <- dedup_results$unique
+unique_citations |> 
+dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+record_level_table(return = "DT")
 }

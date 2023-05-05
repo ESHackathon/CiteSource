@@ -2,3 +2,13 @@ url: http://www.eshackathon.org/CiteSource/
 template:
   bootstrap: 5
 
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - citesource_working_example
+  - citesource_benchmark_testing
+  - citesource_vignette_db-pre-screen_validation
+  - citesource_vignette_db-topic-coverage
+  - Plot_Sandbox
+  - troubleshooting

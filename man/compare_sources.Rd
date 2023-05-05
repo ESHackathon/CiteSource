@@ -23,3 +23,15 @@ dataframe with indicators of where a citation appears, with sources/labels/strin
 \description{
 Compare duplicate citations across sources, labels, and strings
 }
+\examples{
+if (interactive()) {
+  # Load example data from the package
+  examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+  examplecitations <- readRDS(examplecitations_path)
+
+  # Deduplicate citations and compare sources
+  dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+  unique_citations <- dedup_results$unique
+  compare_sources(unique_citations, comp_type = "sources")
+}
+}

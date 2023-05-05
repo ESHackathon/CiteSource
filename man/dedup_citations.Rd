@@ -27,3 +27,12 @@ A list of 2 dataframes - unique citations and citations to be manually deduplica
 This function deduplicates citation data. Note that duplicates are assumed to published
 in the same source, so pre-prints and similar results will not be identified here.
 }
+\examples{
+# Load example data from the package
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations <- readRDS(examplecitations_path)
+
+# Deduplicate citations and compare sources
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations <- dedup_results$unique
+}

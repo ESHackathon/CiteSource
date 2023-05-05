@@ -31,12 +31,17 @@ Create a summary table to show the contribution of each source and the overall p
 labels need to be used that contrast a "search" stage with one or more later stages.
 }
 \examples{
-# Load a sample data set
-data("sample_citations")
+if (interactive()) {
+# Load example data from the package
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate the citations
-deduped_citations <- dedup_citations(sample_citations)
-
-# Generate the citation summary table
-summary_table <- citation_summary_table(deduped_citations)
+# Deduplicate citations and compare sources
+dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations<-dedup_results$unique
+unique_citations |> 
+dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+record_level_table(return = "DT")
+citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+}
 }

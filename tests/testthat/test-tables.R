@@ -1,23 +1,22 @@
-authors <- c(
-  "Jónsdóttir, Jóna and Mustermann, Melanie and Holm, Kari and Doe, Jane",
-  "Jónsdóttir, Jóna and Modaal, Jan and Mustermann, Melanie",
-  "Jónsdóttir, Jóna and Modaal, Jan and Mustermann, Melanie",
-  "Jónsdóttir, Jóna and Mustermann, Melanie and Holm, Kari and Doe, Jane and Doe, Mike and Musterfrau, Michael  and Banana, Joe and Citizen, Kane and Smith, Mary",
-  "Jónsdóttir, Jóna and Mustermann, Melanie and Holm, Kari and Doe, Jane and Doe, Mike and Musterfrau, Michael and Average, Albert",
-  "Doe, Mike", "Doe, Mike"
+
+authors <- c('Mill, John Stuart and Shelley, Mary and Lovelave, Eda and Hemingway, Ernest and Garcia Marquez, Gabriel',
+             'Miller, Arthur and Snow, John',
+             'Woolf, Virginia',
+             'Miller, Arthur and Snow, John',
+             'Mill, John Stuart and Shelley, Mary and Eliot, TS',
+             'Woolf, Walter',
+             'Mill, Arthur and Shelley, Mary and Eliot, TS',
+             'Mill, Arthur and Shelley, Mary and Eliot, TS')
+
+years <- c(rep(1900, 7), 1901)
+
+test_that("disambiguated citations work", {
+expect_equal(generate_apa_citation(authors, years),
+             c("J. S. Mill, Shelley, Lovelave et al. (1900)", 
+               "Miller & Snow (1900a)", "V. Woolf (1900)", 
+               "Miller & Snow (1900b)", "J. S. Mill, Shelley & Eliot (1900)", 
+               "W. Woolf (1900)", "A. Mill et al. (1900)", "A. Mill et al. (1901)")
+  
 )
+  })
 
-years <- c(2022, 2022, 2022, 2022, 2022, 2022, 2022)
-
-output <- c(
-  "Jónsdóttir, Mustermann, Holm & Doe (2022)",
-  "Jónsdóttir, Modaal & Mustermann (2022a)",
-  "Jónsdóttir, Modaal & Mustermann (2022b)",
-  "Jónsdóttir ... Banana et al. (2022)",
-  "Jónsdóttir ... Musterfrau  & Average (2022)",
-  "M. Doe (2022a)", "M. Doe (2022b)"
-)
-
-test_that("citations are correctly formatted", {
-  expect_equal(output, generate_apa_citation(authors, years))
-})

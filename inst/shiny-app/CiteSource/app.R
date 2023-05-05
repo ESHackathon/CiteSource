@@ -1,3 +1,13 @@
+library(shiny)
+library(dplyr)
+library(CiteSource)
+library(stringi)
+library(shinybusy)
+library(htmltools)
+library(MASS)
+#options(repos = c(CRAN = "https://cloud.r-project.org"))
+#devtools::install_version("MASS", "7.3-51.1")  # Resolve incompatibility with shinyapps.io deployment 
+
 options(shiny.maxRequestSize=30*1024^2)
 # Set background colour
 tags$head(tags$style(
@@ -40,15 +50,11 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                                   shiny::fileInput("file",  "",
                                                             multiple = TRUE, 
                                                             accept = c('.ris', '.txt', '.bib')),
-                                                  # textInput('source', 'Citesource', placeholder = 'e.g. Scopus'),
-                                                  # textInput('string', 'Citestring', placeholder = 'e.g. search string 1.3'),
-                                                  # textInput('label', 'Citelabel', placeholder = 'e.g. post Ti/Ab screen'),
-                                                  # actionBttn(
-                                                  #   'upload', 'Add citation file',
-                                                  #   style = "pill",
-                                                  #   color = "primary",
-                                                  #   icon = icon("plus")
-                                                  # )
+                                                  hr(),
+                                                  h4("OR: Re-upload a file exported from CiteSource"),
+                                                  shiny::fileInput("file_reimport",  "",
+                                                                   multiple = TRUE, 
+                                                                   accept = c('.ris', '.csv'))
                                      ),
                                      
                                      # Main panel for displaying outputs ----
@@ -147,13 +153,42 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                                                                     'Strings to include', 
                                                                                     list(), 
                                                                                     multiple = TRUE, 
-                                                                                    selectize=TRUE)                                            
+                                                                                    selectize=TRUE)
+                                                                        
+                                                                        
                                                     ),
                                                     
                                                     shiny::mainPanel(
                                                       shiny::tabsetPanel(
-                                                        shiny::tabPanel("Review individual records", DT::dataTableOutput("reviewTab")),
-                                                        shiny::tabPanel("View summary table", gt::gt_output("summaryTab"))
+                                                        shiny::tabPanel("Review individual records", 
+                                                                        div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
+                                                                        br(),
+                                                                        shinyWidgets::actionBttn(
+                                                                          'generateRecordTable', 'Generate the table',
+                                                                          style = "pill",
+                                                                          color = "primary",
+                                                                          icon = icon("table")
+                                                                        ),
+                                                                        br(),
+                                                                        DT::dataTableOutput("reviewTab")),
+                                                        shiny::tabPanel("View summary table", 
+                                                                        selectInput(inputId = 'summary_search_labels', 
+                                                                                    'Labels indicating search stage', 
+                                                                                    list(), 
+                                                                                    multiple = TRUE, 
+                                                                                    selectize=TRUE),                                            
+                                                                        selectInput(inputId = 'summary_screening_labels', 
+                                                                                    'Labels indicating screening stages', 
+                                                                                    list(), 
+                                                                                    multiple = TRUE, 
+                                                                                    selectize=TRUE),
+                                                                        shinyWidgets::actionBttn(
+                                                                          'generateSummaryTable', 'Generate the table',
+                                                                          style = "pill",
+                                                                          color = "primary",
+                                                                          icon = icon("table")
+                                                                        ),
+                                                                        gt::gt_output("summaryTab"))
                                                       ))))
                                          )))),
                 
@@ -162,8 +197,10 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                 shiny::fluidRow(
                             column(12,
                             mainPanel(
-                              downloadButton("downloadData", "Download csv"),
-                              downloadButton("downloadData2", "Download bibtex")
+                              h5("Note that you can only download the data after you have run the deduplication."),
+                              downloadButton("downloadCsv", "Download csv"),
+                              downloadButton("downloadRis", "Download RIS"),
+                              downloadButton("downloadBib", "Download BibTex")
                             )
                           ))
                  )
@@ -175,13 +212,11 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
 server <- function(input, output, session) {
   
   rv <- shiny::reactiveValues(
-    
-    
+
   )
   
   rv$df <- data.frame()
   rv$upload_df <- data.frame()
-  rv$CiteSource<-data.frame()
   rv$unique<-data.frame()
   
   #### Upload files tab section ####
@@ -236,12 +271,30 @@ server <- function(input, output, session) {
   
   ## display summary input table - summary of files added
   output$tbl_out <- DT::renderDataTable({
+    if(!is.null(input$file_reimport)) {
+      req(FALSE)
+    }
     DT::datatable(rv$df, 
                   editable = TRUE,
                   options = list(paging = FALSE, 
                                  searching = FALSE),
                   rownames = FALSE)
   })
+  
+  shiny::observeEvent(input$file_reimport, {
+    
+    file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
+    
+    if (file_extension == "csv") {
+      rv$unique <- reimport_csv(input$file_reimport$datapath)
+    } else if (file_extension == "ris") {
+      rv$unique <- reimport_ris(input$file_reimport$datapath)
+    } else {
+      warning("Invalid file extension, needs to be .ris or .csv")
+    }
+    
+  })
+    
 
   ## Update filters
   observe({
@@ -249,12 +302,14 @@ server <- function(input, output, session) {
       shiny::updateSelectInput(inputId = "sources_visual", choices = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique())
       shiny::updateSelectInput(inputId = "labels_visual", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
       shiny::updateSelectInput(inputId = "strings_visual", choices = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-    }
-    if (!is.null(rv$unique)) {
+      
       shiny::updateSelectInput(inputId = "sources_tables", choices = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique())
       shiny::updateSelectInput(inputId = "labels_tables", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
       shiny::updateSelectInput(inputId = "strings_tables", choices = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-    }
+
+      shiny::updateSelectInput(inputId = "summary_search_labels", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      shiny::updateSelectInput(inputId = "summary_screening_labels", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      }
   })
     
   # when file upload table is edited, edit reactive value upload df
@@ -314,7 +369,6 @@ server <- function(input, output, session) {
         
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
-    n_duplicate <-n_citations - n_unique
     if (!is.null(last_message)) removeNotification(last_message)
     
       shinyalert::shinyalert("Deduplication complete", 
@@ -397,7 +451,13 @@ server <- function(input, output, session) {
    
    #### Table tab ####
    
-   unique_filtered_table <- reactive({
+   
+   
+   unique_filtered_table <- eventReactive({
+     input$generateRecordTable
+     input$generateSummaryTable
+     1
+   }, {
      sources <- input$sources_tables %>% paste(collapse = "|")
      strings <- input$strings_tables %>% paste(collapse = "|")
      labels <- input$labels_tables %>% paste(collapse = "|")
@@ -433,6 +493,15 @@ server <- function(input, output, session) {
      record_level_table(citations=citations,return = "DT")
    })
 
+   
+   summary_filtered_table <- eventReactive(input$generateSummaryTable,
+                                           {
+                                             citations <- unique_filtered_table()
+                                             citation_summary_table(citations, 
+                                                                    search_label = input$summary_search_labels,
+                                                                    screening_label = input$summary_screening_labels)
+                                           })
+   
    output$summaryTab <- gt::render_gt({
      if (nrow(rv$unique) == 0) {
        shinyalert::shinyalert("Data needed", 
@@ -441,23 +510,28 @@ server <- function(input, output, session) {
        # Stop plotting
        req(FALSE)  
      }
-     citation_summary_table(unique_filtered_table())
+     summary_filtered_table()
    })
    
       
   #### Export tab ####
    
    # # Downloadable bibtex ----
-   output$downloadData <- downloadHandler(
-     
+   # Downloadable bibtex ----
+   output$downloadCsv <- downloadHandler(
      filename = function() {
        paste("data-", Sys.Date(), ".csv", sep="")
      },
      content = function(file) {
-       write.csv(rv$unique, file)
+       if (nrow(rv$unique) > 0) {
+         write.csv(rv$unique, file)
+       } else {
+         stop("No data to download!")
+         req(FALSE)
+       }
      }
    )
-   output$downloadData2 <- downloadHandler(
+   output$downloadBib <- downloadHandler(
      
      filename = function() {
        paste("data-", Sys.Date(), ".bib", sep="")
@@ -467,6 +541,15 @@ server <- function(input, output, session) {
      }
    )
    
+   output$downloadRis <- downloadHandler(
+     
+     filename = function() {
+       paste("data-", Sys.Date(), ".bib", sep="")
+     },
+     content = function(file) {
+       export_ris(rv$unique, file)
+     }
+   )
   
 }
 

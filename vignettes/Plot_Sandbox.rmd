@@ -58,12 +58,6 @@ citation_files
 For this vignette we'll be using the same sources from the "Source Analysis Across Screening Phases" vignette as it's one of the larger sets of citations.
 
 ```{r}
-# Import citation files from folder
-citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
-
-# Print list of citation files to console
-citation_files
-
 # Set the path to the directory containing the citation files
 file_path <- "../vignettes/working_example_data/"
 
@@ -82,10 +76,15 @@ metadata_tbl <- tibble::tribble(
 ) %>% 
 
 dplyr::mutate(files = paste0(file_path, files))
+	
 citations <- read_citations(metadata = metadata_tbl)
 
 # Deduplication & Identifying Crossover Records
 dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+#> formatting data...
+#> identifying potential duplicates...
+#> identified duplicates!
+#> merging citations...
 
 unique_citations <- dedup_results$unique
 
@@ -94,6 +93,55 @@ n_unique <- count_unique(unique_citations)
 
 # Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+
+```
+
+### NEW TABLE Experimentation (related to issue #119 & #120)
+```{r}
+#Create a table to show the difference between the initial number of citations uploaded for each source, and the number D-SUR (Database-Specific Unique Records).
+
+#initial_count is correct, but there is something funny going on with the count_D_SUR and the N_Unique_count. It may be something to do with the weird repeating that we see in unique_citations where the record_ids repeat at times. for an example of this see 1728 and 10104. These two records are the reason we see 52 in D-SUR for Econlit rather than 50, which would be correct.
+
+library(DT)
+
+# Function to count occurrences of each database
+count_databases <- function(df, db_colname) {
+  db_counts <- df %>%
+    dplyr::pull(!!sym(db_colname)) %>%
+    strsplit(", ") %>%
+    unlist() %>%
+    trimws() %>%
+    table() %>%
+    as.data.frame() %>%
+    dplyr::rename_with(~ gsub(" ", "_", .x, fixed = TRUE))
+  
+  colnames(db_counts) <- c("single_db", "count")
+  
+  return(db_counts)
+}
+
+# Calculate D-SUR count for each database
+d_sur_count <- count_databases(unique_citations, "cite_source")
+
+# Count the citations in the initial citations data and remove blank rows
+initial_citations_count <- count_databases(citations, "cite_source")
+
+# Count the citations in the n_unique data, remove blank rows, and exclude rows without 'search' in cite_label
+n_unique_citations_count <- n_unique %>%
+  dplyr::filter(cite_label == "search") %>%
+  dplyr::group_by(cite_source) %>%
+  dplyr::summarise(N_Unique_Count = sum(unique)) %>%
+  dplyr::filter(cite_source != "") %>%
+  dplyr::arrange(cite_source) %>%
+  dplyr::rename(single_db = cite_source)
+
+# Combine the counts into one table
+citation_counts <- dplyr::left_join(initial_citations_count, d_sur_count, by = "single_db", suffix = c("_Initial", "_D_SUR")) %>%
+  dplyr::left_join(n_unique_citations_count, by = "single_db", suffix = c("", "_N_Unique"))
+
+# Display the table using DT
+datatable(citation_counts)
+
 ```
 ### Pull unique records from each source
 ```{r}
