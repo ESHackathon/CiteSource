@@ -309,7 +309,6 @@ server <- function(input, output, session) {
       }
     )
     
-    browser()
 
     rv$unique <- dedup_results
         
