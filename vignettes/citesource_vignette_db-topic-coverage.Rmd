@@ -65,7 +65,7 @@ CiteSource allows users to merge duplicates while maintaining information in the
 
 ```{r, results = FALSE, message=FALSE, warning=FALSE}
 #Deduplicate citations 
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+dedup_results <- dedup_citations(citations)
 
 #Get unique citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.
 unique_citations <- dedup_results$unique

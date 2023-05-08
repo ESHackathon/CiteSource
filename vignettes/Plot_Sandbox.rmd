@@ -80,7 +80,7 @@ dplyr::mutate(files = paste0(file_path, files))
 citations <- read_citations(metadata = metadata_tbl)
 
 # Deduplication & Identifying Crossover Records
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+dedup_results <- dedup_citations(citations)
 #> formatting data...
 #> identifying potential duplicates...
 #> identified duplicates!

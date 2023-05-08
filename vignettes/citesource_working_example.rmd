@@ -114,7 +114,7 @@ Note that duplicates are assumed to published in the same source, so pre-prints 
 
 
 ```{r}
-dedup_results <- dedup_citations(citations, merge_citations = TRUE)
+dedup_results <- dedup_citations(citations)
 
 unique_citations <- dedup_results$unique
 
