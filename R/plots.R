@@ -40,6 +40,8 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
   if (sort_sources) {
     source_sizes <- data %>%
       dplyr::select(tidyselect::matches(paste0(cells, "__"))) %>%
+      as.matrix() %>%
+      as.numeric() %>%
       colSums()
     names(source_sizes) <- data %>%
       dplyr::select(tidyselect::matches(paste0(cells, "__"))) %>%
