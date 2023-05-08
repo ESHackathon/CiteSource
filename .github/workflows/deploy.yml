@@ -13,8 +13,9 @@ on:
 name: Deploy
 
 jobs:
-  deploy:
+  deploy-latest:
     runs-on: ubuntu-latest
+    if: (github.event_name == 'push')
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -29,24 +30,53 @@ jobs:
         R -e "install.packages(c('shiny', 'rsconnect'))"
 
     - name: Deploy Shiny App
-      if: |
-        github.event_name == 'push' || (github.event_name == 'release' && contains(github.event.release.tag_name, 'test'))
       env:
         RS_ACCOUNT_NAME: "drmatt"
-        RS_APP_NAME: "CiteSource_test"
+        RS_APP_NAME: "CiteSource_latest"
+      with:
+        install-package: true
+        rsconnect-account-name: ${{ env.RS_ACCOUNT_NAME }}
+        rsconnect-app-name: ${{ env.RS_APP_NAME }}
+        working-directory: "./inst/shiny-app/CiteSource"
+        environment: "latest"
+        secrets: |
+          RS_ACCOUNT_TOKEN=${{ secrets.TOKEN }}
+          RS_ACCOUNT_SECRET=${{ secrets.SECRET }}
       run: R -e "rsconnect::deployApp(appDir = './inst/shiny-app/CiteSource', appName = Sys.getenv('RS_APP_NAME'), account = Sys.getenv('RS_ACCOUNT_NAME'), launch.browser = FALSE)"
 
-    - name: Deploy Release Shiny App
-      if: |
-        github.event_name == 'release' && !contains(github.event.release.tag_name, 'test')
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+
+  deploy-release:
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'release' && github.event.release.tag_name != *test*)
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v1
+      with:
+        r-version: '4.1.0'
+
+    - name: Install Dependencies
+      run: |
+        R -e "install.packages(c('shiny', 'rsconnect'))"
+
+    - name: Deploy Shiny App
       env:
         RS_ACCOUNT_NAME: "estech"
         RS_APP_NAME: "CiteSource"
+      with:
+        install-package: true
+        rsconnect-account-name: ${{ env.RS_ACCOUNT_NAME }}
+        rsconnect-app-name: ${{ env.RS_APP_NAME }}
+        working-directory: "./inst/shiny-app/CiteSource"
+        environment: "release"
+        secrets: |
+          RS_ACCOUNT_TOKEN=${{ secrets.TOKEN }}
+          RS_ACCOUNT_SECRET=${{ secrets.SECRET }}
       run: R -e "rsconnect::deployApp(appDir = './inst/shiny-app/CiteSource', appName = Sys.getenv('RS_APP_NAME'), account = Sys.getenv('RS_ACCOUNT_NAME'), launch.browser = FALSE)"
-      
+
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-    secrets:
-      RS_ACCOUNT_TOKEN: ${{ secrets.TOKEN }}
-      RS_ACCOUNT_SECRET: ${{ secrets.SECRET }}
-
