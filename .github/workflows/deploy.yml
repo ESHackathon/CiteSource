@@ -9,30 +9,44 @@ on:
     branches:
       - main
       - master
+
 name: Deploy
+
 jobs:
-  deploy-latest:
-    needs: pkgdown
-    if: (github.event_name == 'push')
-    with:
-      install-package: true
-      rsconnect-account-name: "drmatt"
-      rsconnect-app-name: "CiteSource_latest"
-      working-directory: "./inst/shiny-app/CiteSource"
-      environment: "latest"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v1
+      with:
+        r-version: '4.1.0'
+
+    - name: Install Dependencies
+      run: |
+        R -e "install.packages(c('shiny', 'rsconnect'))"
+
+    - name: Deploy Shiny App
+      if: |
+        github.event_name == 'push' || (github.event_name == 'release' && contains(github.event.release.tag_name, 'test'))
+      env:
+        RS_ACCOUNT_NAME: "drmatt"
+        RS_APP_NAME: "CiteSource_test"
+      run: R -e "rsconnect::deployApp(appDir = './inst/shiny-app/CiteSource', appName = Sys.getenv('RS_APP_NAME'), account = Sys.getenv('RS_ACCOUNT_NAME'), launch.browser = FALSE)"
+
+    - name: Deploy Release Shiny App
+      if: |
+        github.event_name == 'release' && !contains(github.event.release.tag_name, 'test')
+      env:
+        RS_ACCOUNT_NAME: "estech"
+        RS_APP_NAME: "CiteSource"
+      run: R -e "rsconnect::deployApp(appDir = './inst/shiny-app/CiteSource', appName = Sys.getenv('RS_APP_NAME'), account = Sys.getenv('RS_ACCOUNT_NAME'), launch.browser = FALSE)"
+      
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
     secrets:
-      rsconnect-account-token: ${{ secrets.TOKEN }}
-      rsconnect-account-secret: ${{ secrets.SECRET }}
-  deploy-release:
-    needs: R-CMD-check
-    uses: prisma-flowdiagram/r-workflows/.github/workflows/deploy.yml@v1
-    with:
-      install-package: true
-      rsconnect-account-name: "estech"
-      rsconnect-app-name: "CiteSource"
-      working-directory: "./inst/shiny-app/CiteSource"
-      environment: "release"
-    secrets:
-      rsconnect-account-token: ${{ secrets.TOKEN }}
-      rsconnect-account-secret: ${{ secrets.SECRET }}
-  
+      RS_ACCOUNT_TOKEN: ${{ secrets.TOKEN }}
+      RS_ACCOUNT_SECRET: ${{ secrets.SECRET }}
+
