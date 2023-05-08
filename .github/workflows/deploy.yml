@@ -14,7 +14,6 @@ jobs:
   deploy-latest:
     needs: pkgdown
     if: (github.event_name == 'push')
-    uses: prisma-flowdiagram/r-workflows/.github/workflows/deploy.yml@v1
     with:
       install-package: true
       rsconnect-account-name: "drmatt"
@@ -26,7 +25,6 @@ jobs:
       rsconnect-account-secret: ${{ secrets.SECRET }}
   deploy-release:
     needs: R-CMD-check
-    if: github.event_name == 'release'
     uses: prisma-flowdiagram/r-workflows/.github/workflows/deploy.yml@v1
     with:
       install-package: true
