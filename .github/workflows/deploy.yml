@@ -6,17 +6,17 @@ on:
   issue_comment:
     types: [created]
   push:
-  branches: 
-    - main
-    - master
+    branches:
+      - main
+      - master
 
 name: Deploy
 
 jobs:
   deploy-latest:
     runs-on: ubuntu-latest
-    
     if: github.event_name == 'push'
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -47,8 +47,8 @@ jobs:
 
   deploy-release:
     runs-on: ubuntu-latest
-    
     if: github.event_name == 'release' && github.event.release.tag_name != '*test*'
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -74,5 +74,5 @@ jobs:
             RS_ACCOUNT_TOKEN=${{ secrets.TOKEN }}
             RS_ACCOUNT_SECRET=${{ secrets.SECRET }}
 
-      env:
-        R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+        env:
+          R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
