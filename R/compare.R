@@ -9,8 +9,7 @@
 #' examplecitations <- readRDS(examplecitations_path)
 #'
 #' # Deduplicate citations
-#' dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#' unique_citations <- dedup_results$unique
+#' dedup_results <- dedup_citations(examplecitations)
 #'
 #' # Count unique and non-unique citations
 #' count_unique(unique_citations)
@@ -51,8 +50,7 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #'   examplecitations <- readRDS(examplecitations_path)
 #'
 #'   # Deduplicate citations and compare sources
-#'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#'   unique_citations <- dedup_results$unique
+#'   dedup_results <- dedup_citations(examplecitations)
 #'   compare_sources(unique_citations, comp_type = "sources")
 #' }
 
