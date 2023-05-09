@@ -114,9 +114,7 @@ Note that duplicates are assumed to published in the same source, so pre-prints 
 
 
 ```{r}
-dedup_results <- dedup_citations(citations)
-
-unique_citations <- dedup_results$unique
+unique_citations <- dedup_citations(citations)
 
 # Count number of unique and non-unique citations from different sources and labels
 n_unique <- count_unique(unique_citations)
