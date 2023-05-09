@@ -43,7 +43,7 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 #remotes::install_github("ESHackathon/CiteSource")
 
 #Load the necessary libraries
-#library(CiteSource)
+library(CiteSource)
 library(dplyr)
 ```
 
