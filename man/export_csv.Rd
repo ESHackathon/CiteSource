@@ -33,6 +33,6 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_csv(dedup_results$unique, "cite_sources.csv", separate = "cite_source")
+  export_csv(dedup_results, "cite_sources.csv", separate = "cite_source")
 }
 }

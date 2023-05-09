@@ -12,7 +12,7 @@
 #' dedup_results <- dedup_citations(examplecitations)
 #'
 #' # Count unique and non-unique citations
-#' count_unique(unique_citations)
+#' count_unique(dedup_results)
 
 count_unique <- function(unique_data, include_references = FALSE) {
   out <- unique_data %>%

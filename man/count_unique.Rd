@@ -26,5 +26,5 @@ examplecitations <- readRDS(examplecitations_path)
 dedup_results <- dedup_citations(examplecitations)
 
 # Count unique and non-unique citations
-count_unique(unique_citations)
+count_unique(dedup_results)
 }

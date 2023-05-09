@@ -6,6 +6,14 @@
 #' @export
 #' @param raw_citations Citation dataframe with relevant columns
 #' @return unique citations formatted for CiteSource
+#' @examples
+#' # Load example data from the package
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
+#'
+#' # Deduplicate citations
+#' dedup_results <- dedup_citations(examplecitations)
+#' 
 
 dedup_citations <- function(raw_citations) {
   

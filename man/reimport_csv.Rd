@@ -18,7 +18,7 @@ this function only works on CSV files that were written with \code{export_csv(..
 \examples{
 if (interactive()) {
   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-  export_csv(dedup_results$unique, "citations.csv")
+  export_csv(dedup_results, "citations.csv")
   unique_citations <- reimport_csv("citations.csv")
 }
 
