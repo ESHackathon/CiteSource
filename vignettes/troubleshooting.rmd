@@ -79,6 +79,7 @@ datatable(citations %>% select(-abstract), options = list(pageLength = 10))
 
 
 ```{r}
+
 unique_citations_raw <- dedup_citations(citations) %>% filter(cite_label == "raw")
 unique_citations_processed <- dedup_citations(citations) %>% filter(cite_label == "processed")
 

@@ -71,6 +71,7 @@ citations <- read_citations(citation_files,
 CiteSource allows users to merge duplicates while maintaining information in the cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. The next few steps produce the dataframes that we can use in subsequent analyses.
 
 ```{r, results = FALSE, message=FALSE, warning=FALSE}
+
 #Dedup citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.
 unique_citations <- dedup_citations(citations)
 
