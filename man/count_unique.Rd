@@ -23,8 +23,7 @@ examplecitations_path <- system.file("extdata", "examplecitations.rds", package 
 examplecitations <- readRDS(examplecitations_path)
 
 # Deduplicate citations
-dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-unique_citations <- dedup_results$unique
+dedup_results <- dedup_citations(examplecitations)
 
 # Count unique and non-unique citations
 count_unique(unique_citations)
