@@ -20,7 +20,7 @@ after the import."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aja
     
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,9 @@ after the import."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aja
     <a class="dropdown-item" href="../articles/Plot_Sandbox.html">Plot Sandbox</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">troubleshooting</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -68,7 +71,7 @@ after the import."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aja
 It allows to continue with further analyses without repeating that step, and also
 allows users to make any manual corrections to tagging or deduplication. The function
 can also be used to replace the import step (for instance if tags are to be added to
-individual citations rather than entire files) - in this case, just call <code><a href="dedup_citations.html">dedup_citations()</a></code>
+individual citations rather than entire files) - in this case, just call <code>dedup_citations()</code>
 after the import.</p>
     </div>
 
@@ -121,7 +124,7 @@ can easily be combined.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="export_ris.html">export_ris</a></span><span class="op">(</span><span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span>, <span class="st">"citations.ris"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">unique_citations2</span> <span class="op">&lt;-</span> <span class="fu">reimport_ris</span><span class="op">(</span><span class="st">"citations.ris"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>

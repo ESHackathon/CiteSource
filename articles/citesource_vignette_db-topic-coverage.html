@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,9 @@
     <a class="dropdown-item" href="../articles/Plot_Sandbox.html">Plot Sandbox</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">troubleshooting</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -76,7 +79,7 @@
       <img src="" class="logo" alt=""><h1>Comparing Database Topic Coverage</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-04-27</h4>
+            <h4 data-toc-skip class="date">2023-05-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/HEAD/vignettes/citesource_vignette_db-topic-coverage.Rmd" class="external-link"><code>vignettes/citesource_vignette_db-topic-coverage.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_vignette_db-topic-coverage.Rmd</code></div>
@@ -153,11 +156,8 @@ the origin of the records is not lost in the deduplication process. The
 next few steps produce the dataframes that we can use in subsequent
 analyses.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Deduplicate citations </span></span>
-<span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#Get unique citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.</span></span>
-<span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span>
+<code class="sourceCode R"><span><span class="co">#Deduplicate citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source. </span></span>
+<span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">citations</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Count number of unique and non-unique citations from different sources and labels. </span></span>
 <span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>

@@ -12,7 +12,7 @@ labels need to be used that contrast a "search" stage with one or more later sta
     
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,9 @@ labels need to be used that contrast a "search" stage with one or more later sta
     <a class="dropdown-item" href="../articles/Plot_Sandbox.html">Plot Sandbox</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">troubleshooting</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -74,7 +77,7 @@ labels need to be used that contrast a "search" stage with one or more later sta
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>citations</dt>
-<dd><p>A deduplicated tibble as returned by <code><a href="dedup_citations.html">dedup_citations()</a></code>.</p></dd>
+<dd><p>A deduplicated tibble as returned by <code>dedup_citations()</code>.</p></dd>
 
 
 <dt>comparison_type</dt>
@@ -108,7 +111,7 @@ labels need to be used that contrast a "search" stage with one or more later sta
 <span class="r-in"><span><span class="va">examplecitations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">examplecitations_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Deduplicate citations and compare sources</span></span></span>
-<span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">examplecitations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">examplecitations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">unique_citations</span><span class="op">&lt;-</span><span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span></span>
 <span class="r-in"><span><span class="va">unique_citations</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">cite_label</span>, <span class="st">"Final"</span><span class="op">)</span><span class="op">)</span>  <span class="op">|&gt;</span> </span></span>
