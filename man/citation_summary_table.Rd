@@ -37,7 +37,7 @@ examplecitations_path <- system.file("extdata", "examplecitations.rds", package 
 examplecitations <- readRDS(examplecitations_path)
 
 # Deduplicate citations and compare sources
-unique_citations <- dedup_citations(examplecitations, merge_citations = TRUE)
+unique_citations <- dedup_citations(examplecitations)
 
 unique_citations |> 
 dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
