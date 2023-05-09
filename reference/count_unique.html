@@ -89,10 +89,15 @@
 <span class="r-in"><span><span class="va">examplecitations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">examplecitations_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Deduplicate citations</span></span></span>
-<span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">examplecitations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dedup_citations(examplecitations, merge_citations = TRUE):</span> unused argument (merge_citations = TRUE)</span>
-<span class="r-in"><span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dedup_results' not found</span>
+<span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">examplecitations</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Search contains missing values for the record_id column. A record_id will be created using row names</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> identifying potential duplicates...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> identified duplicates!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> flagging potential pairs for manual dedup...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 100 citations loaded...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2 duplicate citations removed...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 98 unique citations remaining!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Count unique and non-unique citations</span></span></span>
 <span class="r-in"><span><span class="fu">count_unique</span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span></span>
