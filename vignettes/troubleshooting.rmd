@@ -79,11 +79,9 @@ datatable(citations %>% select(-abstract), options = list(pageLength = 10))
 
 
 ```{r}
-dedup_results_raw <- dedup_citations(citations %>% filter(cite_label == "raw"))
-dedup_results_processed <- dedup_citations(citations %>% filter(cite_label == "processed"))
 
-unique_citations_raw <- dedup_results_raw$unique
-unique_citations_processed <- dedup_results_processed$unique
+unique_citations_raw <- dedup_citations(citations) %>% filter(cite_label == "raw")
+unique_citations_processed <- dedup_citations(citations) %>% filter(cite_label == "processed")
 
 # Count number of unique and non-unique citations from different sources and labels
 if (nrow(unique_citations_raw) == nrow(unique_citations_processed)) message("Deduplication likely identical")

@@ -80,13 +80,11 @@ dplyr::mutate(files = paste0(file_path, files))
 citations <- read_citations(metadata = metadata_tbl)
 
 # Deduplication & Identifying Crossover Records
-dedup_results <- dedup_citations(citations)
+unique_citations <- dedup_citations(citations)
 #> formatting data...
 #> identifying potential duplicates...
 #> identified duplicates!
 #> merging citations...
-
-unique_citations <- dedup_results$unique
 
 # Count number of unique and non-unique citations from different sources and labels
 n_unique <- count_unique(unique_citations)
