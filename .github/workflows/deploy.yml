@@ -15,6 +15,7 @@ name: Deploy
 jobs:
   deploy-latest:
     runs-on: ubuntu-latest
+    
     if: github.event_name == 'push'
     steps:
       - name: Checkout code
@@ -46,6 +47,7 @@ jobs:
 
   deploy-release:
     runs-on: ubuntu-latest
+    
     if: github.event_name == 'release' && github.event.release.tag_name != '*test*'
     steps:
       - name: Checkout code
