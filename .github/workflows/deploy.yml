@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     
-    steps:
+  steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -42,7 +42,7 @@ jobs:
             RS_ACCOUNT_TOKEN=${{ secrets.TOKEN }}
             RS_ACCOUNT_SECRET=${{ secrets.SECRET }}
 
-      env:
+  env:
         R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
 
   deploy-release:
@@ -74,5 +74,5 @@ jobs:
             RS_ACCOUNT_TOKEN=${{ secrets.TOKEN }}
             RS_ACCOUNT_SECRET=${{ secrets.SECRET }}
 
-        env:
+    env:
           R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
