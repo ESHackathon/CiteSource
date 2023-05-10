@@ -1,3 +1,5 @@
+library(dplyr)
+library(CiteSource)
 
 authors <- c('Mill, John Stuart and Shelley, Mary and Lovelave, Eda and Hemingway, Ernest and Garcia Marquez, Gabriel',
              'Miller, Arthur and Snow, John',
