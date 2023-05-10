@@ -94,11 +94,9 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ```
 
-### NEW TABLE Experimentation (related to issue #119 & #120)
+### NEW TABLE Experimentation
 ```{r}
-#Create a table to show the difference between the initial number of citations uploaded for each source, and the number D-SUR (Database-Specific Unique Records).
-
-#initial_count is correct, but there is something funny going on with the count_D_SUR and the N_Unique_count. It may be something to do with the weird repeating that we see in unique_citations where the record_ids repeat at times. for an example of this see 1728 and 10104. These two records are the reason we see 52 in D-SUR for Econlit rather than 50, which would be correct.
+#Create a table to show the difference between the initial number of records uploaded for each source, the number Database-Specific Unique Records (D-SUR) which is the count after internal deduplication, and the number of unique records that source provided after deduplication across all sources.
 
 library(DT)
 
@@ -107,13 +105,14 @@ count_databases <- function(df, db_colname) {
   db_counts <- df %>%
     dplyr::pull(!!sym(db_colname)) %>%
     strsplit(", ") %>%
+    lapply(unique) %>%  # Remove duplicates within each cell
     unlist() %>%
     trimws() %>%
     table() %>%
     as.data.frame() %>%
     dplyr::rename_with(~ gsub(" ", "_", .x, fixed = TRUE))
   
-  colnames(db_counts) <- c("single_db", "count")
+  colnames(db_counts) <- c("Source", "count")
   
   return(db_counts)
 }
@@ -128,14 +127,17 @@ initial_citations_count <- count_databases(citations, "cite_source")
 n_unique_citations_count <- n_unique %>%
   dplyr::filter(cite_label == "search") %>%
   dplyr::group_by(cite_source) %>%
-  dplyr::summarise(N_Unique_Count = sum(unique)) %>%
+  dplyr::summarise(Unique_records = sum(unique)) %>%
   dplyr::filter(cite_source != "") %>%
   dplyr::arrange(cite_source) %>%
-  dplyr::rename(single_db = cite_source)
+  dplyr::rename(Source = cite_source)
 
 # Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, d_sur_count, by = "single_db", suffix = c("_Initial", "_D_SUR")) %>%
-  dplyr::left_join(n_unique_citations_count, by = "single_db", suffix = c("", "_N_Unique"))
+citation_counts <- dplyr::left_join(initial_citations_count, d_sur_count, by = "Source", suffix = c("_initial", "_D_SUR")) %>%
+  dplyr::left_join(n_unique_citations_count, by = "Source", suffix = c("", "_Unique"))
+
+# Update the column names
+colnames(citation_counts) <- c("Source", "Records Imported", "D-SUR", "Unique records")
 
 # Display the table using DT
 datatable(citation_counts)
