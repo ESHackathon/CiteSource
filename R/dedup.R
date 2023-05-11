@@ -31,7 +31,6 @@ dedup_citations <- function(raw_citations) {
     raw_citations
   }
   
-  browser()
   # rename or coalesce columns
   targets <- c("journal", "number", "pages", "isbn", "record_id")
   sources <- c("source", "issue", "start_page", "issn", "ID")
