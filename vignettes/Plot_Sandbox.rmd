@@ -100,6 +100,7 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 library(DT)
 
+
 # Function to count occurrences of each database
 count_databases <- function(df, db_colname) {
   db_counts <- df %>%
@@ -109,8 +110,7 @@ count_databases <- function(df, db_colname) {
     unlist() %>%
     trimws() %>%
     table() %>%
-    as.data.frame() %>%
-    dplyr::rename_with(~ gsub(" ", "_", .x, fixed = TRUE))
+    as.data.frame()
   
   colnames(db_counts) <- c("Source", "count")
   
@@ -119,28 +119,53 @@ count_databases <- function(df, db_colname) {
 
 # Calculate D-SUR count for each database
 d_sur_count <- count_databases(unique_citations, "cite_source")
+colnames(d_sur_count) <- c("Source", "D-SUR")
 
 # Count the citations in the initial citations data and remove blank rows
 initial_citations_count <- count_databases(citations, "cite_source")
+colnames(initial_citations_count) <- c("Source", "Records Imported")
 
 # Count the citations in the n_unique data, remove blank rows, and exclude rows without 'search' in cite_label
 n_unique_citations_count <- n_unique %>%
   dplyr::filter(cite_label == "search") %>%
   dplyr::group_by(cite_source) %>%
-  dplyr::summarise(Unique_records = sum(unique)) %>%
+  dplyr::summarise(`Unique records` = sum(unique)) %>%
   dplyr::filter(cite_source != "") %>%
   dplyr::arrange(cite_source) %>%
   dplyr::rename(Source = cite_source)
 
 # Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, d_sur_count, by = "Source", suffix = c("_initial", "_D_SUR")) %>%
-  dplyr::left_join(n_unique_citations_count, by = "Source", suffix = c("", "_Unique"))
+citation_counts <- dplyr::left_join(initial_citations_count, d_sur_count, by = "Source") %>%
+  dplyr::left_join(n_unique_citations_count, by = "Source")
 
-# Update the column names
-colnames(citation_counts) <- c("Source", "Records Imported", "D-SUR", "Unique records")
+# Add the "Non-unique Records" column directly
+citation_counts <- citation_counts %>%
+  dplyr::mutate(`Non-unique Records` = `D-SUR` - `Unique records`)
 
-# Display the table using DT
-datatable(citation_counts)
+# Add the calculations
+citation_counts <- citation_counts %>%
+  dplyr::mutate(`Source Contribution %` = `D-SUR` / sum(`D-SUR`, na.rm = TRUE),
+                `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
+                `Source Unique %` = `Unique records` / `D-SUR`)
+
+# Add a row with the total count for each column
+totals <- c("Total", 
+            sum(citation_counts$`Records Imported`, na.rm = TRUE),
+            sum(citation_counts$`D-SUR`, na.rm = TRUE),
+            sum(citation_counts$`Unique records`, na.rm = TRUE),
+            sum(citation_counts$`Non-unique Records`, na.rm = TRUE),
+            NA, NA, NA)
+
+citation_counts <- rbind(citation_counts, totals)
+
+# Style the table using DT
+datatable(citation_counts, 
+          options = list(dom = 't', pageLength = nrow(citation_counts), 
+                         columnDefs = list(list(visible = FALSE, targets = 0)))) %>% 
+  formatStyle(names(citation_counts),
+              backgroundColor = styleEqual("Total", "lightgray"),
+              target = "row") %>%
+  formatPercentage(c("Source Contribution %", "Source Unique Contribution %", "Source Unique %"), 1)
 
 ```
 ### Pull unique records from each source
