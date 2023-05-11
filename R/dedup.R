@@ -31,12 +31,22 @@ dedup_citations <- function(raw_citations) {
     raw_citations
   }
   
+  browser()
+  # rename or coalesce columns
+  targets <- c("journal", "number", "pages", "isbn", "record_id")
+  sources <- c("source", "issue", "start_page", "issn", "ID")
+  raw_citations <- add_cols(raw_citations, sources)
+  
+  for (i in seq_along(targets)) {
+    if (targets[i] %in% names(raw_citations)) {
+      raw_citations[[targets[i]]] <- dplyr::coalesce(raw_citations[[targets[i]]], raw_citations[[sources[i]]])
+    }  else {
+      raw_citations[[targets[i]]] <- raw_citations[[sources[i]]]
+    }
+  }
+  
   raw_citations <- add_cols(raw_citations, c("record_id", "cite_label", "cite_source", "cite_string"))
-  raw_citations$record_id <- raw_citations$record_id <- ""
-  raw_citations$journal <- raw_citations$source
-  raw_citations$number <- raw_citations$issue
-  raw_citations$pages <- raw_citations$start_page
-  raw_citations$isbn <- raw_citations$issn
+ 
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
   
