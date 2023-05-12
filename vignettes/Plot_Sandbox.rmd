@@ -94,80 +94,66 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ```
 
-### NEW TABLE Experimentation
+### New table to show internal deduplication
 ```{r}
-#Create a table to show the difference between the initial number of records uploaded for each source, the number Database-Specific Unique Records (S-SUR) which is the count after internal deduplication, and the number of unique records that source provided after deduplication across all sources.
-
-library(DT)
-
 # Function to count occurrences of each database
 count_sources <- function(df, db_colname) {
-  db_counts <- df %>%
-    dplyr::pull(!!sym(db_colname)) %>%
-    strsplit(", ") %>%
-    lapply(unique) %>%  # Remove duplicates within each cell
-    unlist() %>%
-    trimws() %>%
-    table() %>%
-    as.data.frame()
-  
-  colnames(db_counts) <- c("Source", "count")
-  
-  return(db_counts)
+    db_counts <- df %>%
+        dplyr::pull(!!sym(db_colname)) %>%
+        strsplit(", ") %>%
+        lapply(unique) %>%  
+        unlist() %>%
+        trimws() %>%
+        table() %>%
+        as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    
+    return(db_counts)
 }
 
 # Calculate S-SUR count for each database
 s_sur_count <- count_sources(unique_citations, "cite_source")
 colnames(s_sur_count) <- c("Source", "S-SUR")
 
-# Count the citations in the initial citations data and remove blank rows
+# Count the citations in the uploaded .ris data and remove blank rows
 initial_citations_count <- count_sources(citations, "cite_source")
 colnames(initial_citations_count) <- c("Source", "Records Imported")
 
-# Count the citations in the n_unique data, remove blank rows, and exclude rows without 'search' in cite_label
-n_unique_citations_count <- n_unique %>%
-  dplyr::filter(cite_label == "search") %>%
-  dplyr::group_by(cite_source) %>%
-  dplyr::summarise(`Unique records` = sum(unique)) %>%
-  dplyr::filter(cite_source != "") %>%
-  dplyr::arrange(cite_source) %>%
-  dplyr::rename(Source = cite_source)
-
 # Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, s_sur_count, by = "Source") %>%
-  dplyr::left_join(n_unique_citations_count, by = "Source")
+citation_counts <- dplyr::left_join(initial_citations_count, s_sur_count, by = "Source")
 
-# Add the "Non-unique Records" column directly
-citation_counts <- citation_counts %>%
-  dplyr::mutate(`Non-unique Records` = `S-SUR` - `Unique records`)
+# Convert the necessary columns to numeric
+citation_counts$`S-SUR` <- as.numeric(citation_counts$`S-SUR`)
+citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
 
-# Add the calculations
-citation_counts <- citation_counts %>%
-  dplyr::mutate(`Source Contribution %` = `S-SUR` / sum(`S-SUR`, na.rm = TRUE),
-                `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
-                `Source Unique %` = `Unique records` / `S-SUR`)
+# Convert the Source column to character
+citation_counts$Source <- as.character(citation_counts$Source)
 
-# Add a row with the total count for each column
+# Calculate totals
 totals <- c("Total", 
             sum(citation_counts$`Records Imported`, na.rm = TRUE),
-            sum(citation_counts$`S-SUR`, na.rm = TRUE),
-            sum(citation_counts$`Unique records`, na.rm = TRUE),
-            sum(citation_counts$`Non-unique Records`, na.rm = TRUE),
-            NA, NA, NA)
+            sum(citation_counts$`S-SUR`, na.rm = TRUE)
+)
 
+# Add the total row
 citation_counts <- rbind(citation_counts, totals)
 
-# Style the table using DT
-datatable(citation_counts, 
-          options = list(dom = 't', pageLength = nrow(citation_counts), 
-                         columnDefs = list(list(visible = FALSE, targets = 0)))) %>% 
-  formatStyle(names(citation_counts),
-              backgroundColor = styleEqual("Total", "lightgray"),
-              target = "row") %>%
-  formatPercentage(c("Source Contribution %", "Source Unique Contribution %", "Source Unique %"), 1)
-
-
-
+# Generate the final table
+citation_counts %>%
+    gt(rowname_col = "Source") %>%
+    tab_header(title = "Citation Counts") %>%
+    cols_label(
+        `Records Imported` = "Records Imported¹",
+        `S-SUR` = "S-SUR²"
+    ) %>%
+    tab_source_note(
+        source_note = md(c(
+            "¹ Number of records imported from each database.",
+            "² Number of source specific unique records"
+        ))
+    )%>%
+    gt_theme_538()
 ```
 #Updated Search Summary Table
 ```{r}
@@ -273,6 +259,7 @@ citation_counts %>%
     gt_theme_538()
 
 ```
+
 ### Pull unique records from each source
 ```{r}
 #Get unique records from each source and add bibliographic data
