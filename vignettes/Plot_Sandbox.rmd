@@ -96,6 +96,7 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ### New table to show internal deduplication
 ```{r}
+library(gt)
 # Function to count occurrences of each database
 count_sources <- function(df, db_colname) {
     db_counts <- df %>%
@@ -157,6 +158,7 @@ citation_counts %>%
 ```
 #Updated Search Summary Table
 ```{r}
+library(gt)
 # Function to count occurrences of each database
 count_sources <- function(df, db_colname) {
     db_counts <- df %>%
