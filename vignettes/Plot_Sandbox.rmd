@@ -263,7 +263,196 @@ citation_counts %>%
     gt_theme_538()
 
 ```
+```{r}
+# Function to count occurrences of each source in the 'Screened' and 'Final' phases
+count_source_phase <- function(df) {
+    df <- df %>%
+        tidyr::separate_rows(cite_source, sep = ",") %>%
+        tidyr::separate_rows(cite_label, sep = ",")
+    
+    df <- df %>%
+        dplyr::mutate(cite_source = stringr::str_trim(cite_source),
+                      cite_label = stringr::str_trim(cite_label))
+    
+    df <- df %>%
+        dplyr::filter(cite_source != "unknown")
+    
+    df <- df %>%
+        dplyr::mutate(screened = ifelse(cite_label == "Screened", 1, 0),
+                      final = ifelse(cite_label == "Final", 1, 0)) %>%
+        dplyr::group_by(cite_source) %>%
+        dplyr::summarise(screened = sum(screened),
+                         final = sum(final),
+                         .groups = "drop")
+    
+    df <- dplyr::rename(df, Source = cite_source)
+    
+    return(df)
+}
 
+source_phase <- count_source_phase(unique_citations)
+
+# Function to count occurrences of each database
+count_sources <- function(df, db_colname) {
+    db_counts <- df %>%
+        dplyr::pull(rlang::sym(db_colname)) %>%
+        strsplit(", ") %>%
+        lapply(unique) %>%  
+        unlist() %>%
+        trimws() %>%
+        table() %>%
+        as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    
+    return(db_counts)
+}
+
+s_sur_count <- count_sources(unique_citations, "cite_source")
+colnames(s_sur_count) <- c("Source", "S-SUR")
+
+s_sur_count$`S-SUR` <- as.numeric(s_sur_count$`S-SUR`)
+s_sur_count$Source <- as.character(s_sur_count$Source)
+
+# Combine the results
+combined_counts <- dplyr::left_join(s_sur_count, source_phase, by = "Source")
+
+# Calculate totals
+totals <- c("Total", 
+            sum(combined_counts$`S-SUR`, na.rm = TRUE),
+            sum(combined_counts$screened, na.rm = TRUE),
+            sum(combined_counts$final, na.rm = TRUE))
+
+# Add the total row
+combined_counts <- rbind(combined_counts, totals)
+
+# Generate the final table
+combined_counts %>%
+    gt::gt(rowname_col = "Source") %>%
+    gt::tab_header(title = "Citation Counts") %>%
+    gt::cols_label(
+        `S-SUR` = "S-SUR¹",
+        screened = "Screened Included²",
+        final = "Final Included³"
+    ) %>%
+    gt::tab_source_note(
+        source_note = gt::md(c(
+            "¹ Number of source specific unique records",
+            "² Records included after title/abstract screening",
+            "³ Records included after full text screening"
+        ))
+    )%>%
+gt_theme_538()
+
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(gt)
+library(gtExtras)
+
+# Function to count occurrences of each source in the 'Screened' and 'Final' phases
+count_source_phase <- function(df) {
+    df <- df %>%
+        tidyr::separate_rows(cite_source, sep = ",") %>%
+        tidyr::separate_rows(cite_label, sep = ",")
+    
+    df <- df %>%
+        dplyr::mutate(cite_source = stringr::str_trim(cite_source),
+                      cite_label = stringr::str_trim(cite_label))
+    
+    df <- df %>%
+        dplyr::filter(cite_source != "unknown")
+    
+    df <- df %>%
+        dplyr::mutate(screened = ifelse(cite_label == "Screened", 1, 0),
+                      final = ifelse(cite_label == "Final", 1, 0)) %>%
+        dplyr::group_by(cite_source) %>%
+        dplyr::summarise(screened = sum(screened),
+                         final = sum(final),
+                         .groups = "drop")
+    
+    df <- dplyr::rename(df, Source = cite_source)
+    
+    return(df)
+}
+
+source_phase <- count_source_phase(unique_citations)
+
+# Function to count occurrences of each database
+count_sources <- function(df, db_colname) {
+    db_counts <- df %>%
+        dplyr::pull(rlang::sym(db_colname)) %>%
+        strsplit(", ") %>%
+        lapply(unique) %>%  
+        unlist() %>%
+        trimws() %>%
+        table() %>%
+        as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    
+    return(db_counts)
+}
+
+s_sur_count <- count_sources(unique_citations, "cite_source")
+colnames(s_sur_count) <- c("Source", "S-SUR")
+
+s_sur_count$`S-SUR` <- as.numeric(s_sur_count$`S-SUR`)
+s_sur_count$Source <- as.character(s_sur_count$Source)
+
+# Combine the results
+combined_counts <- dplyr::left_join(s_sur_count, source_phase, by = "Source")
+
+# Replace NA values with 0
+combined_counts[is.na(combined_counts)] <- 0
+
+# Calculate Precision
+combined_counts <- combined_counts %>%
+    dplyr::mutate(Precision = ifelse(`S-SUR` != 0, round((final / `S-SUR`) * 100, 2), 0))  # Multiply by 100 and round
+
+# Calculate Recall manually in a loop
+total_final <- sum(combined_counts$final)
+for(i in 1:nrow(combined_counts)) {
+    combined_counts$Recall[i] <- round((combined_counts$final[i] / total_final) * 100, 2)  # Multiply by 100 and round
+}
+
+# Calculate totals
+totals <- c("Total", 
+            sum(combined_counts$`S-SUR`, na.rm = TRUE),
+            sum(combined_counts$screened, na.rm = TRUE),
+            sum(combined_counts$final, na.rm = TRUE),
+            "-",  # Precision total doesn't make sense
+            "-")  # Recall total doesn't make sense
+
+# Add the total row
+combined_counts <- rbind(combined_counts, totals)
+
+# Generate the final table
+combined_counts %>%
+    gt::gt(rowname_col = "Source") %>%
+    gt::tab_header(title = "Citation Counts") %>%
+    gt::cols_label(
+        `S-SUR` = "S-SUR¹",
+        screened = "Screened Included²",
+        final = "Final Included³",
+        Precision = "Precision⁴",
+        Recall = "Sensitivity/Recall⁵"
+    ) %>%
+    gt::tab_source_note(
+        source_note = gt::md(c(
+            "¹ Number of source specific unique records",
+            "² Records included after title/abstract screening",
+            "³ Records included after full text screening",
+            "⁴ Precision = Final Included / S-SUR",
+            "⁵ Sensitivity/Recall = Final Included / Total Final Included"
+        ))
+    )%>%
+    gtExtras::gt_theme_538()
+
+```
 ### Pull unique records from each source
 ```{r}
 #Get unique records from each source and add bibliographic data
