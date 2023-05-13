@@ -286,8 +286,8 @@ count_source_phase <- function(df) {
         dplyr::filter(cite_source != "unknown")
     
     df <- df %>%
-        dplyr::mutate(screened = ifelse(cite_label == "Screened", 1, 0),
-                      final = ifelse(cite_label == "Final", 1, 0)) %>%
+        dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
+                      final = ifelse(cite_label == "final", 1, 0)) %>%
         dplyr::group_by(cite_source) %>%
         dplyr::summarise(screened = sum(screened),
                          final = sum(final),
@@ -341,8 +341,8 @@ for(i in 1:nrow(combined_counts)) {
 # Calculate totals
 totals <- c("Total", 
             sum(combined_counts$`Distinct Records`, na.rm = TRUE),
-            paste0(sum(citations$cite_label == "Screened"), "⁶"),
-            paste0(sum(citations$cite_label == "Final"), "⁷"),
+            paste0(sum(citations$cite_label == "screened"), "⁶"),
+            paste0(sum(citations$cite_label == "final"), "⁷"),
             "-",  # Precision total doesn't make sense
             "-")  # Recall total doesn't make sense
 
@@ -621,7 +621,7 @@ display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations 
 ```{r}
 # Citation summary table
 
-citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+citation_summary_table(unique_citations, screening_label = c("screened", "final"))
 
 ```
 
@@ -630,7 +630,7 @@ citation_summary_table(unique_citations, screening_label = c("Screened", "Final"
 # Citation Record Table
 
 unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "final")) %>%
   record_level_table(return = "DT")
 
 ```
