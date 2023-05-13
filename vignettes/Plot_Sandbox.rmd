@@ -347,7 +347,7 @@ combined_counts %>%
 
 ```
 
-##3. Current plots
+## 3. Current plots
 ### Heatmaps
 ```{r}
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
@@ -382,7 +382,7 @@ my_contributions <- plot_contributions(n_unique,
 
 my_contributions
 ```
-##4. Prep for expirimental plots
+## 4. Prep for expirimental plots
 ```{r}
 #Get unique records from each source and add bibliographic data
 unique_AGRIS <- n_unique %>% 
@@ -414,7 +414,7 @@ all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
 
 ```
 
-##.5 Expirimental plots
+## 5. Expirimental plots
 ### Publication year bar plots
 ```{r}
 
@@ -571,7 +571,7 @@ display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB"
 display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
 ```
 
-##7. Current tables
+## 7. Current tables
 ### Citation Summary Table
 ```{r}
 citation_summary_table(unique_citations, screening_label = c("screened", "final"))
