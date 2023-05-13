@@ -343,7 +343,7 @@ generate_apa_citation <- function(authors, year) {
   id <- seq_along(authors)
   # Extract last names and initials
   processed_names <- tibble::tibble(id = id, authors = authors, year = year) %>%
-    mutate(
+    dplyr::mutate(
       last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
       initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
         stringr::str_remove_all("\\.") %>%
