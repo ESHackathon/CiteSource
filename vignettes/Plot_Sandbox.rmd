@@ -114,19 +114,19 @@ count_sources <- function(df, db_colname) {
     return(db_counts)
 }
 
-# Calculate S-SUR count for each database
-s_sur_count <- count_sources(unique_citations, "cite_source")
-colnames(s_sur_count) <- c("Source", "S-SUR")
+# Calculate distinct record count for each database
+distinct_count <- count_sources(unique_citations, "cite_source")
+colnames(distinct_count) <- c("Source", "Distinct Records")
 
 # Count the citations in the uploaded .ris data and remove blank rows
 initial_citations_count <- count_sources(citations, "cite_source")
 colnames(initial_citations_count) <- c("Source", "Records Imported")
 
 # Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, s_sur_count, by = "Source")
+citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source")
 
 # Convert the necessary columns to numeric
-citation_counts$`S-SUR` <- as.numeric(citation_counts$`S-SUR`)
+citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
 citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
 
 # Convert the Source column to character
@@ -135,7 +135,7 @@ citation_counts$Source <- as.character(citation_counts$Source)
 # Calculate totals
 totals <- c("Total", 
             sum(citation_counts$`Records Imported`, na.rm = TRUE),
-            sum(citation_counts$`S-SUR`, na.rm = TRUE)
+            sum(citation_counts$`Distinct Records`, na.rm = TRUE)
 )
 
 # Add the total row
@@ -144,15 +144,15 @@ citation_counts <- rbind(citation_counts, totals)
 # Generate the final table
 citation_counts %>%
     gt(rowname_col = "Source") %>%
-    tab_header(title = "Citation Counts") %>%
+    tab_header(title = "Record Counts") %>%
     cols_label(
         `Records Imported` = "Records Imported¹",
-        `S-SUR` = "S-SUR²"
+        `Distinct Records` = "Distinct Records²"
     ) %>%
     tab_source_note(
         source_note = md(c(
-            "¹ Number of records imported from each database.",
-            "² Number of source specific unique records"
+            "¹ Number of records imported from each source.",
+            "² Number of records after internal source deduplication"
         ))
     )%>%
     gt_theme_538()
@@ -177,9 +177,9 @@ count_sources <- function(df, db_colname) {
     return(db_counts)
 }
 
-# Calculate S-SUR count for each database
-s_sur_count <- count_sources(unique_citations, "cite_source")
-colnames(s_sur_count) <- c("Source", "S-SUR")
+# Calculate Distinct Records count for each database
+distinct_count <- count_sources(unique_citations, "cite_source")
+colnames(distinct_count) <- c("Source", "Distinct Records")
 
 # Count the citations in the uploaded .ris data and remove blank rows
 initial_citations_count <- count_sources(citations, "cite_source")
@@ -195,24 +195,24 @@ n_unique_citations_count <- n_unique %>%
     dplyr::rename(Source = cite_source)
 
 # Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, s_sur_count, by = "Source") %>%
+citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source") %>%
     dplyr::left_join(n_unique_citations_count, by = "Source")
 
 # Add the "Non-unique Records" column directly
 citation_counts <- citation_counts %>%
-    dplyr::mutate(`Non-unique Records` = `S-SUR` - `Unique records`)
+    dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique records`)
 
 # Convert the necessary columns to numeric
-citation_counts$`S-SUR` <- as.numeric(citation_counts$`S-SUR`)
+citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
 citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
 citation_counts$`Unique records` <- as.numeric(citation_counts$`Unique records`)
 citation_counts$`Non-unique Records` <- as.numeric(citation_counts$`Non-unique Records`)
 
 # Add the calculations
 citation_counts <- citation_counts %>%
-    dplyr::mutate(`Source Contribution %` = `S-SUR` / sum(`S-SUR`, na.rm = TRUE),
+    dplyr::mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
                   `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
-                  `Source Unique %` = `Unique records` / `S-SUR`)
+                  `Source Unique %` = `Unique records` / `Distinct Records`)
 
 citation_counts <- citation_counts %>%
     dplyr::mutate(
@@ -229,7 +229,7 @@ citation_counts <- citation_counts %>%
 # Calculate totals
 totals <- c("Total", 
             sum(citation_counts$`Records Imported`, na.rm = TRUE),
-            sum(citation_counts$`S-SUR`, na.rm = TRUE),
+            sum(citation_counts$`Distinct Records`, na.rm = TRUE),
             sum(citation_counts$`Unique records`, na.rm = TRUE),
             sum(citation_counts$`Non-unique Records`, na.rm = TRUE),
             "-", "-", "-")
@@ -239,25 +239,25 @@ citation_counts <- rbind(citation_counts, totals)
 
 citation_counts %>%
     gt(rowname_col = "Source") %>%
-    tab_header(title = "Citation Counts") %>%
+    tab_header(title = "Record Counts") %>%
     cols_label(
         `Records Imported` = "Records Imported¹",
-        `S-SUR` = "S-SUR²",
+        `Distinct Records` = "Distinct Records²",
         `Unique records` = "Unique records³",
         `Non-unique Records` = "Non-unique Records⁴",
-        `Source Contribution %` = "Source Contribution %⁵",
-        `Source Unique Contribution %` = "Source Unique Contribution %⁶",
-        `Source Unique %` = "Source Unique %⁷"
+        `Source Contribution %` = "Records Contributed %⁵",
+        `Source Unique Contribution %` = "Unique Records Contributed %⁶",
+        `Source Unique %` = "Unique Records %⁷"
     ) %>%
     tab_source_note(
         source_note = md(c(
-            "¹ Number of records imported from each database.",
-            "² Total number of records in S-SUR for each database.",
-            "³ Total number of unique records for each database.",
-            "⁴ Difference between S-SUR and unique records for each database.",
-            "⁵ Percentage contribution of each database to the total S-SUR.",
-            "⁶ Percentage of unique records from each database to the total unique records.",
-            "⁷ Percentage of unique records out of the S-SUR from each database."
+            "¹ Number of raw records imported from each database.",
+            "² Number of records after internal source deduplication",
+            "³ Number of records not found in another source.",
+            "⁴ Number of records found in at least one other source.",
+            "⁵ Percent distinct records contributed to the total number of distinct records.",
+            "⁶ Percent of unique records contributed to the total unique records.",
+            "⁷ Percentage of records that were unique from each source."
         ))
     )%>%
     gt_theme_538()
@@ -316,21 +316,21 @@ count_sources <- function(df, db_colname) {
     return(db_counts)
 }
 
-s_sur_count <- count_sources(unique_citations, "cite_source")
-colnames(s_sur_count) <- c("Source", "S-SUR")
+distinct_count <- count_sources(unique_citations, "cite_source")
+colnames(distinct_count) <- c("Source", "Distinct Records")
 
-s_sur_count$`S-SUR` <- as.numeric(s_sur_count$`S-SUR`)
-s_sur_count$Source <- as.character(s_sur_count$Source)
+distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
+distinct_count$Source <- as.character(distinct_count$Source)
 
 # Combine the results
-combined_counts <- dplyr::left_join(s_sur_count, source_phase, by = "Source")
+combined_counts <- dplyr::left_join(distinct_count, source_phase, by = "Source")
 
 # Replace NA values with 0
 combined_counts[is.na(combined_counts)] <- 0
 
 # Calculate Precision
 combined_counts <- combined_counts %>%
-    dplyr::mutate(Precision = ifelse(`S-SUR` != 0, round((final / `S-SUR`) * 100, 2), 0))  # Multiply by 100 and round
+    dplyr::mutate(Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0))  # Multiply by 100 and round
 
 # Calculate Recall manually in a loop
 total_final <- sum(combined_counts$final)
@@ -340,7 +340,7 @@ for(i in 1:nrow(combined_counts)) {
 
 # Calculate totals
 totals <- c("Total", 
-            sum(combined_counts$`S-SUR`, na.rm = TRUE),
+            sum(combined_counts$`Distinct Records`, na.rm = TRUE),
             sum(combined_counts$screened, na.rm = TRUE),
             sum(combined_counts$final, na.rm = TRUE),
             "-",  # Precision total doesn't make sense
@@ -354,7 +354,7 @@ combined_counts %>%
     gt::gt(rowname_col = "Source") %>%
     gt::tab_header(title = "Citation Counts") %>%
     gt::cols_label(
-        `S-SUR` = "S-SUR¹",
+        `Distinct Records` = "Distinct Records¹",
         screened = "Screened Included²",
         final = "Final Included³",
         Precision = "Precision⁴",
@@ -365,7 +365,7 @@ combined_counts %>%
             "¹ Number of source specific unique records",
             "² Records included after title/abstract screening",
             "³ Records included after full text screening",
-            "⁴ Precision = Final Included / S-SUR",
+            "⁴ Precision = Final Included / Distinct Records",
             "⁵ Sensitivity/Recall = Final Included / Total Final Included"
         ))
     )%>%
