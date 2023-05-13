@@ -383,6 +383,7 @@ my_contributions <- plot_contributions(n_unique,
 my_contributions
 ```
 ## 4. Prep for expirimental plots
+### Unique records count from sources
 ```{r}
 #Get unique records from each source and add bibliographic data
 unique_AGRIS <- n_unique %>% 
