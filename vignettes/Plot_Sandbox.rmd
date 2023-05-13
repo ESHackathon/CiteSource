@@ -66,11 +66,11 @@ metadata_tbl <- tibble::tribble(
    "AGRIS.ris",      "AGRIS",       "search",    
    "CAB.ris",        "CAB",         "search",    
    "EconLit.ris",    "EconLit",     "search",    
-   "Final.ris",       NA,           "Final",     
+   "Final.ris",       NA,           "final",     
    "GreenFile.ris",  "GreenFile",   "search",    
    "McK.ris",        "Method1",     "search",    
    "RM.ris",         "Method2",     "search",    
-   "TiAb.ris",        NA,           "Screened",  
+   "TiAb.ris",        NA,           "screened",  
    "WoS_early.ris",  "WoS",         "search",    
    "WoS_later.ris",  "WoS",         "search"
 ) %>% 
@@ -341,18 +341,22 @@ for(i in 1:nrow(combined_counts)) {
 # Calculate totals
 totals <- c("Total", 
             sum(combined_counts$`Distinct Records`, na.rm = TRUE),
-            sum(combined_counts$screened, na.rm = TRUE),
-            sum(combined_counts$final, na.rm = TRUE),
+            paste0(sum(citations$cite_label == "Screened"), "⁶"),
+            paste0(sum(citations$cite_label == "Final"), "⁷"),
             "-",  # Precision total doesn't make sense
             "-")  # Recall total doesn't make sense
 
 # Add the total row
 combined_counts <- rbind(combined_counts, totals)
 
+# Remove the 'unknown' row - this should be corrected and unnecessary soon
+combined_counts <- combined_counts %>%
+    dplyr::filter(Source != "unknown")
+
 # Generate the final table
 combined_counts %>%
     gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Citation Counts") %>%
+    gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
     gt::cols_label(
         `Distinct Records` = "Distinct Records¹",
         screened = "Screened Included²",
@@ -360,16 +364,23 @@ combined_counts %>%
         Precision = "Precision⁴",
         Recall = "Sensitivity/Recall⁵"
     ) %>%
+   gt::cols_align(
+        align = "right",
+        columns = c(screened, final)
+    ) %>%
     gt::tab_source_note(
         source_note = gt::md(c(
             "¹ Number of source specific unique records",
             "² Records included after title/abstract screening",
             "³ Records included after full text screening",
             "⁴ Precision = Final Included / Distinct Records",
-            "⁵ Sensitivity/Recall = Final Included / Total Final Included"
+            "⁵ Sensitivity/Recall = Final Included / Total Final Included",
+            "⁶ Number of records included after title/abstract screening",
+            "⁷ Number of records included after full text screening"
         ))
     )%>%
     gtExtras::gt_theme_538()
+
 
 ```
 ### Pull unique records from each source
