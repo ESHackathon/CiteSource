@@ -19,7 +19,7 @@
 #' unique_citations <- dedup_citations(examplecitations)
 #' 
 #' unique_citations |> 
-#' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+#' dplyr::filter(stringr::str_detect(cite_label, "final"))  |> 
 #' record_level_table(return = "DT")
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
@@ -167,9 +167,9 @@ record_level_table <- function(citations, include = "sources", include_empty = T
 #' unique_citations <- dedup_citations(examplecitations)
 #' 
 #' unique_citations |> 
-#' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+#' dplyr::filter(stringr::str_detect(cite_label, "final"))  |> 
 #' record_level_table(return = "DT")
-#' citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+#' citation_summary_table(unique_citations, screening_label = c("screened", "final"))
 #' }
 
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
