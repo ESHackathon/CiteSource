@@ -17,13 +17,6 @@
 
 dedup_citations <- function(raw_citations) {
   
-  #' ####------ Add columns ------ ####
-  
-  #' This function adds citesource columns to citation data if missing
-  #' @param raw_citations Citation dataframe with relevant columns
-  #' @param cname column names which are required in dataframe
-  #' @return Dataframe of citations with id
-  #' @noRd
   add_cols <- function(raw_citations, cname) {
     add <- cname[!cname %in% names(raw_citations)]
     
