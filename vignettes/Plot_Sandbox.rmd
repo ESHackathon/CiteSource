@@ -22,42 +22,22 @@ knitr::opts_chunk$set(
 ```
 ## About this vignette
 
-This vignette is a bit of a sandbox for the experimentation with plots! Currently it is using the working example data (same data used in the "Source Analysis Across Screening Phases" vignette). This Vignette includes plots that are already built into CiteSource along with plots that we are exploring.
+This vignette is a bit of a sandbox for the experimentation with plots! Currently it is using the working example data (same data used in the "Source Analysis Across Screening Phases" vignette). The focus is on plots that we are exploring.
 
 If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our discussion board on github! https://github.com/ESHackathon/CiteSource/discussions/100
 
-## 1. Installation of packages and loading libraries
+## 1. Initial setup
 
 ```{r, results = FALSE, message=FALSE}
-#Install the remotes packages to enable installation from GitHub
-#install.packages("remotes")
-#library(remotes)
-
-#Install CiteSource
-#remotes::install_github("ESHackathon/CiteSource")
-
 #Load the necessary libraries
 library(CiteSource)
 library(dplyr)
 library(ggplot2)
-```
 
-## 2. Import Reference Files and Custom Metadata
-
-```{r}
 #Import citation files from a folder
 citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
-
 #Print citation_files to double check the order in which R imported our files.
 citation_files
-```
-
-
-## 3. Tagging Sources & Deduplication
-
-For this vignette we'll be using the same sources from the "Source Analysis Across Screening Phases" vignette as it's one of the larger sets of citations.
-
-```{r}
 # Set the path to the directory containing the citation files
 file_path <- "../vignettes/working_example_data/"
 
@@ -76,24 +56,15 @@ metadata_tbl <- tibble::tribble(
 ) %>% 
 
 dplyr::mutate(files = paste0(file_path, files))
-	
 citations <- read_citations(metadata = metadata_tbl)
-
 # Deduplication & Identifying Crossover Records
 unique_citations <- dedup_citations(citations)
-#> formatting data...
-#> identifying potential duplicates...
-#> identified duplicates!
-#> merging citations...
-
 # Count number of unique and non-unique citations from different sources and labels
 n_unique <- count_unique(unique_citations)
-
 # Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-
 ```
-
+## 2. New slated for implementation
 ### New table to show internal deduplication
 ```{r}
 library(gt)
@@ -157,7 +128,7 @@ citation_counts %>%
     )%>%
     gt_theme_538()
 ```
-#Updated Search Summary Table
+### New Updated Search Summary Table
 ```{r}
 library(gt)
 library(gtExtras)
@@ -263,8 +234,7 @@ citation_counts %>%
     gt_theme_538()
 
 ```
-
-
+### New precision/sensitivity table
 ```{r}
 library(dplyr)
 library(tidyr)
@@ -273,36 +243,29 @@ library(gt)
 library(gtExtras)
 
 # Function to count occurrences of each source in the 'Screened' and 'Final' phases
-count_source_phase <- function(df) {
-    df <- df %>%
+count_source_phase <- function(source_phase_df) {
+    source_phase_df <- source_phase_df %>%
         tidyr::separate_rows(cite_source, sep = ",") %>%
-        tidyr::separate_rows(cite_label, sep = ",")
-    
-    df <- df %>%
+        tidyr::separate_rows(cite_label, sep = ",") %>%
         dplyr::mutate(cite_source = stringr::str_trim(cite_source),
-                      cite_label = stringr::str_trim(cite_label))
-    
-    df <- df %>%
-        dplyr::filter(cite_source != "unknown")
-    
-    df <- df %>%
+                      cite_label = stringr::str_trim(cite_label)) %>%
+        dplyr::filter(cite_source != "unknown") %>%
         dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
                       final = ifelse(cite_label == "final", 1, 0)) %>%
         dplyr::group_by(cite_source) %>%
         dplyr::summarise(screened = sum(screened),
                          final = sum(final),
-                         .groups = "drop")
+                         .groups = "drop") %>%
+        dplyr::rename(Source = cite_source)
     
-    df <- dplyr::rename(df, Source = cite_source)
-    
-    return(df)
+    return(source_phase_df)
 }
 
 source_phase <- count_source_phase(unique_citations)
 
 # Function to count occurrences of each database
-count_sources <- function(df, db_colname) {
-    db_counts <- df %>%
+count_sources <- function(source_phase_df, db_colname) {
+    db_counts <- source_phase_df %>%
         dplyr::pull(rlang::sym(db_colname)) %>%
         strsplit(", ") %>%
         lapply(unique) %>%  
@@ -383,7 +346,43 @@ combined_counts %>%
 
 
 ```
-### Pull unique records from each source
+
+##3. Current plots
+### Heatmaps
+```{r}
+my_heatmap <- plot_source_overlap_heatmap(source_comparison)
+
+my_heatmap
+
+# Plot overlap as a heatmap matrix as percentage
+
+my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
+
+my_heatmap_percent
+
+```
+
+### Upset plot
+```{r}
+# Citation duplication across multitiple resources
+
+my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
+my_upset_plot
+```
+
+### Unique/Crossover Bar Plot
+```{r}
+# Unique vs. Duplicate sources across Search/TiAb Screening/Final Inclusion
+
+my_contributions <- plot_contributions(n_unique,
+  center = TRUE,
+  bar_order = c("search", "Screened", "Final")
+)
+
+my_contributions
+```
+##4. Prep for expirimental plots
 ```{r}
 #Get unique records from each source and add bibliographic data
 unique_AGRIS <- n_unique %>% 
@@ -415,44 +414,7 @@ all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
 
 ```
 
-
-## 4.PLOTS
-### Heatmaps
-```{r}
-my_heatmap <- plot_source_overlap_heatmap(source_comparison)
-
-my_heatmap
-
-# Plot overlap as a heatmap matrix as percentage
-
-my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
-
-my_heatmap_percent
-
-```
-
-### Upset plots
-```{r}
-# Citation duplication across multitiple resources
-
-my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-
-my_upset_plot
-```
-
-
-### Unique/Crossover Bar Plots
-```{r}
-# Unique vs. Duplicate sources across Search/TiAb Screening/Final Inclusion
-
-my_contributions <- plot_contributions(n_unique,
-  center = TRUE,
-  bar_order = c("search", "Screened", "Final")
-)
-
-my_contributions
-```
-
+##.5 Expirimental plots
 ### Publication year bar plots
 ```{r}
 
@@ -560,7 +522,7 @@ sankey<-sankeyNetwork(
 sankey
 ```
 
-## 5. TABLES
+## 6. Expirimental source-specific tables
 ### Unique Journal Count per Source 
 ```{r}
 library(gt)
@@ -600,29 +562,19 @@ display_gt_table <- function(data, caption) {
 }
 ```
 
-### Top 10 journals for each source
+### Top 10 journals for each source 
 ```{r}
 display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
 ```
 ```{r}
-display_gt_table(EconLit_journals[1:10, ], "Top 10 Journals by Unique Citations EconLit")
-```
-```{r}
+
 display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
 ```
-```{r}
-display_gt_table(Method1_journals[1:10, ], "Top 10 Journals by Unique Citations Method 1")
-```
-```{r}
-display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations Method 2")
-```
 
+##7. Current tables
 ### Citation Summary Table
 ```{r}
-# Citation summary table
-
 citation_summary_table(unique_citations, screening_label = c("screened", "final"))
-
 ```
 
 ### Citation Record Table
