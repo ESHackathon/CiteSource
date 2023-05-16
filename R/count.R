@@ -27,7 +27,7 @@ count_sources <- function(df, db_colname) {
 }
 
 
-#' Calcultate Source Counts
+#' Calculate Source Counts
 #'
 #' This function processes citation data to generate a dataframe of citation counts.
 #'
