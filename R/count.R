@@ -7,8 +7,10 @@
 #' @export
 #'
 #' @examples
-#'
+# 'if (interactive()) {
 #' count_sources(df = data, db_colname = "database_source")
+#' }
+
 count_sources <- function(df, db_colname) {
   db_counts <- df %>%
     dplyr::pull(!!rlang::sym(db_colname)) %>%
