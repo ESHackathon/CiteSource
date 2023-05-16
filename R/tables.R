@@ -561,3 +561,44 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
       dplyr::pull(.data$reference)
   }
 }
+
+#' Plot Source Counts
+#'
+#' This function takes the result of calculate_source_counts() and generates a formatted table using the gt package.
+#'
+#' @param source_counts A data frame produced by calculate_source_counts().
+#' 
+#' @return A gt table.
+#' 
+#' @examples
+#' 
+#' @export
+#' 
+plot_source_counts <- function(source_counts) {
+  
+  source_counts %>%
+    gt(rowname_col = "Source") %>%
+    tab_header(title = "Record Counts") %>%
+    cols_label(
+      `Records Imported` = "Records Imported¹",
+      `Distinct Records` = "Distinct Records²",
+      `Unique records` = "Unique records³",
+      `Non-unique Records` = "Non-unique Records⁴",
+      `Source Contribution %` = "Records Contributed %⁵",
+      `Source Unique Contribution %` = "Unique Records Contributed %⁶",
+      `Source Unique %` = "Unique Records %⁷"
+    ) %>%
+    tab_source_note(
+      source_note = md(c(
+        "¹ Number of raw records imported from each database.",
+        "² Number of records after internal source deduplication",
+        "³ Number of records not found in another source.",
+        "⁴ Number of records found in at least one other source.",
+        "⁵ Percent distinct records contributed to the total number of distinct records.",
+        "⁶ Percent of unique records contributed to the total unique records.",
+        "⁷ Percentage of records that were unique from each source."
+      ))
+    )%>%
+    gt_theme_538()
+}
+
