@@ -91,19 +91,38 @@
 <p><img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" style="float:right; height:200px; padding: 10px;"></p>
 <!-- badges: start -->
 
-<p><strong>About</strong></p>
+<div class="section level2">
+<h2 id="about-the-pacakge">About the Pacakge<a class="anchor" aria-label="anchor" href="#about-the-pacakge"></a>
+</h2>
 <p>CiteSource was developed in order to provide researchers the ability to examine the utility and efficacy of literature resources and search methodologies. The idea behind CiteSource is simply allowing users to deduplicate citation records, while maintaining customizable metadata about the citation.</p>
+<p><strong>Development</strong></p>
+<p>Development of this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis &amp; Meta-Analysis in R Conference - ESMARConf 2022. to learn more about this awesome conference and hackathon please visit @ <a href="https://esmarconf.org/" class="external-link uri">https://esmarconf.org/</a></p>
+<p><strong>License</strong></p>
+<p>CiteSource was created under the General Public License (&gt;=v3) find more information on GPL @ <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link uri">https://www.gnu.org/licenses/gpl-3.0.html</a></p>
+</div>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
+<p><strong>Customizable Metadata Tags</strong></p>
 <p>Users can provide customizable metadata in 3 fields, cite_source, cite_string, and cite_label. metadata can include anything from a resource name (ex.Web of Science, LENS.org, PubMed), a method (database search, handsearching, citation snowballing), a variation used within a method (WoS string #1, Wos string #2, WoS string #3), a research phase (search, Ti/Ab screening, Full-text Screening), or a unique group of citations (benchmarking articles, articles from a previous review, articles with a specific author affiliation).</p>
+<p><strong>Record Merging</strong></p>
 <p>The CiteSource deduplication process is better described as record merging process due to the fact that the customizable metadata from duplicate records is maintained through the creation of a single, primary record. Beyond the merging of customizable metadata, the primary record is created by using the most complete metadata available between duplicate records (currently DOI and Abstract fields).The ASySD package, developed by Kaitlyn Hair serves as the backbone of this process.</p>
+<p><strong>Table and Plot Visualizations</strong></p>
 <p>Once records are deduplicated, users are able to easily create plots and tables in order to answer specific questions or to simply explore the data to an effort to develop new hypotheses. Examples of analysis may include how many unique records a specific source contributed or how traditional methods of searching fare against a new AI discovery tool in discovering relevant articles. Users may want to understand the overlap in records between two different search strings or evaluate the impact of including Google Scholar in a review. Before searching, a user may even develop a targeted search to better understand the topical coverage across databases that they intend to search, and once the search has been developed, how particular source, string, or method performed in discovering benchmarking articles.</p>
+</div>
+<div class="section level2">
+<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<p><strong>Installation</strong></p>
+<p>Install CiteSource in R with remotes::install_github(“ESHackathon/CiteSource”)</p>
 <p><strong>Vignettes</strong></p>
 <p>Vignettes covering various use cases can be found on the CiteSource web page <a href="https://www.eshackathon.org/CiteSource/" class="external-link uri">https://www.eshackathon.org/CiteSource/</a>.</p>
-<p><strong>Development and license</strong></p>
-<p>Development of this project began as part of the Evidence Synthesis Hackathon and as part of Evidence Synthesis &amp; Meta-Analysis in R Conference - ESMARConf 2022. to learn more about this awesome conference and hackathon please visit @ <a href="https://esmarconf.org/" class="external-link uri">https://esmarconf.org/</a></p>
-<p>CiteSource was created under the General Public License (&gt;=v3) find more information on GPL @ <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link uri">https://www.gnu.org/licenses/gpl-3.0.html</a></p>
-<p><strong>Installation</strong> Install CiteSource in R with remotes::install_github(“ESHackathon/CiteSource”)</p>
-<p><strong>Feedback</strong></p>
+</div>
+<div class="section level2">
+<h2 id="feedback">Feedback<a class="anchor" aria-label="anchor" href="#feedback"></a>
+</h2>
 <p>Be sure to check out our discussion page to engage with us or to learn more about the various use cases for CiteSource. Here you can provide comments/suggestions or suggest a vignette for a specific use case. <a href="https://github.com/ESHackathon/CiteSource/discussions" class="external-link uri">https://github.com/ESHackathon/CiteSource/discussions</a>.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
