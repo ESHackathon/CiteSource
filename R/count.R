@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-# 'if (interactive()) {
+#' if (interactive()) {
 #' count_sources(df = data, db_colname = "database_source")
 #' }
 
