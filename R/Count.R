@@ -37,7 +37,7 @@ count_sources <- function(df, db_colname) {
 #' 
 #' @examples
 #' # Assuming unique_citations, citations, and n_unique are dataframes with appropriate structure
-#' processed_data <- process_data(unique_citations, citations, n_unique)
+#' processed_data <- calculate_source_counts(unique_citations, citations, n_unique)
 #' 
 #' @export
 calculate_source_counts <- function(unique_citations, citations, n_unique) {
