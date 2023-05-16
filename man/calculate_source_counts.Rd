@@ -2,7 +2,7 @@
 % Please edit documentation in R/count.R
 \name{calculate_source_counts}
 \alias{calculate_source_counts}
-\title{Calcultate Source Counts}
+\title{Calculate Source Counts}
 \usage{
 calculate_source_counts(unique_citations, citations, n_unique)
 }
