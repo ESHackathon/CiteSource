@@ -580,25 +580,24 @@ plot_source_counts <- function(source_counts) {
     gt(rowname_col = "Source") %>%
     tab_header(title = "Record Counts") %>%
     cols_label(
-      `Records Imported` = "Records Imported¹",
-      `Distinct Records` = "Distinct Records²",
-      `Unique records` = "Unique records³",
-      `Non-unique Records` = "Non-unique Records⁴",
-      `Source Contribution %` = "Records Contributed %⁵",
-      `Source Unique Contribution %` = "Unique Records Contributed %⁶",
-      `Source Unique %` = "Unique Records %⁷"
+      `Records Imported` = paste0("Records Imported", "\u00B9"),
+      `Distinct Records` = paste0("Distinct Records", "\u00B2"),
+      `Unique records` = paste0("Unique records", "\u00B3"),
+      `Non-unique Records` = paste0("Non-unique Records", "\u2074"),
+      `Source Contribution %` = paste0("Records Contributed %", "\u2075"),
+      `Source Unique Contribution %` = paste0("Unique Records Contributed %", "\u2076"),
+      `Source Unique %` = paste0("Unique Records %", "\u2077")
     ) %>%
     tab_source_note(
       source_note = md(c(
-        "¹ Number of raw records imported from each database.",
-        "² Number of records after internal source deduplication",
-        "³ Number of records not found in another source.",
-        "⁴ Number of records found in at least one other source.",
-        "⁵ Percent distinct records contributed to the total number of distinct records.",
-        "⁶ Percent of unique records contributed to the total unique records.",
-        "⁷ Percentage of records that were unique from each source."
+        paste0("\u00B9", " Number of raw records imported from each database."),
+        paste0("\u00B2", " Number of records after internal source deduplication"),
+        paste0("\u00B3", " Number of records not found in another source."),
+        paste0("\u2074", " Number of records found in at least one other source."),
+        paste0("\u2075", " Percent distinct records contributed to the total number of distinct records."),
+        paste0("\u2076", " Percent of unique records contributed to the total unique records."),
+        paste0("\u2077", " Percentage of records that were unique from each source.")
       ))
     )%>%
     gt_theme_538()
 }
-
