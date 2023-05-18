@@ -3,12 +3,13 @@ library(dplyr)
 library(CiteSource)
 library(stringi)
 library(shinybusy)
+library(DT)
+library(htmlwidgets)
 library(htmltools)
 library(MASS)
 #options(repos = c(CRAN = "https://cloud.r-project.org"))
 #devtools::install_version("MASS", "7.3-51.1")  # Resolve incompatibility with shinyapps.io deployment 
 
-options(shiny.maxRequestSize=30*1024^2)
 # Set background colour
 tags$head(tags$style(
   HTML('
@@ -26,6 +27,21 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                        header = tagList(
                           shinybusy::add_busy_spinner(spin = "circle")
                           ),
+                       
+
+                       # theme = bslib::bs_theme(bg = "rgb(251, 251, 251)",
+                       #                  primary = "#008080",
+                       #                  secondary = "#00CED1",
+                       #                  success = "#48D1CC",
+                       #                  info = "#82D173",
+                       #                  warning = "#FFC07F",
+                       #                  danger = "#C1666B",
+                       #                  font_scale = NULL,
+                       #                  bootswatch = "cerulean",
+                       #                  fg = "#000"),
+                       
+                       shinyjs::useShinyjs(),
+                       
                  # Home tab
                  shiny::tabPanel('Home',
                                  shiny::navlistPanel(
@@ -62,7 +78,7 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                                        
                                        h4("Step 2: Double click the row to edit sources, labels, and strings"),
                                        # Output: Data file ----
-                                       DT::dataTableOutput("tbl_out"),
+                                       DT::dataTableOutput("tbl_out")
                                    
                                      )
                                    )
@@ -71,10 +87,17 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                  ),
                  
                  shiny::tabPanel("Deduplicate",
+                                 
+                                 tabsetPanel(
+                                   tabPanel("Automated deduplication",
+                              
+                         h4("Step 3: Deduplicate"),
+                         p("Click the button below to detect and remove duplicates automatically"),
+                                         
                             # Action button: identify duplicates in uploaded dataset
                             shinyWidgets::actionBttn(
-                              'identify_dups', 'Identify duplicate citations',
-                              style = "pill",
+                              'identify_dups', 'Find duplicates',
+                              style = "jelly",
                               color = "primary",
                               icon = icon("search")
                             ),               
@@ -82,6 +105,39 @@ ui <- shiny::navbarPage("CiteSource", id = "tabs",
                           # Output: datatable of deduplication results
                           DT::dataTableOutput("dedup_results")
                 ),
+                
+                tabPanel("Manual deduplication",
+                         
+                         
+                         h4("Step 4: Review potential duplicates manually"),
+                       
+                         textOutput("Manual_pretext"),
+                         
+                         br(),
+                         
+                         # Button
+                    
+                        shinyWidgets::actionBttn(
+                          inputId = "manualdedupsubmit",
+                          label = "Remove duplicates",
+                          style = "jelly",
+                          icon = icon("reply"),
+                          color = "primary"
+                        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B; margin-right: 20px"),
+                        shinyWidgets::actionBttn(
+                          inputId = "nomanualdedup",
+                          label = "Proceed without manual dedup",
+                          style = "jelly",
+                          icon = icon("arrow-right"),
+                          color = "primary"
+                        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B"),
+                      
+                         br(),
+                         
+                       DT::DTOutput("manual_dedup_dt")
+                         
+                         
+                ))),
                  
                  # Visualise tab
                 shiny::tabPanel("Visualise",
@@ -218,6 +274,7 @@ server <- function(input, output, session) {
   rv$df <- data.frame()
   rv$upload_df <- data.frame()
   rv$unique<-data.frame()
+  rv$post_manual_dedup <-data.frame()
   
   #### Upload files tab section ####
   #upload on click
@@ -343,7 +400,7 @@ server <- function(input, output, session) {
   
     })
   
-  ### Deduplication tab ####
+  # Deduplication tab ----
   
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups,{
@@ -355,11 +412,12 @@ server <- function(input, output, session) {
       req(FALSE)  
     }
     
-    dedup_results <- dedup_citations(rv$upload_df)
+    dedup_results <- dedup_citations(rv$upload_df, manual=TRUE)
     
 
-    rv$unique <- dedup_results
-        
+    rv$unique <- dedup_results$unique
+    rv$manual <- dedup_results$manual_dedup
+    
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
   
@@ -369,14 +427,92 @@ server <- function(input, output, session) {
     
   })
   
+  # Action button: remove manually selected duplicates 
+ observeEvent(c(input$manualdedupsubmit, input$nomanualdedup), {
+    
+    if(input$nomanualdedup > 0){
+      rv$post_manual_dedup <- rv$unique
+      
+    } else if(input$manualdedupsubmit > 0){
+      
+    removeManual <- rv$manual %>%
+      dplyr::select(author1, author2, title1, title2, year1, year2, journal1, journal2, doi1, doi2, record_id1, record_id2)
+    
+    duplicates <- removeManual[input$manual_dedup_dt_rows_selected,]
+    
+    if(nrow(duplicates) < 1){
+      shinyalert("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
+      
+      return()
+    }
+    
+    unique_citations <- rv$unique
+    after <- dedup_citations_add_manual(rv$upload_df,
+                                        additional_pairs = duplicates)
+    
+    rv$post_manual_dedup <- after
+    
+    shinyalert::shinyalert("Manual deduplication complete", 
+                           paste("From a total of", as.numeric(length(rv$upload_df)), "citations uploaded, there are", as.numeric(length(after$duplicate_id)),
+                           "unique citations after automated and manual deduplication.
+                           Compare citations across sources, labels, and strings in the visualisation tab"), type = "success")
+    }
+    
+  })
+  
+  
+  # Output: manual dedup datatable 
+  output$manual_dedup_dt <- DT::renderDT(
+    DT::datatable(rv$manual,
+              options = list(dom = 'tp',
+                             pageLength = 10,
+                             fixedColumns = TRUE,
+                             scrollX = TRUE,
+                             columnDefs =
+                               list(list(visible=FALSE, targets=c(3,6,9, 12, 15, 18, 21, 24, 25, 30, 31, 32, 33, 34,35,36)),
+                                    list(targets = c(1,2,3,4,5,6,7,8,9,10),
+                                         render = JS(
+                                           "function(data, type, row, meta) {",
+                                           "return type === 'display' && data != null && data.length > 25 ?",
+                                           "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
+                                           "}")
+                                    )))) %>%
+      DT::formatStyle(
+        c('title1', 'author1', 'doi1', 'volume1',
+          'pages1', 'number1', 'year1', 'abstract1', 'journal1', 'isbn1'),
+        c('title', 'author', 'doi', 'volume',
+          'pages', 'number', 'year', 'abstract', 'journal', 'isbn'),
+        backgroundColor = DT::styleInterval(c(0.95, 1), c('white', '#82d173', '#82d173'))) %>%
+      DT::formatStyle(
+        c('title2', 'author2', 'doi2', 'volume2',
+          'pages2', 'number2', 'year2', 'abstract2', 'journal2', 'isbn2'),
+        c('title', 'author', 'doi', 'volume',
+          'pages', 'number', 'year', 'abstract', 'journal', 'isbn'),
+        backgroundColor = DT::styleInterval(c(0.95, 1), c('white', '#82d173', '#82d173')))
+  )
+  
+  
+  # Action: ASySD manual dedup pre text ----
+  output$Manual_pretext <- renderText({
+    
+    manualrefs <- rv$manual
+    manualrefs <- as.numeric(length(manualrefs$record_id1))
+    
+    paste(manualrefs, "pairs of citations require manual deduplication. Review the pairs in the table
+        below. You can scroll right to see all citation metadata and hover over any cell to see truncated text. Identical and near-identical fields are highlighted in green.
+        Select all rows which contain duplicate pairs and click the button below to remove extra
+        duplicates.")
+    
+    
+  })
+  
+  
   # # display results of deduplication
   # output$dedup_results <- renderDataTable({
   # 
   #   gr
   # })
 
-  
-  #### end section ####
   
   #### Visualise tab ####
   
@@ -387,7 +523,7 @@ server <- function(input, output, session) {
     if (sources == "") sources <- ".*"
     if (strings == "") strings <- ".*"
     if (labels == "") labels <- ".*"
-    out <- rv$unique %>% 
+    out <-  rv$post_manual_dedup %>% 
       dplyr::filter(.data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
                     .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
                     .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
@@ -404,7 +540,7 @@ server <- function(input, output, session) {
   })
   
   output$plotgraph1<-plotly::renderPlotly({
-    if (nrow(rv$unique) == 0) {
+    if (nrow( rv$post_manual_dedup) == 0) {
       shinyalert::shinyalert("Data needed", 
                              "Please import and deduplicate your citations first.", 
                              type = "error")
@@ -423,7 +559,7 @@ server <- function(input, output, session) {
   })
   
   output$plotgraph2<-shiny::renderPlot({
-    if (nrow(rv$unique) == 0) {
+    if (nrow( rv$post_manual_dedup) == 0) {
       shinyalert::shinyalert("Data needed", 
                              "Please import and deduplicate your citations first.", 
                              type = "error")
@@ -456,7 +592,7 @@ server <- function(input, output, session) {
      if (sources == "") sources <- ".*"
      if (strings == "") strings <- ".*"
      if (labels == "") labels <- ".*"
-     out <- rv$unique %>% 
+     out <-  rv$post_manual_dedup %>% 
        dplyr::filter(.data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
                      .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
                      .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
@@ -473,7 +609,7 @@ server <- function(input, output, session) {
    })
    
    output$reviewTab <- DT::renderDataTable({
-     if (nrow(rv$unique) == 0) {
+     if (nrow( rv$post_manual_dedup) == 0) {
        shinyalert::shinyalert("Data needed", 
                               "Please import and deduplicate your citations first.", 
                               type = "error")
@@ -495,7 +631,7 @@ server <- function(input, output, session) {
                                            })
    
    output$summaryTab <- gt::render_gt({
-     if (nrow(rv$unique) == 0) {
+     if (nrow( rv$post_manual_dedup) == 0) {
        shinyalert::shinyalert("Data needed", 
                               "Please import and deduplicate your citations first.", 
                               type = "error")
@@ -515,8 +651,8 @@ server <- function(input, output, session) {
        paste("data-", Sys.Date(), ".csv", sep="")
      },
      content = function(file) {
-       if (nrow(rv$unique) > 0) {
-         write.csv(rv$unique, file)
+       if (nrow( rv$post_manual_dedup) > 0) {
+         write.csv(manual_dedup_result, file)
        } else {
          stop("No data to download!")
          req(FALSE)
@@ -529,7 +665,7 @@ server <- function(input, output, session) {
        paste("data-", Sys.Date(), ".bib", sep="")
      },
      content = function(file) {
-       export_bib(rv$unique, file)
+       export_bib( rv$post_manual_dedup, file)
      }
    )
    
@@ -539,7 +675,7 @@ server <- function(input, output, session) {
        paste("data-", Sys.Date(), ".bib", sep="")
      },
      content = function(file) {
-       export_ris(rv$unique, file)
+       export_ris( rv$post_manual_dedup, file)
      }
    )
   
