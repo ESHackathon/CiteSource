@@ -355,23 +355,15 @@ server <- function(input, output, session) {
       req(FALSE)  
     }
     
-    last_message <- NULL
-    dedup_results <- withCallingHandlers(
-      dedup_citations(rv$upload_df),
-      message = function(m) {
-        if (!is.null(last_message)) removeNotification(last_message)
-        last_message <<- showNotification(m$message, duration = NULL, type = "message")
-      }
-    )
+    dedup_results <- dedup_citations(rv$upload_df)
     
 
     rv$unique <- dedup_results
         
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
-    if (!is.null(last_message)) removeNotification(last_message)
-    
-      shinyalert::shinyalert("Deduplication complete", 
+  
+  shinyalert::shinyalert("Deduplication complete", 
                    paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Compare citations across sources,
                    labels, and strings in the visualisation tab"), type = "success")
     

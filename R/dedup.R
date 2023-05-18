@@ -49,11 +49,12 @@ dedup_citations <- function(raw_citations) {
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
   
-  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string")
+  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", shiny_progress=TRUE)
   
   unique_post_dedup <- dedup_results$unique
   unique_post_dedup$cite_source = unique_post_dedup$source
   unique_post_dedup$cite_label = unique_post_dedup$label
   
   return(unique_post_dedup)
+  
 }
