@@ -422,17 +422,21 @@ all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
 # Filter the "all_unique" dataset to only include records with a valid year
 # Create a new column to represent the year
 # Group the data by source and year and calculate the count of records for each group
-year_data <- all_unique %>% 
-  dplyr::mutate(year = as.numeric(year)) %>%  # Convert "year" column to numeric format
-  dplyr::filter(!is.na(year) & year != "") %>%  # Remove rows where "year" is missing or empty
+year_data <- all_unique %>%
+  dplyr::mutate(year = as.character(year)) %>%  # Convert "year" column to character format
+  dplyr::filter(stringr::str_detect(year, "^[0-9]+$")) %>%  # Remove rows where "year" is not numeric
+  dplyr::mutate(year = as.numeric(year)) %>%  # Convert "year" column back to numeric format
+  dplyr::filter(year > 1965) %>%  # Remove rows where "year" is 1965 or earlier
   group_by(cite_source.x, year) %>%  # Group data by "cite_source.x" and "year"
   summarise(count = n(), .groups = "drop")  # Calculate the number of records in each group
+
 
 # Create a bar plot to visualize the filtered and grouped data
 unique_yearplot <- ggplot(year_data, aes(x=year, y=count, fill = cite_source.x)) +
   geom_bar(position = "stack", stat = "identity") +  # Create a stacked bar plot with actual count values
-  scale_x_continuous(breaks = seq(min(year_data$year), max(year_data$year), by = 5)) +  # Set x-axis breaks to every 5 years
-  coord_cartesian(ylim = c(0, 950)) +  # Set y-axis limits to ensure all bars are visible
+scale_x_continuous(breaks = seq(1966, 2023, by = 5))+
+
+  coord_cartesian(ylim = c(0, 400)) +  # Set y-axis limits to ensure all bars are visible
   xlab("Publication year") +  # Add x-axis label
   ylab("Unique records") +  # Add y-axis label
   labs(fill = "Source")  # Add legend label for the fill color
@@ -573,11 +577,6 @@ display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS"
 ```
 
 ## 7. Current tables
-### Citation Summary Table
-```{r}
-citation_summary_table(unique_citations, screening_label = c("screened", "final"))
-```
-
 ### Citation Record Table
 ```{r}
 # Citation Record Table
