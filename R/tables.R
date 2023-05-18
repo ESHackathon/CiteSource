@@ -53,8 +53,8 @@ record_level_table <- function(citations, include = "sources", include_empty = T
   citations <- citations %>%
     dplyr::mutate(
       citation = generate_apa_citation(.data$author, .data$year),
-      reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$source, .data$volume, .data$issue, .data$doi, .data$url),
-      html_reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$source, .data$volume, .data$issue, .data$doi, .data$url, return_html = TRUE)
+      reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$journal, .data$volume, .data$issue, .data$doi, .data$url),
+      html_reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$journal, .data$volume, .data$issue, .data$doi, .data$url, return_html = TRUE)
     ) %>%
     # Arrange by first author to avoid issue with initials
     dplyr::arrange(stringr::str_extract(.data$author, "^.*?,"), .data$citation) %>%
