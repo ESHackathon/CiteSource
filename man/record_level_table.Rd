@@ -42,6 +42,6 @@ examplecitations <- readRDS(examplecitations_path)
 unique_citations <- dedup_citations(examplecitations)
 
 unique_citations |> 
-dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+dplyr::filter(stringr::str_detect(cite_label, "final"))  |> 
 record_level_table(return = "DT")
 }

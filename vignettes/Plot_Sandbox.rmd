@@ -22,42 +22,22 @@ knitr::opts_chunk$set(
 ```
 ## About this vignette
 
-This vignette is a bit of a sandbox for the experimentation with plots! Currently it is using the working example data (same data used in the "Source Analysis Across Screening Phases" vignette). This Vignette includes plots that are already built into CiteSource along with plots that we are exploring.
+This vignette is a bit of a sandbox for the experimentation with plots! Currently it is using the working example data (same data used in the "Source Analysis Across Screening Phases" vignette). The focus is on plots that we are exploring.
 
 If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our discussion board on github! https://github.com/ESHackathon/CiteSource/discussions/100
 
-## 1. Installation of packages and loading libraries
+## 1. Initial setup
 
 ```{r, results = FALSE, message=FALSE}
-#Install the remotes packages to enable installation from GitHub
-#install.packages("remotes")
-#library(remotes)
-
-#Install CiteSource
-#remotes::install_github("ESHackathon/CiteSource")
-
 #Load the necessary libraries
 library(CiteSource)
 library(dplyr)
 library(ggplot2)
-```
 
-## 2. Import Reference Files and Custom Metadata
-
-```{r}
 #Import citation files from a folder
 citation_files <- list.files(path = file.path("../vignettes/working_example_data"), pattern = "\\.ris", full.names = TRUE)
-
 #Print citation_files to double check the order in which R imported our files.
 citation_files
-```
-
-
-## 3. Tagging Sources & Deduplication
-
-For this vignette we'll be using the same sources from the "Source Analysis Across Screening Phases" vignette as it's one of the larger sets of citations.
-
-```{r}
 # Set the path to the directory containing the citation files
 file_path <- "../vignettes/working_example_data/"
 
@@ -66,84 +46,344 @@ metadata_tbl <- tibble::tribble(
    "AGRIS.ris",      "AGRIS",       "search",    
    "CAB.ris",        "CAB",         "search",    
    "EconLit.ris",    "EconLit",     "search",    
-   "Final.ris",       NA,           "Final",     
+   "Final.ris",       NA,           "final",     
    "GreenFile.ris",  "GreenFile",   "search",    
    "McK.ris",        "Method1",     "search",    
    "RM.ris",         "Method2",     "search",    
-   "TiAb.ris",        NA,           "Screened",  
+   "TiAb.ris",        NA,           "screened",  
    "WoS_early.ris",  "WoS",         "search",    
    "WoS_later.ris",  "WoS",         "search"
 ) %>% 
 
 dplyr::mutate(files = paste0(file_path, files))
-	
 citations <- read_citations(metadata = metadata_tbl)
-
 # Deduplication & Identifying Crossover Records
 unique_citations <- dedup_citations(citations)
-#> formatting data...
-#> identifying potential duplicates...
-#> identified duplicates!
-#> merging citations...
-
 # Count number of unique and non-unique citations from different sources and labels
 n_unique <- count_unique(unique_citations)
-
 # Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
-
 ```
-
-### NEW TABLE Experimentation
+## 2. New slated for implementation
+### New table to show internal deduplication
 ```{r}
-#Create a table to show the difference between the initial number of records uploaded for each source, the number Database-Specific Unique Records (D-SUR) which is the count after internal deduplication, and the number of unique records that source provided after deduplication across all sources.
-
-library(DT)
-
+library(gt)
+library(gtExtras)
 # Function to count occurrences of each database
-count_databases <- function(df, db_colname) {
-  db_counts <- df %>%
-    dplyr::pull(!!sym(db_colname)) %>%
-    strsplit(", ") %>%
-    lapply(unique) %>%  # Remove duplicates within each cell
-    unlist() %>%
-    trimws() %>%
-    table() %>%
-    as.data.frame() %>%
-    dplyr::rename_with(~ gsub(" ", "_", .x, fixed = TRUE))
-  
-  colnames(db_counts) <- c("Source", "count")
-  
-  return(db_counts)
+count_sources <- function(df, db_colname) {
+    db_counts <- df %>%
+        dplyr::pull(!!sym(db_colname)) %>%
+        strsplit(", ") %>%
+        lapply(unique) %>%  
+        unlist() %>%
+        trimws() %>%
+        table() %>%
+        as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    
+    return(db_counts)
 }
 
-# Calculate D-SUR count for each database
-d_sur_count <- count_databases(unique_citations, "cite_source")
+# Calculate distinct record count for each database
+distinct_count <- count_sources(unique_citations, "cite_source")
+colnames(distinct_count) <- c("Source", "Distinct Records")
 
-# Count the citations in the initial citations data and remove blank rows
-initial_citations_count <- count_databases(citations, "cite_source")
+# Count the citations in the uploaded .ris data and remove blank rows
+initial_citations_count <- count_sources(citations, "cite_source")
+colnames(initial_citations_count) <- c("Source", "Records Imported")
+
+# Combine the counts into one table
+citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source")
+
+# Convert the necessary columns to numeric
+citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
+citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
+
+# Convert the Source column to character
+citation_counts$Source <- as.character(citation_counts$Source)
+
+# Calculate totals
+totals <- c("Total", 
+            sum(citation_counts$`Records Imported`, na.rm = TRUE),
+            sum(citation_counts$`Distinct Records`, na.rm = TRUE)
+)
+
+# Add the total row
+citation_counts <- rbind(citation_counts, totals)
+
+# Generate the final table
+citation_counts %>%
+    gt(rowname_col = "Source") %>%
+    tab_header(title = "Record Counts") %>%
+    cols_label(
+        `Records Imported` = "Records Imported¹",
+        `Distinct Records` = "Distinct Records²"
+    ) %>%
+    tab_source_note(
+        source_note = md(c(
+            "¹ Number of records imported from each source.",
+            "² Number of records after internal source deduplication"
+        ))
+    )%>%
+    gt_theme_538()
+```
+### New Updated Search Summary Table
+```{r}
+library(gt)
+library(gtExtras)
+# Function to count occurrences of each database
+count_sources <- function(df, db_colname) {
+    db_counts <- df %>%
+        dplyr::pull(!!sym(db_colname)) %>%
+        strsplit(", ") %>%
+        lapply(unique) %>%  
+        unlist() %>%
+        trimws() %>%
+        table() %>%
+        as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    
+    return(db_counts)
+}
+
+# Calculate Distinct Records count for each database
+distinct_count <- count_sources(unique_citations, "cite_source")
+colnames(distinct_count) <- c("Source", "Distinct Records")
+
+# Count the citations in the uploaded .ris data and remove blank rows
+initial_citations_count <- count_sources(citations, "cite_source")
+colnames(initial_citations_count) <- c("Source", "Records Imported")
 
 # Count the citations in the n_unique data, remove blank rows, and exclude rows without 'search' in cite_label
 n_unique_citations_count <- n_unique %>%
-  dplyr::filter(cite_label == "search") %>%
-  dplyr::group_by(cite_source) %>%
-  dplyr::summarise(Unique_records = sum(unique)) %>%
-  dplyr::filter(cite_source != "") %>%
-  dplyr::arrange(cite_source) %>%
-  dplyr::rename(Source = cite_source)
+    dplyr::filter(cite_label == "search") %>%
+    dplyr::group_by(cite_source) %>%
+    dplyr::summarise(`Unique records` = sum(unique)) %>%
+    dplyr::filter(cite_source != "") %>%
+    dplyr::arrange(cite_source) %>%
+    dplyr::rename(Source = cite_source)
 
 # Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, d_sur_count, by = "Source", suffix = c("_initial", "_D_SUR")) %>%
-  dplyr::left_join(n_unique_citations_count, by = "Source", suffix = c("", "_Unique"))
+citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source") %>%
+    dplyr::left_join(n_unique_citations_count, by = "Source")
 
-# Update the column names
-colnames(citation_counts) <- c("Source", "Records Imported", "D-SUR", "Unique records")
+# Add the "Non-unique Records" column directly
+citation_counts <- citation_counts %>%
+    dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique records`)
 
-# Display the table using DT
-datatable(citation_counts)
+# Convert the necessary columns to numeric
+citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
+citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
+citation_counts$`Unique records` <- as.numeric(citation_counts$`Unique records`)
+citation_counts$`Non-unique Records` <- as.numeric(citation_counts$`Non-unique Records`)
+
+# Add the calculations
+citation_counts <- citation_counts %>%
+    dplyr::mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
+                  `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
+                  `Source Unique %` = `Unique records` / `Distinct Records`)
+
+citation_counts <- citation_counts %>%
+    dplyr::mutate(
+        `Source Contribution %` = as.numeric(`Source Contribution %`),
+        `Source Unique Contribution %` = as.numeric(`Source Unique Contribution %`),
+        `Source Unique %` = as.numeric(`Source Unique %`)
+    ) %>%
+    dplyr::mutate(
+        `Source Contribution %` = scales::percent(`Source Contribution %`, accuracy = 0.1),
+        `Source Unique Contribution %` = scales::percent(`Source Unique Contribution %`, accuracy = 0.1),
+        `Source Unique %` = scales::percent(`Source Unique %`, accuracy = 0.1)
+    )
+
+# Calculate totals
+totals <- c("Total", 
+            sum(citation_counts$`Records Imported`, na.rm = TRUE),
+            sum(citation_counts$`Distinct Records`, na.rm = TRUE),
+            sum(citation_counts$`Unique records`, na.rm = TRUE),
+            sum(citation_counts$`Non-unique Records`, na.rm = TRUE),
+            "-", "-", "-")
+
+# Add the total row
+citation_counts <- rbind(citation_counts, totals)
+
+citation_counts %>%
+    gt(rowname_col = "Source") %>%
+    tab_header(title = "Record Counts") %>%
+    cols_label(
+        `Records Imported` = "Records Imported¹",
+        `Distinct Records` = "Distinct Records²",
+        `Unique records` = "Unique records³",
+        `Non-unique Records` = "Non-unique Records⁴",
+        `Source Contribution %` = "Records Contributed %⁵",
+        `Source Unique Contribution %` = "Unique Records Contributed %⁶",
+        `Source Unique %` = "Unique Records %⁷"
+    ) %>%
+    tab_source_note(
+        source_note = md(c(
+            "¹ Number of raw records imported from each database.",
+            "² Number of records after internal source deduplication",
+            "³ Number of records not found in another source.",
+            "⁴ Number of records found in at least one other source.",
+            "⁵ Percent distinct records contributed to the total number of distinct records.",
+            "⁶ Percent of unique records contributed to the total unique records.",
+            "⁷ Percentage of records that were unique from each source."
+        ))
+    )%>%
+    gt_theme_538()
 
 ```
-### Pull unique records from each source
+### New precision/sensitivity table
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(gt)
+library(gtExtras)
+
+# Function to count occurrences of each source in the 'Screened' and 'Final' phases
+count_source_phase <- function(source_phase_df) {
+    source_phase_df <- source_phase_df %>%
+        tidyr::separate_rows(cite_source, sep = ",") %>%
+        tidyr::separate_rows(cite_label, sep = ",") %>%
+        dplyr::mutate(cite_source = stringr::str_trim(cite_source),
+                      cite_label = stringr::str_trim(cite_label)) %>%
+        dplyr::filter(cite_source != "unknown") %>%
+        dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
+                      final = ifelse(cite_label == "final", 1, 0)) %>%
+        dplyr::group_by(cite_source) %>%
+        dplyr::summarise(screened = sum(screened),
+                         final = sum(final),
+                         .groups = "drop") %>%
+        dplyr::rename(Source = cite_source)
+    
+    return(source_phase_df)
+}
+
+source_phase <- count_source_phase(unique_citations)
+
+# Function to count occurrences of each database
+count_sources <- function(source_phase_df, db_colname) {
+    db_counts <- source_phase_df %>%
+        dplyr::pull(rlang::sym(db_colname)) %>%
+        strsplit(", ") %>%
+        lapply(unique) %>%  
+        unlist() %>%
+        trimws() %>%
+        table() %>%
+        as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    
+    return(db_counts)
+}
+
+distinct_count <- count_sources(unique_citations, "cite_source")
+colnames(distinct_count) <- c("Source", "Distinct Records")
+
+distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
+distinct_count$Source <- as.character(distinct_count$Source)
+
+# Combine the results
+combined_counts <- dplyr::left_join(distinct_count, source_phase, by = "Source")
+
+# Replace NA values with 0
+combined_counts[is.na(combined_counts)] <- 0
+
+# Calculate Precision
+combined_counts <- combined_counts %>%
+    dplyr::mutate(Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0))  # Multiply by 100 and round
+
+# Calculate Recall manually in a loop
+total_final <- sum(combined_counts$final)
+for(i in 1:nrow(combined_counts)) {
+    combined_counts$Recall[i] <- round((combined_counts$final[i] / total_final) * 100, 2)  # Multiply by 100 and round
+}
+
+# Calculate totals
+totals <- c("Total", 
+            sum(combined_counts$`Distinct Records`, na.rm = TRUE),
+            paste0(sum(citations$cite_label == "screened"), "⁶"),
+            paste0(sum(citations$cite_label == "final"), "⁷"),
+            "-",  # Precision total doesn't make sense
+            "-")  # Recall total doesn't make sense
+
+# Add the total row
+combined_counts <- rbind(combined_counts, totals)
+
+# Remove the 'unknown' row - this should be corrected and unnecessary soon
+combined_counts <- combined_counts %>%
+    dplyr::filter(Source != "unknown")
+
+# Generate the final table
+combined_counts %>%
+    gt::gt(rowname_col = "Source") %>%
+    gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
+    gt::cols_label(
+        `Distinct Records` = "Distinct Records¹",
+        screened = "Screened Included²",
+        final = "Final Included³",
+        Precision = "Precision⁴",
+        Recall = "Sensitivity/Recall⁵"
+    ) %>%
+   gt::cols_align(
+        align = "right",
+        columns = c(screened, final)
+    ) %>%
+    gt::tab_source_note(
+        source_note = gt::md(c(
+            "¹ Number of source specific unique records",
+            "² Records included after title/abstract screening",
+            "³ Records included after full text screening",
+            "⁴ Precision = Final Included / Distinct Records",
+            "⁵ Sensitivity/Recall = Final Included / Total Final Included",
+            "⁶ Number of records included after title/abstract screening",
+            "⁷ Number of records included after full text screening"
+        ))
+    )%>%
+    gtExtras::gt_theme_538()
+
+
+```
+
+## 3. Current plots
+### Heatmaps
+```{r}
+my_heatmap <- plot_source_overlap_heatmap(source_comparison)
+
+my_heatmap
+
+# Plot overlap as a heatmap matrix as percentage
+
+my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
+
+my_heatmap_percent
+
+```
+
+### Upset plot
+```{r}
+# Citation duplication across multitiple resources
+
+my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
+my_upset_plot
+```
+
+### Unique/Crossover Bar Plot
+```{r}
+# Unique vs. Duplicate sources across Search/TiAb Screening/Final Inclusion
+
+my_contributions <- plot_contributions(n_unique,
+  center = TRUE,
+  bar_order = c("search", "Screened", "Final")
+)
+
+my_contributions
+```
+## 4. Prep for expirimental plots
+### Unique records count from sources
 ```{r}
 #Get unique records from each source and add bibliographic data
 unique_AGRIS <- n_unique %>% 
@@ -175,61 +415,28 @@ all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
 
 ```
 
-
-## 4.PLOTS
-### Heatmaps
-```{r}
-my_heatmap <- plot_source_overlap_heatmap(source_comparison)
-
-my_heatmap
-
-# Plot overlap as a heatmap matrix as percentage
-
-my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
-
-my_heatmap_percent
-
-```
-
-### Upset plots
-```{r}
-# Citation duplication across multitiple resources
-
-my_upset_plot <- plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
-
-my_upset_plot
-```
-
-
-### Unique/Crossover Bar Plots
-```{r}
-# Unique vs. Duplicate sources across Search/TiAb Screening/Final Inclusion
-
-my_contributions <- plot_contributions(n_unique,
-  center = TRUE,
-  bar_order = c("search", "Screened", "Final")
-)
-
-my_contributions
-```
-
+## 5. Expirimental plots
 ### Publication year bar plots
 ```{r}
 
 # Filter the "all_unique" dataset to only include records with a valid year
 # Create a new column to represent the year
 # Group the data by source and year and calculate the count of records for each group
-year_data <- all_unique %>% 
-  dplyr::mutate(year = as.numeric(year)) %>%  # Convert "year" column to numeric format
-  dplyr::filter(!is.na(year) & year != "") %>%  # Remove rows where "year" is missing or empty
+year_data <- all_unique %>%
+  dplyr::mutate(year = as.character(year)) %>%  # Convert "year" column to character format
+  dplyr::filter(stringr::str_detect(year, "^[0-9]+$")) %>%  # Remove rows where "year" is not numeric
+  dplyr::mutate(year = as.numeric(year)) %>%  # Convert "year" column back to numeric format
+  dplyr::filter(year > 1965) %>%  # Remove rows where "year" is 1965 or earlier
   group_by(cite_source.x, year) %>%  # Group data by "cite_source.x" and "year"
   summarise(count = n(), .groups = "drop")  # Calculate the number of records in each group
+
 
 # Create a bar plot to visualize the filtered and grouped data
 unique_yearplot <- ggplot(year_data, aes(x=year, y=count, fill = cite_source.x)) +
   geom_bar(position = "stack", stat = "identity") +  # Create a stacked bar plot with actual count values
-  scale_x_continuous(breaks = seq(min(year_data$year), max(year_data$year), by = 5)) +  # Set x-axis breaks to every 5 years
-  coord_cartesian(ylim = c(0, 950)) +  # Set y-axis limits to ensure all bars are visible
+scale_x_continuous(breaks = seq(1966, 2023, by = 5))+
+
+  coord_cartesian(ylim = c(0, 400)) +  # Set y-axis limits to ensure all bars are visible
   xlab("Publication year") +  # Add x-axis label
   ylab("Unique records") +  # Add y-axis label
   labs(fill = "Source")  # Add legend label for the fill color
@@ -320,7 +527,7 @@ sankey<-sankeyNetwork(
 sankey
 ```
 
-## 5. TABLES
+## 6. Expirimental source-specific tables
 ### Unique Journal Count per Source 
 ```{r}
 library(gt)
@@ -360,37 +567,22 @@ display_gt_table <- function(data, caption) {
 }
 ```
 
-### Top 10 journals for each source
+### Top 10 journals for each source 
 ```{r}
 display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
 ```
 ```{r}
-display_gt_table(EconLit_journals[1:10, ], "Top 10 Journals by Unique Citations EconLit")
-```
-```{r}
+
 display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
 ```
-```{r}
-display_gt_table(Method1_journals[1:10, ], "Top 10 Journals by Unique Citations Method 1")
-```
-```{r}
-display_gt_table(Method2_journals[1:10, ], "Top 10 Journals by Unique Citations Method 2")
-```
 
-### Citation Summary Table
-```{r}
-# Citation summary table
-
-citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
-
-```
-
+## 7. Current tables
 ### Citation Record Table
 ```{r}
 # Citation Record Table
 
 unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "final")) %>%
   record_level_table(return = "DT")
 
 ```

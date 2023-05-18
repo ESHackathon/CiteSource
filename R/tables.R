@@ -19,7 +19,7 @@
 #' unique_citations <- dedup_citations(examplecitations)
 #' 
 #' unique_citations |> 
-#' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+#' dplyr::filter(stringr::str_detect(cite_label, "final"))  |> 
 #' record_level_table(return = "DT")
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
@@ -167,9 +167,9 @@ record_level_table <- function(citations, include = "sources", include_empty = T
 #' unique_citations <- dedup_citations(examplecitations)
 #' 
 #' unique_citations |> 
-#' dplyr::filter(stringr::str_detect(cite_label, "Final"))  |> 
+#' dplyr::filter(stringr::str_detect(cite_label, "final"))  |> 
 #' record_level_table(return = "DT")
-#' citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+#' citation_summary_table(unique_citations, screening_label = c("screened", "final"))
 #' }
 
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
@@ -343,7 +343,7 @@ generate_apa_citation <- function(authors, year) {
   id <- seq_along(authors)
   # Extract last names and initials
   processed_names <- tibble::tibble(id = id, authors = authors, year = year) %>%
-    mutate(
+    dplyr::mutate(
       last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
       initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
         stringr::str_remove_all("\\.") %>%
@@ -506,7 +506,7 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
   # Extract last names and initials
   citations <- tibble::tibble(id, authors, year, title, source, volume, issue, doi, weblink) %>%
     dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ dplyr::na_if(.x, ""))) %>%
-    mutate(
+    dplyr::mutate(
       last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
       initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
                                                                                     stringr::str_remove_all("\\.") %>%
@@ -560,4 +560,44 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
       ) %>%
       dplyr::pull(.data$reference)
   }
+}
+
+#' Plot Source Counts
+#'
+#' This function takes the result of calculate_source_counts() and generates a formatted table using the gt package.
+#'
+#' @param source_counts A data frame produced by calculate_source_counts().
+#' 
+#' @return A gt table.
+#' 
+#' @examples
+#' 
+#' @export
+#' 
+plot_source_counts <- function(source_counts) {
+  
+  source_counts %>%
+    gt(rowname_col = "Source") %>%
+    tab_header(title = "Record Counts") %>%
+    cols_label(
+      `Records Imported` = paste0("Records Imported", "\u00B9"),
+      `Distinct Records` = paste0("Distinct Records", "\u00B2"),
+      `Unique records` = paste0("Unique records", "\u00B3"),
+      `Non-unique Records` = paste0("Non-unique Records", "\u2074"),
+      `Source Contribution %` = paste0("Records Contributed %", "\u2075"),
+      `Source Unique Contribution %` = paste0("Unique Records Contributed %", "\u2076"),
+      `Source Unique %` = paste0("Unique Records %", "\u2077")
+    ) %>%
+    tab_source_note(
+      source_note = md(c(
+        paste0("\u00B9", " Number of raw records imported from each database."),
+        paste0("\u00B2", " Number of records after internal source deduplication"),
+        paste0("\u00B3", " Number of records not found in another source."),
+        paste0("\u2074", " Number of records found in at least one other source."),
+        paste0("\u2075", " Percent distinct records contributed to the total number of distinct records."),
+        paste0("\u2076", " Percent of unique records contributed to the total unique records."),
+        paste0("\u2077", " Percentage of records that were unique from each source.")
+      ))
+    )%>%
+    gt_theme_538()
 }
