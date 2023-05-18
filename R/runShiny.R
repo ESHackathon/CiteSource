@@ -5,7 +5,6 @@
 #' @return CiteSource shiny app
 #' @param app Defaults to CiteSource - possibly other apps will be included in the future
 #' @param offer_install Should user be prompted to install required packages if they are missing?
-#' @importFrom magrittr %>%
 #' @export
 #' @examples 
 #' if (interactive()) {

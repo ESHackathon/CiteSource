@@ -41,7 +41,6 @@ Imports:
     glue,
     gt,
     gtExtras,
-    magrittr,
     parallel,
     purrr,
     RecordLinkage,
