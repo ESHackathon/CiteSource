@@ -569,11 +569,7 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
 #' @param source_counts A data frame produced by calculate_source_counts().
 #' 
 #' @return A gt table.
-#' 
-#' @examples
-#' 
-#' @export
-#' 
+
 plot_source_counts <- function(source_counts) {
   
   source_counts %>%
