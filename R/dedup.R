@@ -5,6 +5,8 @@
 #'
 #' @export
 #' @param raw_citations Citation dataframe with relevant columns
+#' @param manual logical. If TRUE, manually specify pairs of duplicates to merge. Default is FALSE.
+#' @param shiny_progress logical. If TRUE, show a progress bar in the Shiny app. Default is FALSE.
 #' @return unique citations formatted for CiteSource
 #' @examples
 #' # Load example data from the package
