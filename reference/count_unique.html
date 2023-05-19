@@ -103,17 +103,17 @@
 <span class="r-in"><span><span class="fu">count_unique</span><span class="op">(</span><span class="va">dedup_results</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 166 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    duplicate_id cite_source cite_label cite_string record_ids       unique type </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1001         DIM         search     unknown     1001             TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 1002         WoS         search     unknown     1002, 1081       FALSE  dupl…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 1002         DIM         search     unknown     1002, 1081       FALSE  dupl…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 1003         WoS         search     unknown     1003             TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 1004         LENS        search     unknown     1004             TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 1005         DIM         search     unknown     1005, 1140       TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 1005         DIM         screened   unknown     1005, 1140       TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 1006         DIM         search     unknown     1006             TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 1007         WoS         search     unknown     1007, 1117, 1164 TRUE   uniq…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 1007         WoS         screened   unknown     1007, 1117, 1164 TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1001         DIM         search     <span style="color: #BB0000;">NA</span>          1001             TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 1002         WoS         search     <span style="color: #BB0000;">NA</span>          1002, 1081       FALSE  dupl…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 1002         DIM         search     <span style="color: #BB0000;">NA</span>          1002, 1081       FALSE  dupl…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 1003         WoS         search     <span style="color: #BB0000;">NA</span>          1003             TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 1004         LENS        search     <span style="color: #BB0000;">NA</span>          1004             TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 1005         DIM         search     <span style="color: #BB0000;">NA</span>          1005, 1140       TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 1005         DIM         screened   <span style="color: #BB0000;">NA</span>          1005, 1140       TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 1006         DIM         search     <span style="color: #BB0000;">NA</span>          1006             TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 1007         WoS         search     <span style="color: #BB0000;">NA</span>          1007, 1117, 1164 TRUE   uniq…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 1007         WoS         screened   <span style="color: #BB0000;">NA</span>          1007, 1117, 1164 TRUE   uniq…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 156 more rows</span></span>
 </code></pre></div>
     </div>
