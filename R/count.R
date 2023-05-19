@@ -4,12 +4,7 @@
 #' @param db_colname A character string specifying the column name which contains the database source.
 #'
 #' @return A data frame with columns 'Source' and 'count'.
-#' @export
-#'
-#' @examples
-#' if (interactive()) {
-#' count_sources(df = data, db_colname = "database_source")
-#' }
+#' @keywords internal
 
 count_sources <- function(df, db_colname) {
   db_counts <- df %>%
@@ -34,14 +29,10 @@ count_sources <- function(df, db_colname) {
 #' @param unique_citations A dataframe of unique citations.
 #' @param citations A dataframe of all citations.
 #' @param n_unique A dataframe of unique citation counts.
-#'
+#' 
 #' @return A dataframe of calculated citation counts.
-#' 
-#' @examples
-#' # sample data unique_example_citations, examplecitations, and n_unique
-#' processed_data <- calculate_source_counts(unique_example_citations, examplecitations, n_unique)
-#' 
-#' @export
+#' @keywords internal
+
 calculate_source_counts <- function(unique_citations, citations, n_unique) {
   # Calculate Distinct Records count for each database
   distinct_count <- count_sources(unique_citations, "cite_source")
