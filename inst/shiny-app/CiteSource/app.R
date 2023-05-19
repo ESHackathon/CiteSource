@@ -412,7 +412,7 @@ server <- function(input, output, session) {
       req(FALSE)  
     }
     
-    dedup_results <- dedup_citations(rv$upload_df, manual=TRUE)
+    dedup_results <- dedup_citations(rv$upload_df, manual=TRUE, shiny_progress=TRUE)
     
 
     rv$unique <- dedup_results$unique
@@ -420,10 +420,10 @@ server <- function(input, output, session) {
     
     n_citations <- nrow(rv$upload_df)
     n_unique <- nrow(rv$unique)
-  
-  shinyalert::shinyalert("Deduplication complete", 
-                   paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Compare citations across sources,
-                   labels, and strings in the visualisation tab"), type = "success")
+    n_pairs_manual  <- nrow(rv$manual)
+  shinyalert::shinyalert("Auto-deduplication complete", 
+                   paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Head to the manual deduplication
+                   tab to check ", n_pairs_manual, " potential duplicates"), type = "success")
     
   })
   
@@ -459,6 +459,13 @@ server <- function(input, output, session) {
     }
     
   })
+ 
+ # if no manual dedup, proceed to visualisations 
+ observeEvent(input$nomanualdedup, {
+   updateNavbarPage(session=session,
+                    inputId="tabs",
+                    selected="Visualise")
+ })
   
   
   # Output: manual dedup datatable 
