@@ -17,8 +17,4 @@ A data frame with columns 'Source' and 'count'.
 \description{
 Count Sources
 }
-\examples{
-if (interactive()) {
-count_sources(df = data, db_colname = "database_source")
-}
-}
+\keyword{internal}

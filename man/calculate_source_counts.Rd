@@ -19,8 +19,4 @@ A dataframe of calculated citation counts.
 \description{
 This function processes citation data to generate a dataframe of citation counts.
 }
-\examples{
-# sample data unique_example_citations, examplecitations, and n_unique
-processed_data <- calculate_source_counts(unique_example_citations, examplecitations, n_unique)
-
-}
+\keyword{internal}
