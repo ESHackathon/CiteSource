@@ -41,18 +41,14 @@ Imports:
     glue,
     gt,
     gtExtras,
-    parallel,
     purrr,
-    RecordLinkage,
     rlang,
     scales,
-    snakecase,
     stringr,
     tibble,
     tidyr,
     tidyselect,
     UpSetR,
-    utf8
 Suggests: 
     htmltools,
     knitr,
