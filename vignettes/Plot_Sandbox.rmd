@@ -68,7 +68,6 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ### New table to show internal deduplication
 ```{r}
 library(gt)
-library(gtExtras)
 # Function to count occurrences of each database
 count_sources <- function(df, db_colname) {
     db_counts <- df %>%
@@ -111,7 +110,10 @@ totals <- c("Total",
 
 # Add the total row
 citation_counts <- rbind(citation_counts, totals)
+```
 
+###Simple Table
+```{r}
 # Generate the final table
 citation_counts %>%
     gt(rowname_col = "Source") %>%
@@ -126,9 +128,10 @@ citation_counts %>%
             "² Number of records after internal source deduplication"
         ))
     )%>%
-    gt_theme_538()
+    gtExtras::gt_theme_538()
 ```
-### New Updated Search Summary Table
+
+###Calcultations for Updated Summary Table
 ```{r}
 library(gt)
 library(gtExtras)
@@ -207,7 +210,9 @@ totals <- c("Total",
 
 # Add the total row
 citation_counts <- rbind(citation_counts, totals)
-
+```
+###Updated Search Summary Table
+```{r}
 citation_counts %>%
     gt(rowname_col = "Source") %>%
     tab_header(title = "Record Counts") %>%
@@ -231,10 +236,10 @@ citation_counts %>%
             "⁷ Percentage of records that were unique from each source."
         ))
     )%>%
-    gt_theme_538()
+    gtExtras::gt_theme_538()
 
 ```
-### New precision/sensitivity table
+### Calculations for New precision/sensitivity table
 ```{r}
 library(dplyr)
 library(tidyr)
@@ -315,7 +320,9 @@ combined_counts <- rbind(combined_counts, totals)
 # Remove the 'unknown' row - this should be corrected and unnecessary soon
 combined_counts <- combined_counts %>%
     dplyr::filter(Source != "unknown")
-
+```
+###New precision/sensitivity table
+```{r}
 # Generate the final table
 combined_counts %>%
     gt::gt(rowname_col = "Source") %>%
@@ -436,7 +443,7 @@ unique_yearplot <- ggplot(year_data, aes(x=year, y=count, fill = cite_source.x))
   geom_bar(position = "stack", stat = "identity") +  # Create a stacked bar plot with actual count values
 scale_x_continuous(breaks = seq(1966, 2023, by = 5))+
 
-  coord_cartesian(ylim = c(0, 400)) +  # Set y-axis limits to ensure all bars are visible
+  coord_cartesian(ylim = c(0, 600)) +  # Set y-axis limits to ensure all bars are visible
   xlab("Publication year") +  # Add x-axis label
   ylab("Unique records") +  # Add y-axis label
   labs(fill = "Source")  # Add legend label for the fill color
@@ -508,8 +515,6 @@ links <- rbind(links, data.frame(
   target = c(12, 13),
   value = c(NA, NA)
 ))
-
-
 
 # Create Sankey diagram
 sankey<-sankeyNetwork(
