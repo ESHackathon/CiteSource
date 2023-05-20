@@ -28,8 +28,3 @@ distinct records, imported records, unique records, non-unique records, and vari
 The function returns a data frame summarizing the counts and percentages,
 including totals for each metric.
 }
-\examples{
-\dontrun{
-all_counts <- calculate_all_counts(unique_citations, citations, n_unique, "cite_source")
-}
-}
