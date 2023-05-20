@@ -1,27 +1,59 @@
-#' Count Sources Function
-#' 
-#' This function counts the unique citations per source.
+#' Calculate Counts of Records
 #'
-#' @param df A data frame containing the raw data.
-#' @param db_colname The name of the column in `df` that contains the database names.
+#' This function calculates the distinct record count and initial citations count for each source in the input data frames.
+#' The function then combines these counts into one table, converts the necessary columns to numeric, adds a row for the totals, and returns the resulting data frame.
+#'
+#' @param df1 A data frame representing unique citations. Must include a column matching `db_colname` which will be used for count calculations.
+#' @param df2 A data frame representing citations. Must include a column matching `db_colname` which will be used for count calculations.
+#' @param db_colname The column name that exists in both `df1` and `df2` which will be used to calculate counts. Should be a character string.
 #' 
-#' @return A data frame of counts by source.
-#' 
-#' @export
-count_sources <- function(df, db_colname) {
-  db_counts <- df %>%
-    dplyr::pull(!!sym(db_colname)) %>%
-    strsplit(", ") %>%
-    lapply(unique) %>%  
-    unlist() %>%
-    trimws() %>%
-    table() %>%
-    as.data.frame()
+#' @return A data frame with the counts of records for each source in the input data frames. Includes columns for the source, records imported, distinct records, and a total row.
+
+calculate_counts <- function(df1, df2, db_colname) {
+  # Internal function to count sources
+  count_sources <- function(df, db_colname) {
+    db_counts <- df %>%
+      dplyr::pull(!!sym(db_colname)) %>%
+      strsplit(", ") %>%
+      lapply(unique) %>%  
+      unlist() %>%
+      trimws() %>%
+      table() %>%
+      as.data.frame()
+    
+    colnames(db_counts) <- c("Source", "count")
+    return(db_counts)
+  }
   
-  colnames(db_counts) <- c("Source", "count")
+  # Calculate distinct record count for each database
+  distinct_count <- count_sources(df1, db_colname)
+  colnames(distinct_count) <- c("Source", "Distinct Records")
   
-  return(db_counts)
+  # Count the citations in the uploaded .ris data and remove blank rows
+  initial_citations_count <- count_sources(df2, db_colname)
+  colnames(initial_citations_count) <- c("Source", "Records Imported")
+  
+  # Combine the counts into one table
+  citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source")
+  
+  # Convert the necessary columns to numeric
+  citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
+  citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
+  
+  # Convert the Source column to character
+  citation_counts$Source <- as.character(citation_counts$Source)
+  
+  # Calculate totals
+  totals <- c("Total", 
+              sum(citation_counts$`Records Imported`, na.rm = TRUE),
+              sum(citation_counts$`Distinct Records`, na.rm = TRUE))
+  
+  # Add the total row
+  citation_counts <- rbind(citation_counts, totals)
+  
+  return(citation_counts)
 }
+
 
 #' Extend Citation Counts Function
 #' 
