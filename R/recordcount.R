@@ -71,13 +71,7 @@ calculate_counts <- function(df1, df2, db_colname) {
 #' The columns of the data frame are: 'Source', 'Records Imported', 'Distinct Records',
 #' 'Unique records', 'Non-unique Records', 'Source Contribution %',
 #' 'Source Unique Contribution %', 'Source Unique %'.
-#'
-#' @examples
-#' \dontrun{
-#' all_counts <- calculate_all_counts(unique_citations, citations, n_unique, "cite_source")
-#' }
-#' @export
-#'
+
 calculate_all_counts <- function(unique_citations, citations, n_unique, db_colname) {
   # Function to count occurrences of each database
   count_sources_all <- function(df, db_colname) {
