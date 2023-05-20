@@ -40,16 +40,19 @@
     <loc>http://www.eshackathon.org/CiteSource/reference/CiteSource.html</loc>
   </url>
   <url>
-    <loc>http://www.eshackathon.org/CiteSource/reference/calculate_source_counts.html</loc>
+    <loc>http://www.eshackathon.org/CiteSource/reference/calculate_all_counts.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/calculate_counts.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/calculate_counts_with_phase.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/citation_summary_table.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/compare_sources.html</loc>
-  </url>
-  <url>
-    <loc>http://www.eshackathon.org/CiteSource/reference/count_sources.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/count_unique.html</loc>
