@@ -66,8 +66,6 @@ record_counts <- function(df1, df2, db_colname) {
                                      `Records Imported` = total_records_imported,
                                      `Distinct Records` = total_distinct_records)
   
-  print(citation_counts)
-  
   return(citation_counts)
 }
 
@@ -151,8 +149,6 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
                                        `Unique records` = total_unique_records,
                                        `Non-unique Records` = total_nonunique_records)
   
-  print(calculated_counts)
-  
   # Return the final counts dataframe which includes initial, distinct, and unique record counts and percentage contribution of each source to the totals.
   return(calculated_counts)
 }
@@ -217,7 +213,6 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
               "-")
   combined_counts <- rbind(combined_counts, totals)
   
-  print(combined_counts)
   return(combined_counts)
 }
 
