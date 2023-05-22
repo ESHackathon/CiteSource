@@ -64,297 +64,8 @@ n_unique <- count_unique(unique_citations)
 # Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ```
-## 2. New slated for implementation
-### Original function to show internal deduplication
-```{r}
-# Function to count occurrences of each database
-count_sources <- function(df, db_colname) {
-    db_counts <- df %>%
-        dplyr::pull(!!sym(db_colname)) %>%
-        strsplit(", ") %>%
-        lapply(unique) %>%  
-        unlist() %>%
-        trimws() %>%
-        table() %>%
-        as.data.frame()
-    
-    colnames(db_counts) <- c("Source", "count")
-    
-    return(db_counts)
-}
 
-# Calculate distinct record count for each database
-distinct_count <- count_sources(unique_citations, "cite_source")
-colnames(distinct_count) <- c("Source", "Distinct Records")
-
-# Count the citations in the uploaded .ris data and remove blank rows
-initial_citations_count <- count_sources(citations, "cite_source")
-colnames(initial_citations_count) <- c("Source", "Records Imported")
-
-# Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source")
-
-# Convert the necessary columns to numeric
-citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
-citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
-
-# Convert the Source column to character
-citation_counts$Source <- as.character(citation_counts$Source)
-
-# Calculate totals
-totals <- c("Total", 
-            sum(citation_counts$`Records Imported`, na.rm = TRUE),
-            sum(citation_counts$`Distinct Records`, na.rm = TRUE)
-)
-
-# Add the total row
-citation_counts <- rbind(citation_counts, totals)
-```
-
-###Simple Table
-```{r}
-library(gt)
-# Generate the final table
-citation_counts %>%
-    gt(rowname_col = "Source") %>%
-    tab_header(title = "Record Counts") %>%
-    cols_label(
-        `Records Imported` = "Records Imported¹",
-        `Distinct Records` = "Distinct Records²"
-    ) %>%
-    tab_source_note(
-        source_note = md(c(
-            "¹ Number of records imported from each source.",
-            "² Number of records after internal source deduplication"
-        ))
-    )%>%
-    gtExtras::gt_theme_538()
-```
-
-###Calcultations for Updated Summary Table
-```{r}
-library(gt)
-library(gtExtras)
-# Function to count occurrences of each database
-count_sources <- function(df, db_colname) {
-    db_counts <- df %>%
-        dplyr::pull(!!sym(db_colname)) %>%
-        strsplit(", ") %>%
-        lapply(unique) %>%  
-        unlist() %>%
-        trimws() %>%
-        table() %>%
-        as.data.frame()
-    
-    colnames(db_counts) <- c("Source", "count")
-    
-    return(db_counts)
-}
-
-# Calculate Distinct Records count for each database
-distinct_count <- count_sources(unique_citations, "cite_source")
-colnames(distinct_count) <- c("Source", "Distinct Records")
-
-# Count the citations in the uploaded .ris data and remove blank rows
-initial_citations_count <- count_sources(citations, "cite_source")
-colnames(initial_citations_count) <- c("Source", "Records Imported")
-
-# Count the citations in the n_unique data, remove blank rows, and exclude rows without 'search' in cite_label
-n_unique_citations_count <- n_unique %>%
-    dplyr::filter(cite_label == "search") %>%
-    dplyr::group_by(cite_source) %>%
-    dplyr::summarise(`Unique records` = sum(unique)) %>%
-    dplyr::filter(cite_source != "") %>%
-    dplyr::arrange(cite_source) %>%
-    dplyr::rename(Source = cite_source)
-
-# Combine the counts into one table
-citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source") %>%
-    dplyr::left_join(n_unique_citations_count, by = "Source")
-
-# Add the "Non-unique Records" column directly
-citation_counts <- citation_counts %>%
-    dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique records`)
-
-# Convert the necessary columns to numeric
-citation_counts$`Distinct Records` <- as.numeric(citation_counts$`Distinct Records`)
-citation_counts$`Records Imported` <- as.numeric(citation_counts$`Records Imported`)
-citation_counts$`Unique records` <- as.numeric(citation_counts$`Unique records`)
-citation_counts$`Non-unique Records` <- as.numeric(citation_counts$`Non-unique Records`)
-
-# Add the calculations
-citation_counts <- citation_counts %>%
-    dplyr::mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
-                  `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
-                  `Source Unique %` = `Unique records` / `Distinct Records`)
-
-citation_counts <- citation_counts %>%
-    dplyr::mutate(
-        `Source Contribution %` = as.numeric(`Source Contribution %`),
-        `Source Unique Contribution %` = as.numeric(`Source Unique Contribution %`),
-        `Source Unique %` = as.numeric(`Source Unique %`)
-    ) %>%
-    dplyr::mutate(
-        `Source Contribution %` = scales::percent(`Source Contribution %`, accuracy = 0.1),
-        `Source Unique Contribution %` = scales::percent(`Source Unique Contribution %`, accuracy = 0.1),
-        `Source Unique %` = scales::percent(`Source Unique %`, accuracy = 0.1)
-    )
-
-# Calculate totals
-totals <- c("Total", 
-            sum(citation_counts$`Records Imported`, na.rm = TRUE),
-            sum(citation_counts$`Distinct Records`, na.rm = TRUE),
-            sum(citation_counts$`Unique records`, na.rm = TRUE),
-            sum(citation_counts$`Non-unique Records`, na.rm = TRUE),
-            "-", "-", "-")
-
-# Add the total row
-citation_counts <- rbind(citation_counts, totals)
-```
-###Updated Search Summary Table
-```{r}
-citation_counts %>%
-    gt(rowname_col = "Source") %>%
-    tab_header(title = "Record Counts") %>%
-    cols_label(
-        `Records Imported` = "Records Imported¹",
-        `Distinct Records` = "Distinct Records²",
-        `Unique records` = "Unique records³",
-        `Non-unique Records` = "Non-unique Records⁴",
-        `Source Contribution %` = "Records Contributed %⁵",
-        `Source Unique Contribution %` = "Unique Records Contributed %⁶",
-        `Source Unique %` = "Unique Records %⁷"
-    ) %>%
-    tab_source_note(
-        source_note = md(c(
-            "¹ Number of raw records imported from each database.",
-            "² Number of records after internal source deduplication",
-            "³ Number of records not found in another source.",
-            "⁴ Number of records found in at least one other source.",
-            "⁵ Percent distinct records contributed to the total number of distinct records.",
-            "⁶ Percent of unique records contributed to the total unique records.",
-            "⁷ Percentage of records that were unique from each source."
-        ))
-    )%>%
-    gtExtras::gt_theme_538()
-
-```
-### Calculations for New precision/sensitivity table
-```{r}
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(gt)
-library(gtExtras)
-
-# Function to count occurrences of each source in the 'Screened' and 'Final' phases
-count_source_phase <- function(source_phase_df) {
-    source_phase_df <- source_phase_df %>%
-        tidyr::separate_rows(cite_source, sep = ",") %>%
-        tidyr::separate_rows(cite_label, sep = ",") %>%
-        dplyr::mutate(cite_source = stringr::str_trim(cite_source),
-                      cite_label = stringr::str_trim(cite_label)) %>%
-        dplyr::filter(cite_source != "unknown") %>%
-        dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
-                      final = ifelse(cite_label == "final", 1, 0)) %>%
-        dplyr::group_by(cite_source) %>%
-        dplyr::summarise(screened = sum(screened),
-                         final = sum(final),
-                         .groups = "drop") %>%
-        dplyr::rename(Source = cite_source)
-    
-    return(source_phase_df)
-}
-
-source_phase <- count_source_phase(unique_citations)
-
-# Function to count occurrences of each database
-count_sources <- function(source_phase_df, db_colname) {
-    db_counts <- source_phase_df %>%
-        dplyr::pull(rlang::sym(db_colname)) %>%
-        strsplit(", ") %>%
-        lapply(unique) %>%  
-        unlist() %>%
-        trimws() %>%
-        table() %>%
-        as.data.frame()
-    
-    colnames(db_counts) <- c("Source", "count")
-    
-    return(db_counts)
-}
-
-distinct_count <- count_sources(unique_citations, "cite_source")
-colnames(distinct_count) <- c("Source", "Distinct Records")
-
-distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
-distinct_count$Source <- as.character(distinct_count$Source)
-
-# Combine the results
-combined_counts <- dplyr::left_join(distinct_count, source_phase, by = "Source")
-
-# Replace NA values with 0
-combined_counts[is.na(combined_counts)] <- 0
-
-# Calculate Precision
-combined_counts <- combined_counts %>%
-    dplyr::mutate(Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0))  # Multiply by 100 and round
-
-# Calculate Recall manually in a loop
-total_final <- sum(combined_counts$final)
-for(i in 1:nrow(combined_counts)) {
-    combined_counts$Recall[i] <- round((combined_counts$final[i] / total_final) * 100, 2)  # Multiply by 100 and round
-}
-
-# Calculate totals
-totals <- c("Total", 
-            sum(combined_counts$`Distinct Records`, na.rm = TRUE),
-            paste0(sum(citations$cite_label == "screened"), "⁶"),
-            paste0(sum(citations$cite_label == "final"), "⁷"),
-            "-",  # Precision total doesn't make sense
-            "-")  # Recall total doesn't make sense
-
-# Add the total row
-combined_counts <- rbind(combined_counts, totals)
-
-# Remove the 'unknown' row - this should be corrected and unnecessary soon
-combined_counts <- combined_counts %>%
-    dplyr::filter(Source != "unknown")
-```
-###New precision/sensitivity table
-```{r}
-# Generate the final table
-combined_counts %>%
-    gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
-    gt::cols_label(
-        `Distinct Records` = "Distinct Records¹",
-        screened = "Screened Included²",
-        final = "Final Included³",
-        Precision = "Precision⁴",
-        Recall = "Sensitivity/Recall⁵"
-    ) %>%
-   gt::cols_align(
-        align = "right",
-        columns = c(screened, final)
-    ) %>%
-    gt::tab_source_note(
-        source_note = gt::md(c(
-            "¹ Number of source specific unique records",
-            "² Records included after title/abstract screening",
-            "³ Records included after full text screening",
-            "⁴ Precision = Final Included / Distinct Records",
-            "⁵ Sensitivity/Recall = Final Included / Total Final Included",
-            "⁶ Number of records included after title/abstract screening",
-            "⁷ Number of records included after full text screening"
-        ))
-    )%>%
-    gtExtras::gt_theme_538()
-
-
-```
-
-## 3. Current plots
+## 2. Current plots
 ### Heatmaps
 ```{r}
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
@@ -389,7 +100,7 @@ my_contributions <- plot_contributions(n_unique,
 
 my_contributions
 ```
-## 4. Prep for expirimental plots
+## 3. Prep for expirimental plots
 ### Unique records count from sources
 ```{r}
 #Get unique records from each source and add bibliographic data
@@ -422,7 +133,7 @@ all_unique <- bind_rows(unique_AGRIS, unique_CAB, unique_EconLit,
 
 ```
 
-## 5. Expirimental plots
+## 4. Expirimental plots
 ### Publication year bar plots
 ```{r}
 
@@ -532,7 +243,7 @@ sankey<-sankeyNetwork(
 sankey
 ```
 
-## 6. Expirimental source-specific tables
+## 5. Expirimental source-specific tables
 ### Unique Journal Count per Source 
 ```{r}
 library(gt)
@@ -581,7 +292,7 @@ display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB"
 display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
 ```
 
-## 7. Current tables
+## 6. Current tables
 ### Citation Record Table
 ```{r}
 # Citation Record Table
@@ -591,7 +302,7 @@ unique_citations %>%
   record_level_table(return = "DT")
 
 ```
-###NEW count functions and tables
+## 7.New Tables
 ```{r}
 initial_counts<-record_counts(unique_citations, citations, "cite_source")
   
