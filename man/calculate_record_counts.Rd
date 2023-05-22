@@ -2,7 +2,7 @@
 % Please edit documentation in R/count.R
 \name{calculate_record_counts}
 \alias{calculate_record_counts}
-\title{Calculate counts fucntion
+\title{Calculate record counts function
 Calculate and combine counts of distinct records, imported records, and unique records for each database}
 \usage{
 calculate_record_counts(unique_citations, citations, n_unique, db_colname)
