@@ -13,7 +13,7 @@ count_sources <- function(df, db_colname) {
 # Pull out the database column, split it into multiple elements if there are commas,
 # create a list of unique elements, unlist it to a vector, remove white spaces, and count occurrences
   db_counts <- df %>%
-    dplyr::pull(!!sym(db_colname)) %>%
+    dplyr::pull(!!rlang::sym(db_colname)) %>%
     strsplit(", ") %>%
     lapply(unique) %>%
     unlist() %>%
@@ -29,6 +29,7 @@ count_sources <- function(df, db_colname) {
 #' This function calculates the counts of distinct records and records imported for each database source. 
 #' It combines these counts into one dataframe and calculates the total for each count type.
 #'
+#' @export
 #' @param df1 Dataframe. The dataframe for calculating distinct records count.
 #' @param df2 Dataframe. The dataframe for calculating records imported count.
 #' @param db_colname Character. The name of the column containing the database source information.
@@ -70,13 +71,14 @@ record_counts <- function(df1, df2, db_colname) {
   return(citation_counts)
 }
 
-#' Calculate counts fucntion
+#' Calculate record counts function
 #' Calculate and combine counts of distinct records, imported records, and unique records for each database
 #'
 #' This function calculates the counts of distinct records, records imported, and unique records for each database source. 
 #' It combines these counts into one dataframe and calculates several ratios and percentages related to the unique and distinct counts.
 #' It also calculates the total for each count type.
 #'
+#' @export
 #' @param unique_citations Dataframe. The dataframe for calculating distinct records count.
 #' @param citations Dataframe. The dataframe for calculating records imported count.
 #' @param n_unique Dataframe. The dataframe for calculating unique records count.
@@ -86,14 +88,12 @@ record_counts <- function(df1, df2, db_colname) {
 
 calculate_record_counts <- function(unique_citations, citations, n_unique, db_colname) {
   
-  # Calculate the count of distinct records for each database source 
-  # and convert the count to numeric.
+  # Calculate the count of distinct records for each database source and convert the count to numeric.
   distinct_count <- count_sources(unique_citations, db_colname)
   colnames(distinct_count) <- c("Source", "Distinct Records")
   distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
   
-  # Count the number of records imported from each source in the initial citations data.
-  # Also, convert these counts to numeric.
+  # Count the number of records imported from each source in the initial citations data. Also, convert these counts to numeric.
   initial_citations_count <- count_sources(citations, db_colname)
   colnames(initial_citations_count) <- c("Source", "Records Imported")
   initial_citations_count$`Records Imported` <- as.numeric(initial_citations_count$`Records Imported`)
@@ -101,12 +101,12 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
   # Filter n_unique data to only include records with 'search' as the citation label.
   # Then count the unique records in each source, convert these counts to numeric, and rename the column.
   n_unique_citations_count <- n_unique %>%
-    dplyr::filter(cite_label == "search") %>%
-    dplyr::group_by(cite_source) %>%
-    dplyr::summarise(`Unique records` = sum(unique)) %>%
-    dplyr::filter(cite_source != "") %>%
-    dplyr::arrange(cite_source) %>%
-    dplyr::rename(Source = cite_source)
+    dplyr::filter(.data$cite_label == "search") %>%
+    dplyr::group_by(.data$cite_source) %>%
+    dplyr::summarise("Unique records" = sum(.data$unique)) %>%
+    dplyr::filter(.data$cite_source != "") %>%
+    dplyr::arrange(.data$cite_source) %>%
+    dplyr::rename(Source = .data$cite_source)
   n_unique_citations_count$`Unique records` <- as.numeric(n_unique_citations_count$`Unique records`)
   
   # Merge the three counts (initial, distinct, unique) into a single dataframe.
@@ -115,25 +115,27 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
   
   # Calculate the number of non-unique records by subtracting the number of unique records from the total records.
   citation_counts <- citation_counts %>%
-    dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique records`)
+    dplyr::mutate("Non-unique Records" = .data$`Distinct Records` - .data$`Unique records`)
   citation_counts$`Non-unique Records` <- as.numeric(citation_counts$`Non-unique Records`)
   
-  # Calculate and add three percentages: the contribution of each source to the total, 
+  # Calculate and add three percentages: the contribution of each source to the total,
   # the contribution of unique records of each source to the total unique records,
   # and the proportion of unique records in each source's distinct records.
   citation_counts <- citation_counts %>%
-    dplyr::mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
-                  `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
-                  `Source Unique %` = `Unique records` / `Distinct Records`) %>%
+    dplyr::mutate("Source Contribution %" = .data$`Distinct Records` / sum(.data$`Distinct Records`, na.rm = TRUE),
+                  "Source Unique Contribution %" = .data$`Unique records` / sum(.data$`Unique records`, na.rm = TRUE),
+                  "Source Unique %" = .data$`Unique records` / .data$`Distinct Records`)
+  
+  citation_counts <- citation_counts %>%
     dplyr::mutate(
-      `Source Contribution %` = as.numeric(`Source Contribution %`),
-      `Source Unique Contribution %` = as.numeric(`Source Unique Contribution %`),
-      `Source Unique %` = as.numeric(`Source Unique %`)
+      `Source Contribution %` = as.numeric(.data$`Source Contribution %`),
+      `Source Unique Contribution %` = as.numeric(.data$`Source Unique Contribution %`),
+      `Source Unique %` = as.numeric(.data$`Source Unique %`)
     ) %>%
     dplyr::mutate(
-      `Source Contribution %` = scales::percent(`Source Contribution %`, accuracy = 0.1),
-      `Source Unique Contribution %` = scales::percent(`Source Unique Contribution %`, accuracy = 0.1),
-      `Source Unique %` = scales::percent(`Source Unique %`, accuracy = 0.1))
+      `Source Contribution %` = scales::percent(.data$`Source Contribution %`, accuracy = 0.1),
+      `Source Unique Contribution %` = scales::percent(.data$`Source Unique Contribution %`, accuracy = 0.1),
+      `Source Unique %` = scales::percent(.data$`Source Unique %`, accuracy = 0.1))
   
   # Calculate the totals
   total_records_imported <- sum(citation_counts$`Records Imported`, na.rm = TRUE)
@@ -143,24 +145,25 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
   
   # Add totals to the citation_counts dataframe
   calculated_counts <- tibble::add_row(citation_counts, 
-                                     Source = "Total", 
-                                     `Records Imported` = total_records_imported,
-                                     `Distinct Records` = total_distinct_records,
-                                     `Unique records` = total_unique_records,
-                                     `Non-unique Records` = total_nonunique_records)
+                                       Source = "Total", 
+                                       `Records Imported` = total_records_imported,
+                                       `Distinct Records` = total_distinct_records,
+                                       `Unique records` = total_unique_records,
+                                       `Non-unique Records` = total_nonunique_records)
   
   print(calculated_counts)
   
-  # Return the final counts dataframe which includes initial, distinct, and unique record counts 
-  # and percentage contribution of each source to the totals.
+  # Return the final counts dataframe which includes initial, distinct, and unique record counts and percentage contribution of each source to the totals.
   return(calculated_counts)
 }
+
 
 #' Calculate phase counts, precision, and recall
 #'
 #' This function calculates counts for different phases and calculates precision and recall
 #' for each source based on unique citations and citations dataframe.
 #'
+#' @export
 #' @param unique_citations A dataframe containing unique citations with phase information.
 #' @param citations A dataframe containing all citations with phase information.
 #' @param db_colname The name of the column representing the source database.
@@ -188,7 +191,8 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   }
   
   source_phase <- count_source_phase(unique_citations, db_colname)
-  distinct_count <- count_sources(unique_citations, db_colname)
+  
+  distinct_count <- count_sources(unique_citations, db_colname) # Assuming that 'count_sources' function is correctly defined
   colnames(distinct_count) <- c("Source", "Distinct Records")
   
   distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
@@ -207,14 +211,15 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   
   totals <- c("Total", 
               sum(combined_counts$`Distinct Records`, na.rm = TRUE),
-              paste0(sum(citations$cite_label == "screened"), "⁶"),
-              paste0(sum(citations$cite_label == "final"), "⁷"),
+              paste0(sum(citations$cite_label == "screened")),
+              paste0(sum(citations$cite_label == "final")),
               "-",
               "-")
-  
   combined_counts <- rbind(combined_counts, totals)
-  combined_counts <- combined_counts
   
   print(combined_counts)
   return(combined_counts)
 }
+
+
+                                         
