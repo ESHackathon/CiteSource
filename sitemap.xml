@@ -88,13 +88,13 @@
     <loc>http://www.eshackathon.org/CiteSource/reference/plot_contributions.html</loc>
   </url>
   <url>
-    <loc>http://www.eshackathon.org/CiteSource/reference/plot_source_counts.html</loc>
-  </url>
-  <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/plot_source_overlap_heatmap.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/plot_source_overlap_upset.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/precision_sensitivity_table.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/read_citations.html</loc>
@@ -103,7 +103,13 @@
     <loc>http://www.eshackathon.org/CiteSource/reference/record_counts.html</loc>
   </url>
   <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/record_counts_table.html</loc>
+  </url>
+  <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/record_level_table.html</loc>
+  </url>
+  <url>
+    <loc>http://www.eshackathon.org/CiteSource/reference/record_summary_table.html</loc>
   </url>
   <url>
     <loc>http://www.eshackathon.org/CiteSource/reference/reimport_csv.html</loc>
