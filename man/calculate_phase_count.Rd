@@ -2,22 +2,22 @@
 % Please edit documentation in R/count.R
 \name{calculate_phase_count}
 \alias{calculate_phase_count}
-\title{Calculate phase counts function
-Calculate and combine counts of distinct records for each database and counts of 'Screened' and 'Final' labels}
+\title{Calculate phase counts, precision, and recall}
 \usage{
 calculate_phase_count(unique_citations, citations, db_colname)
 }
 \arguments{
-\item{unique_citations}{Dataframe. The dataframe for calculating distinct records count and also counts of 'Screened' and 'Final' labels.}
+\item{unique_citations}{A dataframe containing unique citations with phase information.}
 
-\item{citations}{Dataframe. Unused in the current implementation.}
+\item{citations}{A dataframe containing all citations with phase information.}
 
-\item{db_colname}{Character. The name of the column containing the database source information.}
+\item{db_colname}{The name of the column representing the source database.}
 }
 \value{
-A dataframe with counts of distinct records, 'Screened' and 'Final' labels for each source, including total counts, precision and recall.
+A dataframe containing distinct counts, counts for different phases, precision,
+and recall for each source, as well as totals.
 }
 \description{
-This function calculates the counts of distinct records for each database source and the counts of 'Screened' and 'Final' labels.
-It combines these counts into one dataframe, calculates precision and recall, and also calculates total counts for each count type.
+This function calculates counts for different phases and calculates precision and recall
+for each source based on unique citations and citations dataframe.
 }
