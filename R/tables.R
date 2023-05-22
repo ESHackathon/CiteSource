@@ -314,7 +314,6 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
       columns = dplyr::all_of(stringr::str_to_title(comparison_type)),
       rows = !!rlang::sym(stringr::str_to_title(comparison_type)) == "Total"
     )) %>%
-    gtExtras::gt_theme_538() %>%
     gt::tab_source_note(gt::md(glue::glue(" \n **Included fields:**
     * **_Total_ records** are all records returned by that {comparison_type_singular}, while **_unique_ records** are found in only that {comparison_type_singular} (or, in the Total rows, in only one {comparison_type_singular}).
     * The **unique contribution** is the share of records only found in that {comparison_type_singular} (or, in the Total rows, in only one {comparison_type_singular}).\n
@@ -562,38 +561,203 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
   }
 }
 
-#' Plot Source Counts
-#'
-#' This function takes the result of calculate_source_counts() and generates a formatted table using the gt package.
-#'
-#' @param source_counts A data frame produced by calculate_source_counts().
-#' 
-#' @return A gt table.
 
-plot_source_counts <- function(source_counts) {
-  
-  source_counts %>%
-    gt(rowname_col = "Source") %>%
-    tab_header(title = "Record Counts") %>%
-    cols_label(
-      `Records Imported` = paste0("Records Imported", "\u00B9"),
-      `Distinct Records` = paste0("Distinct Records", "\u00B2"),
-      `Unique records` = paste0("Unique records", "\u00B3"),
-      `Non-unique Records` = paste0("Non-unique Records", "\u2074"),
-      `Source Contribution %` = paste0("Records Contributed %", "\u2075"),
-      `Source Unique Contribution %` = paste0("Unique Records Contributed %", "\u2076"),
-      `Source Unique %` = paste0("Unique Records %", "\u2077")
+#' record_counts_table
+#'
+#' This function creates a table with footnotes for columns in the table. 
+#' It uses the gt package to create the table and adds footnotes to 
+#' the "Records Imported" and "Distinct Records" columns.
+#'
+#' @param data A data frame that must contain the columns "Source", "Records Imported", 
+#' and "Distinct Records". The "Source" column is used as the row names of the table.
+#'
+#' @return A gt object representing the table.
+#'
+#' @importFrom gt gt tab_header cols_label tab_footnote cells_column_labels
+#' @export
+record_counts_table <- function(data) {
+  # Create the initial gt table
+  data %>%
+    gt::gt(rowname_col = "Source") %>%
+    gt::tab_header(title = "Record Counts") %>%
+    
+    # Label the columns
+    gt::cols_label(
+      `Records Imported` = "Records Imported",
+      `Distinct Records` = "Distinct Records"
     ) %>%
-    tab_source_note(
-      source_note = md(c(
-        paste0("\u00B9", " Number of raw records imported from each database."),
-        paste0("\u00B2", " Number of records after internal source deduplication"),
-        paste0("\u00B3", " Number of records not found in another source."),
-        paste0("\u2074", " Number of records found in at least one other source."),
-        paste0("\u2075", " Percent distinct records contributed to the total number of distinct records."),
-        paste0("\u2076", " Percent of unique records contributed to the total unique records."),
-        paste0("\u2077", " Percentage of records that were unique from each source.")
-      ))
-    )%>%
-    gt_theme_538()
+    
+    # Add footnote for "Records Imported"
+    gt::tab_footnote(
+      footnote = "Number of records imported from each source.",
+      locations = gt::cells_column_labels(
+        columns = `Records Imported`
+      )
+    ) %>%
+    
+    # Add footnote for "Distinct Records"
+    gt::tab_footnote(
+      footnote = "Number of records after internal source deduplication",
+      locations = gt::cells_column_labels(
+        columns = `Distinct Records`
+      )
+    )
 }
+
+#' search_summary_table
+#'
+#' This function creates a table with footnotes for columns in the table.
+#' It uses the gt package to create the table and adds footnotes to various columns.
+#'
+#' @param data A data frame that must contain the columns "Source", "Records Imported", 
+#' "Distinct Records", "Unique records", "Non-unique Records", "Source Contribution %", 
+#' "Source Unique Contribution %", and "Source Unique %". The "Source" column is used as the row names of the table.
+#'
+#' @return A gt object representing the table.
+#'
+#' @importFrom gt gt tab_header cols_label tab_footnote cells_column_labels
+#' @export
+record_summary_table <- function(data) {
+  # Create the initial gt table
+  data %>%
+    gt::gt(rowname_col = "Source") %>%
+    gt::tab_header(title = "Record Counts") %>%
+    
+    # Label the columns
+    gt::cols_label(
+      `Records Imported` = "Records Imported",
+      `Distinct Records` = "Distinct Records",
+      `Unique records` = "Unique records",
+      `Non-unique Records` = "Non-unique Records",
+      `Source Contribution %` = "Records Contributed %",
+      `Source Unique Contribution %` = "Unique Records Contributed %",
+      `Source Unique %` = "Unique Records %"
+    ) %>%
+    
+    # Add footnotes for the columns
+    gt::tab_footnote(
+      footnote = "Number of raw records imported from each database.",
+      locations = gt::cells_column_labels(
+        columns = `Records Imported`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Number of records after internal source deduplication",
+      locations = gt::cells_column_labels(
+        columns = `Distinct Records`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Number of records not found in another source.",
+      locations = gt::cells_column_labels(
+        columns = `Unique records`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Number of records found in at least one other source.",
+      locations = gt::cells_column_labels(
+        columns = `Non-unique Records`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Percent distinct records contributed to the total number of distinct records.",
+      locations = gt::cells_column_labels(
+        columns = `Source Contribution %`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Percent of unique records contributed to the total unique records.",
+      locations = gt::cells_column_labels(
+        columns = `Source Unique Contribution %`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Percentage of records that were unique from each source.",
+      locations = gt::cells_column_labels(
+        columns = `Source Unique %`
+      )
+    )
+}
+
+
+#' precision_sensitivity_table
+#'
+#' This function creates a table with footnotes for columns in the table.
+#' It uses the gt package to create the table and adds footnotes to various columns.
+#'
+#' @param data A data frame that must contain the columns "Source", "Distinct Records",
+#' "Screened Included", "Final Included", "Precision", and "Recall". The "Source" column is used as the row names of the table.
+#'
+#' @return A gt object representing the table.
+#'
+#' @importFrom gt gt tab_header cols_label cols_align tab_footnote cells_column_labels cells_body
+#' @export
+precision_sensitivity_table <- function(data) {
+  # Create the initial gt table
+  data %>%
+    gt::gt(rowname_col = "Source") %>%
+    gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
+    
+    # Label the columns
+    gt::cols_label(
+      `Distinct Records` = "Distinct Records",
+      screened = "Screened Included",
+      final = "Final Included",
+      Precision = "Precision",
+      Recall = "Sensitivity/Recall"
+    ) %>%
+    
+    # Align columns to the right
+    gt::cols_align(
+      align = "right",
+      columns = c(screened, final)
+    ) %>%
+    
+    # Add footnotes for the columns
+    gt::tab_footnote(
+      footnote = "Number of source specific unique records",
+      locations = gt::cells_column_labels(
+        columns = `Distinct Records`
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Records included after title/abstract screening",
+      locations = gt::cells_column_labels(
+        columns = screened
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Records included after full text screening",
+      locations = gt::cells_column_labels(
+        columns = final
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Precision = Final Included / Distinct Records",
+      locations = gt::cells_column_labels(
+        columns = Precision
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Sensitivity/Recall = Final Included / Total Final Included",
+      locations = gt::cells_column_labels(
+        columns = Recall
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "This is the total for Screened Included",
+      locations = gt::cells_body(
+        columns = screened,
+        rows = "Total"
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "This is the total for Final Included",
+      locations = gt::cells_body(
+        columns = final,
+        rows = "Total"
+      )
+    )
+}
+
+  
