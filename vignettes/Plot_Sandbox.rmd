@@ -65,9 +65,8 @@ n_unique <- count_unique(unique_citations)
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 ```
 ## 2. New slated for implementation
-### New table to show internal deduplication
+### Original function to show internal deduplication
 ```{r}
-library(gt)
 # Function to count occurrences of each database
 count_sources <- function(df, db_colname) {
     db_counts <- df %>%
@@ -114,6 +113,7 @@ citation_counts <- rbind(citation_counts, totals)
 
 ###Simple Table
 ```{r}
+library(gt)
 # Generate the final table
 citation_counts %>%
     gt(rowname_col = "Source") %>%
@@ -591,5 +591,15 @@ unique_citations %>%
   record_level_table(return = "DT")
 
 ```
+###NEW count functions and tables
+```{r}
+initial_counts<-record_counts(unique_citations, citations, "cite_source")
+  
+calculated_counts<-calculate_record_counts(unique_citations, citations, n_unique, "cite_source")
+  
+phase_counts<-calculate_phase_count(unique_citations, citations, "cite_source")
 
-
+record_counts_table(initial_counts)
+record_summary_table(calculated_counts)
+precision_sensitivity_table(phase_counts)
+```
