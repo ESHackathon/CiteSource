@@ -52,6 +52,9 @@ record_counts <- function(df1, df2, db_colname) {
   # Convert the Source column to character
   citation_counts$Source <- as.character(citation_counts$Source)
  
+  # Create 'totals' dataframe with same structure
+  totals <- citation_counts[FALSE, ]  # This creates an empty df with the same structure
+  
   # Calculate the totals
   total_records_imported <- sum(citation_counts$`Records Imported`, na.rm = TRUE)
   total_distinct_records <- sum(citation_counts$`Distinct Records`, na.rm = TRUE)
@@ -63,11 +66,6 @@ record_counts <- function(df1, df2, db_colname) {
                                      `Distinct Records` = total_distinct_records)
   
   print(citation_counts)
-  
-  
-  print(citation_counts)
-  
-  
   
   return(citation_counts)
 }
@@ -137,108 +135,86 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
       `Source Unique Contribution %` = scales::percent(`Source Unique Contribution %`, accuracy = 0.1),
       `Source Unique %` = scales::percent(`Source Unique %`, accuracy = 0.1))
   
-  # Calculate the sum totals for each numeric column
-  totals <- data.frame("Source" = "Total", 
-                       "Records Imported" = sum(citation_counts$`Records Imported`, na.rm = TRUE),
-                       "Distinct Records" = sum(citation_counts$`Distinct Records`, na.rm = TRUE),
-                       "Unique records" = sum(citation_counts$`Unique records`, na.rm = TRUE),
-                       "Non-unique Records" = sum(citation_counts$`Non-unique Records`, na.rm = TRUE))
+  # Calculate the totals
+  total_records_imported <- sum(citation_counts$`Records Imported`, na.rm = TRUE)
+  total_distinct_records <- sum(citation_counts$`Distinct Records`, na.rm = TRUE)
+  total_unique_records <- sum(citation_counts$`Unique records`, na.rm = TRUE)
+  total_nonunique_records <- sum(citation_counts$`Non-unique Records`, na.rm = TRUE)
   
-  # Add a row to the citation_counts dataframe with the totals calculated above.
-  citation_counts <- dplyr::bind_rows(citation_counts, totals)
+  # Add totals to the citation_counts dataframe
+  calculated_counts <- tibble::add_row(citation_counts, 
+                                     Source = "Total", 
+                                     `Records Imported` = total_records_imported,
+                                     `Distinct Records` = total_distinct_records,
+                                     `Unique records` = total_unique_records,
+                                     `Non-unique Records` = total_nonunique_records)
+  
+  print(calculated_counts)
   
   # Return the final counts dataframe which includes initial, distinct, and unique record counts 
   # and percentage contribution of each source to the totals.
-  return(citation_counts)
+  return(calculated_counts)
 }
 
-
-#' Calculate phase counts function
-#' Calculate and combine counts of distinct records for each database and counts of 'Screened' and 'Final' labels
+#' Calculate phase counts, precision, and recall
 #'
-#' This function calculates the counts of distinct records for each database source and the counts of 'Screened' and 'Final' labels. 
-#' It combines these counts into one dataframe, calculates precision and recall, and also calculates total counts for each count type.
+#' This function calculates counts for different phases and calculates precision and recall
+#' for each source based on unique citations and citations dataframe.
 #'
-#' @param unique_citations Dataframe. The dataframe for calculating distinct records count and also counts of 'Screened' and 'Final' labels.
-#' @param citations Dataframe. Unused in the current implementation.
-#' @param db_colname Character. The name of the column containing the database source information.
+#' @param unique_citations A dataframe containing unique citations with phase information.
+#' @param citations A dataframe containing all citations with phase information.
+#' @param db_colname The name of the column representing the source database.
 #'
-#' @return A dataframe with counts of distinct records, 'Screened' and 'Final' labels for each source, including total counts, precision and recall.
+#' @return A dataframe containing distinct counts, counts for different phases, precision,
+#' and recall for each source, as well as totals.
 
 calculate_phase_count <- function(unique_citations, citations, db_colname) {
-  # This function calculates counts for different phases and precision and recall
-  
-  # Nested helper function to count occurrences of each source in 'Screened' and 'Final' phases
   count_source_phase <- function(source_phase_df, db_colname) {
-    # Take a dataframe and a database column name as inputs.
-    
     source_phase_df <- source_phase_df %>%
-      # Separate rows by the database column and cite_label, which should contain phase information.
       tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",") %>%
       tidyr::separate_rows(cite_label, sep = ",") %>%
-      # Trim any extra spaces from the database column and cite_label.
       dplyr::mutate(!!rlang::sym(db_colname) := stringr::str_trim(!!rlang::sym(db_colname)),
                     cite_label = stringr::str_trim(cite_label)) %>%
-      # Filter out any rows where the database column is 'unknown'.
       dplyr::filter(!!rlang::sym(db_colname) != "unknown") %>%
-      # Create two new columns, screened and final, which are binary flags indicating the phase.
       dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
                     final = ifelse(cite_label == "final", 1, 0)) %>%
-      # Group by the database column and calculates the sum of the screened and final columns.
       dplyr::group_by(!!rlang::sym(db_colname)) %>%
       dplyr::summarise(screened = sum(screened),
                        final = sum(final),
                        .groups = "drop") %>%
-      # Rename the database column to 'Source'.
       dplyr::rename(Source = !!rlang::sym(db_colname))
     
-    # Converts the screened and final columns to numeric.
-    source_phase_df$screened <- as.numeric(source_phase_df$screened)
-    source_phase_df$final <- as.numeric(source_phase_df$final)
-    
-    # Returns the updated dataframe.
     return(source_phase_df)
   }
   
-  # Count the occurrences of each source in the 'Screened' and 'Final' phases.
   source_phase <- count_source_phase(unique_citations, db_colname)
-  
-  # Compute the distinct counts of each source.
   distinct_count <- count_sources(unique_citations, db_colname)
   colnames(distinct_count) <- c("Source", "Distinct Records")
+  
   distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
+  distinct_count$Source <- as.character(distinct_count$Source)
   
-  # Combine the distinct count and the phase count into one table.
   combined_counts <- dplyr::left_join(distinct_count, source_phase, by = "Source")
-  
-  # Replace any NA values in the table with 0.
   combined_counts[is.na(combined_counts)] <- 0
   
-  # Calculate the Precision and Recall for each source.
   combined_counts <- combined_counts %>%
-    dplyr::mutate(
-      Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0),
-      Recall = ifelse(sum(final, na.rm = TRUE) != 0, round((final / sum(final, na.rm = TRUE)) * 100, 2), 0)
-    )
+    dplyr::mutate(Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0))
   
-  # Calculate the total counts for all sources combined.
-  totals <- data.frame(
-    "Source" = "Total", 
-    "Distinct Records" = sum(combined_counts$`Distinct Records`, na.rm = TRUE),
-    "screened" = sum(combined_counts$screened, na.rm = TRUE),
-    "final" = sum(combined_counts$final, na.rm = TRUE)
-  )
+  total_final <- sum(combined_counts$final)
+  for(i in 1:nrow(combined_counts)) {
+    combined_counts$Recall[i] <- round((combined_counts$final[i] / total_final) * 100, 2)
+  }
   
-  # Add the total row to the end of the combined counts dataframe.
-  combined_counts <- dplyr::bind_rows(combined_counts, totals)
+  totals <- c("Total", 
+              sum(combined_counts$`Distinct Records`, na.rm = TRUE),
+              paste0(sum(citations$cite_label == "screened"), "⁶"),
+              paste0(sum(citations$cite_label == "final"), "⁷"),
+              "-",
+              "-")
   
-  # Remove the 'unknown' row as this is likely an error or placeholder that is no longer necessary.
-  combined_counts <- combined_counts %>%
-    dplyr::filter(Source != "unknown")
+  combined_counts <- rbind(combined_counts, totals)
+  combined_counts <- combined_counts
   
-  # Return the final counts dataframe, which contains distinct counts, counts for different phases,
-  # and the precision and recall for each source, as well as totals.
+  print(combined_counts)
   return(combined_counts)
 }
-
-  
