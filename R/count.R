@@ -53,10 +53,10 @@ record_counts <- function(df1, df2, db_colname) {
   citation_counts$Source <- as.character(citation_counts$Source)
   # Calculate and add total row
   totals <- data.frame("Source" = "Total", 
-                       "Records Imported" = as.numeric(sum(citation_counts$`Records Imported`, na.rm = TRUE)),
-                       "Distinct Records" = as.numeric(sum(citation_counts$`Distinct Records`, na.rm = TRUE)))
+                       "Records Imported" = sum(citation_counts$`Records Imported`, na.rm = TRUE),
+                       "Distinct Records" = sum(citation_counts$`Distinct Records`, na.rm = TRUE))
   # Append total row to the dataframe
-  citation_counts <- dplyr::bind_rows(citation_counts, totals)
+  citation_counts <- rbind(citation_counts, totals)
   
   
   return(citation_counts)
