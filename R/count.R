@@ -52,16 +52,18 @@ record_counts <- function(df1, df2, db_colname) {
   # Convert the Source column to character
   citation_counts$Source <- as.character(citation_counts$Source)
  
-  # Create 'totals' dataframe with same structure
-  totals <- citation_counts[FALSE, ]  # This creates an empty df with the same structure
+  # Calculate the totals
+  total_records_imported <- sum(citation_counts$`Records Imported`, na.rm = TRUE)
+  total_distinct_records <- sum(citation_counts$`Distinct Records`, na.rm = TRUE)
   
-  # Fill 'totals' with the summary data
-  totals$Source <- "Total"
-  totals$`Records Imported` <- sum(citation_counts$`Records Imported`, na.rm = TRUE)
-  totals$`Distinct Records` <- sum(citation_counts$`Distinct Records`, na.rm = TRUE)
+  # Use add_row() to add the totals to the dataframe
+  citation_counts <- tibble::add_row(citation_counts, 
+                                     Source = "Total", 
+                                     `Records Imported` = total_records_imported,
+                                     `Distinct Records` = total_distinct_records)
   
-  # Append total row to the dataframe
-  citation_counts <- dplyr::bind_rows(citation_counts, totals)
+  print(citation_counts)
+  
   
   print(citation_counts)
   
