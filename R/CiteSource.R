@@ -35,4 +35,5 @@ utils::globalVariables(".")
         options(shiny.maxRequestSize=2000*1024^2, timeout = 40000000) 
     } else {
         options(shiny.maxRequestSize=250*1024^2, timeout = 40000000) 
+        }
 }
