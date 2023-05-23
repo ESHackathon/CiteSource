@@ -92,11 +92,11 @@ metadata_tbl <- tibble::tribble(
    "AGRIS.ris",      "AGRIS",       "search",    
    "CAB.ris",        "CAB",         "search",    
    "EconLit.ris",    "EconLit",     "search",    
-   "Final.ris",       NA,           "Final",     
+   "Final.ris",       NA,           "final",     
    "GreenFile.ris",  "GreenFile",   "search",    
    "McK.ris",        "Method1",     "search",    
    "RM.ris",         "Method2",     "search",    
-   "TiAb.ris",        NA,           "Screened",  
+   "TiAb.ris",        NA,           "screened",  
    "WoS_early.ris",  "WoS",         "search",    
    "WoS_later.ris",  "WoS",         "search"
 ) %>% 
@@ -121,6 +121,11 @@ n_unique <- count_unique(unique_citations)
 
 # Create dataframe indicating occurrence of records across sources
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+
+# initial upload/post internal deduplication table creation
+initial_counts<-record_counts(unique_citations, citations, "cite_source")
+record_counts_table(initial_counts)
+
 ```
 
 
@@ -174,8 +179,11 @@ my_contributions
 In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.) 
 
 ```{r}
-citation_summary_table(unique_citations, screening_label = c("Screened", "Final"))
+calculated_counts<-calculate_record_counts(unique_citations, citations, n_unique, "cite_source")
+record_summary_table(calculated_counts)
 
+phase_counts<-calculate_phase_count(unique_citations, citations, "cite_source")
+precision_sensitivity_table(phase_counts)
 ```
 
 ### Creating a Citation Record Table
@@ -183,7 +191,7 @@ citation_summary_table(unique_citations, screening_label = c("Screened", "Final"
 Another useful table that can be exported as a .csv is the record-level table. This table allows users to quickly identify which individual citations were present/absent from each source. The source tag is the default (include = "sources"), but can be replaced or expanded with 'labels' and/or 'strings'
 ```{r}
 unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "Final")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "final")) %>%
   record_level_table(return = "DT")
 ```
   
