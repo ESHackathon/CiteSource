@@ -28,3 +28,11 @@ NULL
 
 # Declare . as global variable to remove warnings
 utils::globalVariables(".")
+
+# Set Shiny upload size depending on interactive use or deployment on shinyapps.io
+.onLoad <- function(libname, pkgname) {
+    if (interactive() ) { 
+        options(shiny.maxRequestSize=2000*1024^2, timeout = 40000000) 
+    } else {
+        options(shiny.maxRequestSize=250*1024^2, timeout = 40000000) 
+}
