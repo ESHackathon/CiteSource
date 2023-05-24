@@ -69,9 +69,9 @@ citation_files
 ### Read citation files
 In this example we read in the citaiton files and tag the citation files with the resource they came using "cite_sources". The two citation files labeled NA represent the file from included papers after title/abstract screening and the file of the included papers after full-text screening. 
 
-In this case, the "cite_labels" tag is being used to tag files with "search" (the initial search results), screened (included papers after TI/AB screening), or "Final" (papers included after full-text screening).
+In this case, the "cite_labels" tag is being used to tag files with "search" (the initial search results), "screened" (included papers after TI/AB screening), or "final" (papers included after full-text screening).
 
-The tag "cite_strings" is the third customizable field, however, it currently is currently not used in any of the package plots or tables. Future development is planned in order to integrate this it. The field is active and can still be used to document any variable users would like to track.
+The tag "cite_strings" is the third customizable field, however, it currently is currently not used in any of the package plots or tables. Future development is planned in order to integrate this it. The field is active and can still be used to document any variable users would like to track. Currently no plots or tables include the use of cite_string.
 
 ## 3. Tagging Sources
 
@@ -131,12 +131,12 @@ record_counts_table(initial_counts)
 
 ## 5. Analyzing Sources & Methods
 
-When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in environmental research where research is often cross-disciplinary. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
+When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in in fields where research is relies on cross-disciplinary resources. By tracking where/how each citation was found, the evidence synthesis community could in turn track the efficacy of various databases and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as strategy and methodology comparison.
 
 ### Plot overlap as a heatmap matrix
 CiteSource performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to that each source at the top of the source's column. The heatmap also provides a count of citations that were found at the intersection of each source. 
 
-In this case you can see that the source tag McK only shows 2400 results, while the initial .ris file contained 2661 citations. This means that CiteSource identified 261 duplicate references within that citation list. The 2400 remaining citations then attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.
+In this case you can see that the source tag "Method 1" only shows 2364 records, while the initial .ris file contained 2656 citations. This means that CiteSource identified duplicate references within that citation list. The 2364 remaining citations are attributed to this source. Looking at the source Greenfile, we can see that the CiteSource did not find any duplicate citations within this source as both counts read 139.
 
 CiteSource is more accurate in deduplicating references when complete metadata is provided. It is recommended that users provide the most full metadata as possible. Please not that citations in this vignette were stripped of their abstracts to avoid any copyright issues. 
 ```{r}
@@ -168,7 +168,7 @@ Once the title and abstract screening has been completed or once the final paper
 ```{r}
 my_contributions <- plot_contributions(n_unique,
   center = TRUE,
-  bar_order = c("search", "Screened", "Final")
+  bar_order = c("search", "screened", "final")
 )
 
 my_contributions
@@ -176,12 +176,14 @@ my_contributions
 
 ### Analyzing Precision/Sensitivity 
 
-In addition to the above visualizations, it may be useful to export datasets for additional analysis, for example to identify the origin of specific records. Presenting data in the form a search summary table can also provide a user with information about the specificity and recall of each database (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.) 
+In addition to the above visualizations, it may be useful to export tables for additional analysis. Presenting data in the form a search summary table can provide an overview of each source's impact as well as precision and sensitivity. (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables.) 
 
 ```{r}
 calculated_counts<-calculate_record_counts(unique_citations, citations, n_unique, "cite_source")
 record_summary_table(calculated_counts)
+```
 
+```{r}
 phase_counts<-calculate_phase_count(unique_citations, citations, "cite_source")
 precision_sensitivity_table(phase_counts)
 ```

@@ -95,7 +95,7 @@ my_upset_plot
 
 my_contributions <- plot_contributions(n_unique,
   center = TRUE,
-  bar_order = c("search", "Screened", "Final")
+  bar_order = c("search", "screened", "final")
 )
 
 my_contributions
@@ -283,11 +283,9 @@ display_gt_table <- function(data, caption) {
 }
 ```
 
-### Top 10 journals for each source 
+### Example of Top 10 journals
 ```{r}
 display_gt_table(CAB_journals[1:10, ], "Top 10 Journals by Unique Citations CAB")
-```
-```{r}
 
 display_gt_table(WoS_journals[1:10, ], "Top 10 Journals by Unique Citations WoS")
 ```
