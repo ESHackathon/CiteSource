@@ -24,9 +24,9 @@ knitr::opts_chunk$set(
 ```
 ## About this vignette
 
-When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search, the process can often be a very time consuming. 
+When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search. This process can often be a very time consuming if variations of a string are being tested.
 
-This vignette will provide an example of how one may use CiteSource to speed up the process of benchmarking as well as iterate the development of search strings and search strategies. 
+This vignette will provide an example of how CiteSource can be used to speed up the process of benchmarking especially when comparing variations of a search strings or search strategies. 
 
 ## 1. Installation of packages and loading libraries
 
@@ -47,7 +47,7 @@ library(dplyr)
 ```
 ## 2. Import files from multiple sources
 
-Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. 
+Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. in this case we are uploading the results from 6 different strings, which were applied to Web of Science.
 
 ```{r}
 # Import citation files from folder
@@ -106,7 +106,7 @@ unique_citations <- dedup_citations(citations)
 #Count number of unique and non-unique citations from different sources and labels. 
 n_unique <- count_unique(unique_citations)
 
-#For each unique citation, determine which sources were present
+#For each unique citation, determine which sources were present.
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ```
