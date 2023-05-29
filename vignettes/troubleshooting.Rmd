@@ -56,13 +56,60 @@ dplyr::mutate(files = paste0(file_path, files))
 
 citations <- read_citations(metadata = metadata_tbl)
 refWoS <- read_citations("../vignettes/TEST_RIS/WoS.ris")
+refDIM <- read_citations("../vignettes/TEST_RIS/DIM.ris")
+refPQ <- read_citations("../vignettes/TEST_RIS/PQ.ris")
+refLENS <- read_citations("../vignettes/TEST_RIS/LENS.ris")
+refScopus <- read_citations("../vignettes/TEST_RIS/Scopus.ris")
+refGS <- read_citations("../vignettes/TEST_RIS/Gscholar.ris")
+refIn <- read_citations("../vignettes/TEST_RIS/Inciteful.ris")
 refWoS2 <- synthesisr::read_ref("../vignettes/TEST_RIS/WoS.ris")
 
 refWoS_counts <- refWoS %>% 
-  purrr::map_int(~sum(!is.na(.)))
-refWoS_counts <- tibble(Column = names(refWoS_counts), Count = as.vector(refWoS_counts))
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+refDIM_counts <- refDIM %>% 
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+refPQ_counts <- refPQ %>% 
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+refLENS_counts <- refLENS %>% 
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+refScopus_counts <- refScopus %>% 
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+refGS_counts <- refGS %>% 
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+refIn_counts <- refIn %>% 
+  purrr::map_int(~sum(!is.na(.))) %>%
+  enframe(name = "Column", value = "Count") %>% 
+  pivot_wider(names_from = Column, values_from = Count)
+
+combined_counts <- dplyr::bind_rows(refWoS_counts %>% mutate(Ref = "refWoS"),
+                                    refDIM_counts %>% mutate(Ref = "refDIM"),
+                                    refPQ_counts %>% mutate(Ref = "refPQ"),
+                                    refLENS_counts %>% mutate(Ref = "refLENS"),
+                                    refScopus_counts %>% mutate(Ref = "refScopus"),
+                                    refGS_counts %>% mutate(Ref = "refGS"),
+                                    refIn_counts %>% mutate(Ref = "refIn"))
+
 
 ```
+
 ```{r}
 unique_citations <- dedup_citations(citations)
 
@@ -75,6 +122,8 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 # initial upload/post internal deduplication table creation
 initial_counts<-record_counts(unique_citations, citations, "cite_source")
 record_counts_table(initial_counts)
+
+#this example had multiple search strings applied within each source, therefore there were a large number of duplicates within each source.
 ```
 
 ### Heatmap
