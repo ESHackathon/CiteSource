@@ -32,7 +32,7 @@ License: GPL (>= 3)
 URL: https://www.eshackathon.org/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
 Imports: 
-    ASySD (>= 0.1.0),
+    ASySD (>= 0.1.2),
     dplyr,
     DT,
     forcats,
@@ -47,7 +47,7 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    UpSetR,
+    UpSetR
 Suggests: 
     htmltools,
     knitr,
@@ -68,5 +68,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: 
     R (>= 2.10)
-Remotes:  
+Remotes: 
     camaradesuk/ASySD

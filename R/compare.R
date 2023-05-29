@@ -56,7 +56,8 @@ count_unique <- function(unique_data, include_references = FALSE) {
 
 
 compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
-  out <- list()
+  
+  out <- list(unique_data %>% dplyr::select("duplicate_id"))
 
   if ("sources" %in% comp_type) {
     source_comparison <- unique_data %>%
@@ -121,8 +122,12 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
 
   if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
 
+  
   out <- purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
 
+  # Deals with entries missing source or label
+  out <- out %>% dplyr::mutate(dplyr::across(dplyr::everything(), ~tidyr::replace_na(.x, FALSE)))
+    
   if (include_references == TRUE) {
     out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
   } else {
