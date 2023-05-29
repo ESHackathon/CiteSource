@@ -1,0 +1,145 @@
+---
+title: "Troubleshooting"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Troubleshooting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+# This code chunk sets global options for all subsequent code chunks in the document using the `knitr` package in R.
+knitr::opts_chunk$set(
+  collapse = TRUE,   # Collapses output with no extra whitespace.
+  comment = "#>",    # Uses `#>` to comment out code in output.
+  warning = FALSE,   # Turns off warnings for all code chunks.
+  fig.width = 6,     # Sets default figure width to 6 inches.
+  fig.height = 6     # Sets default figure height to 6 inches.
+)
+```
+
+```{r}
+# Load CiteSource
+library(CiteSource)
+library(synthesisr)
+
+#Import citation files from a folder
+citation_files <- list.files(path = file.path("../vignettes/Test_RIS"), 
+                             recursive = TRUE, 
+                             pattern = "\\.ris", 
+                             full.names = TRUE)
+                            
+#Print citation_files to double check the order in which R imported our files.
+
+citation_files
+```
+
+```{r}
+file_path <- "../vignettes/Test_RIS/"
+
+metadata_tbl <- tibble::tribble(
+  ~files, ~cite_sources, ~cite_labels,
+  "DIM.ris",       "DIM",       "search",
+  "Gscholar.ris",  "Gscholar",  "search",
+  "inciteful.ris", "inciteful", "search",
+  "LENS.ris",      "LENS",      "search",
+  "PQ.ris",        "PQ",        "search",
+  "Scopus.ris",    "Scopus",    "search",
+  "WoS.ris",       "WoS",       "search"
+  ) %>%
+dplyr::mutate(files = paste0(file_path, files))
+
+citations <- read_citations(metadata = metadata_tbl)
+refWoS <- read_citations("../vignettes/TEST_RIS/WoS.ris")
+refWoS2 <- synthesisr::read_ref("../vignettes/TEST_RIS/WoS.ris")
+
+refWoS_counts <- refWoS %>% 
+  purrr::map_int(~sum(!is.na(.)))
+refWoS_counts <- tibble(Column = names(refWoS_counts), Count = as.vector(refWoS_counts))
+
+```
+```{r}
+unique_citations <- dedup_citations(citations)
+
+# Count number of unique and non-unique citations from different sources and labels
+n_unique <- count_unique(unique_citations)
+
+# Create dataframe indicating occurrence of records across sources
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+
+# initial upload/post internal deduplication table creation
+initial_counts<-record_counts(unique_citations, citations, "cite_source")
+record_counts_table(initial_counts)
+```
+
+### Heatmap
+```{r}
+my_heatmap <- plot_source_overlap_heatmap(source_comparison)
+
+my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
+
+my_heatmap
+my_heatmap_percent
+```
+
+### Upset Plot
+```{r}
+my_upset_plot <- plot_source_overlap_upset(source_comparison, nintersects = 70, order.by = c( "freq", "degree"), number.angles = 30,)
+
+my_upset_plot
+```
+
+### Bar Chart
+```{r}
+my_contributions <- plot_contributions(n_unique,
+  center = TRUE,
+  bar_order = c("search")
+)
+
+my_contributions
+```
+
+## Record Count & Precision/Sensitivity Table
+```{r}
+calculated_counts<-calculate_record_counts(unique_citations, citations, n_unique, "cite_source")
+record_summary_table(calculated_counts)
+
+phase_counts<-calculate_phase_count(unique_citations, citations, "cite_source")
+precision_sensitivity_table(phase_counts)
+```
+
+### Citation Record Table
+```{r}
+ unique_citations %>%
+  filter(stringr::str_detect(cite_label, "search")) %>%
+  record_level_table(return = "DT")
+```
+### Exporting for further analysis
+```{r}
+# export_csv(unique_citations, filename = "file_name.csv", separate = "cite_label")
+
+#EndNote export
+#export_ris(unique_citations, filename = "file_name.ris", source_field = "C3", string_field = "C7")
+
+#zotero export
+# export_ris(unique_citations, filename = "file_name.ris", source_field = "DB", label_field = "N1")
+
+
+#export_bib(unique_citations, filename = "file_name.bib", include = c("sources", "labels", "strings"))
+```
+### Reimporting Data
+```{r}
+#citesource_working_example <-reimport_csv("file_name.csv")
+
+#citesource_working_example <-reimport_ris("file_name.ris")
+```
+### Launch the Shiny  & save environment
+```{r}
+#runShiny(CiteSource)
+save.image("troubleshooting.RData")
+```
