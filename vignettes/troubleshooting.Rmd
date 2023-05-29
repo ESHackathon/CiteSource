@@ -38,7 +38,7 @@ citation_files <- list.files(path = file.path("../vignettes/Test_RIS"),
 
 citation_files
 ```
-
+### Load, Tag, & Count Metadata Elements
 ```{r}
 file_path <- "../vignettes/Test_RIS/"
 
@@ -168,30 +168,6 @@ precision_sensitivity_table(phase_counts)
 ### Citation Record Table
 ```{r}
  unique_citations %>%
-  filter(stringr::str_detect(cite_label, "search")) %>%
+  dplyr::filter(stringr::str_detect(cite_label, "search")) %>%
   record_level_table(return = "DT")
-```
-### Exporting for further analysis
-```{r}
-# export_csv(unique_citations, filename = "file_name.csv", separate = "cite_label")
-
-#EndNote export
-#export_ris(unique_citations, filename = "file_name.ris", source_field = "C3", string_field = "C7")
-
-#zotero export
-# export_ris(unique_citations, filename = "file_name.ris", source_field = "DB", label_field = "N1")
-
-
-#export_bib(unique_citations, filename = "file_name.bib", include = c("sources", "labels", "strings"))
-```
-### Reimporting Data
-```{r}
-#citesource_working_example <-reimport_csv("file_name.csv")
-
-#citesource_working_example <-reimport_ris("file_name.ris")
-```
-### Launch the Shiny  & save environment
-```{r}
-#runShiny(CiteSource)
-save.image("troubleshooting.RData")
 ```
