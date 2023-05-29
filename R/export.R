@@ -76,25 +76,25 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
 #' }
 
 export_ris <- function(citations, filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8") {
+  
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
-
-  if (!is.null(source_field)) {
-    citations <- citations %>% dplyr::rename(cite_source_include = .data$cite_source)
+  
+  if (!is.null(source_field) && source_field %in% names(citations)) {
+    citations <- citations %>% dplyr::rename(cite_source_include = .data[[source_field]])
   }
-
-  if (!is.null(label_field)) {
-    citations <- citations %>% dplyr::rename(cite_label_include = .data$cite_label)
+  
+  if (!is.null(label_field) && label_field %in% names(citations)) {
+    citations <- citations %>% dplyr::rename(cite_label_include = .data[[label_field]])
   }
-
-  if (!is.null(string_field)) {
-    citations <- citations %>% dplyr::rename(cite_string_include = .data$cite_string)
+  
+  if (!is.null(string_field) && string_field %in% names(citations)) {
+    citations <- citations %>% dplyr::rename(cite_string_include = .data[[string_field]])
   }
-
-  # Move source_type to the front - should be there unless there was an import issue
-  # but these are common - see https://github.com/mjwestgate/synthesisr/issues/24
+  
+  select_cols <- c("source_type", "duplicate_id") %in% names(citations)
   citations <- citations %>%
-    dplyr::select("source_type", "duplicate_id", dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "record_id")))
-
+    dplyr::select(c("source_type", "duplicate_id")[select_cols], dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "record_id")))
+  
   synthesisr_codes <- dplyr::bind_rows(
     tibble::tribble(
       ~code, ~field, ~ris_synthesisr,
@@ -106,10 +106,12 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
     ),
     synthesisr_code_lookup %>% dplyr::filter(.data$ris_synthesisr)
   ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
-
+  
   # Currently, write_refs does not accept tibbles, thus converted
   write_refs(as.data.frame(citations), file = filename, tag_naming = synthesisr_codes)
 }
+
+
 
 
 #' Export deduplicated citations to .bib file
