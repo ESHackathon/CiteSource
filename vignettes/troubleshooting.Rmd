@@ -1,12 +1,12 @@
 ---
-title: "Troubleshooting"
+title: "troubleshooting"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Troubleshooting}
+  %\VignetteIndexEntry{troubleshooting}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -99,13 +99,16 @@ refIn_counts <- refIn %>%
   enframe(name = "Column", value = "Count") %>% 
   pivot_wider(names_from = Column, values_from = Count)
 
-combined_counts <- dplyr::bind_rows(refWoS_counts %>% mutate(Ref = "refWoS"),
-                                    refDIM_counts %>% mutate(Ref = "refDIM"),
-                                    refPQ_counts %>% mutate(Ref = "refPQ"),
-                                    refLENS_counts %>% mutate(Ref = "refLENS"),
-                                    refScopus_counts %>% mutate(Ref = "refScopus"),
-                                    refGS_counts %>% mutate(Ref = "refGS"),
-                                    refIn_counts %>% mutate(Ref = "refIn"))
+combined_counts <- dplyr::bind_rows(refWoS_counts %>% mutate(DataSource = "refWoS"),
+                                    refDIM_counts %>% mutate(DataSource = "refDIM"),
+                                    refPQ_counts %>% mutate(DataSource = "refPQ"),
+                                    refLENS_counts %>% mutate(DataSource = "refLENS"),
+                                    refScopus_counts %>% mutate(DataSource = "refScopus"),
+                                    refGS_counts %>% mutate(DataSource = "refGS"),
+                                    refIn_counts %>% mutate(DataSource = "refIn"))
+
+
+
 
 
 ```
