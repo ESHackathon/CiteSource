@@ -23,30 +23,26 @@ knitr::opts_chunk$set(
 )
 ```
 
+### Load, Tag, & Count Metadata Elements
 ```{r}
 # Load CiteSource
 library(CiteSource)
 library(synthesisr)
 library(tidyr)
+library(tibble)
 
 #Import citation files from a folder
-citation_files <- list.files(path = file.path("vignettes/Test_RIS"), 
-                             recursive = TRUE, 
-                             pattern = "\\.ris", 
-                             full.names = TRUE)
-                            
-#Print citation_files to double check the order in which R imported our files.
+citation_files <- list.files(path = "Test_RIS", pattern = "\\.ris", full.names = TRUE)
 
+#Print citation_files to double check the order in which R imported our files.
 citation_files
-```
-### Load, Tag, & Count Metadata Elements
-```{r}
-file_path <- "vignettes/Test_RIS/"
+
+file_path <- "../vignettes/Test_RIS/"
 
 metadata_tbl <- tibble::tribble(
   ~files, ~cite_sources, ~cite_labels,
   "DIM.ris",       "DIM",       "search",
-  "Gscholar.ris",  "Gscholar",  "search",
+  "GScholar.ris",  "Gscholar",  "search",
   "inciteful.ris", "inciteful", "search",
   "LENS.ris",      "LENS",      "search",
   "PQ.ris",        "PQ",        "search",
@@ -56,13 +52,13 @@ metadata_tbl <- tibble::tribble(
 dplyr::mutate(files = paste0(file_path, files))
 
 citations <- read_citations(metadata = metadata_tbl)
-refWoS <- read_citations("vignettes/TEST_RIS/WoS.ris")
-refDIM <- read_citations("vignettes/TEST_RIS/DIM.ris")
-refPQ <- read_citations("vignettes/TEST_RIS/PQ.ris")
-refLENS <- read_citations("vignettes/TEST_RIS/LENS.ris")
-refScopus <- read_citations("vignettes/TEST_RIS/Scopus.ris")
-refGS <- read_citations("vignettes/TEST_RIS/Gscholar.ris")
-refIn <- read_citations("vignettes/TEST_RIS/Inciteful.ris")
+refWoS <- read_citations("TEST_RIS/WoS.ris")
+refDIM <- read_citations("TEST_RIS/DIM.ris")
+refPQ <- read_citations("TEST_RIS/PQ.ris")
+refLENS <- read_citations("TEST_RIS/LENS.ris")
+refScopus <- read_citations("TEST_RIS/Scopus.ris")
+refGS <- read_citations("TEST_RIS/GScholar.ris")
+refIn <- read_citations("TEST_RIS/inciteful.ris")
 
 refWoS_counts <- refWoS %>% 
   purrr::map_int(~sum(!is.na(.))) %>%
@@ -159,11 +155,4 @@ record_summary_table(calculated_counts)
 
 phase_counts<-calculate_phase_count(unique_citations, citations, "cite_source")
 precision_sensitivity_table(phase_counts)
-```
-
-### Citation Record Table
-```{r}
- unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "search")) %>%
-  record_level_table(return = "DT")
 ```
