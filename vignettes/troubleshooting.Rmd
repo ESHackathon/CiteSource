@@ -62,7 +62,6 @@ refLENS <- read_citations("../vignettes/TEST_RIS/LENS.ris")
 refScopus <- read_citations("../vignettes/TEST_RIS/Scopus.ris")
 refGS <- read_citations("../vignettes/TEST_RIS/Gscholar.ris")
 refIn <- read_citations("../vignettes/TEST_RIS/Inciteful.ris")
-refWoS2 <- synthesisr::read_ref("../vignettes/TEST_RIS/WoS.ris")
 
 refWoS_counts <- refWoS %>% 
   purrr::map_int(~sum(!is.na(.))) %>%
