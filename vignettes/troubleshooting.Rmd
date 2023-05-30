@@ -27,9 +27,10 @@ knitr::opts_chunk$set(
 # Load CiteSource
 library(CiteSource)
 library(synthesisr)
+library(tidyr)
 
 #Import citation files from a folder
-citation_files <- list.files(path = file.path("../vignettes/Test_RIS"), 
+citation_files <- list.files(path = file.path("vignettes/Test_RIS"), 
                              recursive = TRUE, 
                              pattern = "\\.ris", 
                              full.names = TRUE)
@@ -40,7 +41,7 @@ citation_files
 ```
 ### Load, Tag, & Count Metadata Elements
 ```{r}
-file_path <- "../vignettes/Test_RIS/"
+file_path <- "vignettes/Test_RIS/"
 
 metadata_tbl <- tibble::tribble(
   ~files, ~cite_sources, ~cite_labels,
@@ -55,13 +56,13 @@ metadata_tbl <- tibble::tribble(
 dplyr::mutate(files = paste0(file_path, files))
 
 citations <- read_citations(metadata = metadata_tbl)
-refWoS <- read_citations("../vignettes/TEST_RIS/WoS.ris")
-refDIM <- read_citations("../vignettes/TEST_RIS/DIM.ris")
-refPQ <- read_citations("../vignettes/TEST_RIS/PQ.ris")
-refLENS <- read_citations("../vignettes/TEST_RIS/LENS.ris")
-refScopus <- read_citations("../vignettes/TEST_RIS/Scopus.ris")
-refGS <- read_citations("../vignettes/TEST_RIS/Gscholar.ris")
-refIn <- read_citations("../vignettes/TEST_RIS/Inciteful.ris")
+refWoS <- read_citations("vignettes/TEST_RIS/WoS.ris")
+refDIM <- read_citations("vignettes/TEST_RIS/DIM.ris")
+refPQ <- read_citations("vignettes/TEST_RIS/PQ.ris")
+refLENS <- read_citations("vignettes/TEST_RIS/LENS.ris")
+refScopus <- read_citations("vignettes/TEST_RIS/Scopus.ris")
+refGS <- read_citations("vignettes/TEST_RIS/Gscholar.ris")
+refIn <- read_citations("vignettes/TEST_RIS/Inciteful.ris")
 
 refWoS_counts <- refWoS %>% 
   purrr::map_int(~sum(!is.na(.))) %>%
@@ -105,10 +106,6 @@ combined_counts <- dplyr::bind_rows(refWoS_counts %>% mutate(DataSource = "refWo
                                     refScopus_counts %>% mutate(DataSource = "refScopus"),
                                     refGS_counts %>% mutate(DataSource = "refGS"),
                                     refIn_counts %>% mutate(DataSource = "refIn"))
-
-
-
-
 
 ```
 
