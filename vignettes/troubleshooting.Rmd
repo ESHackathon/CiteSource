@@ -104,7 +104,7 @@ combined_counts <- dplyr::bind_rows(refWoS_counts %>% mutate(DataSource = "refWo
                                     refIn_counts %>% mutate(DataSource = "refIn"))
 
 ```
-
+### Deduplicate Citations
 ```{r}
 unique_citations <- dedup_citations(citations)
 
