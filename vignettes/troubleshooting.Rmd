@@ -52,13 +52,13 @@ metadata_tbl <- tibble::tribble(
 dplyr::mutate(files = paste0(file_path, files))
 
 citations <- read_citations(metadata = metadata_tbl)
-refWoS <- read_citations("TEST_RIS/WoS.ris")
-refDIM <- read_citations("TEST_RIS/DIM.ris")
-refPQ <- read_citations("TEST_RIS/PQ.ris")
-refLENS <- read_citations("TEST_RIS/LENS.ris")
-refScopus <- read_citations("TEST_RIS/Scopus.ris")
-refGS <- read_citations("TEST_RIS/GScholar.ris")
-refIn <- read_citations("TEST_RIS/inciteful.ris")
+refWoS <- read_citations("../vignettes/TEST_RIS/WoS.ris")
+refDIM <- read_citations("../vignettes/TEST_RIS/DIM.ris")
+refPQ <- read_citations("../vignettes/TEST_RIS/PQ.ris")
+refLENS <- read_citations("../vignettes/TEST_RIS/LENS.ris")
+refScopus <- read_citations("../vignettes/TEST_RIS/Scopus.ris")
+refGS <- read_citations("../vignettes/TEST_RIS/GScholar.ris")
+refIn <- read_citations("../vignettes/TEST_RIS/inciteful.ris")
 
 refWoS_counts <- refWoS %>% 
   purrr::map_int(~sum(!is.na(.))) %>%
