@@ -303,7 +303,7 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       dplyr::summarise(n = dplyr::n())
 
     data_sum$labelpos <- ifelse(data_sum$type == vals[1],
-      .5 * data_sum$n, -.5 * data_sum$n
+      pmax(.5 * data_sum$n, 1 + .05 * max(abs(data_sum$n))), pmin(-.5 * data_sum$n, -1 - .05 * max(abs(data_sum$n)))
     ) # add label positions for geom_text
 
     p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
@@ -311,7 +311,8 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::labs(y = "Citations") +
       ggplot2::scale_y_continuous(labels = abs) +
-      ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) + # make legend ordering the same as plot ordering
+      ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) +
+      # make legend ordering the same as plot ordering
       ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5)
 
     if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
