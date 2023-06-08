@@ -10,6 +10,7 @@
 #' @param cite_labels Optional. An additional label per file, for instance the stage of search - vector with one value per file
 #' @param metadata A tibble with file names and metadata for each file. Can be specified as an *alternative* to files, cite_sources, cite_strings and cite_labels. 
 #' @param verbose Should number of reference and allocation of labels be reported?
+#' @param only_key_fields Should only key fields (e.g., those used by CiteCourse) be imported? If FALSE, all RIS data is retained. Can also be a character vector of field names to retain (after they have been renamed by the import function) in addition to the essential ones.
 #' @inheritParams synthesisr_read_refs
 #' @return A tibble with one row per citation
 #' @examples
@@ -50,7 +51,18 @@ read_citations <- function(files = NULL,
                            cite_labels = NULL,
                            metadata = NULL,
                            verbose = TRUE,
-                           tag_naming = "best_guess") {
+                           tag_naming = "best_guess",
+                           only_key_fields = TRUE) {
+  
+  if (is.character(only_key_fields)) {
+    only_key_fields <- union(key_fields, only_key_fields)
+  } else if (only_key_fields == TRUE) {
+    only_key_fields <- key_fields
+  } else if (!only_key_fields == FALSE) {
+    stop("only_key_fields must be TRUE, FALSE or a character vector")
+  } else {
+    only_key_fields <- NULL
+  }
 
   if (is.null(files) && is.null(metadata)) stop("Either files or metadata must be specified.")
   if (!is.null(files) && !is.null(metadata)) stop("files and metadata cannot both be specified.")
@@ -95,9 +107,10 @@ read_citations <- function(files = NULL,
   }
 
   # Need to import files separately to add origin, platform, and searches
-  ref_list <- lapply(files,
-    synthesisr_read_refs,
-    tag_naming = tag_naming
+  ref_list <- purrr::map(files,
+                         \(x) synthesisr_read_refs(x,  tag_naming = tag_naming, select_fields = only_key_fields),
+                         .progress = list(  total = 100, 
+                                            format = "Importing files {cli::pb_bar} {cli::pb_percent}")
   )
 
   # Drop empty citations

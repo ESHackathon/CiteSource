@@ -20,6 +20,7 @@ NULL
 #' @param tag_naming Either a length-1 character stating how should ris tags be replaced (see details for a list of options), or an object inheriting from class \code{data.frame} containing user-defined replacement tags.
 #' @param return_df If TRUE (default), returns a data.frame; if FALSE, returns a list.
 #' @param verbose If TRUE, prints status updates (defaults to FALSE).
+#' @inheritParams synthesisr_read_ref
 #' @details The default for argument \code{tag_naming} is \code{"best_guess"}, which estimates what database has been used for ris tag replacement, then fills any gaps with generic tags. Any tags missing from the database (i.e. \code{code_lookup}) are passed unchanged. Other options are to use tags from Web of Science (\code{"wos"}), Scopus (\code{"scopus"}), Ovid (\code{"ovid"}) or Academic Search Premier (\code{"asp"}). If a \code{data.frame} is given, then it must contain two columns: \code{"code"} listing the original tags in the source document, and \code{"field"} listing the replacement column/tag names. The \code{data.frame} may optionally include a third column named \code{"order"}, which specifies the order of columns in the resulting \code{data.frame}; otherwise this will be taken as the row order. Finally, passing \code{"none"} to \code{replace_tags} suppresses tag replacement.
 #' @return Returns a data.frame or list of assembled search results.
 
@@ -27,7 +28,8 @@ synthesisr_read_refs <- function(
     filename,
     tag_naming = "best_guess",
     return_df = TRUE,
-    verbose = FALSE) {
+    verbose = FALSE,
+    select_fields = NULL) {
   if (missing(filename)) {
     stop("filename is missing with no default")
   }
@@ -42,6 +44,7 @@ synthesisr_read_refs <- function(
         filename = a,
         tag_naming = tag_naming,
         return_df = return_df,
+        select_fields = select_fields,
         verbose = verbose
       )
     })
@@ -74,6 +77,7 @@ synthesisr_read_refs <- function(
         filename,
         tag_naming = tag_naming,
         return_df = return_df,
+        select_fields = select_fields,
         verbose = verbose
       )
     )
@@ -86,6 +90,7 @@ synthesisr_read_refs <- function(
 # ' @param filename A path to a filename containing search results to import.
 # ' @param return_df If TRUE, returns a data.frame; if FALSE, returns a list.
 # ' @param verbose If TRUE, prints status updates.
+# ' @param select_fields Character vector of fields to be retained. If NULL, all fields from the RIS file are returned
 # ' @return Returns a data.frame or list of assembled search results.
 
 #' @describeIn synthesisr_read_refs Import a single file
@@ -93,7 +98,8 @@ read_ref <- function(
     filename,
     tag_naming = "best_guess",
     return_df = TRUE,
-    verbose = FALSE) {
+    verbose = FALSE,
+    select_fields = NULL) {
   old_loc <- Sys.getlocale("LC_CTYPE")
   invisible(Sys.setlocale("LC_CTYPE", "C"))
   on.exit(invisible(Sys.setlocale("LC_CTYPE", old_loc)))
@@ -143,6 +149,10 @@ read_ref <- function(
     }
     if (verbose) {
       cat("done\n")
+    }
+    
+    if (!is.null(select_fields)) {
+      df <- df %>% dplyr::select(dplyr::any_of(select_fields))
     }
     return(df)
   } else {
@@ -1140,38 +1150,19 @@ as.data.frame.bibliography <- function(x, ...) {
     x[lengths(x) == 0] <- NA
     x
   })
-  cols <- unique(unlist(lapply(x, names)))
-  # cols <- cols[which(cols != "further_info")]
-
-  x_list <- lapply(x, function(a, cols) {
-    result <- lapply(cols, function(b, lookup) {
-      if (any(names(lookup) == b)) {
-        data_tr <- lookup[[b]]
-        if (length(data_tr) > 1) {
-          data_tr <- paste0(data_tr, collapse = " and ")
-        }
-        return(data_tr)
-      } else {
-        return(NA)
-      }
-    },
-    lookup = a
-    )
-    names(result) <- cols
+  
+  x_list <- lapply(x, \(a) {
+    a[lengths(a) > 1] <-  a[lengths(a) > 1] %>% purrr::map(\(x) paste0(x, collapse = " and "))
     return(
       as.data.frame(
-        result,
+        a,
         stringsAsFactors = FALSE
       )
     )
-  },
-  cols = cols
+  }
   )
 
-  x_dframe <- data.frame(
-    do.call(rbind, x_list),
-    stringsAsFactors = FALSE
-  )
+  x_dframe <- dplyr::bind_rows(x_list)
   rownames(x_dframe) <- NULL
 
   return(x_dframe)
@@ -1295,7 +1286,7 @@ prep_ris <- function(
   })
   z_dframe <- do.call(rbind, z_list)
   z_dframe <- z_dframe[order(z_dframe$row), ]
-
+  
   # clean up obvious errors
   z_dframe$ris <- gsub("[[:punct:]]", "", z_dframe$ris)
   z_dframe$text <- sub("^[[:punct:]]{0,1}\\s*", "", z_dframe$text)

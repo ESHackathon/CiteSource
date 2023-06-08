@@ -37,3 +37,8 @@ utils::globalVariables(".")
         options(shiny.maxRequestSize=250*1024^2, timeout = 40000000) 
         }
 }
+
+
+key_fields <- c("author", "title", "year", "journal", "abstract", "doi", "number", "pages", 
+                          "volume", "isbn", "record_id", "label", "source", "issue", "url")
+
