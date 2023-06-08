@@ -9,14 +9,16 @@ synthesisr_read_refs(
   filename,
   tag_naming = "best_guess",
   return_df = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  select_fields = NULL
 )
 
 read_ref(
   filename,
   tag_naming = "best_guess",
   return_df = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  select_fields = NULL
 )
 }
 \arguments{
