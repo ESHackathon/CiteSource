@@ -11,7 +11,8 @@ read_citations(
   cite_labels = NULL,
   metadata = NULL,
   verbose = TRUE,
-  tag_naming = "best_guess"
+  tag_naming = "best_guess",
+  only_key_fields = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ Should be .bib or .ris files}
 \item{verbose}{Should number of reference and allocation of labels be reported?}
 
 \item{tag_naming}{Either a length-1 character stating how should ris tags be replaced (see details for a list of options), or an object inheriting from class \code{data.frame} containing user-defined replacement tags.}
+
+\item{only_key_fields}{Should only key fields (e.g., those used by CiteCourse) be imported? If FALSE, all RIS data is retained. Can also be a character vector of field names to retain (after they have been renamed by the import function) in addition to the essential ones.}
 }
 \value{
 A tibble with one row per citation
