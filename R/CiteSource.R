@@ -40,5 +40,5 @@ utils::globalVariables(".")
 
 
 key_fields <- c("author", "title", "year", "journal", "abstract", "doi", "number", "pages", 
-                          "volume", "isbn", "record_id", "label", "source", "issue", "url")
-
+                          "volume", "isbn", "record_id", "label", "source", "issue", "url",
+                "issn", "start_page", "ID")
