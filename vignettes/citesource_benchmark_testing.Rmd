@@ -109,6 +109,10 @@ n_unique <- count_unique(unique_citations)
 #For each unique citation, determine which sources were present.
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
+# initial upload/post internal deduplication table creation
+initial_counts<-record_counts(unique_citations, citations, "cite_source")
+record_counts_table(initial_counts)
+
 ```
 
 ## 4. Upset plot to compare discovery of benchmarking articles
