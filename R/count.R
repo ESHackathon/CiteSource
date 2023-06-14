@@ -200,7 +200,9 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   combined_counts <- combined_counts %>%
     dplyr::mutate(Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0))
   
-  total_final <- sum(combined_counts$final)
+  # Calculate total_final before the loop
+  total_final <- sum(citations$cite_label == "final")
+  
   for(i in 1:nrow(combined_counts)) {
     combined_counts$Recall[i] <- round((combined_counts$final[i] / total_final) * 100, 2)
   }
@@ -208,13 +210,10 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   totals <- c("Total", 
               sum(combined_counts$`Distinct Records`, na.rm = TRUE),
               paste0(sum(citations$cite_label == "screened")),
-              paste0(sum(citations$cite_label == "final")),
+              total_final,
               "-",
               "-")
   combined_counts <- rbind(combined_counts, totals)
   
   return(combined_counts)
 }
-
-
-                                         
