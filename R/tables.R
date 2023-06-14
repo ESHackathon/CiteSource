@@ -715,7 +715,7 @@ precision_sensitivity_table <- function(data) {
     
     # Add footnotes for the columns
     gt::tab_footnote(
-      footnote = "Number of source specific unique records",
+      footnote = "Number of records after internal source deduplication",
       locations = gt::cells_column_labels(
         columns = `Distinct Records`
       )
@@ -745,14 +745,14 @@ precision_sensitivity_table <- function(data) {
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "This is the total for Screened Included",
+      footnote = "Total included after Ti/Ab Screening",
       locations = gt::cells_body(
         columns = screened,
         rows = "Total"
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "This is the total for Final Included",
+      footnote = "Total included after full text screening",
       locations = gt::cells_body(
         columns = final,
         rows = "Total"
