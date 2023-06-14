@@ -71,7 +71,8 @@ into one long tibble with one record per line.</p>
 <span>  cite_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  tag_naming <span class="op">=</span> <span class="st">"best_guess"</span></span>
+<span>  tag_naming <span class="op">=</span> <span class="st">"best_guess"</span>,</span>
+<span>  only_key_fields <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -104,6 +105,10 @@ Should be .bib or .ris files</p></dd>
 
 <dt>tag_naming</dt>
 <dd><p>Either a length-1 character stating how should ris tags be replaced (see details for a list of options), or an object inheriting from class <code>data.frame</code> containing user-defined replacement tags.</p></dd>
+
+
+<dt>only_key_fields</dt>
+<dd><p>Should only key fields (e.g., those used by CiteCourse) be imported? If FALSE, all RIS data is retained. Can also be a character vector of field names to retain (after they have been renamed by the import function) in addition to the essential ones.</p></dd>
 
 </dl></div>
     <div class="section level2">
