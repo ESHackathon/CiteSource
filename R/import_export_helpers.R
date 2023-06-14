@@ -20,7 +20,7 @@ NULL
 #' @param tag_naming Either a length-1 character stating how should ris tags be replaced (see details for a list of options), or an object inheriting from class \code{data.frame} containing user-defined replacement tags.
 #' @param return_df If TRUE (default), returns a data.frame; if FALSE, returns a list.
 #' @param verbose If TRUE, prints status updates (defaults to FALSE).
-#' @inheritParams synthesisr_read_ref
+#' @param select_fields Character vector of fields to be retained. If NULL, all fields from the RIS file are returned
 #' @details The default for argument \code{tag_naming} is \code{"best_guess"}, which estimates what database has been used for ris tag replacement, then fills any gaps with generic tags. Any tags missing from the database (i.e. \code{code_lookup}) are passed unchanged. Other options are to use tags from Web of Science (\code{"wos"}), Scopus (\code{"scopus"}), Ovid (\code{"ovid"}) or Academic Search Premier (\code{"asp"}). If a \code{data.frame} is given, then it must contain two columns: \code{"code"} listing the original tags in the source document, and \code{"field"} listing the replacement column/tag names. The \code{data.frame} may optionally include a third column named \code{"order"}, which specifies the order of columns in the resulting \code{data.frame}; otherwise this will be taken as the row order. Finally, passing \code{"none"} to \code{replace_tags} suppresses tag replacement.
 #' @return Returns a data.frame or list of assembled search results.
 
