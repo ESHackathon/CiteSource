@@ -676,7 +676,14 @@ record_summary_table <- function(data) {
       locations = gt::cells_column_labels(
         columns = .data$`Source Unique %`
       )
+    )%>%
+  gt::tab_footnote(
+    footnote = "Total citations discoverd (after internal and cross-source deduplication)",
+    locations = gt::cells_body(
+      columns = "Distinct Records",
+      rows = "Total"
     )
+  )
 }
 
 
@@ -710,7 +717,7 @@ precision_sensitivity_table <- function(data) {
     # Align columns to the right
     gt::cols_align(
       align = "right",
-      columns = c("screened", "final")
+      columns = c("screened", "final", "Precision", "Recall")
     ) %>%
     
     # Add footnotes for the columns
@@ -721,40 +728,54 @@ precision_sensitivity_table <- function(data) {
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "Records included after title/abstract screening",
+      footnote = "Number of citations included after title/abstract screening",
       locations = gt::cells_column_labels(
         columns = "screened"
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "Records included after full text screening",
+      footnote = "Number of citations included after full text screening",
       locations = gt::cells_column_labels(
         columns = "final"
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "Precision = Final Included / Distinct Records",
+      footnote = "Number of final included citations / Number of distinct records",
       locations = gt::cells_column_labels(
         columns = "Precision"
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "Sensitivity/Recall = Final Included / Total Final Included",
+      footnote = "Number of final included citations / Total number of final included citations",
       locations = gt::cells_column_labels(
         columns = "Recall"
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "Total included after Ti/Ab Screening",
+      footnote = "Total citations discoverd (after internal and cross-source deduplication)",
+      locations = gt::cells_body(
+        columns = "Distinct Records",
+        rows = "Total"
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Total citations included after Ti/Ab Screening",
       locations = gt::cells_body(
         columns = "screened",
         rows = "Total"
       )
     ) %>%
     gt::tab_footnote(
-      footnote = "Total included after full text screening",
+      footnote = "Total citations included after full text screening",
       locations = gt::cells_body(
         columns = "final",
+        rows = "Total"
+      )
+    ) %>%
+    gt::tab_footnote(
+      footnote = "Overall Precision = Number of final included citations / Total distinct records",
+      locations = gt::cells_body(
+        columns = "Precision",
         rows = "Total"
       )
     )
