@@ -7,9 +7,11 @@
 calculate_phase_count(unique_citations, citations, db_colname)
 }
 \arguments{
-\item{unique_citations}{A dataframe containing unique citations with phase information.}
+\item{unique_citations}{A dataframe containing unique citations with phase information.
+The phase information must be provided in a column named 'cite_label' in the dataframe.}
 
-\item{citations}{A dataframe containing all citations with phase information.}
+\item{citations}{A dataframe containing all citations with phase information. The phase
+information must be provided in a column named 'cite_label' in the dataframe.}
 
 \item{db_colname}{The name of the column representing the source database.}
 }
@@ -19,5 +21,11 @@ and recall for each source, as well as totals.
 }
 \description{
 This function calculates counts for different phases and calculates precision and recall
-for each source based on unique citations and citations dataframe.
+for each source based on unique citations and citations dataframe. The phases should be
+labeled as 'screened' and 'final' (case-insensitive) in the input dataframes. The function
+will give a warning if these labels are not present in the input dataframes.
+}
+\details{
+The function will give a warning if 'screened' and 'final' labels are not present
+in the 'cite_label' column of the input dataframes.
 }
