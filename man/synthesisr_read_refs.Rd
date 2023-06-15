@@ -29,6 +29,8 @@ read_ref(
 \item{return_df}{If TRUE (default), returns a data.frame; if FALSE, returns a list.}
 
 \item{verbose}{If TRUE, prints status updates (defaults to FALSE).}
+
+\item{select_fields}{Character vector of fields to be retained. If NULL, all fields from the RIS file are returned}
 }
 \value{
 Returns a data.frame or list of assembled search results.
