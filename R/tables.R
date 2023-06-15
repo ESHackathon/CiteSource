@@ -591,7 +591,7 @@ record_counts_table <- function(data) {
     gt::tab_footnote(
       footnote = "Number of records imported from each source.",
       locations = gt::cells_column_labels(
-        columns = `Records Imported`
+        columns = .data$`Records Imported`
       )
     ) %>%
     
@@ -599,7 +599,7 @@ record_counts_table <- function(data) {
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication",
       locations = gt::cells_column_labels(
-        columns = `Distinct Records`
+        columns = .data$`Distinct Records`
       )
     )
 }
@@ -638,43 +638,43 @@ record_summary_table <- function(data) {
     gt::tab_footnote(
       footnote = "Number of raw records imported from each database.",
       locations = gt::cells_column_labels(
-        columns = `Records Imported`
+        columns = .data$`Records Imported`
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication",
       locations = gt::cells_column_labels(
-        columns = `Distinct Records`
+        columns = .data$`Distinct Records`
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Number of records not found in another source.",
       locations = gt::cells_column_labels(
-        columns = `Unique records`
+        columns = .data$`Unique records`
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Number of records found in at least one other source.",
       locations = gt::cells_column_labels(
-        columns = `Non-unique Records`
+        columns = .data$`Non-unique Records`
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Percent distinct records contributed to the total number of distinct records.",
       locations = gt::cells_column_labels(
-        columns = `Source Contribution %`
+        columns = .data$`Source Contribution %`
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Percent of unique records contributed to the total unique records.",
       locations = gt::cells_column_labels(
-        columns = `Source Unique Contribution %`
+        columns = .data$`Source Unique Contribution %`
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Percentage of records that were unique from each source.",
       locations = gt::cells_column_labels(
-        columns = `Source Unique %`
+        columns = .data$`Source Unique %`
       )
     )
 }
@@ -710,51 +710,51 @@ precision_sensitivity_table <- function(data) {
     # Align columns to the right
     gt::cols_align(
       align = "right",
-      columns = c(screened, final)
+      columns = c("screened", "final")
     ) %>%
     
     # Add footnotes for the columns
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication",
       locations = gt::cells_column_labels(
-        columns = `Distinct Records`
+        columns = "Distinct Records"
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Records included after title/abstract screening",
       locations = gt::cells_column_labels(
-        columns = screened
+        columns = "screened"
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Records included after full text screening",
       locations = gt::cells_column_labels(
-        columns = final
+        columns = "final"
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Precision = Final Included / Distinct Records",
       locations = gt::cells_column_labels(
-        columns = Precision
+        columns = "Precision"
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Sensitivity/Recall = Final Included / Total Final Included",
       locations = gt::cells_column_labels(
-        columns = Recall
+        columns = "Recall"
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Total included after Ti/Ab Screening",
       locations = gt::cells_body(
-        columns = screened,
+        columns = "screened",
         rows = "Total"
       )
     ) %>%
     gt::tab_footnote(
       footnote = "Total included after full text screening",
       locations = gt::cells_body(
-        columns = final,
+        columns = "final",
         rows = "Total"
       )
     )

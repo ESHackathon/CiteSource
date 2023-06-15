@@ -174,21 +174,22 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
       tidyr::separate_rows(cite_label, sep = ",") %>%
       dplyr::mutate(!!rlang::sym(db_colname) := stringr::str_trim(!!rlang::sym(db_colname)),
                     cite_label = stringr::str_trim(cite_label)) %>%
-      dplyr::filter(!!rlang::sym(db_colname) != "unknown") %>%
-      dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
-                    final = ifelse(cite_label == "final", 1, 0)) %>%
+      dplyr::mutate(screened = ifelse(.data$cite_label == "screened", 1, 0),
+                    final = ifelse(.data$cite_label == "final", 1, 0)) %>%
       dplyr::group_by(!!rlang::sym(db_colname)) %>%
-      dplyr::summarise(screened = sum(screened),
-                       final = sum(final),
+      dplyr::summarise(screened = sum(.data$screened),
+                       final = sum(.data$final),
                        .groups = "drop") %>%
       dplyr::rename(Source = !!rlang::sym(db_colname))
     
     return(source_phase_df)
   }
+
+
   
   source_phase <- count_source_phase(unique_citations, db_colname)
   
-  distinct_count <- count_sources(unique_citations, db_colname) # Assuming that 'count_sources' function is correctly defined
+  distinct_count <- count_sources(unique_citations, db_colname)
   colnames(distinct_count) <- c("Source", "Distinct Records")
   
   distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
@@ -198,7 +199,7 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   combined_counts[is.na(combined_counts)] <- 0
   
   combined_counts <- combined_counts %>%
-    dplyr::mutate(Precision = ifelse(`Distinct Records` != 0, round((final / `Distinct Records`) * 100, 2), 0))
+    dplyr::mutate(Precision = ifelse(.data$`Distinct Records` != 0, round((.data$final / .data$`Distinct Records`) * 100, 2), 0))
   
   # Calculate total_final before the loop
   total_final <- sum(citations$cite_label == "final")
