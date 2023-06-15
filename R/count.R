@@ -137,7 +137,7 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
   
   # Calculate the totals
   total_records_imported <- sum(citation_counts$`Records Imported`, na.rm = TRUE)
-  total_distinct_records <- sum(citation_counts$`Distinct Records`, na.rm = TRUE)
+  total_distinct_records <- nrow(unique_citations)
   total_unique_records <- sum(citation_counts$`Unique records`, na.rm = TRUE)
   total_nonunique_records <- sum(citation_counts$`Non-unique Records`, na.rm = TRUE)
   
@@ -157,18 +157,35 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
 #' Calculate phase counts, precision, and recall
 #'
 #' This function calculates counts for different phases and calculates precision and recall
-#' for each source based on unique citations and citations dataframe.
+#' for each source based on unique citations and citations dataframe. The phases should be 
+#' labeled as 'screened' and 'final' (case-insensitive) in the input dataframes. The function 
+#' will give a warning if these labels are not present in the input dataframes.
 #'
 #' @export
-#' @param unique_citations A dataframe containing unique citations with phase information.
-#' @param citations A dataframe containing all citations with phase information.
+#' @param unique_citations A dataframe containing unique citations with phase information. 
+#' The phase information must be provided in a column named 'cite_label' in the dataframe.
+#' @param citations A dataframe containing all citations with phase information. The phase 
+#' information must be provided in a column named 'cite_label' in the dataframe.
 #' @param db_colname The name of the column representing the source database.
 #'
 #' @return A dataframe containing distinct counts, counts for different phases, precision,
 #' and recall for each source, as well as totals.
+#'
+#' @details The function will give a warning if 'screened' and 'final' labels are not present
+#' in the 'cite_label' column of the input dataframes.
 
 calculate_phase_count <- function(unique_citations, citations, db_colname) {
   count_source_phase <- function(source_phase_df, db_colname) {
+    # Convert cite_label to lower case
+    source_phase_df$cite_label <- tolower(source_phase_df$cite_label)
+    # Check if cite_label contains "screened" and "final"
+    labels <- unique(source_phase_df$cite_label)
+    if(!("screened" %in% labels)) {
+      warning("The data does not contain 'screened' label.")
+    }
+    if(!("final" %in% labels)) {
+      warning("The data does not contain 'final' label.")
+    }
     source_phase_df <- source_phase_df %>%
       tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",") %>%
       tidyr::separate_rows(cite_label, sep = ",") %>%
@@ -184,9 +201,6 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
     
     return(source_phase_df)
   }
-
-
-  
   source_phase <- count_source_phase(unique_citations, db_colname)
   
   distinct_count <- count_sources(unique_citations, db_colname)
@@ -203,17 +217,19 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   
   # Calculate total_final before the loop
   total_final <- sum(citations$cite_label == "final")
+  # Calculate overall Precision
+  overall_precision <- ifelse(nrow(unique_citations) != 0, round((total_final / nrow(unique_citations)) * 100, 2), 0)
   
   for(i in 1:nrow(combined_counts)) {
     combined_counts$Recall[i] <- round((combined_counts$final[i] / total_final) * 100, 2)
   }
   
   totals <- c("Total", 
-              sum(combined_counts$`Distinct Records`, na.rm = TRUE),
+              nrow(unique_citations),
               paste0(sum(citations$cite_label == "screened")),
               total_final,
-              "-",
-              "-")
+              overall_precision,
+              "NA")
   combined_counts <- rbind(combined_counts, totals)
   
   return(combined_counts)
