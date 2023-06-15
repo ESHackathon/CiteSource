@@ -15,10 +15,9 @@ shiny::tags$head(shiny::tags$style(
 ui <- shiny::navbarPage("CiteSource",
   id = "tabs",
   header = shiny::tagList(
-    shinybusy::add_busy_spinner(spin = "circle")
+    shinybusy::add_busy_spinner(spin = "circle"),
+    shinyjs::useShinyjs()
   ),
-
-
   # theme = bslib::bs_theme(bg = "rgb(251, 251, 251)",
   #                  primary = "#008080",
   #                  secondary = "#00CED1",
@@ -30,7 +29,6 @@ ui <- shiny::navbarPage("CiteSource",
   #                  bootswatch = "cerulean",
   #                  fg = "#000"),
 
-  shinyjs::useShinyjs(),
 
   # Home tab
   shiny::tabPanel(
@@ -236,31 +234,26 @@ ui <- shiny::navbarPage("CiteSource",
                       icon = shiny::icon("table")
                     ),
                     shiny::br(),
+                    shiny::br(" "),
                     DT::dataTableOutput("reviewTab")
                   ),
                   shiny::tabPanel(
                     "View summary table",
-                    selectInput(
-                      inputId = "summary_search_labels",
-                      "Labels indicating search stage",
-                      list(),
-                      multiple = TRUE,
-                      selectize = TRUE
-                    ),
-                    selectInput(
-                      inputId = "summary_screening_labels",
-                      "Labels indicating screening stages",
-                      list(),
-                      multiple = TRUE,
-                      selectize = TRUE
-                    ),
+                    shiny::div("The first table will summarise the results by source, label or string - depending on your selection. If your labels include 'screened' and 'final', a second table will summarise the contribution of each source or string across these stages."),
+                    shiny::selectInput("summary_type", "Select grouping for summary table:",
+                                choices = c("source", "label", "string")),
                     shinyWidgets::actionBttn(
-                      "generateSummaryTable", "Generate the table",
+                      "generateSummaryTable", "Generate the table(s)",
                       style = "pill",
                       color = "primary",
                       icon = shiny::icon("table")
                     ),
-                    gt::gt_output("summaryTab")
+                    shiny::br(),
+                    shiny::br(" "),
+                    gt::gt_output("summaryRecordTab"),
+                    shiny::br(),
+                    shiny::br(" "),
+                    gt::gt_output("summaryPrecTab")
                   )
                 )
               )
@@ -344,7 +337,7 @@ server <- function(input, output, session) {
       upload_df[required_cols[!(required_cols %in% colnames(upload_df))]] <- NA
 
       df <- dplyr::left_join(upload_length, df, by = c("source" = "suggested_source")) %>%
-        dplyr::select(file.name, records, source, label, string)
+        dplyr::select(file.datapath, file.name, records, source, label, string)
 
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
@@ -355,13 +348,14 @@ server <- function(input, output, session) {
   ## display summary input table - summary of files added
   output$tbl_out <- DT::renderDataTable({
     if (!is.null(input$file_reimport)) {
-      req(FALSE)
+      shiny::req(FALSE)
     }
     DT::datatable(rv$df,
       editable = TRUE,
       options = list(
         paging = FALSE,
-        searching = FALSE
+        searching = FALSE,
+        columnDefs = list(list(visible=FALSE, targets=c(0)))
       ),
       rownames = FALSE
     )
@@ -406,16 +400,15 @@ server <- function(input, output, session) {
       val <- NA
     }
 
-
     rv$df[info$row, info$col + 1] <- val
-
+    
     # get rownames for file
     row_indexes <- rv$upload_df %>%
       dplyr::mutate(rowname = dplyr::row_number()) %>%
-      dplyr::group_by(file.name) %>%
+      dplyr::group_by(file.datapath) %>%
       dplyr::summarise(min_row = dplyr::first(rowname), max_row = dplyr::last(rowname))
 
-    rows <- row_indexes[info$row, 2:3]
+    rows <- row_indexes[row_indexes$file.datapath == rv$df[info$row, 1], 2:3]
     col <- paste0("cite_", names(rv$df[info$col + 1]))
     file <- rv$df[info$row, 1]
 
@@ -432,9 +425,12 @@ server <- function(input, output, session) {
         type = "error"
       )
       # Stop plotting
-      req(FALSE)
+      shiny::req(FALSE)
     }
-
+    
+    #Set here, otherwise manual deduplication fails if there are duplicate IDs
+    rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
+    
     dedup_results <- dedup_citations(rv$upload_df, manual = TRUE, shiny_progress = TRUE)
 
 
@@ -452,15 +448,14 @@ server <- function(input, output, session) {
   })
 
   # Action button: remove manually selected duplicates
-  shiny::observeEvent(c(input$manualdedupsubmit, input$nomanualdedup), {
-    if (input$nomanualdedup > 0) {
-      rv$post_manual_dedup <- rv$unique
-    } else if (input$manualdedupsubmit > 0) {
+  shiny::observeEvent(input$manualdedupsubmit, {
+  
       removeManual <- rv$manual %>%
         dplyr::select(author1, author2, title1, title2, year1, year2, journal1, journal2, doi1, doi2, record_id1, record_id2)
 
       duplicates <- removeManual[input$manual_dedup_dt_rows_selected, ]
 
+      
       if (nrow(duplicates) < 1) {
         shinyalert::shinyalert("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
         return()
@@ -475,17 +470,18 @@ server <- function(input, output, session) {
 
       shinyalert::shinyalert("Manual deduplication complete",
         paste(
-          "From a total of", as.numeric(length(rv$upload_df)), "citations uploaded, there are", as.numeric(length(after$duplicate_id)),
+          "From a total of", nrow(rv$upload_df), "citations uploaded, there are", nrow(rv$post_manual_dedup),
           "unique citations after automated and manual deduplication.
                            Compare citations across sources, labels, and strings in the visualisation tab"
         ),
         type = "success"
       )
-    }
+      
   })
 
   # if no manual dedup, proceed to visualisations
   shiny::observeEvent(input$nomanualdedup, {
+    rv$post_manual_dedup <- rv$unique
     shiny::updateNavbarPage(
       session = session,
       inputId = "tabs",
@@ -544,10 +540,8 @@ server <- function(input, output, session) {
 
   # Action: ASySD manual dedup pre text ----
   output$Manual_pretext <- shiny::renderText({
-    manualrefs <- rv$manual
-    manualrefs <- as.numeric(length(manualrefs$record_id1))
 
-    paste(manualrefs, "pairs of citations require manual deduplication. Review the pairs in the table
+    paste(nrow(rv$manual), "pairs of citations require manual deduplication. Review the pairs in the table
         below. You can scroll right to see all citation metadata and hover over any cell to see truncated text. Identical and near-identical fields are highlighted in green.
         Select all rows which contain duplicate pairs and click the button below to remove extra
         duplicates.")
@@ -594,7 +588,7 @@ server <- function(input, output, session) {
         type = "error"
       )
       # Stop plotting
-      req(FALSE)
+      shiny::req(FALSE)
     }
     # for each unique citation, which sources/ strings/ labels are present
     source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
@@ -613,7 +607,7 @@ server <- function(input, output, session) {
         type = "error"
       )
       # Stop plotting
-      req(FALSE)
+      shiny::req(FALSE)
     }
     print(plotInput())
   })
@@ -631,10 +625,8 @@ server <- function(input, output, session) {
 
   #### Table tab ####
   unique_filtered_table <- shiny::eventReactive(
-    {
-      input$generateRecordTable
-      input$generateSummaryTable
-    },
+      c(input$generateRecordTable,
+      input$generateSummaryTable),
     {
       sources <- input$sources_tables %>% paste(collapse = "|")
       strings <- input$strings_tables %>% paste(collapse = "|")
@@ -655,7 +647,6 @@ server <- function(input, output, session) {
         purrr::map_chr(~ paste(.x, collapse = ", "))
       out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
         purrr::map_chr(~ paste(.x, collapse = ", "))
-
       out
     }
   )
@@ -667,33 +658,76 @@ server <- function(input, output, session) {
         type = "error"
       )
       # Stop plotting
-      req(FALSE)
+      shiny::req(FALSE)
     }
+    browser()
     citations <- unique_filtered_table()
     citations$source <- citations$cite_source
     record_level_table(citations = citations, return = "DT")
-  })
+  }) %>% shiny::bindEvent(input$generateRecordTable)
 
-  summary_filtered_table <- shiny::eventReactive(input$generateSummaryTable, {
-    citations <- unique_filtered_table()
-    citation_summary_table(citations,
-      search_label = input$summary_search_labels,
-      screening_label = input$summary_screening_labels
-    )
-  })
-
-  output$summaryTab <- gt::render_gt({
+  full_filtered_table <- shiny::eventReactive(
+      input$generateSummaryTable,
+    {
+      sources <- input$sources_tables %>% paste(collapse = "|")
+      strings <- input$strings_tables %>% paste(collapse = "|")
+      labels <- input$labels_tables %>% paste(collapse = "|")
+      if (sources == "") sources <- ".*"
+      if (strings == "") strings <- ".*"
+      if (labels == "") labels <- ".*"
+      out <- rv$upload_df %>%
+        dplyr::filter(
+          .data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
+          .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
+          .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
+        )
+      
+      out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
+        purrr::map_chr(~ paste(.x, collapse = ", "))
+      out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
+        purrr::map_chr(~ paste(.x, collapse = ", "))
+      out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
+        purrr::map_chr(~ paste(.x, collapse = ", "))
+      out
+    }
+  )
+  
+  output$summaryRecordTab <- gt::render_gt({
     if (nrow(rv$post_manual_dedup) == 0) {
       shinyalert::shinyalert("Data needed",
         "Please import and deduplicate your citations first.",
         type = "error"
       )
       # Stop plotting
-      req(FALSE)
+      shiny::req(FALSE)
     }
-    summary_filtered_table()
-  })
+    unique_citations <- unique_filtered_table()
+    full_citations <- full_filtered_table()
+    
+    calculated_counts <- calculate_record_counts(unique_citations, full_citations, count_unique(unique_citations), paste0("cite_", input$summary_type))
+    record_summary_table(calculated_counts)
+  }) %>% shiny::bindEvent(input$generateSummaryTable)
 
+  output$summaryPrecTab <- gt::render_gt({
+    if (nrow(rv$post_manual_dedup) == 0) {
+      shinyalert::shinyalert("Data needed",
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
+      )
+      # Stop plotting
+      shiny::req(FALSE)
+    }
+    unique_citations <- unique_filtered_table()
+    full_citations <- full_filtered_table()
+    
+    # Table only makes sense if screening stages are provided and sources or strings compared
+    if (!any(str_detect(tolower(unique_citations$cite_label), "final")) ||
+        !input$summary_type %in% c("source", "string")) shiny::req(FALSE)
+    
+    phase_counts <- calculate_phase_count(unique_citations, full_citations, paste0("cite_", input$summary_type))
+    precision_sensitivity_table(phase_counts)
+  }) %>% shiny::bindEvent(input$generateSummaryTable)
+  
 
   #### Export tab ####
 
@@ -708,7 +742,7 @@ server <- function(input, output, session) {
         write.csv(manual_dedup_result, file)
       } else {
         stop("No data to download!")
-        req(FALSE)
+        shiny::req(FALSE)
       }
     }
   )

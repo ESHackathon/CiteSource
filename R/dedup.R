@@ -19,13 +19,6 @@
 
 dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE){
   
-  add_cols <- function(raw_citations, cname) {
-    add <- cname[!cname %in% names(raw_citations)]
-    
-    if (length(add) != 0) raw_citations[add] <- NA
-    raw_citations
-  }
-  
   # rename or coalesce columns
   targets <- c("journal", "number", "pages", "isbn", "record_id")
   sources <- c("source", "issue", "start_page", "issn", "ID")
@@ -68,20 +61,6 @@ dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE){
 
 dedup_citations_add_manual <- function(raw_citations, additional_pairs) {
   
-  #' ####------ Add columns ------ ####
-  
-  #' This function adds citesource columns to citation data if missing
-  #' @param raw_citations Citation dataframe with relevant columns
-  #' @param cname column names which are required in dataframe
-  #' @return Dataframe of citations with id
-  #' @noRd
-  add_cols <- function(raw_citations, cname) {
-    add <- cname[!cname %in% names(raw_citations)]
-    
-    if (length(add) != 0) raw_citations[add] <- NA
-    raw_citations
-  }
-  
   # rename or coalesce columns
   targets <- c("journal", "number", "pages", "isbn", "record_id")
   sources <- c("source", "issue", "start_page", "issn", "ID")
@@ -99,19 +78,29 @@ dedup_citations_add_manual <- function(raw_citations, additional_pairs) {
   
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
-  
   dedup_results <- ASySD::dedup_citations_add_manual(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string",additional_pairs = additional_pairs, show_unknown_tags = FALSE)
 
-    unique_post_dedup <- dedup_results
-    unique_post_dedup$cite_source = unique_post_dedup$source
-    unique_post_dedup$cite_label = unique_post_dedup$label
-    
-    return(unique_post_dedup)
+  dedup_results$cite_source <- dedup_results$source
+  dedup_results$cite_label <- dedup_results$label
+  
+  return(dedup_results)
   
 }
 
 
+#' ####------ Add columns ------ ####
 
+#' This function adds citesource columns to citation data if missing
+#' @param raw_citations Citation dataframe with relevant columns
+#' @param cname column names which are required in dataframe
+#' @return Dataframe of citations with id
+#' @noRd
+add_cols <- function(raw_citations, cname) {
+  add <- cname[!cname %in% names(raw_citations)]
+  
+  if (length(add) != 0) raw_citations[add] <- NA
+  raw_citations
+}
 
 
   
