@@ -18,9 +18,9 @@ count_unique <- function(unique_data, include_references = FALSE) {
   out <- unique_data %>%
     dplyr::filter(!.data$cite_source == "") %>%
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$cite_label, .data$cite_string, tidyselect::any_of("record_ids")) %>%
-    tidyr::separate_rows(.data$cite_source, convert = TRUE) %>%
-    tidyr::separate_rows(.data$cite_label, convert = TRUE) %>%
-    tidyr::separate_rows(.data$cite_string, convert = TRUE) %>%
+    tidyr::separate_rows(.data$cite_source, convert = TRUE, sep = ", ") %>%
+    tidyr::separate_rows(.data$cite_label, convert = TRUE, sep = ", ") %>%
+    tidyr::separate_rows(.data$cite_string, convert = TRUE, sep = ", ") %>%
     dplyr::group_by(.data$duplicate_id) %>%
     dplyr::mutate(
       unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),
