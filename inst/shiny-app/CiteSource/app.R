@@ -239,9 +239,9 @@ ui <- shiny::navbarPage("CiteSource",
                   ),
                   shiny::tabPanel(
                     "View summary table",
-                    shiny::div("The first table will summarise the results by source, label or string - depending on your selection. If your labels include 'screened' and 'final', a second table will summarise the contribution of each source or string across these stages."),
-                    shiny::selectInput("summary_type", "Select grouping for summary table:",
-                                choices = c("source", "label", "string")),
+                    shiny::div("The first table will summarise the results by source. If your labels include 'search', 'screened' and 'final', a second table will summarise the contribution of each source across these stages."),
+                    #shiny::selectInput("summary_type", "Select grouping for summary table:",
+                    #            choices = c("source", "label", "string")),
                     shinyWidgets::actionBttn(
                       "generateSummaryTable", "Generate the table(s)",
                       style = "pill",
@@ -375,17 +375,23 @@ server <- function(input, output, session) {
 
   ## Update filters
   shiny::observe({
-    if (!is.null(rv$unique)) {
-      shiny::updateSelectInput(inputId = "sources_visual", choices = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-      shiny::updateSelectInput(inputId = "labels_visual", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-      shiny::updateSelectInput(inputId = "strings_visual", choices = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+    if (nrow(rv$post_manual_dedup) > 0) {
+      
+      sources <- unique(rv$post_manual_dedup$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      labels <- unique(rv$post_manual_dedup$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      strings <- unique(rv$post_manual_dedup$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      
+      if (any(rv$post_manual_dedup$cite_source == "")) sources <- c(sources, "_blank_")
+      if (any(rv$post_manual_dedup$cite_label == "")) labels <- c(labels, "_blank_")
+      if (any(rv$post_manual_dedup$cite_string == "")) strings <- c(strings, "_blank_")
+      
+      shiny::updateSelectInput(inputId = "sources_visual", choices = sources, selected = sources)
+      shiny::updateSelectInput(inputId = "labels_visual", choices = labels, selected = labels)
+      shiny::updateSelectInput(inputId = "strings_visual", choices = strings, selected = strings)
 
-      shiny::updateSelectInput(inputId = "sources_tables", choices = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-      shiny::updateSelectInput(inputId = "labels_tables", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-      shiny::updateSelectInput(inputId = "strings_tables", choices = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-
-      shiny::updateSelectInput(inputId = "summary_search_labels", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
-      shiny::updateSelectInput(inputId = "summary_screening_labels", choices = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort(), selected = unique(rv$unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique())
+      shiny::updateSelectInput(inputId = "sources_tables", choices = sources, selected = sources)
+      shiny::updateSelectInput(inputId = "labels_tables", choices = labels, selected = labels)
+      shiny::updateSelectInput(inputId = "strings_tables", choices = strings, selected = strings)
     }
   })
 
@@ -566,9 +572,9 @@ server <- function(input, output, session) {
     if (labels == "") labels <- ".*"
     out <- rv$post_manual_dedup %>%
       dplyr::filter(
-        .data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
-        .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
-        .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
+        (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
+        (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
+        (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
       )
 
     out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
@@ -634,13 +640,14 @@ server <- function(input, output, session) {
       if (sources == "") sources <- ".*"
       if (strings == "") strings <- ".*"
       if (labels == "") labels <- ".*"
+      
       out <- rv$post_manual_dedup %>%
         dplyr::filter(
-          .data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
-          .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
-          .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
+          (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
+          (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
+          (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
         )
-
+      
       out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
         purrr::map_chr(~ paste(.x, collapse = ", "))
       out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
@@ -660,26 +667,25 @@ server <- function(input, output, session) {
       # Stop plotting
       shiny::req(FALSE)
     }
-    browser()
+
     citations <- unique_filtered_table()
     citations$source <- citations$cite_source
     record_level_table(citations = citations, return = "DT")
   }) %>% shiny::bindEvent(input$generateRecordTable)
 
-  full_filtered_table <- shiny::eventReactive(
-      input$generateSummaryTable,
-    {
+  full_filtered_table <- reactive({
       sources <- input$sources_tables %>% paste(collapse = "|")
       strings <- input$strings_tables %>% paste(collapse = "|")
       labels <- input$labels_tables %>% paste(collapse = "|")
       if (sources == "") sources <- ".*"
       if (strings == "") strings <- ".*"
       if (labels == "") labels <- ".*"
+      
       out <- rv$upload_df %>%
         dplyr::filter(
-          .data$cite_source == "" | stringr::str_detect(.data$cite_source, sources),
-          .data$cite_string == "" | stringr::str_detect(.data$cite_string, strings),
-          .data$cite_label == "" | stringr::str_detect(.data$cite_label, labels)
+          (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
+          (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
+          (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
         )
       
       out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
@@ -690,7 +696,7 @@ server <- function(input, output, session) {
         purrr::map_chr(~ paste(.x, collapse = ", "))
       out
     }
-  )
+  ) %>%  shiny::bindEvent(input$generateSummaryTable)
   
   output$summaryRecordTab <- gt::render_gt({
     if (nrow(rv$post_manual_dedup) == 0) {
@@ -703,6 +709,8 @@ server <- function(input, output, session) {
     }
     unique_citations <- unique_filtered_table()
     full_citations <- full_filtered_table()
+    
+    browser()
     
     calculated_counts <- calculate_record_counts(unique_citations, full_citations, count_unique(unique_citations), paste0("cite_", input$summary_type))
     record_summary_table(calculated_counts)
@@ -721,7 +729,7 @@ server <- function(input, output, session) {
     full_citations <- full_filtered_table()
     
     # Table only makes sense if screening stages are provided and sources or strings compared
-    if (!any(str_detect(tolower(unique_citations$cite_label), "final")) ||
+    if (!any(stringr::str_detect(tolower(unique_citations$cite_label), "final")) ||
         !input$summary_type %in% c("source", "string")) shiny::req(FALSE)
     
     phase_counts <- calculate_phase_count(unique_citations, full_citations, paste0("cite_", input$summary_type))
