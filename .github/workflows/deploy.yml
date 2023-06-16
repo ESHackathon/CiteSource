@@ -27,12 +27,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          R -e "install.packages(c('shiny', 'rsconnect'))"
-
-       - name: Push to shiny.io
-        run: |
-          Rscript -e "rsconnect::setAccountInfo(name='drmatt', token=${{secrets.TOKEN}}, secret=${{secrets.SECRET}})"
-          Rscript -e "rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')" 
+          R |
+            -e "install.packages(c('shiny', 'rsconnect'))"
+            -e "rsconnect::setAccountInfo(name='drmatt', token=${{secrets.TOKEN}}, secret=${{secrets.SECRET}})"
+            -e "rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
 
