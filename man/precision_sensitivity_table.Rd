@@ -17,8 +17,3 @@ A gt object representing the table.
 This function creates a gt table from a given data, and
 removes the 'screened' column and its associated footnotes if all its values are zero.
 }
-\examples{
-# assuming 'my_data' is a data.frame with appropriate columns
-precision_sensitivity_table(my_data)
-
-}
