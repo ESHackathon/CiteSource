@@ -7,13 +7,18 @@
 precision_sensitivity_table(data)
 }
 \arguments{
-\item{data}{A data frame that must contain the columns "Source", "Distinct Records",
-"Screened Included", "Final Included", "Precision", and "Recall". The "Source" column is used as the row names of the table.}
+\item{data}{A data.frame. The dataset to build the table from.
+It should contain the columns 'screened', 'final', 'Precision', 'Recall'.}
 }
 \value{
 A gt object representing the table.
 }
 \description{
-This function creates a table with footnotes for columns in the table.
-It uses the gt package to create the table and adds footnotes to various columns.
+This function creates a gt table from a given data, and
+removes the 'screened' column and its associated footnotes if all its values are zero.
+}
+\examples{
+# assuming 'my_data' is a data.frame with appropriate columns
+precision_sensitivity_table(my_data)
+
 }
