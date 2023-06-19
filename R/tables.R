@@ -689,26 +689,36 @@ record_summary_table <- function(data) {
 
 #' precision_sensitivity_table
 #'
-#' This function creates a table with footnotes for columns in the table.
-#' It uses the gt package to create the table and adds footnotes to various columns.
+#' This function creates a gt table from a given data, and 
+#' removes the 'screened' column and its associated footnotes if all its values are zero.
 #'
-#' @param data A data frame that must contain the columns "Source", "Distinct Records",
-#' "Screened Included", "Final Included", "Precision", and "Recall". The "Source" column is used as the row names of the table.
+#' @param data A data.frame. The dataset to build the table from.
+#'   It should contain the columns 'screened', 'final', 'Precision', 'Recall'.
 #'
 #' @return A gt object representing the table.
 #'
-#' @importFrom gt gt tab_header cols_label cols_align tab_footnote cells_column_labels cells_body
+#' @examples
+#' # assuming 'my_data' is a data.frame with appropriate columns
+#' precision_sensitivity_table(my_data)
+#'
 #' @export
 precision_sensitivity_table <- function(data) {
+  # First, we check if all values in the "screened" column are 0
+  all_zero_screened <- all(data$screened == 0)
+  
+  # If all values are zero, we remove the "screened" column from the data
+  if (all_zero_screened) {
+    data <- data[ , !(names(data) %in% "screened")]
+  }
+
   # Create the initial gt table
-  data %>%
+  gt_table <- data %>%
     gt::gt(rowname_col = "Source") %>%
     gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
     
     # Label the columns
     gt::cols_label(
       `Distinct Records` = "Distinct Records",
-      screened = "Screened Included",
       final = "Final Included",
       Precision = "Precision",
       Recall = "Sensitivity/Recall"
@@ -717,68 +727,53 @@ precision_sensitivity_table <- function(data) {
     # Align columns to the right
     gt::cols_align(
       align = "right",
-      columns = c("screened", "final", "Precision", "Recall")
-    ) %>%
+      columns = c("final", "Precision", "Recall")
+    )
     
+  # If the "screened" column isn't all zeros, add its specific labels, alignment, and footnotes
+  if (!all_zero_screened) {
+    gt_table <- gt_table %>%
+      gt::cols_label(screened = "Screened Included") %>%
+      gt::cols_align(align = "right", columns = "screened") %>%
+      gt::tab_footnote(
+        footnote = "Number of citations included after title/abstract screening",
+        locations = gt::cells_column_labels(columns = "screened")
+      ) %>%
+      gt::tab_footnote(
+        footnote = "Total citations included after Ti/Ab Screening",
+        locations = gt::cells_body(columns = "screened", rows = "Total")
+      )
+  }
+
+  # Add remaining footnotes and return the gt_table
+  gt_table %>%
     # Add footnotes for the columns
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication",
-      locations = gt::cells_column_labels(
-        columns = "Distinct Records"
-      )
-    ) %>%
-    gt::tab_footnote(
-      footnote = "Number of citations included after title/abstract screening",
-      locations = gt::cells_column_labels(
-        columns = "screened"
-      )
+      locations = gt::cells_column_labels(columns = "Distinct Records")
     ) %>%
     gt::tab_footnote(
       footnote = "Number of citations included after full text screening",
-      locations = gt::cells_column_labels(
-        columns = "final"
-      )
+      locations = gt::cells_column_labels(columns = "final")
     ) %>%
     gt::tab_footnote(
       footnote = "Number of final included citations / Number of distinct records",
-      locations = gt::cells_column_labels(
-        columns = "Precision"
-      )
+      locations = gt::cells_column_labels(columns = "Precision")
     ) %>%
     gt::tab_footnote(
       footnote = "Number of final included citations / Total number of final included citations",
-      locations = gt::cells_column_labels(
-        columns = "Recall"
-      )
+      locations = gt::cells_column_labels(columns = "Recall")
     ) %>%
     gt::tab_footnote(
       footnote = "Total citations discoverd (after internal and cross-source deduplication)",
-      locations = gt::cells_body(
-        columns = "Distinct Records",
-        rows = "Total"
-      )
-    ) %>%
-    gt::tab_footnote(
-      footnote = "Total citations included after Ti/Ab Screening",
-      locations = gt::cells_body(
-        columns = "screened",
-        rows = "Total"
-      )
+      locations = gt::cells_body(columns = "Distinct Records", rows = "Total")
     ) %>%
     gt::tab_footnote(
       footnote = "Total citations included after full text screening",
-      locations = gt::cells_body(
-        columns = "final",
-        rows = "Total"
-      )
+      locations = gt::cells_body(columns = "final", rows = "Total")
     ) %>%
     gt::tab_footnote(
       footnote = "Overall Precision = Number of final included citations / Total distinct records",
-      locations = gt::cells_body(
-        columns = "Precision",
-        rows = "Total"
-      )
+      locations = gt::cells_body(columns = "Precision", rows = "Total")
     )
 }
-
-  
