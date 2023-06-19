@@ -697,10 +697,6 @@ record_summary_table <- function(data) {
 #'
 #' @return A gt object representing the table.
 #'
-#' @examples
-#' # assuming 'my_data' is a data.frame with appropriate columns
-#' precision_sensitivity_table(my_data)
-#'
 #' @export
 precision_sensitivity_table <- function(data) {
   # First, we check if all values in the "screened" column are 0
