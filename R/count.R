@@ -64,7 +64,6 @@ count_sources <- function(df, db_colname) {
 #' result <- record_counts(unique_citations, citations, "db_source")
 #' result
 
-
 record_counts <- function(unique_citations, citations, db_colname) {
   # Count distinct record sources
   distinct_count <- count_sources(unique_citations, db_colname)
@@ -112,6 +111,26 @@ record_counts <- function(unique_citations, citations, db_colname) {
 #' @param db_colname Character. The name of the column containing the database source information.
 #'
 #' @return A dataframe with counts of distinct records, imported records, and unique records for each source, including total counts and several calculated ratios and percentages.
+#' #' @examples
+#' unique_citations <- data.frame(
+#'   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+#'   other_data = 1:6
+#' )
+#' 
+#' citations <- data.frame(
+#'   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+#'   other_data = 7:12
+#' )
+#' 
+#' n_unique <- data.frame(
+#'   cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
+#'   cite_label = c("search", "other", "search", "search", "search", "other"),
+#'   unique = c(1, 0, 1, 1, 1, 0)
+#' )
+#' 
+#' result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
+#' result
+
 
 calculate_record_counts <- function(unique_citations, citations, n_unique, db_colname) {
   
