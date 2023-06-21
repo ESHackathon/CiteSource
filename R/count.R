@@ -1,13 +1,23 @@
 #' Count sources function
 #' Count database source occurrences in a column
 #'
-#' This function counts the occurrences of different database sources present in a specific column of a dataframe. 
-#' It returns a dataframe with the counts for each source.
+#' This is an internal function that counts the occurrences of different database sources 
+#' present in a specific column of a dataframe. It returns a dataframe with the counts 
+#' for each source. It's not intended to be used directly by users, but is called by other functions.
+#'
+#' @description
+#' This function is used internally by other functions to count the occurrences of different 
+#' database sources present in a specific column of a dataframe.
+#' 
+#' @details
+#' This is an internal function and isn't intended to be used directly by the user.
 #'
 #' @param df Dataframe. The dataframe containing the data to be analyzed.
 #' @param db_colname Character. The name of the column containing the database source information.
 #'
 #' @return A dataframe with the names of the sources and their corresponding counts.
+#' 
+#' @noRd
 
 count_sources <- function(df, db_colname) {
 # Pull out the database column, split it into multiple elements if there are commas,
