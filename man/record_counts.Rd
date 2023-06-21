@@ -5,12 +5,12 @@
 \title{Record counts function
 Calculate and combine counts of distinct records and imported records for each database}
 \usage{
-record_counts(df1, df2, db_colname)
+record_counts(unique_citations, citations, db_colname)
 }
 \arguments{
-\item{df1}{Dataframe. The dataframe for calculating distinct records count.}
+\item{unique_citations}{Dataframe. The dataframe for calculating distinct records count.}
 
-\item{df2}{Dataframe. The dataframe for calculating records imported count.}
+\item{citations}{Dataframe. The dataframe for calculating records imported count.}
 
 \item{db_colname}{Character. The name of the column containing the database source information.}
 }
