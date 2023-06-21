@@ -45,6 +45,25 @@ count_sources <- function(df, db_colname) {
 #' @param db_colname Character. The name of the column containing the database source information.
 #'
 #' @return A dataframe with counts of distinct records and imported records for each source, including total counts.
+#' 
+#' @examples
+#' # Create synthetic data for example
+#' unique_citations <- data.frame(
+#'   title = paste("Article", 1:10),
+#'   db_source = sample(c("Database 1", "Database 2", "Database 3"), 10, replace = TRUE),
+#'   stringsAsFactors = FALSE
+#' )
+#' 
+#' citations <- data.frame(
+#'   title = paste("Article", 1:20),
+#'   db_source = sample(c("Database 1", "Database 2", "Database 3"), 20, replace = TRUE),
+#'   stringsAsFactors = FALSE
+#' )
+#'
+#' # Use the synthetic data with the function
+#' result <- record_counts(unique_citations, citations, "db_source")
+#' result
+
 
 record_counts <- function(unique_citations, citations, db_colname) {
   # Count distinct record sources
