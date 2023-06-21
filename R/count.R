@@ -124,7 +124,7 @@ record_counts <- function(unique_citations, citations, db_colname) {
 #' 
 #' n_unique <- data.frame(
 #'   cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
-#'   cite_label = c("search", "other", "search", "search", "search", "other"),
+#'   cite_label = c("search", "final", "search", "search", "search", "final"),
 #'   unique = c(1, 0, 1, 1, 1, 0)
 #' )
 #' 
@@ -210,6 +210,8 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
 #' will give a warning if these labels are not present in the input dataframes.
 #'
 #' @export
+#' @details The function will give a warning if 'screened' and 'final' labels are not present
+#' in the 'cite_label' column of the input dataframes.
 #' @param unique_citations A dataframe containing unique citations with phase information. 
 #' The phase information must be provided in a column named 'cite_label' in the dataframe.
 #' @param citations A dataframe containing all citations with phase information. The phase 
@@ -219,8 +221,22 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
 #' @return A dataframe containing distinct counts, counts for different phases, precision,
 #' and recall for each source, as well as totals.
 #'
-#' @details The function will give a warning if 'screened' and 'final' labels are not present
-#' in the 'cite_label' column of the input dataframes.
+#' @examples
+#' unique_citations <- data.frame(
+#'   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+#'   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
+#'   other_data = 1:6
+#' )
+#' 
+#' citations <- data.frame(
+#'   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+#'   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
+#'   other_data = 7:12
+#' )
+#' 
+#' result <- calculate_phase_count(unique_citations, citations, "db_source")
+#' result
+
 
 calculate_phase_count <- function(unique_citations, citations, db_colname) {
   count_source_phase <- function(source_phase_df, db_colname) {
