@@ -30,20 +30,20 @@ count_sources <- function(df, db_colname) {
 #' It combines these counts into one dataframe and calculates the total for each count type.
 #'
 #' @export
-#' @param df1 Dataframe. The dataframe for calculating distinct records count.
-#' @param df2 Dataframe. The dataframe for calculating records imported count.
+#' @param unique_citations Dataframe. The dataframe for calculating distinct records count.
+#' @param citations Dataframe. The dataframe for calculating records imported count.
 #' @param db_colname Character. The name of the column containing the database source information.
 #'
 #' @return A dataframe with counts of distinct records and imported records for each source, including total counts.
 
-record_counts <- function(df1, df2, db_colname) {
+record_counts <- function(unique_citations, citations, db_colname) {
   # Count distinct record sources
-  distinct_count <- count_sources(df1, db_colname)
+  distinct_count <- count_sources(unique_citations, db_colname)
   colnames(distinct_count) <- c("Source", "Distinct Records")
   distinct_count$`Distinct Records` <- as.numeric(distinct_count$`Distinct Records`)
   
   # Count initial imported record sources
-  initial_citations_count <- count_sources(df2, db_colname)
+  initial_citations_count <- count_sources(citations, db_colname)
   colnames(initial_citations_count) <- c("Source", "Records Imported")
   initial_citations_count$`Records Imported` <- as.numeric(initial_citations_count$`Records Imported`)
   
