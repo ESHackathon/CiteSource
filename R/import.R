@@ -34,17 +34,6 @@
 #' }
 #' @export
 
-
-# TODO: allow user to specify citation fields to serve as cite_sources, cite_strings or cite_labels
-
-# TODO_LATER - revisit idea of search detail JSONs - could be
-# @param search_json Optional JSON containing search history
-# information in line with the search history standard.
-# If a vector is provided, it must be the same length as the list of files.
-# @param search_json_field Optional field code / name that contains the
-# JSON metadata in line with the search history standard. If specified
-# search_json is ignored.
-
 read_citations <- function(files = NULL,
                            cite_sources = NULL,
                            cite_strings = NULL,
