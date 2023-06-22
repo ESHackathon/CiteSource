@@ -59,6 +59,8 @@ Suggests:
     shinybusy,
     shinyWidgets,
     testthat (>= 3.0.0)
+Additional_repositories:
+https://github.com/camaradesuk/ASySD
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
@@ -67,5 +69,3 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: 
     R (>= 3.5.0)
-Remotes: 
-    camaradesuk/ASySD
