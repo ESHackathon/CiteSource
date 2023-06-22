@@ -1,8 +1,7 @@
 Package: CiteSource
-Title: Analyze the utility of information sources and retrieval
-    methodologies for evidence synthesis
+Title: Analyze the Utility of Information Sources and Retrieval Methodologies for Evidence Synthesis
 Version: 0.0.1
-Date: 2022-11-18
+Date: 2023-06-22
 Authors@R: c(
     person("Trevor", "Riley", , "trevor.riley@noaa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6834-9802")),
@@ -21,7 +20,7 @@ Authors@R: c(
     person("Martin", "Westgate", role = "cph", comment = "Author of included synthesisr fragments"),
     person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments")      
   )
-Description: CiteSource was developed in order to provide researchers the ability to 
+Description: This package was developed in order to provide researchers the ability to 
              examine the utility and efficacy of literature resources and search 
              methodologies. The package provides users with the ability to deduplicate
              references while maintaining customizable metadata. The resulting data 
