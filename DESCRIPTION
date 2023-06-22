@@ -60,7 +60,7 @@ Suggests:
     shinyWidgets,
     testthat (>= 3.0.0)
 Additional_repositories:
-https://github.com/camaradesuk/ASySD
+    https://github.com/camaradesuk/ASySD
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
