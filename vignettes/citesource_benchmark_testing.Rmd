@@ -24,9 +24,9 @@ knitr::opts_chunk$set(
 ```
 ## About this vignette
 
-When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search. This process can often be a very time consuming if variations of a string are being tested.
+When estimating he comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are discovered using their search strategy. While benchmarking is an important step in testing the sensitivity of a search, this process can be very time consuming if variations of a string are being tested.
 
-This vignette will provide an example of how CiteSource can be used to speed up the process of benchmarking especially when comparing variations of a search strings or search strategies. 
+This vignette will provide an example of how CiteSource can be used to speed up the process of benchmarking especially when comparing variations of search strings or search strategies. 
 
 ## 1. Installation of packages and loading libraries
 
@@ -47,7 +47,7 @@ library(dplyr)
 ```
 ## 2. Import files from multiple sources
 
-Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. in this case we are uploading the results from 6 different strings, which were applied to Web of Science.
+Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. In this case we are uploading the results from six different strings, which were applied to Web of Science.
 
 ```{r}
 # Import citation files from folder
@@ -103,13 +103,13 @@ CiteSource allows users to merge duplicates while maintaining information in the
 #Deduplicate citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.
 unique_citations <- dedup_citations(citations)
 
-#Count number of unique and non-unique citations from different sources and labels. 
+#Count number of unique and non-unique citations from different sources and labels 
 n_unique <- count_unique(unique_citations)
 
-#For each unique citation, determine which sources were present.
+#For each unique citation, determine which sources were present
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
-# initial upload/post internal deduplication table creation
+#Initial upload/post internal deduplication table creation
 initial_counts<-record_counts(unique_citations, citations, "cite_source")
 record_counts_table(initial_counts)
 
@@ -117,15 +117,15 @@ record_counts_table(initial_counts)
 
 ## 4. Upset plot to compare discovery of benchmarking articles
 
-An upset plot is a useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. Using this data we'll outline a few potential uses of this data, when looking at the discovery of benchmarking articles.
+An upset plot is useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. Using this data we'll outline a few potential uses, when looking at the discovery of benchmarking articles.
 
-We have uploaded 55 benchmarking articles. Of these 55 articles we can see that all but 6 have been found across the six searches. We can see the number benchmarking articles that were discovered by each string as well as the number of articles that were shared between searches. 
+We have uploaded 55 benchmarking articles. Of these 55 articles we can see that all but 6 have been found across the six searches. We can see the number of benchmarking articles that were discovered by each string as well as the number of articles that were shared between searches. 
 
-Looking at the first column we can see that 9 benchmarking articles were found across every search. One may hypothesize that the 140 citations that follow in the second column may have a high number of relevant articles due to the fact that they were also discovered across the 6 searches. If a researcher was interested in building a larger group of benchmarking articles, it's possible that they may want to review these articles first.
+Looking at the first column, we see that 9 benchmarking articles were found across every search. One may hypothesize that the 140 citations that follow in the second column may have a high number of relevant articles due to the fact that they were also discovered across the 6 searches. If a researcher was interested in building a larger group of benchmarking articles, they may want to review these articles first.
 
-Looking at the plot we can see that search #5 has the largest number of results, well over 6k. Of these, 5,964 are unique to that search. We can also see that search #5 discovers 3 benchmarking articles that would have otherwise not been found had the search not been employed. While a researcher may want to ensure that they capture the highest number of benchmarking articles, the addition of ~6k articles may not be efficient when the result is only 3 benchmarking articles. Instead of including this search in their final strategy, they may consider reviewing the three articles that were found by this search and work to adjust their other searches instead.
+Looking at the plot we can see that search #5 has the largest number of results, well over 6000. Of these, 5,964 are unique to that search. We can also see that search #5 finds 3 benchmarking articles that would have otherwise not been found. While a researcher may want to ensure that they capture the highest number of benchmarking articles, the addition of ~6k articles may not be efficient when the result is only 3 benchmarking articles. Instead of including this search in their final strategy, they may consider reviewing the three articles that were found by this search and work to adjust their other searches instead.
 
-Another decision in this case may be to drop search #4 and #6 as each of these strings do not contribute uniquely to the discovery of any benchmarking articles. While the data backs up this decision, there may also be more to consider. For example, if benchmarking articles are bias for any known reason, certain search strategies may be employed with an understanding that benchmarking data may not accurately reflect their potential contribution. (ex. benchmarking articles were gathered from previous systematic reviews that focused on a specific geographic region and the current review is global in nature). 
+Another decision in this case may be to drop search #4 and #6 as each of these strings do not contribute uniquely to the discovery of any benchmarking articles. While the data backs up this decision, there may also be more to consider. For example, if benchmarking articles are biased for any known reason, certain search strategies may be employed with an understanding that benchmarking data may not accurately reflect their potential contribution. (e.g. benchmarking articles were gathered from previous systematic reviews that focused on a specific geographic region and the current review is global in nature). 
 
 ```{r}
 #Generate a source comparison upset plot.
