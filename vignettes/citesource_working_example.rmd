@@ -25,13 +25,13 @@ knitr::opts_chunk$set(
 In order to complete a reliable systematic search one must include multiple resources to ensure the inclusion of all relevant studies. The exact number of sources that are necessary for a thorough search can vary depending on the topic, type of review, etc. Along with the selection and search of traditional literature sources, other methods such as hand searching relevant journals, citation chasing/snowballing, searching websites, etc. can be used to minimize the risk of missing relevant studies. 
 But how important is that extra database? How much return are you getting from the weeks worth of combing through websites? Did that open resource perform just perform as well as (or better than) the one your library/institution pays 500k/year for? How much time could you save if you had these answers? Wouldn't knowing the answers to these questions give us a better understanding of HOW to conduct our searches? Wouldn't it be great it we could speed up the process without impacting its quality, better yet, improve our understanding while making the process faster?
 
-These were some of the main questions that our team wanted to answer. The goal of this vignette (which we'd love your feedback on) is to show you how *CiteSource* can help you gather information on the ways sources and methods impact a review. The data in this vignette is based on a subset of data from an actual project. In it, we'll walk through how *CiteSource* can import original search results, compare those information sources and methods, and determine how they contributed to the final review. 
+These were some of the main questions that our team wanted to answer. The goal of this vignette (which we'd love your feedback on) is to show you how CiteSource can help you gather information on the ways sources and methods impact a review. The data in this vignette is based on a subset of data from an actual project. In it, we'll walk through how CiteSource can import original search results, compare those information sources and methods, and determine how they contributed to the final review. 
 
 If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our [discussion board](https://github.com/ESHackathon/CiteSource/discussions/100) on github! 
 
 ## 1. Installation of packages and loading libraries
 
-Use the following code to install *CiteSource*. Currently, *CiteSource* lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the *ggplot2* and *dplyr* packages.
+Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the *ggplot2* and *dplyr* packages.
 
 ```{r, results = FALSE, message=FALSE}
 #Install the remotes packages to enable installation from GitHub
@@ -48,13 +48,13 @@ library(dplyr)
 
 ## 2. Import Reference Files and Add Custom Metadata
 
-Users can import multiple .ris or .bib files into *CiteSource*, which they can then label with three custom metadata fields: cite_source, cite_string, and cite_label. 
+Users can import multiple .ris or .bib files into CiteSource, which they can then label with three custom metadata fields: cite_source, cite_string, and cite_label. 
 
 Using the cite_source field, the user can label individual files with source information such as database or platform. Beyond source information, users may also use the cite_source field to provide search results using various search methodologies. 
 
 The second field, cite_label, can be used to apply yet another variable. This label was intended to be used in combination with the label cite_source, to track the inclusion or exclusion of citations from a specific source over the course of title/abstract and full text screening.
 
-As a note, *CiteSource* does provide a third metadata field, cite_string, which can be used to specify another attribute or variable. For example, a use of cite_source and cite_string may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results. While it's possible to use cite_string, we have not fully integrated this third field into any of our tables and plots and it is not used in this vignette. As we continue to develop CiteSource and get feedback from users, we'll continue to update this and other vignettes.
+As a note, CiteSource does provide a third metadata field, cite_string, which can be used to specify another attribute or variable. For example, a use of cite_source and cite_string may be to examine the unique and crossover citations that occur between databases, while simultaneously evaluating unique search string results. While it's possible to use cite_string, we have not fully integrated this third field into any of our tables and plots and it is not used in this vignette. As we continue to develop CiteSource and get feedback from users, we'll continue to update this and other vignettes.
 
 ### Indicate file location
 ```{r}
@@ -68,7 +68,7 @@ citation_files
 
 ## 3. Read in citation files and add custom metadata
 
-Prior to importing files into *CiteSource*, it is recommended that users import raw .ris/.bib files into a citation management software such as EndNote or Zotero and combine multiple citation files from each individual source. This can reduce complication and assist with applying metadata. Features such as EndNote's "find reference updates" can also ensure that citations are more complete by filling in missing metadata fields.
+Prior to importing files into CiteSource, it is recommended that users import raw .ris/.bib files into a citation management software such as EndNote or Zotero and combine multiple citation files from each individual source. This can reduce complication and assist with applying metadata. Features such as EndNote's "find reference updates" can also ensure that citations are more complete by filling in missing metadata fields.
 
 In this example, we read in the citaiton files and tag the citation files with the resource they came from using the cite_source field. The two citation files labeled NA represent the file from included papers after title/abstract screening and the file of the included papers after full-text screening and therefore are not assigned a source. The cite_label tag is being used to tag files with "search" (the initial search results), "screened" (included papers after TI/AB screening), and "final" (papers included after full-text screening).
 
@@ -130,9 +130,9 @@ record_counts_table(initial_counts)
 When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the ROI in terms of the time it takes to apply searches. This is especially true in fields where research relies on cross-disciplinary resources. By tracking and reporting where/how each citation was found, the evidence synthesis community could in turn track the utility of various databases/platforms and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as various search strategies and methodologies.
 
 ### Plot overlap as a heatmap matrix
-*CiteSource* performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to each source at the top of the source's column. The heatmap also provides a count of citations that were found at the intersection of each source. 
+CiteSource performs citation analysis and deduplication within each source file, prior to comparing sources across source files. This heatmap shows the number of citations unique to each source at the top of the source's column. The heatmap also provides a count of citations that were found at the intersection of each source. 
 
-In this case, you can see that the source tag "Method 1" only shows 2364 records, while the initial .ris file contained 2656 citations. This means that *CiteSource* identified duplicate references within that citation list. The 2364 remaining citations are attributed to this source. Looking at the source Greenfile, we can see that  *CiteSource* did not find any duplicate citations within this source as both counts read 139.
+In this case, you can see that the source tag "Method 1" only shows 2364 records, while the initial .ris file contained 2656 citations. This means that CiteSource identified duplicate references within that citation list. The 2364 remaining citations are attributed to this source. Looking at the source Greenfile, we can see that  CiteSource did not find any duplicate citations within this source as both counts read 139.
 
 ```{r}
 my_heatmap <- plot_source_overlap_heatmap(source_comparison)
@@ -194,7 +194,7 @@ unique_citations %>%
   
 ## 7. Exporting for further analysis
 
-We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save them in a convenient format for subsequent use. *CiteSource* offers a set of export functions called `export_csv`, `export_ris` and `export_bib` that will save dataframes as a .csv file, .ris file or .bib file, respectively. 
+We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save them in a convenient format for subsequent use. CiteSource offers a set of export functions called `export_csv`, `export_ris` and `export_bib` that will save dataframes as a .csv file, .ris file or .bib file, respectively. 
 
 You can then reimport exported files to pick up a project or analysis without having to start from scratch, or after making manual adjustments (such as adding missing abstract data) to a file. 
 
