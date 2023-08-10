@@ -247,8 +247,8 @@ ui <- shiny::navbarPage("CiteSource",
                   shiny::tabPanel(
                     "View summary table",
                     shiny::div("The first table will summarise the results by source. If your labels include 'search', 'screened' and 'final', a second table will summarise the contribution of each source across these stages."),
-                    #shiny::selectInput("summary_type", "Select grouping for summary table:",
-                    #            choices = c("source", "label", "string")),
+                    shiny::selectInput("summary_type", "Select grouping for summary table:",
+                               choices = c("source", "label", "string")),
                     shinyWidgets::actionBttn(
                       "generateSummaryTable", "Generate the table(s)",
                       style = "pill",
@@ -388,7 +388,7 @@ server <- function(input, output, session) {
       labels <- unique(rv$latest_unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
       strings <- unique(rv$latest_unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
       
-      sources[sources != "unknown"]
+      sources <- sources[sources != "unknown"]
       labels  <- labels[labels != "unknown"]
       strings <- strings[strings != "unknown"]
       
@@ -449,7 +449,7 @@ server <- function(input, output, session) {
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
     
     # results of auto dedup
-    dedup_results <- dedup(rv$upload_df, manual = TRUE, shiny_progress = TRUE, show_unknown_tags=TRUE)
+    dedup_results <- dedup_citations(rv$upload_df, manual = TRUE, shiny_progress = TRUE, show_unknown_tags=TRUE)
 
     # unique and pairs to check sent to reactive values
     rv$pairs_to_check <- dedup_results$manual_dedup 
@@ -486,7 +486,7 @@ server <- function(input, output, session) {
   # remove manually selected duplicates 
   observeEvent(input$manualdedupsubmit,{
     
-    after <- remove_extra_pairs(rv$latest_unique,
+    after <- dedup_citations_add_manual(rv$latest_unique,
                                         additional_pairs = rv$pairs_removed)
     
     # update latest unique df reactive value
@@ -581,31 +581,23 @@ server <- function(input, output, session) {
   #### Visualise tab ####
 
   unique_filtered_visual <- shiny::reactive({
-    out <- rv$latest_unique %>%
-      group_by(duplicate_id) %>%
-      tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ")
     
-    # 
-    # sources <- input$sources_visual %>% paste(collapse = "|")
-    # strings <- input$strings_visual %>% paste(collapse = "|")
-    # labels <- input$labels_visual %>% paste(collapse = "|")
-    # if (sources == "") sources <- ".*"
-    # if (strings == "") strings <- ".*"
-    # if (labels == "") labels <- ".*"
-    # out <- rv$latest_unique %>%
-    #   dplyr::filter(
-    #     (stringr::str_detect(sources, "unknown"))  | stringr::str_detect(.data$cite_source, sources),
-    #     (stringr::str_detect(strings, "unknown")) | stringr::str_detect(.data$cite_string, strings),
-    #     (stringr::str_detect(labels, "unknown")) | stringr::str_detect(.data$cite_label, labels))
-    # 
-    # out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
-    #   purrr::map_chr(~ paste(.x, collapse = ", "))
-    # out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
-    #   purrr::map_chr(~ paste(.x, collapse = ", "))
-    # out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
-    #   purrr::map_chr(~ paste(.x, collapse = ", "))
-    # 
-    # out
+    sources <- input$sources_visual 
+    sources <- ifelse(sources == "_blank_", "unknown", sources)
+    strings <- input$strings_visual
+    strings <- ifelse(strings == "_blank_", "unknown", strings)
+    labels <- input$labels_visual 
+    labels <- ifelse(labels == "_blank_", "unknown", labels)
+    
+    out <- rv$latest_unique %>%
+      dplyr::group_by(duplicate_id) %>%
+      tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
+      dplyr::filter(cite_source %in% sources) %>%
+      dplyr::filter(cite_string %in% strings) %>%
+      dplyr::filter(cite_label %in% labels) %>%
+      dplyr::summarise(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
+      dplyr::ungroup()
+    
   })
 
   output$plotgraph1 <- plotly::renderPlotly({
@@ -655,27 +647,22 @@ server <- function(input, output, session) {
       c(input$generateRecordTable,
       input$generateSummaryTable),
     {
-      sources <- input$sources_tables %>% paste(collapse = "|")
-      strings <- input$strings_tables %>% paste(collapse = "|")
-      labels <- input$labels_tables %>% paste(collapse = "|")
-      if (sources == "") sources <- ".*"
-      if (strings == "") strings <- ".*"
-      if (labels == "") labels <- ".*"
+      sources <- input$sources_tables 
+      sources <- ifelse(sources == "_blank_", "unknown", sources)
+      strings <- input$strings_tables
+      strings <- ifelse(strings == "_blank_", "unknown", strings)
+      labels <- input$labels_tables
+      labels <- ifelse(labels == "_blank_", "unknown", labels)
       
       out <- rv$latest_unique %>%
-        dplyr::filter(
-          (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
-          (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
-          (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
-        )
-      
-      out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out
+        dplyr::group_by(duplicate_id) %>%
+        tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
+        dplyr::filter(cite_source %in% sources) %>%
+        dplyr::filter(cite_string %in% strings) %>%
+        dplyr::filter(cite_label %in% labels) %>%
+        dplyr::mutate(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
+        unique() %>%
+        dplyr::ungroup()
     }
   )
 
@@ -695,27 +682,22 @@ server <- function(input, output, session) {
   }) %>% shiny::bindEvent(input$generateRecordTable)
 
   full_filtered_table <- reactive({
-      sources <- input$sources_tables %>% paste(collapse = "|")
-      strings <- input$strings_tables %>% paste(collapse = "|")
-      labels <- input$labels_tables %>% paste(collapse = "|")
-      if (sources == "") sources <- ".*"
-      if (strings == "") strings <- ".*"
-      if (labels == "") labels <- ".*"
-      
-      out <- rv$upload_df %>%
-        dplyr::filter(
-          (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
-          (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
-          (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
-        )
-      
-      out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out
+    sources <- input$sources_tables 
+    sources <- ifelse(sources == "_blank_", "", sources)
+    strings <- input$strings_tables
+    strings <- ifelse(strings == "_blank_", "", strings)
+    labels <- input$labels_tables 
+    labels <- ifelse(labels == "_blank_", "", labels)
+    
+    out <- rv$upload_df  %>%
+      dplyr::mutate(cite_source = ifelse(is.na(cite_source), "", cite_source)) %>%
+      dplyr::mutate(cite_string = ifelse(is.na(cite_string), "", cite_string)) %>%
+      dplyr::mutate(cite_label = ifelse(is.na(cite_label), "", cite_label)) %>%
+      dplyr::filter(cite_source %in% sources) %>%
+      dplyr::filter(cite_string %in% strings) %>%
+      dplyr::filter(cite_label %in% labels) %>%
+      unique() %>%
+      dplyr::ungroup()
     }
   ) %>%  shiny::bindEvent(input$generateSummaryTable)
   
