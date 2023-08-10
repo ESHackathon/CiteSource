@@ -17,7 +17,7 @@
 #' dedup_results <- dedup_citations(examplecitations)
 #' 
 
-dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE){
+dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE, show_unknown_tags=FALSE){
   
   # rename or coalesce columns
   targets <- c("journal", "number", "pages", "isbn", "record_id")
@@ -37,7 +37,7 @@ dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE){
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
   
-  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", shiny_progress=shiny_progress, show_unknown_tags = FALSE)
+  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", shiny_progress=shiny_progress, show_unknown_tags = show_unknown_tags)
   
   if(manual == FALSE){
     
@@ -59,26 +59,13 @@ dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE){
 }
 
 
-dedup_citations_add_manual <- function(raw_citations, additional_pairs) {
+dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
   
-  # rename or coalesce columns
-  targets <- c("journal", "number", "pages", "isbn", "record_id")
-  sources <- c("source", "issue", "start_page", "issn", "ID")
-  raw_citations <- add_cols(raw_citations, sources)
+  unique_citations$source = unique_citations$cite_source
+  unique_citations$label = unique_citations$cite_label
   
-  for (i in seq_along(targets)) {
-    if (targets[i] %in% names(raw_citations)) {
-      raw_citations[[targets[i]]] <- dplyr::coalesce(raw_citations[[targets[i]]], raw_citations[[sources[i]]])
-    }  else {
-      raw_citations[[targets[i]]] <- raw_citations[[sources[i]]]
-    }
-  }
-  
-  raw_citations <- add_cols(raw_citations, c("record_id", "cite_label", "cite_source", "cite_string"))
-  
-  raw_citations$source <- raw_citations$cite_source
-  raw_citations$label <- raw_citations$cite_label
-  dedup_results <- ASySD::dedup_citations_add_manual(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string",additional_pairs = additional_pairs, show_unknown_tags = FALSE)
+  dedup_results <- ASySD::dedup_citations_add_manual(unique_citations, additional_pairs = additional_pairs,
+                                                     extra_merge_fields = "cite_string")
 
   dedup_results$cite_source <- dedup_results$source
   dedup_results$cite_label <- dedup_results$label
