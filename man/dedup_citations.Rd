@@ -4,7 +4,12 @@
 \alias{dedup_citations}
 \title{Deduplicate citations - ASySD wrapper}
 \usage{
-dedup_citations(raw_citations, manual = FALSE, shiny_progress = FALSE)
+dedup_citations(
+  raw_citations,
+  manual = FALSE,
+  shiny_progress = FALSE,
+  show_unknown_tags = FALSE
+)
 }
 \arguments{
 \item{raw_citations}{Citation dataframe with relevant columns}
