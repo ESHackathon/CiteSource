@@ -101,29 +101,6 @@ and recall for each source, as well as totals.</p>
 in the 'cite_label' column of the input dataframes.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  db_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Database1"</span>, <span class="st">"Database1"</span>, <span class="st">"Database2"</span>, <span class="st">"Database3"</span>, <span class="st">"Database3"</span>, <span class="st">"Database3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  cite_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"screened"</span>, <span class="st">"final"</span>, <span class="st">"screened"</span>, <span class="st">"final"</span>, <span class="st">"screened"</span>, <span class="st">"final"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  other_data <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  db_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Database1"</span>, <span class="st">"Database1"</span>, <span class="st">"Database1"</span>, <span class="st">"Database2"</span>, <span class="st">"Database2"</span>, <span class="st">"Database3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  cite_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"screened"</span>, <span class="st">"final"</span>, <span class="st">"screened"</span>, <span class="st">"final"</span>, <span class="st">"screened"</span>, <span class="st">"final"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  other_data <span class="op">=</span> <span class="fl">7</span><span class="op">:</span><span class="fl">12</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">calculate_phase_count</span><span class="op">(</span><span class="va">unique_citations</span>, <span class="va">citations</span>, <span class="st">"db_source"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Source Distinct Records screened final Precision Recall</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Database1                2        1     1        50  33.33</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Database2                1        1     0         0      0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Database3                3        1     2     66.67  66.67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     Total                6        3     3        50     NA</span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

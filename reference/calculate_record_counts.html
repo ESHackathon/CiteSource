@@ -94,29 +94,7 @@ It also calculates the total for each count type.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A dataframe with counts of distinct records, imported records, and unique records for each source, including total counts and several calculated ratios and percentages.
-#' @examples
-unique_citations &lt;- data.frame(
-db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
-other_data = 1:6
-)</p>
-
-
-<p>citations &lt;- data.frame(
-db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
-other_data = 7:12
-)</p>
-
-
-<p>n_unique &lt;- data.frame(
-cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
-cite_label = c("search", "final", "search", "search", "search", "final"),
-unique = c(1, 0, 1, 1, 1, 0)
-)</p>
-
-
-<p>result &lt;- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
-result</p>
+<p>A dataframe with counts of distinct records, imported records, and unique records for each source, including total counts and several calculated ratios and percentages.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

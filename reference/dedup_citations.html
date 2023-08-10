@@ -63,7 +63,12 @@ in the same journal, so pre-prints and similar results will not be identified he
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dedup_citations</span><span class="op">(</span><span class="va">raw_citations</span>, manual <span class="op">=</span> <span class="cn">FALSE</span>, shiny_progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dedup_citations</span><span class="op">(</span></span>
+<span>  <span class="va">raw_citations</span>,</span>
+<span>  manual <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shiny_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_unknown_tags <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -96,10 +101,18 @@ in the same journal, so pre-prints and similar results will not be identified he
 <span class="r-in"><span><span class="co"># Deduplicate citations</span></span></span>
 <span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">examplecitations</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Search contains missing values for the record_id column. A record_id will be created using row names</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Search contains missing values for the record_id column. A record_id will be created using row numbers</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> identifying potential duplicates...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> identified duplicates!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(record_id)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> flagging potential pairs for manual dedup...</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>There were 2 warnings in `mutate()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> The first warning was:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `min_id = min(duplicate_id.x, duplicate_id.y)`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning in `min()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> no non-missing arguments, returning NA</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 1 remaining warning.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(duplicate_id.x, duplicate_id.y)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 165 citations loaded...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 67 duplicate citations removed...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 98 unique citations remaining!</span>
