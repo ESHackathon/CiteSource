@@ -109,6 +109,13 @@ ui <- shiny::navbarPage("CiteSource",
           color = "primary"
         ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B; margin-right: 20px"),
         shinyWidgets::actionBttn(
+          inputId = "completed_manual_dedup",
+          label = "Finished removing extra duplicates",
+          style = "jelly",
+          icon = shiny::icon("arrow-right"),
+          color = "primary"
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B"),
+        shinyWidgets::actionBttn(
           inputId = "nomanualdedup",
           label = "Proceed without manual dedup",
           style = "jelly",
@@ -240,8 +247,8 @@ ui <- shiny::navbarPage("CiteSource",
                   shiny::tabPanel(
                     "View summary table",
                     shiny::div("The first table will summarise the results by source. If your labels include 'search', 'screened' and 'final', a second table will summarise the contribution of each source across these stages."),
-                    #shiny::selectInput("summary_type", "Select grouping for summary table:",
-                    #            choices = c("source", "label", "string")),
+                    shiny::selectInput("summary_type", "Select grouping for summary table:",
+                               choices = c("source", "label", "string")),
                     shinyWidgets::actionBttn(
                       "generateSummaryTable", "Generate the table(s)",
                       style = "pill",
@@ -280,17 +287,17 @@ ui <- shiny::navbarPage("CiteSource",
 )
 
 
-
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
   rv <- shiny::reactiveValues()
 
   rv$df <- data.frame()
   rv$upload_df <- data.frame()
-  rv$unique <- data.frame()
-  rv$post_manual_dedup <- data.frame()
-
-  #### Upload files tab section ####
+  rv$latest_unique <- data.frame()
+  rv$pairs_to_check <- data.frame()
+  rv$pairs_removed <- data.frame()
+  
+  #### Upload files tab section ------
   # upload on click
   shiny::observeEvent(input$file, {
     shiny::validate(need(input$file != "", "Select your bibliographic file to upload..."))
@@ -365,9 +372,9 @@ server <- function(input, output, session) {
     file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
 
     if (file_extension == "csv") {
-      rv$unique <- reimport_csv(input$file_reimport$datapath)
+      rv$latest_unique <- reimport_csv(input$file_reimport$datapath)
     } else if (file_extension == "ris") {
-      rv$unique <- reimport_ris(input$file_reimport$datapath)
+      rv$latest_unique <- reimport_ris(input$file_reimport$datapath)
     } else {
       warning("Invalid file extension, needs to be .ris or .csv")
     }
@@ -375,15 +382,19 @@ server <- function(input, output, session) {
 
   ## Update filters
   shiny::observe({
-    if (nrow(rv$post_manual_dedup) > 0) {
+    if (nrow(rv$latest_unique) > 0) {
       
-      sources <- unique(rv$post_manual_dedup$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
-      labels <- unique(rv$post_manual_dedup$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
-      strings <- unique(rv$post_manual_dedup$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      sources <- unique(rv$latest_unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort() 
+      labels <- unique(rv$latest_unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      strings <- unique(rv$latest_unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
       
-      if (any(rv$post_manual_dedup$cite_source == "")) sources <- c(sources, "_blank_")
-      if (any(rv$post_manual_dedup$cite_label == "")) labels <- c(labels, "_blank_")
-      if (any(rv$post_manual_dedup$cite_string == "")) strings <- c(strings, "_blank_")
+      sources <- sources[sources != "unknown"]
+      labels  <- labels[labels != "unknown"]
+      strings <- strings[strings != "unknown"]
+      
+      if (any(rv$latest_unique$cite_source == "unknown")) sources <- c(sources, "_blank_")
+      if (any(rv$latest_unique$cite_label == "unknown")) labels <- c(labels, "_blank_")
+      if (any(rv$latest_unique$cite_string == "unknown")) strings <- c(strings, "_blank_")
       
       shiny::updateSelectInput(inputId = "sources_visual", choices = sources, selected = sources)
       shiny::updateSelectInput(inputId = "labels_visual", choices = labels, selected = labels)
@@ -421,7 +432,7 @@ server <- function(input, output, session) {
     rv$upload_df[c(rows$min_row:rows$max_row), col] <- val
   })
 
-  # Deduplication tab ----
+# Deduplication tab -----------------
 
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups, {
@@ -437,15 +448,18 @@ server <- function(input, output, session) {
     #Set here, otherwise manual deduplication fails if there are duplicate IDs
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
     
-    dedup_results <- dedup_citations(rv$upload_df, manual = TRUE, shiny_progress = TRUE)
+    # results of auto dedup
+    dedup_results <- dedup_citations(rv$upload_df, manual = TRUE, shiny_progress = TRUE, show_unknown_tags=TRUE)
 
+    # unique and pairs to check sent to reactive values
+    rv$pairs_to_check <- dedup_results$manual_dedup 
+    rv$latest_unique <- dedup_results$unique
 
-    rv$unique <- dedup_results$unique
-    rv$manual <- dedup_results$manual_dedup
-
+    # generate shiny alert with dedup results
     n_citations <- nrow(rv$upload_df)
-    n_unique <- nrow(rv$unique)
-    n_pairs_manual <- nrow(rv$manual)
+    n_unique <- nrow(rv$latest_unique)
+    n_pairs_manual <- nrow(rv$pairs_to_check)
+    
     shinyalert::shinyalert("Auto-deduplication complete",
       paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Head to the manual deduplication
                    tab to check ", n_pairs_manual, " potential duplicates"),
@@ -454,40 +468,50 @@ server <- function(input, output, session) {
   })
 
   # Action button: remove manually selected duplicates
-  shiny::observeEvent(input$manualdedupsubmit, {
-  
-      removeManual <- rv$manual %>%
-        dplyr::select(author1, author2, title1, title2, year1, year2, journal1, journal2, doi1, doi2, record_id1, record_id2)
-
-      duplicates <- removeManual[input$manual_dedup_dt_rows_selected, ]
-
-      
-      if (nrow(duplicates) < 1) {
-        shinyalert::shinyalert("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
-        return()
-      }
-
-      unique_citations <- rv$unique
-      after <- dedup_citations_add_manual(rv$upload_df,
-        additional_pairs = duplicates
-      )
-
-      rv$post_manual_dedup <- after
-
-      shinyalert::shinyalert("Manual deduplication complete",
-        paste(
-          "From a total of", nrow(rv$upload_df), "citations uploaded, there are", nrow(rv$post_manual_dedup),
-          "unique citations after automated and manual deduplication.
-                           Compare citations across sources, labels, and strings in the visualisation tab"
-        ),
-        type = "success"
-      )
-      
+  observeEvent(input$manualdedupsubmit, {
+    
+    rv$pairs_removed <- rv$pairs_to_check[input$manual_dedup_dt_rows_selected,]
+    rv$pairs_to_check <- rv$pairs_to_check[-input$manual_dedup_dt_rows_selected,]
+    
+    if(nrow(rv$pairs_removed) < 1){
+      shinyalert("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
+      return()
+    }
+    
   })
+  
 
+  ## Manual deduplication -----
+  
+  # remove manually selected duplicates 
+  observeEvent(input$manualdedupsubmit,{
+    
+    after <- dedup_citations_add_manual(rv$latest_unique,
+                                        additional_pairs = rv$pairs_removed)
+    
+    # update latest unique df reactive value
+    rv$latest_unique <- after
+    
+  })
+  
+    observeEvent(input$completed_manual_dedup,{
+      
+    # provide shiny alert
+    shinyalert::shinyalert("Manual deduplication complete",
+                           paste(
+                             "From a total of", nrow(rv$upload_df), "citations uploaded, there are", nrow(rv$latest_unique),
+                             "unique citations after automated and manual deduplication.
+                           Compare citations across sources, labels, and strings in the visualisation tab"
+                           ),
+                           type = "success"
+    )
+
+      })
+
+   
   # if no manual dedup, proceed to visualisations
   shiny::observeEvent(input$nomanualdedup, {
-    rv$post_manual_dedup <- rv$unique
+    
     shiny::updateNavbarPage(
       session = session,
       inputId = "tabs",
@@ -498,7 +522,7 @@ server <- function(input, output, session) {
 
   # Output: manual dedup datatable
   output$manual_dedup_dt <- DT::renderDT(
-    DT::datatable(rv$manual,
+    DT::datatable(rv$pairs_to_check,
       options = list(
         dom = "tp",
         pageLength = 10,
@@ -544,51 +568,40 @@ server <- function(input, output, session) {
   )
 
 
-  # Action: ASySD manual dedup pre text ----
+  # ASySD manual dedup pre text 
   output$Manual_pretext <- shiny::renderText({
 
-    paste(nrow(rv$manual), "pairs of citations require manual deduplication. Review the pairs in the table
+    paste(nrow(rv$pairs_to_check), "pairs of citations require manual deduplication. Review the pairs in the table
         below. You can scroll right to see all citation metadata and hover over any cell to see truncated text. Identical and near-identical fields are highlighted in green.
         Select all rows which contain duplicate pairs and click the button below to remove extra
         duplicates.")
   })
 
 
-  # # display results of deduplication
-  # output$dedup_results <- renderDataTable({
-  #
-  #   gr
-  # })
-
-
   #### Visualise tab ####
 
   unique_filtered_visual <- shiny::reactive({
-    sources <- input$sources_visual %>% paste(collapse = "|")
-    strings <- input$strings_visual %>% paste(collapse = "|")
-    labels <- input$labels_visual %>% paste(collapse = "|")
-    if (sources == "") sources <- ".*"
-    if (strings == "") strings <- ".*"
-    if (labels == "") labels <- ".*"
-    out <- rv$post_manual_dedup %>%
-      dplyr::filter(
-        (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
-        (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
-        (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
-      )
-
-    out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
-      purrr::map_chr(~ paste(.x, collapse = ", "))
-    out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
-      purrr::map_chr(~ paste(.x, collapse = ", "))
-    out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
-      purrr::map_chr(~ paste(.x, collapse = ", "))
-
-    out
+    
+    sources <- input$sources_visual 
+    sources <- ifelse(sources == "_blank_", "unknown", sources)
+    strings <- input$strings_visual
+    strings <- ifelse(strings == "_blank_", "unknown", strings)
+    labels <- input$labels_visual 
+    labels <- ifelse(labels == "_blank_", "unknown", labels)
+    
+    out <- rv$latest_unique %>%
+      dplyr::group_by(duplicate_id) %>%
+      tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
+      dplyr::filter(cite_source %in% sources) %>%
+      dplyr::filter(cite_string %in% strings) %>%
+      dplyr::filter(cite_label %in% labels) %>%
+      dplyr::summarise(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
+      dplyr::ungroup()
+    
   })
 
   output$plotgraph1 <- plotly::renderPlotly({
-    if (nrow(rv$post_manual_dedup) == 0) {
+    if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
         "Please import and deduplicate your citations first.",
         type = "error"
@@ -607,7 +620,7 @@ server <- function(input, output, session) {
   })
 
   output$plotgraph2 <- shiny::renderPlot({
-    if (nrow(rv$post_manual_dedup) == 0) {
+    if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
         "Please import and deduplicate your citations first.",
         type = "error"
@@ -634,32 +647,27 @@ server <- function(input, output, session) {
       c(input$generateRecordTable,
       input$generateSummaryTable),
     {
-      sources <- input$sources_tables %>% paste(collapse = "|")
-      strings <- input$strings_tables %>% paste(collapse = "|")
-      labels <- input$labels_tables %>% paste(collapse = "|")
-      if (sources == "") sources <- ".*"
-      if (strings == "") strings <- ".*"
-      if (labels == "") labels <- ".*"
+      sources <- input$sources_tables 
+      sources <- ifelse(sources == "_blank_", "unknown", sources)
+      strings <- input$strings_tables
+      strings <- ifelse(strings == "_blank_", "unknown", strings)
+      labels <- input$labels_tables
+      labels <- ifelse(labels == "_blank_", "unknown", labels)
       
-      out <- rv$post_manual_dedup %>%
-        dplyr::filter(
-          (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
-          (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
-          (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
-        )
-      
-      out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out
+      out <- rv$latest_unique %>%
+        dplyr::group_by(duplicate_id) %>%
+        tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
+        dplyr::filter(cite_source %in% sources) %>%
+        dplyr::filter(cite_string %in% strings) %>%
+        dplyr::filter(cite_label %in% labels) %>%
+        dplyr::mutate(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
+        unique() %>%
+        dplyr::ungroup()
     }
   )
 
   output$reviewTab <- DT::renderDataTable({
-    if (nrow(rv$post_manual_dedup) == 0) {
+    if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
         "Please import and deduplicate your citations first.",
         type = "error"
@@ -674,32 +682,27 @@ server <- function(input, output, session) {
   }) %>% shiny::bindEvent(input$generateRecordTable)
 
   full_filtered_table <- reactive({
-      sources <- input$sources_tables %>% paste(collapse = "|")
-      strings <- input$strings_tables %>% paste(collapse = "|")
-      labels <- input$labels_tables %>% paste(collapse = "|")
-      if (sources == "") sources <- ".*"
-      if (strings == "") strings <- ".*"
-      if (labels == "") labels <- ".*"
-      
-      out <- rv$upload_df %>%
-        dplyr::filter(
-          (.data$cite_source == "" & stringr::str_detect(sources, "_blank_"))  | stringr::str_detect(.data$cite_source, sources),
-          (.data$cite_string == "" & stringr::str_detect(strings, "_blank_")) | stringr::str_detect(.data$cite_string, strings),
-          (.data$cite_label == "" & stringr::str_detect(labels, "_blank_")) | stringr::str_detect(.data$cite_label, labels)
-        )
-      
-      out$cite_source <- stringr::str_extract_all(out$cite_source, sources) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_label <- stringr::str_extract_all(out$cite_label, labels) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out$cite_string <- stringr::str_extract_all(out$cite_string, strings) %>%
-        purrr::map_chr(~ paste(.x, collapse = ", "))
-      out
+    sources <- input$sources_tables 
+    sources <- ifelse(sources == "_blank_", "", sources)
+    strings <- input$strings_tables
+    strings <- ifelse(strings == "_blank_", "", strings)
+    labels <- input$labels_tables 
+    labels <- ifelse(labels == "_blank_", "", labels)
+    
+    out <- rv$upload_df  %>%
+      dplyr::mutate(cite_source = ifelse(is.na(cite_source), "", cite_source)) %>%
+      dplyr::mutate(cite_string = ifelse(is.na(cite_string), "", cite_string)) %>%
+      dplyr::mutate(cite_label = ifelse(is.na(cite_label), "", cite_label)) %>%
+      dplyr::filter(cite_source %in% sources) %>%
+      dplyr::filter(cite_string %in% strings) %>%
+      dplyr::filter(cite_label %in% labels) %>%
+      unique() %>%
+      dplyr::ungroup()
     }
   ) %>%  shiny::bindEvent(input$generateSummaryTable)
   
   output$summaryRecordTab <- gt::render_gt({
-    if (nrow(rv$post_manual_dedup) == 0) {
+    if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
         "Please import and deduplicate your citations first.",
         type = "error"
@@ -710,14 +713,14 @@ server <- function(input, output, session) {
     unique_citations <- unique_filtered_table()
     full_citations <- full_filtered_table()
     
-    browser()
+    # browser()
     
     calculated_counts <- calculate_record_counts(unique_citations, full_citations, count_unique(unique_citations), paste0("cite_", input$summary_type))
     record_summary_table(calculated_counts)
   }) %>% shiny::bindEvent(input$generateSummaryTable)
 
   output$summaryPrecTab <- gt::render_gt({
-    if (nrow(rv$post_manual_dedup) == 0) {
+    if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
                              "Please import and deduplicate your citations first.",
                              type = "error"
@@ -746,8 +749,8 @@ server <- function(input, output, session) {
       paste("data-", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
-      if (nrow(rv$post_manual_dedup) > 0) {
-        write.csv(manual_dedup_result, file)
+      if (nrow(rv$latest_unique) > 0) {
+        write.csv(rv$latest_unique, file)
       } else {
         stop("No data to download!")
         shiny::req(FALSE)
@@ -759,7 +762,7 @@ server <- function(input, output, session) {
       paste("data-", Sys.Date(), ".bib", sep = "")
     },
     content = function(file) {
-      export_bib(rv$post_manual_dedup, file)
+      export_bib(rv$latest_unique, file)
     }
   )
 
@@ -768,7 +771,7 @@ server <- function(input, output, session) {
       paste("data-", Sys.Date(), ".bib", sep = "")
     },
     content = function(file) {
-      export_ris(rv$post_manual_dedup, file)
+      export_ris(rv$latest_unique, file)
     }
   )
 }
