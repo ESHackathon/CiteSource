@@ -111,25 +111,25 @@ record_counts <- function(unique_citations, citations, db_colname) {
 #' @param db_colname Character. The name of the column containing the database source information.
 #'
 #' @return A dataframe with counts of distinct records, imported records, and unique records for each source, including total counts and several calculated ratios and percentages.
-#' #' @examples
-#' unique_citations <- data.frame(
-#'   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
-#'   other_data = 1:6
-#' )
-#' 
-#' citations <- data.frame(
-#'   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
-#'   other_data = 7:12
-#' )
-#' 
-#' n_unique <- data.frame(
-#'   cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
-#'   cite_label = c("search", "final", "search", "search", "search", "final"),
-#'   unique = c(1, 0, 1, 1, 1, 0)
-#' )
-#' 
-#' result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
-#' result
+#' @examples
+# unique_citations <- data.frame(
+#   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+#   other_data = 1:6
+# )
+# 
+# citations <- data.frame(
+#   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+#   other_data = 7:12
+# )
+# 
+# n_unique <- data.frame(
+#   cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
+#   cite_label = c("search", "final", "search", "search", "search", "final"),
+#   unique = c(1, 0, 1, 1, 1, 0)
+# )
+# 
+# result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
+# result
 
 
 calculate_record_counts <- function(unique_citations, citations, n_unique, db_colname) {
@@ -222,20 +222,21 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
 #' and recall for each source, as well as totals.
 #'
 #' @examples
-#' unique_citations <- data.frame(
-#'   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
-#'   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
-#'   other_data = 1:6
-#' )
-#' 
-#' citations <- data.frame(
-#'   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
-#'   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
-#'   other_data = 7:12
-#' )
-#' 
-#' result <- calculate_phase_count(unique_citations, citations, "db_source")
-#' result
+# unique_citations <- data.frame(
+#   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+#   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
+#   duplicate_id = c(102, 102, 103, 103, 104, 104),
+#   other_data = 1:6
+# )
+# 
+# citations <- data.frame(
+#   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+#   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
+#   other_data = 7:12
+# )
+# 
+# result <- calculate_phase_count(unique_citations, citations, "db_source")
+# result
 
 
 calculate_phase_count <- function(unique_citations, citations, db_colname) {
@@ -251,8 +252,11 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
       warning("The data does not contain 'final' label.")
     }
     source_phase_df <- source_phase_df %>%
-      tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",") %>%
-      tidyr::separate_rows(cite_label, sep = ",") %>%
+      dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) %>%
+      tidyr::separate_rows(!!rlang::sym(db_colname), sep = ", ") %>%
+      tidyr::separate_rows(cite_label, sep = ", ") %>%
+      unique() %>%
+      dplyr::filter(!(!!db_colname == "unknown")) %>%
       dplyr::mutate(!!rlang::sym(db_colname) := stringr::str_trim(!!rlang::sym(db_colname)),
                     cite_label = stringr::str_trim(cite_label)) %>%
       dplyr::mutate(screened = ifelse(.data$cite_label == "screened", 1, 0),
@@ -277,7 +281,8 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   combined_counts[is.na(combined_counts)] <- 0
   
   combined_counts <- combined_counts %>%
-    dplyr::mutate(Precision = ifelse(.data$`Distinct Records` != 0, round((.data$final / .data$`Distinct Records`) * 100, 2), 0))
+    dplyr::mutate(Precision = ifelse(.data$`Distinct Records` != 0, round((.data$final / .data$`Distinct Records`) * 100, 2), 0)) %>%
+    dplyr::filter(!Source == "unknown")
   
   # Calculate total_final before the loop
   total_final <- sum(citations$cite_label == "final")
