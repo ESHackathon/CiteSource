@@ -29,19 +29,3 @@ will give a warning if these labels are not present in the input dataframes.
 The function will give a warning if 'screened' and 'final' labels are not present
 in the 'cite_label' column of the input dataframes.
 }
-\examples{
-unique_citations <- data.frame(
-  db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
-  cite_label = c("screened", "final", "screened", "final", "screened", "final"),
-  other_data = 1:6
-)
-
-citations <- data.frame(
-  db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
-  cite_label = c("screened", "final", "screened", "final", "screened", "final"),
-  other_data = 7:12
-)
-
-result <- calculate_phase_count(unique_citations, citations, "db_source")
-result
-}
