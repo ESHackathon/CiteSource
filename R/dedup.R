@@ -58,7 +58,23 @@ dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE, s
   
 }
 
-
+#' Remove pairs with manual dedup - ASySD wrapper
+#'
+#' This function deduplicates citation data. Note that duplicates are assumed to published
+#' in the same journal, so pre-prints and similar results will not be identified here.
+#'
+#' @export
+#' @param unique_citations Unique citations post deduplication
+#' @param additional_pairs TRUE duplicate pairs
+#' @return unique citations formatted for CiteSource
+#' @examples
+#' # Load example data from the package
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
+#'
+#' # Deduplicate citations
+#' dedup_results <- dedup_citations(examplecitations)
+#' 
 dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
   
   unique_citations$source = unique_citations$cite_source
