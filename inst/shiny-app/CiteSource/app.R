@@ -540,8 +540,8 @@ server <- function(input, output, session) {
 
   observe({
    shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
-                      choices = names(rv$manual)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
-                      selected = names(rv$manual)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
+                      choices = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
+                      selected = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
   })
   
   
@@ -568,7 +568,7 @@ server <- function(input, output, session) {
   # Output: manual dedup datatable
   manual_dedup_data <- reactive({
     
-    data <- rv$manual[,1:36]
+    data <- rv$pairs_to_check[,1:36]
     data <- data[,c(paste0(input$manual_dedup_cols))]
     
     match_cols <- c("title", "author", "doi", "volume",
@@ -576,7 +576,7 @@ server <- function(input, output, session) {
     
     
     data <- data %>% dplyr::select(-any_of(match_cols))
-   match_number_cols <- rv$manual[,c(paste0(match_cols))]
+   match_number_cols <- rv$pairs_to_check[,c(paste0(match_cols))]
    
    data <- cbind(data,match_number_cols)
    
@@ -633,7 +633,7 @@ server <- function(input, output, session) {
   # ASySD manual dedup pre text 
   output$Manual_pretext <- shiny::renderText({
 
-    paste(nrow(rv$manual), "pairs of citations require manual deduplication. Review the pairs in the table
+    paste(nrow(rv$pairs_to_check), "pairs of citations require manual deduplication. Review the pairs in the table
         below.")
 
   })
