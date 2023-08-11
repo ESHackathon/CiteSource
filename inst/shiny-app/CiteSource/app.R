@@ -124,20 +124,20 @@ ui <- shiny::navbarPage("CiteSource",
         
         # Button
         shinyWidgets::actionBttn(
-          inputId = "manualdedupsubmit",
-          label = "Remove duplicates",
-          style = "jelly",
-          icon = shiny::icon("reply"),
-          color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B; margin-right: 20px"),
-        shinyWidgets::actionBttn(
           inputId = "nomanualdedup",
-          label = "Proceed without manual dedup",
+          label = "Go to visualisations",
           style = "jelly",
           icon = shiny::icon("arrow-right"),
           color = "primary"
         ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173"),
-        
+        br(),
+        shinyWidgets::actionBttn(
+          inputId = "manualdedupsubmit",
+          label = "Remove additional duplicates",
+          style = "jelly",
+          icon = shiny::icon("reply"),
+          color = "primary" # Hide the button initially
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
         
         shinyWidgets::dropdown(
           
@@ -545,7 +545,16 @@ server <- function(input, output, session) {
     )
   })
 
-
+  # if rows selected in manual dedup, make buttom appear
+  observe({
+    selected_rows <- input$manual_dedup_dt_rows_selected
+    if (length(selected_rows) > 0) {
+      shinyjs::show("manualdedupsubmit")  # Show the button when rows are selected
+    } else {
+      shinyjs::hide("manualdedupsubmit")  # Hide the button when no rows are selected
+    }
+  })
+  
   # Output: manual dedup datatable
   manual_dedup_data <- reactive({
     
