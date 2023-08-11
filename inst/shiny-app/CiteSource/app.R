@@ -46,7 +46,7 @@ ui <- shiny::navbarPage("CiteSource",
         margin-bottom: .5rem;
         font-weight: 500;
         line-height: 1.2;
-        color: #008080;
+        color: #23395B;
       }
     "))
   ),
@@ -62,7 +62,8 @@ ui <- shiny::navbarPage("CiteSource",
       shiny::tabPanel(
         title = "Use Cases",
         htmltools::includeMarkdown("www/use-cases.md")
-      )
+      ),
+      widths = c(2, 10)
     )
   ),
   shiny::tabPanel(
@@ -73,13 +74,13 @@ ui <- shiny::navbarPage("CiteSource",
         # Sidebar layout with input and output definitions ----
         shiny::sidebarLayout(
           shiny::sidebarPanel( # Input: Select a file ----
-            shiny::h4("Step 1: Upload your citation files"),
+            shiny::h5("Step 1: Upload your citation files"),
             shiny::fileInput("file", "",
               multiple = TRUE,
               accept = c(".ris", ".txt", ".bib")
             ),
             shiny::hr(),
-            shiny::h4("OR: Re-upload a file exported from CiteSource"),
+            shiny::h5("OR: Re-upload a file exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
               multiple = TRUE,
               accept = c(".ris", ".csv")
@@ -88,7 +89,7 @@ ui <- shiny::navbarPage("CiteSource",
 
           # Main panel for displaying outputs ----
           shiny::mainPanel(
-            shiny::h4("Step 2: Double click the row to edit sources, labels, and strings"),
+            shiny::h5("Step 2: Double click the row to edit sources, labels, and strings"),
             # Output: Data file ----
             DT::dataTableOutput("tbl_out")
           )
@@ -101,7 +102,8 @@ ui <- shiny::navbarPage("CiteSource",
     shiny::tabsetPanel(
       shiny::tabPanel(
         "Automated deduplication",
-        shiny::h4("Step 3: Deduplicate"),
+        br(),
+        shiny::h5("Step 3: Deduplicate"),
         shiny::p("Click the button below to detect and remove duplicates automatically"),
 
         # Action button: identify duplicates in uploaded dataset
@@ -117,7 +119,8 @@ ui <- shiny::navbarPage("CiteSource",
       ),
       shiny::tabPanel(
         "Manual deduplication",
-        shiny::h4("Step 4: Review potential duplicates manually"),
+        br(),
+        shiny::h5("Step 4: Review potential duplicates manually"),
         shiny::textOutput("Manual_pretext"),
         shiny::br(),
 
@@ -159,24 +162,24 @@ ui <- shiny::navbarPage("CiteSource",
           status = "danger", width = "600px",
           tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")),
     
-        DT::DTOutput("manual_dedup_dt")
+        DT::DTOutput("manual_dedup_dt"),
+        tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
+            background-color: #CBF7ED!important; color: black!important}")),
+        
       )
     )
   ),
   shiny::tabPanel(
     "Visualise",
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::fluidRow(
-          shiny::column(
-            12,
-            # Sidebar layout with input and output definitions ----
+    
+    # Sidebar layout with input and output definitions ----
             shiny::sidebarLayout(
 
               # Sidebar panel for inputs ----
               shiny::sidebarPanel(
+                width = 3,
                 id = "sidebar",
+                shiny::h5("Step 5: Visualise overlap"),
                 shinyWidgets::prettyRadioButtons(
                   inputId = "comp_type",
                   label = "Chose a comparison",
@@ -222,26 +225,19 @@ ui <- shiny::navbarPage("CiteSource",
                   )
                 )
               )
-            )
-          )
-        )
-      )
-    )
-  ),
+            )),
+  
   shiny::tabPanel(
     "Tables",
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::fluidRow(
-          shiny::column(
-            12,
-            # Sidebar layout with input and output definitions ----
-            shiny::sidebarLayout(
+    
+    # Sidebar layout with input and output definitions ----
+          shiny::sidebarLayout(
 
               # Sidebar panel for inputs ----
               shiny::sidebarPanel(
                 id = "sidebar",
+                width = 3,
+                shiny::h5("Step 6: Summary tables"),
                 selectInput(
                   inputId = "sources_tables",
                   "Sources to include",
@@ -299,20 +295,17 @@ ui <- shiny::navbarPage("CiteSource",
                     gt::gt_output("summaryPrecTab")
                   )
                 )
-              )
-            )
-          )
-        )
-      )
-    )
-  ),
+              ))
+    ),
+    
   shiny::tabPanel(
     "Export",
     shiny::fluidRow(
       shiny::column(
         12,
         shiny::mainPanel(
-          shiny::h5("Note that you can only download the data after you have run the deduplication."),
+          shiny::h5("Step 7: Export citations"),
+          shiny::h6("Note that you can only download the data after you have run the deduplication."),
           shiny::downloadButton("downloadCsv", "Download csv"),
           shiny::downloadButton("downloadRis", "Download RIS"),
           shiny::downloadButton("downloadBib", "Download BibTex")
@@ -604,28 +597,26 @@ server <- function(input, output, session) {
                       )
                     )
                   )
-              )
-    ) %>%
-      DT::formatStyle(
-        columns = format_cols,
-        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
-        target = "row"
-      ) %>%
-      DT::formatStyle(
-        columns = format_cols,
-        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
-        target = "cell",
-        color = JS("value >= 0.95 ? 'white' : null")
-      )
+              ))
+    # ) %>%
+    #   DT::formatStyle(
+    #     columns = format_cols,
+    #     backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
+    #     target = "row"
+    #   ) %>%
+    #   DT::formatStyle(
+    #     columns = format_cols,
+    #     backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
+    #     target = "cell",
+    #     color = JS("value >= 0.95 ? 'white' : null")
+    #   )
   })
 
   # Action: ASySD manual dedup pre text ----
   output$Manual_pretext <- shiny::renderText({
 
     paste(nrow(rv$manual), "pairs of citations require manual deduplication. Review the pairs in the table
-        below. You can scroll right to see all citation metadata and hover over any cell to see truncated text. Identical and near-identical fields are highlighted in green.
-        Select all rows which contain duplicate pairs and click the button below to remove extra
-        duplicates.")
+        below.")
   })
 
 
