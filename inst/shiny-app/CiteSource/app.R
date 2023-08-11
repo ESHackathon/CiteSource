@@ -262,20 +262,7 @@ ui <- shiny::navbarPage("CiteSource",
               ),
               shiny::mainPanel(
                 shiny::tabsetPanel(
-                  shiny::tabPanel(
-                    "Review individual records",
-                    shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
-                    shiny::br(),
-                    shinyWidgets::actionBttn(
-                      "generateRecordTable", "Generate the table",
-                      style = "jelly",
-                      icon = shiny::icon("table"),
-                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-                    
-                    shiny::br(),
-                    shiny::br(" "),
-                    DT::dataTableOutput("reviewTab")
-                  ),
+                  
                   shiny::tabPanel(
                     "View summary table",
                     shiny::div("The first table will summarise the results by source. If your labels include 'search', 'screened' and 'final', a second table will summarise the contribution of each source across these stages."),
@@ -293,6 +280,20 @@ ui <- shiny::navbarPage("CiteSource",
                     shiny::br(),
                     shiny::br(" "),
                     gt::gt_output("summaryPrecTab")
+                  ),
+                  shiny::tabPanel(
+                    "Review individual records",
+                    shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
+                    shiny::br(),
+                    shinyWidgets::actionBttn(
+                      "generateRecordTable", "Generate the table",
+                      style = "jelly",
+                      icon = shiny::icon("table"),
+                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                    
+                    shiny::br(),
+                    shiny::br(" "),
+                    DT::dataTableOutput("reviewTab")
                   )
                 )
               ))
