@@ -1,3 +1,5 @@
+library(DT)
+
 # Set background colour
 shiny::tags$head(shiny::tags$style(
   shiny::HTML('
@@ -10,6 +12,9 @@ shiny::tags$head(shiny::tags$style(
                     }')
 ))
 
+columns2hide <- c("title", "author", "doi", "volume",
+                "pages", "number", "year", "abstract", "journal", "isbn")
+
 
 # Define UI for data upload app ----
 ui <- shiny::navbarPage("CiteSource",
@@ -18,17 +23,33 @@ ui <- shiny::navbarPage("CiteSource",
     shinybusy::add_busy_spinner(spin = "circle"),
     shinyjs::useShinyjs()
   ),
-  # theme = bslib::bs_theme(bg = "rgb(251, 251, 251)",
-  #                  primary = "#008080",
-  #                  secondary = "#00CED1",
-  #                  success = "#48D1CC",
-  #                  info = "#82D173",
-  #                  warning = "#FFC07F",
-  #                  danger = "#C1666B",
-  #                  font_scale = NULL,
-  #                  bootswatch = "cerulean",
-  #                  fg = "#000"),
-
+  theme = bslib::bs_theme(
+    bg = "rgb(251, 251, 251)",
+    primary = "#008080",
+    secondary = "#CBF7ED",
+    success = "#23395B",
+    info = "#82D173",
+    warning = "#FFC07F",
+    danger = "#008080",
+    font_scale = NULL,
+    bootswatch = "cerulean",
+    fg = "#000",
+    input_bg = "#E0E0E0",  # Set the background color for input boxes
+    input_border_color = "#23395B"  # Set the border color for input boxes
+  ),
+  
+  #header text colour
+  tags$head(
+    tags$style(HTML("
+      h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+        margin-top: 0;
+        margin-bottom: .5rem;
+        font-weight: 500;
+        line-height: 1.2;
+        color: #008080;
+      }
+    "))
+  ),
 
   # Home tab
   shiny::tabPanel(
@@ -89,7 +110,7 @@ ui <- shiny::navbarPage("CiteSource",
           style = "jelly",
           color = "primary",
           icon = shiny::icon("search")
-        ),
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
 
         # Output: datatable of deduplication results
         DT::dataTableOutput("dedup_results")
@@ -100,6 +121,7 @@ ui <- shiny::navbarPage("CiteSource",
         shiny::textOutput("Manual_pretext"),
         shiny::br(),
 
+        
         # Button
         shinyWidgets::actionBttn(
           inputId = "manualdedupsubmit",
@@ -107,15 +129,36 @@ ui <- shiny::navbarPage("CiteSource",
           style = "jelly",
           icon = shiny::icon("reply"),
           color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B; margin-right: 20px"),
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B; margin-right: 20px"),
         shinyWidgets::actionBttn(
           inputId = "nomanualdedup",
           label = "Proceed without manual dedup",
           style = "jelly",
           icon = shiny::icon("arrow-right"),
           color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B"),
-        shiny::br(),
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173"),
+        
+        
+        shinyWidgets::dropdown(
+          
+          tags$h3("Select columns to display"),
+
+          shinyWidgets::pickerInput(
+            inputId = "manual_dedup_cols",
+            label = "Choose columns",
+            choices = NULL,
+            selected = NULL,
+            multiple = TRUE,
+            options = list(
+              `live-search` = TRUE,
+              `actions-box` = TRUE,
+              style = "btn-primary")
+          ), 
+          icon = icon("filter"),
+          inline =TRUE,
+          status = "danger", width = "600px",
+          tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")),
+    
         DT::DTOutput("manual_dedup_dt")
       )
     )
@@ -485,6 +528,13 @@ server <- function(input, output, session) {
       
   })
 
+  observe({
+   shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
+                      choices = names(rv$manual)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
+                      selected = names(rv$manual)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
+  })
+  
+  
   # if no manual dedup, proceed to visualisations
   shiny::observeEvent(input$nomanualdedup, {
     rv$post_manual_dedup <- rv$unique
@@ -497,52 +547,68 @@ server <- function(input, output, session) {
 
 
   # Output: manual dedup datatable
-  output$manual_dedup_dt <- DT::renderDT(
-    DT::datatable(rv$manual,
-      options = list(
-        dom = "tp",
-        pageLength = 10,
-        fixedColumns = TRUE,
-        scrollX = TRUE,
-        columnDefs =
-          list(
-            list(visible = FALSE, targets = c(3, 6, 9, 12, 15, 18, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36)),
-            list(
-              targets = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-              render = htmlwidgets::JS(
-                "function(data, type, row, meta) {",
-                "return type === 'display' && data != null && data.length > 25 ?",
-                "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
-                "}"
+  manual_dedup_data <- reactive({
+    
+    data <- rv$manual[,1:36]
+    data <- data[,c(paste0(input$manual_dedup_cols))]
+    
+    match_cols <- c("title", "author", "doi", "volume",
+                    "pages", "number", "year", "abstract", "journal", "isbn")
+    
+    
+    data <- data %>% dplyr::select(-any_of(match_cols))
+   match_number_cols <- rv$manual[,c(paste0(match_cols))]
+   
+   data <- cbind(data,match_number_cols)
+   
+  })
+  output$manual_dedup_dt <- DT::renderDataTable({
+    
+    data <- manual_dedup_data()
+    
+    format_cols <- c(
+      "title1", "author1", "doi1", "volume1",
+      "pages1", "number1", "year1", "abstract1", "journal1", "isbn1",
+      "title2", "author2", "doi2", "volume2",
+      "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
+    )
+    
+    format_cols <- intersect(format_cols, colnames(data))
+    shinyjs::useShinyjs()
+    
+    datatable(data,
+              options = list(
+                dom = "tp",
+                pageLength = 10,
+                scrollX = TRUE,
+                columnDefs =
+                  list(
+                    list(visible = FALSE, 
+                         targets = columns2hide),
+                    list(
+                      targets = "_all",
+                      render = JS(
+                        "function(data, type, row, meta) {",
+                        "return type === 'display' && data != null && data.length > 25 ?",
+                        "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
+                        "}"
+                      )
+                    )
+                  )
               )
-            )
-          )
-      )
     ) %>%
       DT::formatStyle(
-        c(
-          "title1", "author1", "doi1", "volume1",
-          "pages1", "number1", "year1", "abstract1", "journal1", "isbn1"
-        ),
-        c(
-          "title", "author", "doi", "volume",
-          "pages", "number", "year", "abstract", "journal", "isbn"
-        ),
-        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173"))
+        columns = format_cols,
+        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
+        target = "row"
       ) %>%
       DT::formatStyle(
-        c(
-          "title2", "author2", "doi2", "volume2",
-          "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
-        ),
-        c(
-          "title", "author", "doi", "volume",
-          "pages", "number", "year", "abstract", "journal", "isbn"
-        ),
-        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173"))
+        columns = format_cols,
+        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
+        target = "cell",
+        color = JS("value >= 0.95 ? 'white' : null")
       )
-  )
-
+  })
 
   # Action: ASySD manual dedup pre text ----
   output$Manual_pretext <- shiny::renderText({
