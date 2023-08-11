@@ -580,9 +580,9 @@ server <- function(input, output, session) {
     
     datatable(data,
               options = list(
-                dom = "tp",
+                dom = "t",
                 pageLength = 10,
-                scrollX = TRUE,
+                lengthMenu = c(10, 20, 30, 40),
                 columnDefs =
                   list(
                     list(visible = FALSE, 
