@@ -1,3 +1,5 @@
+library(DT)
+
 # Set background colour
 shiny::tags$head(shiny::tags$style(
   shiny::HTML('
@@ -10,6 +12,9 @@ shiny::tags$head(shiny::tags$style(
                     }')
 ))
 
+columns2hide <- c("title", "author", "doi", "volume",
+                "pages", "number", "year", "abstract", "journal", "isbn")
+
 
 # Define UI for data upload app ----
 ui <- shiny::navbarPage("CiteSource",
@@ -18,17 +23,33 @@ ui <- shiny::navbarPage("CiteSource",
     shinybusy::add_busy_spinner(spin = "circle"),
     shinyjs::useShinyjs()
   ),
-  # theme = bslib::bs_theme(bg = "rgb(251, 251, 251)",
-  #                  primary = "#008080",
-  #                  secondary = "#00CED1",
-  #                  success = "#48D1CC",
-  #                  info = "#82D173",
-  #                  warning = "#FFC07F",
-  #                  danger = "#C1666B",
-  #                  font_scale = NULL,
-  #                  bootswatch = "cerulean",
-  #                  fg = "#000"),
-
+  theme = bslib::bs_theme(
+    bg = "rgb(251, 251, 251)",
+    primary = "#008080",
+    secondary = "#CBF7ED",
+    success = "#23395B",
+    info = "#82D173",
+    warning = "#FFC07F",
+    danger = "#008080",
+    font_scale = NULL,
+    bootswatch = "cerulean",
+    fg = "#000",
+    input_bg = "#E0E0E0",  # Set the background color for input boxes
+    input_border_color = "#23395B"  # Set the border color for input boxes
+  ),
+  
+  #header text colour
+  tags$head(
+    tags$style(HTML("
+      h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+        margin-top: 0;
+        margin-bottom: .5rem;
+        font-weight: 500;
+        line-height: 1.2;
+        color: #23395B;
+      }
+    "))
+  ),
 
   # Home tab
   shiny::tabPanel(
@@ -41,7 +62,8 @@ ui <- shiny::navbarPage("CiteSource",
       shiny::tabPanel(
         title = "Use Cases",
         htmltools::includeMarkdown("www/use-cases.md")
-      )
+      ),
+      widths = c(2, 10)
     )
   ),
   shiny::tabPanel(
@@ -52,13 +74,13 @@ ui <- shiny::navbarPage("CiteSource",
         # Sidebar layout with input and output definitions ----
         shiny::sidebarLayout(
           shiny::sidebarPanel( # Input: Select a file ----
-            shiny::h4("Step 1: Upload your citation files"),
+            shiny::h5("Step 1: Upload your citation files"),
             shiny::fileInput("file", "",
               multiple = TRUE,
               accept = c(".ris", ".txt", ".bib")
             ),
             shiny::hr(),
-            shiny::h4("OR: Re-upload a file exported from CiteSource"),
+            shiny::h5("OR: Re-upload a file exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
               multiple = TRUE,
               accept = c(".ris", ".csv")
@@ -67,7 +89,7 @@ ui <- shiny::navbarPage("CiteSource",
 
           # Main panel for displaying outputs ----
           shiny::mainPanel(
-            shiny::h4("Step 2: Double click the row to edit sources, labels, and strings"),
+            shiny::h5("Step 2: Double click the row to edit sources, labels, and strings"),
             # Output: Data file ----
             DT::dataTableOutput("tbl_out")
           )
@@ -80,7 +102,8 @@ ui <- shiny::navbarPage("CiteSource",
     shiny::tabsetPanel(
       shiny::tabPanel(
         "Automated deduplication",
-        shiny::h4("Step 3: Deduplicate"),
+        br(),
+        shiny::h5("Step 3: Deduplicate"),
         shiny::p("Click the button below to detect and remove duplicates automatically"),
 
         # Action button: identify duplicates in uploaded dataset
@@ -89,58 +112,74 @@ ui <- shiny::navbarPage("CiteSource",
           style = "jelly",
           color = "primary",
           icon = shiny::icon("search")
-        ),
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
 
         # Output: datatable of deduplication results
         DT::dataTableOutput("dedup_results")
       ),
       shiny::tabPanel(
         "Manual deduplication",
-        shiny::h4("Step 4: Review potential duplicates manually"),
+        br(),
+        shiny::h5("Step 4: Review potential duplicates manually"),
         shiny::textOutput("Manual_pretext"),
         shiny::br(),
 
+        
         # Button
         shinyWidgets::actionBttn(
+          inputId = "nomanualdedup",
+          label = "Go to visualisations",
+          style = "jelly",
+          icon = shiny::icon("arrow-right"),
+          color = "primary"
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173"),
+        br(),
+        shinyWidgets::actionBttn(
           inputId = "manualdedupsubmit",
-          label = "Remove duplicates",
+          label = "Remove additional duplicates",
           style = "jelly",
           icon = shiny::icon("reply"),
-          color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B; margin-right: 20px"),
-        shinyWidgets::actionBttn(
-          inputId = "completed_manual_dedup",
-          label = "Finished removing extra duplicates",
-          style = "jelly",
-          icon = shiny::icon("arrow-right"),
-          color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B"),
-        shinyWidgets::actionBttn(
-          inputId = "nomanualdedup",
-          label = "Proceed without manual dedup",
-          style = "jelly",
-          icon = shiny::icon("arrow-right"),
-          color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #754E9B"),
-        shiny::br(),
-        DT::DTOutput("manual_dedup_dt")
+          color = "primary" # Hide the button initially
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+        
+        shinyWidgets::dropdown(
+          
+          tags$h3("Select columns to display"),
+
+          shinyWidgets::pickerInput(
+            inputId = "manual_dedup_cols",
+            label = "Choose columns",
+            choices = NULL,
+            selected = NULL,
+            multiple = TRUE,
+            options = list(
+              `live-search` = TRUE,
+              `actions-box` = TRUE,
+              style = "btn-primary")
+          ), 
+          icon = icon("filter"),
+          inline =TRUE,
+          status = "danger", width = "600px",
+          tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")),
+    
+        DT::DTOutput("manual_dedup_dt"),
+        tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
+            background-color: #CBF7ED!important; color: black!important}")),
+        
       )
     )
   ),
   shiny::tabPanel(
     "Visualise",
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::fluidRow(
-          shiny::column(
-            12,
-            # Sidebar layout with input and output definitions ----
+    
+    # Sidebar layout with input and output definitions ----
             shiny::sidebarLayout(
 
               # Sidebar panel for inputs ----
               shiny::sidebarPanel(
+                width = 3,
                 id = "sidebar",
+                shiny::h5("Step 5: Visualise overlap"),
                 shinyWidgets::prettyRadioButtons(
                   inputId = "comp_type",
                   label = "Chose a comparison",
@@ -186,26 +225,19 @@ ui <- shiny::navbarPage("CiteSource",
                   )
                 )
               )
-            )
-          )
-        )
-      )
-    )
-  ),
+            )),
+  
   shiny::tabPanel(
     "Tables",
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::fluidRow(
-          shiny::column(
-            12,
-            # Sidebar layout with input and output definitions ----
-            shiny::sidebarLayout(
+    
+    # Sidebar layout with input and output definitions ----
+          shiny::sidebarLayout(
 
               # Sidebar panel for inputs ----
               shiny::sidebarPanel(
                 id = "sidebar",
+                width = 3,
+                shiny::h5("Step 6: Summary tables"),
                 selectInput(
                   inputId = "sources_tables",
                   "Sources to include",
@@ -230,20 +262,7 @@ ui <- shiny::navbarPage("CiteSource",
               ),
               shiny::mainPanel(
                 shiny::tabsetPanel(
-                  shiny::tabPanel(
-                    "Review individual records",
-                    shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
-                    shiny::br(),
-                    shinyWidgets::actionBttn(
-                      "generateRecordTable", "Generate the table",
-                      style = "pill",
-                      color = "primary",
-                      icon = shiny::icon("table")
-                    ),
-                    shiny::br(),
-                    shiny::br(" "),
-                    DT::dataTableOutput("reviewTab")
-                  ),
+                  
                   shiny::tabPanel(
                     "View summary table",
                     shiny::div("The first table will summarise the results by source. If your labels include 'search', 'screened' and 'final', a second table will summarise the contribution of each source across these stages."),
@@ -251,32 +270,43 @@ ui <- shiny::navbarPage("CiteSource",
                                choices = c("source", "label", "string")),
                     shinyWidgets::actionBttn(
                       "generateSummaryTable", "Generate the table(s)",
-                      style = "pill",
-                      color = "primary",
-                      icon = shiny::icon("table")
-                    ),
+                      style = "jelly",
+                      icon = shiny::icon("table"),
+                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+              
                     shiny::br(),
                     shiny::br(" "),
                     gt::gt_output("summaryRecordTab"),
                     shiny::br(),
                     shiny::br(" "),
                     gt::gt_output("summaryPrecTab")
+                  ),
+                  shiny::tabPanel(
+                    "Review individual records",
+                    shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
+                    shiny::br(),
+                    shinyWidgets::actionBttn(
+                      "generateRecordTable", "Generate the table",
+                      style = "jelly",
+                      icon = shiny::icon("table"),
+                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                    
+                    shiny::br(),
+                    shiny::br(" "),
+                    DT::dataTableOutput("reviewTab")
                   )
                 )
-              )
-            )
-          )
-        )
-      )
-    )
-  ),
+              ))
+    ),
+    
   shiny::tabPanel(
     "Export",
     shiny::fluidRow(
       shiny::column(
         12,
         shiny::mainPanel(
-          shiny::h5("Note that you can only download the data after you have run the deduplication."),
+          shiny::h5("Step 7: Export citations"),
+          shiny::h6("Note that you can only download the data after you have run the deduplication."),
           shiny::downloadButton("downloadCsv", "Download csv"),
           shiny::downloadButton("downloadRis", "Download RIS"),
           shiny::downloadButton("downloadBib", "Download BibTex")
@@ -508,7 +538,13 @@ server <- function(input, output, session) {
 
       })
 
-   
+  observe({
+   shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
+                      choices = names(rv$manual)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
+                      selected = names(rv$manual)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
+  })
+  
+  
   # if no manual dedup, proceed to visualisations
   shiny::observeEvent(input$nomanualdedup, {
     
@@ -519,62 +555,87 @@ server <- function(input, output, session) {
     )
   })
 
-
+  # if rows selected in manual dedup, make buttom appear
+  observe({
+    selected_rows <- input$manual_dedup_dt_rows_selected
+    if (length(selected_rows) > 0) {
+      shinyjs::show("manualdedupsubmit")  # Show the button when rows are selected
+    } else {
+      shinyjs::hide("manualdedupsubmit")  # Hide the button when no rows are selected
+    }
+  })
+  
   # Output: manual dedup datatable
-  output$manual_dedup_dt <- DT::renderDT(
-    DT::datatable(rv$pairs_to_check,
-      options = list(
-        dom = "tp",
-        pageLength = 10,
-        fixedColumns = TRUE,
-        scrollX = TRUE,
-        columnDefs =
-          list(
-            list(visible = FALSE, targets = c(3, 6, 9, 12, 15, 18, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36)),
-            list(
-              targets = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-              render = htmlwidgets::JS(
-                "function(data, type, row, meta) {",
-                "return type === 'display' && data != null && data.length > 25 ?",
-                "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
-                "}"
-              )
-            )
-          )
-      )
-    ) %>%
-      DT::formatStyle(
-        c(
-          "title1", "author1", "doi1", "volume1",
-          "pages1", "number1", "year1", "abstract1", "journal1", "isbn1"
-        ),
-        c(
-          "title", "author", "doi", "volume",
-          "pages", "number", "year", "abstract", "journal", "isbn"
-        ),
-        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173"))
-      ) %>%
-      DT::formatStyle(
-        c(
-          "title2", "author2", "doi2", "volume2",
-          "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
-        ),
-        c(
-          "title", "author", "doi", "volume",
-          "pages", "number", "year", "abstract", "journal", "isbn"
-        ),
-        backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173"))
-      )
-  )
+  manual_dedup_data <- reactive({
+    
+    data <- rv$manual[,1:36]
+    data <- data[,c(paste0(input$manual_dedup_cols))]
+    
+    match_cols <- c("title", "author", "doi", "volume",
+                    "pages", "number", "year", "abstract", "journal", "isbn")
+    
+    
+    data <- data %>% dplyr::select(-any_of(match_cols))
+   match_number_cols <- rv$manual[,c(paste0(match_cols))]
+   
+   data <- cbind(data,match_number_cols)
+   
+  })
+  output$manual_dedup_dt <- DT::renderDataTable({
+    
+    data <- manual_dedup_data()
+    
+    format_cols <- c(
+      "title1", "author1", "doi1", "volume1",
+      "pages1", "number1", "year1", "abstract1", "journal1", "isbn1",
+      "title2", "author2", "doi2", "volume2",
+      "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
+    )
+    
+    format_cols <- intersect(format_cols, colnames(data))
+    shinyjs::useShinyjs()
+    
+    datatable(data,
+              options = list(
+                dom = "t",
+                pageLength = 10,
+                lengthMenu = c(10, 20, 30, 40),
+                columnDefs =
+                  list(
+                    list(visible = FALSE, 
+                         targets = columns2hide),
+                    list(
+                      targets = "_all",
+                      render = JS(
+                        "function(data, type, row, meta) {",
+                        "return type === 'display' && data != null && data.length > 25 ?",
+                        "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
+                        "}"
+                      )
+                    )
+                  )
+              ))
+    # ) %>%
+    #   DT::formatStyle(
+    #     columns = format_cols,
+    #     backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
+    #     target = "row"
+    #   ) %>%
+    #   DT::formatStyle(
+    #     columns = format_cols,
+    #     backgroundColor = DT::styleInterval(c(0.95, 1), c("white", "#82d173", "#82d173")),
+    #     target = "cell",
+    #     color = JS("value >= 0.95 ? 'white' : null")
+    #   )
+  })
 
 
   # ASySD manual dedup pre text 
   output$Manual_pretext <- shiny::renderText({
 
-    paste(nrow(rv$pairs_to_check), "pairs of citations require manual deduplication. Review the pairs in the table
-        below. You can scroll right to see all citation metadata and hover over any cell to see truncated text. Identical and near-identical fields are highlighted in green.
-        Select all rows which contain duplicate pairs and click the button below to remove extra
-        duplicates.")
+    paste(nrow(rv$manual), "pairs of citations require manual deduplication. Review the pairs in the table
+        below.")
+
   })
 
 
