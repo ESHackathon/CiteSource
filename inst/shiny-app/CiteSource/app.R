@@ -268,10 +268,10 @@ ui <- shiny::navbarPage("CiteSource",
                     shiny::br(),
                     shinyWidgets::actionBttn(
                       "generateRecordTable", "Generate the table",
-                      style = "pill",
-                      color = "primary",
-                      icon = shiny::icon("table")
-                    ),
+                      style = "jelly",
+                      icon = shiny::icon("table"),
+                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                    
                     shiny::br(),
                     shiny::br(" "),
                     DT::dataTableOutput("reviewTab")
@@ -283,10 +283,10 @@ ui <- shiny::navbarPage("CiteSource",
                     #            choices = c("source", "label", "string")),
                     shinyWidgets::actionBttn(
                       "generateSummaryTable", "Generate the table(s)",
-                      style = "pill",
-                      color = "primary",
-                      icon = shiny::icon("table")
-                    ),
+                      style = "jelly",
+                      icon = shiny::icon("table"),
+                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+              
                     shiny::br(),
                     shiny::br(" "),
                     gt::gt_output("summaryRecordTab"),
