@@ -31,7 +31,7 @@ License: GPL (>= 3)
 URL: https://www.eshackathon.org/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
 Imports: 
-    ASySD (>= 0.1.2),
+    ASySD (>= 0.3.0),
     dplyr,
     DT,
     forcats,
