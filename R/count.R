@@ -112,25 +112,24 @@ record_counts <- function(unique_citations, citations, db_colname) {
 #'
 #' @return A dataframe with counts of distinct records, imported records, and unique records for each source, including total counts and several calculated ratios and percentages.
 #' @examples
-# unique_citations <- data.frame(
-#   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
-#   other_data = 1:6
-# )
-# 
-# citations <- data.frame(
-#   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
-#   other_data = 7:12
-# )
-# 
-# n_unique <- data.frame(
-#   cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
-#   cite_label = c("search", "final", "search", "search", "search", "final"),
-#   unique = c(1, 0, 1, 1, 1, 0)
-# )
-# 
-# result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
-# result
-
+#' unique_citations <- data.frame(
+#'   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+#'   other_data = 1:6
+#' )
+#' 
+#' citations <- data.frame(
+#'   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+#'   other_data = 7:12
+#' )
+#'
+#' n_unique <- data.frame(
+#'   cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
+#'  cite_label = c("search", "final", "search", "search", "search", "final"),
+#'   unique = c(1, 0, 1, 1, 1, 0)
+#' )
+#' 
+#' result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
+#' print(result)
 
 calculate_record_counts <- function(unique_citations, citations, n_unique, db_colname) {
   
@@ -222,21 +221,21 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
 #' and recall for each source, as well as totals.
 #'
 #' @examples
-# unique_citations <- data.frame(
-#   db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
-#   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
-#   duplicate_id = c(102, 102, 103, 103, 104, 104),
-#   other_data = 1:6
-# )
-# 
-# citations <- data.frame(
-#   db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
-#   cite_label = c("screened", "final", "screened", "final", "screened", "final"),
-#   other_data = 7:12
-# )
-# 
-# result <- calculate_phase_count(unique_citations, citations, "db_source")
-# result
+#' unique_citations <- data.frame(
+#' db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+#' cite_label = c("screened", "final", "screened", "final", "screened", "final"),
+#' duplicate_id = c(102, 102, 103, 103, 104, 104),
+#' other_data = 1:6
+#' )
+#' 
+#' citations <- data.frame(
+#' db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+#' cite_label = c("screened", "final", "screened", "final", "screened", "final"),
+#' other_data = 7:12
+#' )
+#' 
+#' result <- calculate_phase_count(unique_citations, citations, "db_source")
+#' result
 
 
 calculate_phase_count <- function(unique_citations, citations, db_colname) {

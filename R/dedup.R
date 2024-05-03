@@ -6,7 +6,7 @@
 #' @export
 #' @param raw_citations Citation dataframe with relevant columns
 #' @param manual logical. If TRUE, manually specify pairs of duplicates to merge. Default is FALSE.
-#' @param shiny_progress logical. If TRUE, show a progress bar in the Shiny app. Default is FALSE.
+#' @param show_unknown_tags When a label, source, or other merged field is missing, do you want this to show as "unknown"?
 #' @return unique citations formatted for CiteSource
 #' @examples
 #' # Load example data from the package
@@ -17,7 +17,7 @@
 #' dedup_results <- dedup_citations(examplecitations)
 #' 
 
-dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE, show_unknown_tags=FALSE){
+dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE){
   
   # rename or coalesce columns
   targets <- c("journal", "number", "pages", "isbn", "record_id")
@@ -37,7 +37,7 @@ dedup_citations <- function(raw_citations, manual=FALSE, shiny_progress=FALSE, s
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
   
-  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", shiny_progress=shiny_progress, show_unknown_tags = show_unknown_tags)
+  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", show_unknown_tags = show_unknown_tags)
   
   if(manual == FALSE){
     

@@ -1,4 +1,6 @@
 library(DT)
+library(CiteSource)
+library(dplyr)
 
 # Set background colour
 shiny::tags$head(shiny::tags$style(
@@ -342,7 +344,7 @@ server <- function(input, output, session) {
       suggested_source <- stringr::str_replace_all(input$file$name, ".ris", "")
       suggested_source <- stringr::str_replace_all(suggested_source, ".bib", "")
       suggested_source <- stringr::str_replace_all(suggested_source, ".txt", "")
-      upload_df <- read_citations(
+      upload_df <- CiteSource::read_citations(
         files = input$file$datapath,
         cite_sources = suggested_source,
         cite_labels = rep("", length(input$file$datapath)),
@@ -479,10 +481,22 @@ server <- function(input, output, session) {
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
     
     # results of auto dedup
-    dedup_results <- dedup_citations(rv$upload_df, manual = TRUE, shiny_progress = TRUE, show_unknown_tags=TRUE)
+    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags=TRUE)
 
-    # unique and pairs to check sent to reactive values
-    rv$pairs_to_check <- dedup_results$manual_dedup 
+    # Possible way of PRIORITISING manual dedup 
+    # priority_df <- rv$upload_df %>%
+    #   filter(cite_label %in% c("final", "screened")) %>%
+    #   select(record_id)
+    
+    # manual_to_review <- dedup_results$manual_dedup %>%
+    #   mutate(match_score_ls = RecordLinkage::levenshteinSim(title1, title2)) %>%
+    #   arrange(desc(match_score_ls)) %>%
+    #   mutate(priority = ifelse(record_id1 %in% priority_df$record_id, "Yes", "No")) %>%
+    #   mutate(priority = ifelse(record_id2 %in% priority_df$record_id, "Yes", priority)) %>%
+    #   arrange(desc(priority)) %>%
+    #   filter(priority == "Yes")
+    
+    rv$pairs_to_check <- dedup_results$manual_dedup
     rv$latest_unique <- dedup_results$unique
 
     # generate shiny alert with dedup results
@@ -597,9 +611,8 @@ server <- function(input, output, session) {
     
     datatable(data,
               options = list(
-                dom = "t",
-                pageLength = 10,
-                lengthMenu = c(10, 20, 30, 40),
+                pageLength = 100, info = FALSE,
+                               lengthMenu = list(c(100, -1), c("100", "All")),
                 columnDefs =
                   list(
                     list(visible = FALSE, 

@@ -24,3 +24,23 @@ This function calculates the counts of distinct records, records imported, and u
 It combines these counts into one dataframe and calculates several ratios and percentages related to the unique and distinct counts.
 It also calculates the total for each count type.
 }
+\examples{
+unique_citations <- data.frame(
+  db_source = c("Database1", "Database1", "Database2", "Database3", "Database3", "Database3"),
+  other_data = 1:6
+)
+
+citations <- data.frame(
+  db_source = c("Database1", "Database1", "Database1", "Database2", "Database2", "Database3"),
+  other_data = 7:12
+)
+
+n_unique <- data.frame(
+  cite_source = c("Database1", "Database2", "Database2", "Database3", "Database3", "Database3"),
+ cite_label = c("search", "final", "search", "search", "search", "final"),
+  unique = c(1, 0, 1, 1, 1, 0)
+)
+
+result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
+print(result)
+}
