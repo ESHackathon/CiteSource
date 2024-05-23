@@ -27,7 +27,7 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::roxygen2, any::devtools
           needs: check
-      - uses: xu-cheng/texlive-action/@v2
+      - uses: xu-cheng/texlive-action@v2
       - name: Update date
         run: Rscript -e 'descr <- readLines("DESCRIPTION")' -e 'descr <- stringr::str_replace(descr, "^Date.*$", paste("Date:", Sys.Date()))' -e 'writeLines(descr, "DESCRIPTION")' 
       - name: Document
