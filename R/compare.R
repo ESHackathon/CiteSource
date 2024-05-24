@@ -15,30 +15,33 @@
 #' count_unique(dedup_results)
 
 count_unique <- function(unique_data, include_references = FALSE) {
+  # Start a pipeline with the input data
   out <- unique_data %>%
+    # Filter out rows where 'cite_source' is empty
     dplyr::filter(!.data$cite_source == "") %>%
+    # Select specific columns
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$cite_label, .data$cite_string, tidyselect::any_of("record_ids")) %>%
+    # Separate rows by 'cite_source', 'cite_label', and 'cite_string'
     tidyr::separate_rows(.data$cite_source, convert = TRUE, sep = ", ") %>%
     tidyr::separate_rows(.data$cite_label, convert = TRUE, sep = ", ") %>%
     tidyr::separate_rows(.data$cite_string, convert = TRUE, sep = ", ") %>%
+    # Group by 'duplicate_id'
     dplyr::group_by(.data$duplicate_id) %>%
+    # Add 'unique' and 'type' columns
     dplyr::mutate(
-      unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),
-      type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))
+      unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),  # 'unique' is TRUE if 'cite_source' is unique
+      type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))  # 'type' is 'unique' if 'unique' is TRUE, 'duplicated' otherwise
     ) %>%
+    # Ungroup the data
     dplyr::ungroup() %>%
-    dplyr::distinct()
+    # Remove duplicate rows
+    unique()
 
+  # If 'include_references' is TRUE, join 'out' with 'unique_data' on 'duplicate_id'
   if (include_references == TRUE) {
     out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
   } else {
-    out
-  }
-}
-
-  if (include_references == TRUE) {
-    out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
-  } else {
+    # Otherwise, return 'out' as is
     out
   }
 }
