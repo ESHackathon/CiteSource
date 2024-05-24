@@ -27,7 +27,14 @@ count_unique <- function(unique_data, include_references = FALSE) {
       type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))
     ) %>%
     dplyr::ungroup() %>%
-    unique()
+    dplyr::distinct()
+
+  if (include_references == TRUE) {
+    out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
+  } else {
+    out
+  }
+}
 
   if (include_references == TRUE) {
     out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
