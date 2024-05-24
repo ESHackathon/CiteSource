@@ -99,16 +99,19 @@ export_ris <- function(x, filename = "output.ris", user_mapping = NULL) {
     }
   }
   
-  # Print the final mapping and ask the user if they want to proceed
-  print(default_mapping)
-  proceed <- readline("Do you want to proceed with this mapping? (yes/no): ")
-  
-  if (tolower(proceed) == "yes") {
-    # Currently, write_refs does not accept tibbles, thus converted
-    write_refs(as.data.frame(x), file = filename)
-  } else {
-    message("Export cancelled. Please modify your user_mapping argument and try again.")
-  }
+# Print the final mapping and ask the user if they want to proceed
+cat("\nFinal Mapping:\n")
+for (field in names(default_mapping)) {
+  cat(field, ":", default_mapping[[field]], "\n")
+}
+
+proceed <- readline("Do you want to proceed with this mapping? (yes/no): ")
+
+if (tolower(proceed) == "yes") {
+  # Currently, write_refs does not accept tibbles, thus converted
+  write_refs(as.data.frame(citations), file = filename)
+} else {
+  message("Export cancelled. Please modify your user_mapping argument and try again.")
 }
 
 
