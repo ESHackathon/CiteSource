@@ -25,7 +25,9 @@ in the same journal, so pre-prints and similar results will not be identified he
 examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate citations
+# Deduplicate citations without manually specifying pairs and without showing unknown tags
 dedup_results <- dedup_citations(examplecitations)
 
+# Deduplicate citations with manual specification of pairs and showing unknown tags
+dedup_results_manual_unknown <- dedup_citations(examplecitations, manual = TRUE, show_unknown_tags = TRUE)
 }
