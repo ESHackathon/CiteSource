@@ -15,22 +15,22 @@
 #' @return A tibble with one row per citation
 #' @examples
 #' if (interactive()) {
+#'   # Import only key fields from the RIS files
 #'   read_citations(c("res.ris", "res.bib"),
 #'     cite_sources = c("CINAHL", "MEDLINE"),
 #'     cite_strings = c("Search1", "Search2"),
-#'     cite_labels = c("raw", "screened")
+#'     cite_labels = c("raw", "screened"),
+#'     only_key_fields = TRUE
 #'   )
-#'   
+#'
 #'   # or equivalently
-#'   
-#'   metadata_tbl <- tibble::tribble(
-#'    ~files,     ~cite_sources, ~cite_strings, ~cite_labels, 
-#'   "res.ris",  "CINAHL",      "Search1",     "raw", 
-#'   "res.bib",  "MEDLINE",     "Search2",     "screened"
+#'   metadata_tbl_key_fields <- tibble::tribble(
+#'    ~files,     ~cite_sources, ~cite_strings, ~cite_labels, ~only_key_fields,
+#'   "res.ris",  "CINAHL",      "Search1",     "raw",        TRUE,
+#'   "res.bib",  "MEDLINE",     "Search2",     "screened",   TRUE
 #'   )
-#'   
-#'   read_citations(metadata = metadata_tbl)
-#'   
+#'
+#'   read_citations(metadata = metadata_tbl_key_fields)
 #' }
 #' @export
 
