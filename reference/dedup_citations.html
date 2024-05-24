@@ -93,7 +93,7 @@ in the same journal, so pre-prints and similar results will not be identified he
 <span class="r-in"><span><span class="va">examplecitations_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"examplecitations.rds"</span>, package <span class="op">=</span> <span class="st">"CiteSource"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">examplecitations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">examplecitations_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Deduplicate citations</span></span></span>
+<span class="r-in"><span><span class="co"># Deduplicate citations without manually specifying pairs and without showing unknown tags</span></span></span>
 <span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">examplecitations</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Search contains missing values for the record_id column. A record_id will be created using row numbers</span>
@@ -104,6 +104,16 @@ in the same journal, so pre-prints and similar results will not be identified he
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 67 duplicate citations removed...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 98 unique citations remaining!</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Deduplicate citations with manual specification of pairs and showing unknown tags</span></span></span>
+<span class="r-in"><span><span class="va">dedup_results_manual_unknown</span> <span class="op">&lt;-</span> <span class="fu">dedup_citations</span><span class="op">(</span><span class="va">examplecitations</span>, manual <span class="op">=</span> <span class="cn">TRUE</span>, show_unknown_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Search contains missing values for the record_id column. A record_id will be created using row numbers</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> identifying potential duplicates...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> identified duplicates!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> flagging potential pairs for manual dedup...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 165 citations loaded...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 67 duplicate citations removed...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 98 unique citations remaining!</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
