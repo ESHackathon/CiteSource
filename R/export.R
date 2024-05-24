@@ -113,7 +113,7 @@ if (tolower(proceed) == "yes") {
 } else {
   message("Export cancelled. Please modify your user_mapping argument and try again.")
 }
-
+}
 
 
 
