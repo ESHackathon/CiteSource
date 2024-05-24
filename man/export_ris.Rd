@@ -2,30 +2,19 @@
 % Please edit documentation in R/export.R
 \name{export_ris}
 \alias{export_ris}
-\title{Export deduplicated citations to RIS file}
+\title{Export data frame to RIS file}
 \usage{
-export_ris(
-  citations,
-  filename = "citations.ris",
-  source_field = "DB",
-  label_field = "C7",
-  string_field = "C8"
-)
+export_ris(x, filename = "output.ris", user_mapping = NULL)
 }
 \arguments{
-\item{citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
-
 \item{filename}{Name (and path) of file, should end in .ris}
 
-\item{source_field}{Character. Which RIS field should cite_sources be saved to? NULL to exclude.}
+\item{user_mapping}{List. Custom mapping of RIS fields to data frame columns. If NULL, a default mapping is used.}
 
-\item{label_field}{Character. Which RIS field should cite_labels be saved to? NULL to exclude.}
-
-\item{string_field}{Character. Which RIS field should cite_strings be saved to? NULL to exclude.}
+\item{citations}{Dataframe to be exported to RIS file}
 }
 \description{
-This function saves deduplicated citations as a RIS file with sources, labels and strings
-included as custom fields (if they were initially provided for any of the citations). Note that
+This function saves a data frame as a RIS file with specified columns mapped to RIS fields. Note that
 \emph{existing files are overwritten without warning.}
 }
 \examples{
@@ -34,6 +23,6 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_ris(dedup_results$unique, "cite_sources.ris", string_field = NULL)
+  export_ris(dedup_results$unique, "cite_sources.ris", user_mapping = list("DB" = "cite_source_include", "C7" = "cite_label_include"))
 }
 }
