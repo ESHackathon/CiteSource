@@ -120,22 +120,22 @@ Should be .bib or .ris files</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Import only key fields from the RIS files</span></span></span>
 <span class="r-in"><span>  <span class="fu">read_citations</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"res.ris"</span>, <span class="st">"res.bib"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    cite_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CINAHL"</span>, <span class="st">"MEDLINE"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    cite_strings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Search1"</span>, <span class="st">"Search2"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw"</span>, <span class="st">"screened"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    cite_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw"</span>, <span class="st">"screened"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    only_key_fields <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span>  </span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># or equivalently</span></span></span>
-<span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="va">metadata_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   <span class="op">~</span><span class="va">files</span>,     <span class="op">~</span><span class="va">cite_sources</span>, <span class="op">~</span><span class="va">cite_strings</span>, <span class="op">~</span><span class="va">cite_labels</span>, </span></span>
-<span class="r-in"><span>  <span class="st">"res.ris"</span>,  <span class="st">"CINAHL"</span>,      <span class="st">"Search1"</span>,     <span class="st">"raw"</span>, </span></span>
-<span class="r-in"><span>  <span class="st">"res.bib"</span>,  <span class="st">"MEDLINE"</span>,     <span class="st">"Search2"</span>,     <span class="st">"screened"</span></span></span>
+<span class="r-in"><span>  <span class="va">metadata_tbl_key_fields</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>   <span class="op">~</span><span class="va">files</span>,     <span class="op">~</span><span class="va">cite_sources</span>, <span class="op">~</span><span class="va">cite_strings</span>, <span class="op">~</span><span class="va">cite_labels</span>, <span class="op">~</span><span class="va">only_key_fields</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"res.ris"</span>,  <span class="st">"CINAHL"</span>,      <span class="st">"Search1"</span>,     <span class="st">"raw"</span>,        <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"res.bib"</span>,  <span class="st">"MEDLINE"</span>,     <span class="st">"Search2"</span>,     <span class="st">"screened"</span>,   <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="fu">read_citations</span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">metadata_tbl</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  </span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu">read_citations</span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">metadata_tbl_key_fields</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
