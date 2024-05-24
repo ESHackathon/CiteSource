@@ -8,14 +8,17 @@
 #' @param manual logical. If TRUE, manually specify pairs of duplicates to merge. Default is FALSE.
 #' @param show_unknown_tags When a label, source, or other merged field is missing, do you want this to show as "unknown"?
 #' @return unique citations formatted for CiteSource
+#'
 #' @examples
 #' # Load example data from the package
 #' examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 #' examplecitations <- readRDS(examplecitations_path)
 #'
-#' # Deduplicate citations
+#' # Deduplicate citations without manually specifying pairs and without showing unknown tags
 #' dedup_results <- dedup_citations(examplecitations)
-#' 
+#'
+#' # Deduplicate citations with manual specification of pairs and showing unknown tags
+#' dedup_results_manual_unknown <- dedup_citations(examplecitations, manual = TRUE, show_unknown_tags = TRUE)
 
 dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE){
   
