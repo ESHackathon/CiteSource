@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: |
           R -e "install.packages(c('shiny', 'rsconnect'))"
-          R -e "rsconnect::setAccountInfo(name='drmatt', token='${{secrets.TOKEN}}', secret='${{secrets.SECRET}}')"
+          R -e "rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}})"
           R -e "rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
