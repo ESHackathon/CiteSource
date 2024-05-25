@@ -18,18 +18,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - uses: r-lib/actions/setup-r@v2
-      - name: Install packages
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 2
-          packages: |
-            any::rsconnect
-            any::shiny
-            github::ESHackathon/CiteSource
+      - name: Set up R2u (faster dependency installation)
+        uses: eddelbuettel/github-actions/r2u-setup@master
       - name: Install dependencies and deploy
         run: |
           R -e "
+            install.packages(c('shiny', 'rsconnect')); 
+            if (!require('remotes')) install.packages('remotes'); 
+            gitcreds_delete(url = 'https://github.com');
+            remotes::install_github('ESHackathon/CiteSource'); 
             rsconnect::setAccountInfo(name='${{secrets.SHINY_LUKAS_ACCOUNT}}', token='${{secrets.SHINY_LUKAS_TOKEN}}', secret='${{secrets.SHINY_LUKAS_SECRET}}'); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
 
@@ -42,21 +39,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - uses: r-lib/actions/setup-r@v2
-      - name: Install packages
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 2
-          packages: |
-            any::rsconnect
-            any::shiny
-            github::ESHackathon/CiteSource
+      - name: Set up R2u (faster dependency installation)
+        uses: eddelbuettel/github-actions/r2u-setup@master
       - name: Install dependencies and deploy
         run: |
           R -e "
+            install.packages(c('shiny', 'rsconnect')); 
+            if (!require('remotes')) install.packages('remotes'); 
+            remotes::install_github('ESHackathon/CiteSource'); 
+            gitcreds_delete(url = 'https://github.com');            
             rsconnect::setAccountInfo(name='${{secrets.SHINY_LUKAS_ACCOUNT}}', token='${{secrets.SHINY_LUKAS_TOKEN}}', secret='${{secrets.SHINY_LUKAS_SECRET}}'); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-
