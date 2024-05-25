@@ -25,7 +25,7 @@ jobs:
           R -e "
             install.packages(c('shiny', 'rsconnect')); 
             if (!require('remotes')) install.packages('remotes'); 
-            gitcreds_delete(url = 'https://github.com');
+            gitcreds::gitcreds_delete(url = 'https://github.com');
             remotes::install_github('ESHackathon/CiteSource'); 
             rsconnect::setAccountInfo(name='${{secrets.SHINY_LUKAS_ACCOUNT}}', token='${{secrets.SHINY_LUKAS_TOKEN}}', secret='${{secrets.SHINY_LUKAS_SECRET}}'); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
