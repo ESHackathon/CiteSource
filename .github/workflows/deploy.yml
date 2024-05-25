@@ -3,12 +3,11 @@ on:
     types: [released]
   pull_request:
     types: [opened, synchronize, reopened]
-  issue_comment:
-    types: [created]
   push:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 name: Deploy
 
@@ -21,11 +20,15 @@ jobs:
         uses: actions/checkout@v4
       - name: Set up R2u (faster dependency installation)
         uses: eddelbuettel/github-actions/r2u-setup@master
-      - name: Install Dependencies
+      - name: Install dependencies and deploy
         run: |
-          R -e "install.packages(c('shiny', 'rsconnect'))"
-          R -e "rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}})"
-          R -e "rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
+          R -e "
+            install.packages(c('shiny', 'rsconnect')); 
+            if (!require('remotes')) install.packages('remotes'); 
+            remotes::install_github('ESHackathon/CiteSource'); 
+            rsconnect::setAccountInfo(name='${{secrets.SHINY_LUKAS_ACCOUNT}}', token='${{secrets.SHINY_LUKAS_TOKEN}}', secret='${{secrets.SHINY_LUKAS_SECRET}}'); 
+            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
+
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
 
@@ -34,27 +37,18 @@ jobs:
     if: github.event_name == 'release' && github.event.release.tag_name != '*test*'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: '4.1.0'
-
-      - name: Install Dependencies
+        uses: actions/checkout@v4
+      - name: Set up R2u (faster dependency installation)
+        uses: eddelbuettel/github-actions/r2u-setup@master
+      - name: Install dependencies and deploy
         run: |
-          R -e "install.packages(c('shiny', 'rsconnect'))"
+          R -e "
+            install.packages(c('shiny', 'rsconnect')); 
+            if (!require('remotes')) install.packages('remotes'); 
+            remotes::install_github('ESHackathon/CiteSource'); 
+            rsconnect::setAccountInfo(name='${{secrets.SHINY_LUKAS_ACCOUNT}}', token='${{secrets.SHINY_LUKAS_TOKEN}}', secret='${{secrets.SHINY_LUKAS_SECRET}}'); 
+            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"
 
-      - name: Deploy Shiny App
-        uses: rsconnect/shinyapps-deploy@v1
-        env:
-          RS_ACCOUNT_NAME: "estech"
-          RS_APP_NAME: "CiteSource"
-        with:
-          app_dir: "./inst/shiny-app/CiteSource"
-          environment: "release"
-          secrets: |
-            RS_ACCOUNT_TOKEN=${{ secrets.TOKEN }}
-            RS_ACCOUNT_SECRET=${{ secrets.SECRET }}
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+
