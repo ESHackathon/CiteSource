@@ -10,14 +10,8 @@ env:
   _R_CHECK_FORCE_SUGGESTS_: "false"
 
 jobs:
-  ci:
-    strategy:
-      matrix:
-        include:
-          #- {os: macOS-latest}
-          - {os: ubuntu-latest}
-
-    runs-on: ${{ matrix.os }}
+  document-and-deploy:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -82,10 +76,39 @@ jobs:
       
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@4.6.1
         with:
           clean: true
           branch: gh-pages
           folder: docs      
+
+  R-CMD-check:
+    strategy:
+      matrix:
+        include:
+          - {os: macOS-latest}
+          - {os: ubuntu-latest}
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: eddelbuettel/github-actions/r-ci-setup@master
+
+      - name: Bootstrap
+        run: ./run.sh bootstrap
+
+      #- name: Dependencies
+      #  run: ./run.sh install_deps
+
+      - name: All Dependencies
+        run: ./run.sh install_all
+
+      - name: Install rcmdcheck
+        run: |
+          R -e "install.packages('rcmdcheck')"
 
       - uses: r-lib/actions/check-r-package@v2
