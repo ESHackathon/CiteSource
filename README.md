@@ -3,7 +3,7 @@
 
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/ESHackathon/CiteSource/workflows/R-CMD-check/badge.svg)](https://github.com/ESHackathon/CiteSource/actions)
+[![R-CMD-check](https://github.com/ESHackathon/CiteSource/workflows/R-CMD-Check/badge.svg)](https://github.com/ESHackathon/CiteSource/actions)
 [![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-orange)](https://github.com/ESHackathon/CiteSource)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
