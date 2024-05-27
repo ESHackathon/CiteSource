@@ -72,11 +72,11 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
 #'   export_ris(dedup_results$unique, "cite_sources.ris", user_mapping = list("DB" = "cite_source_include", "C7" = "cite_label_include"))
 #' }
 
-export_ris <- function(x, filename = "output.ris", user_mapping = NULL) {
+export_ris <- function(citations, filename = "output.ris", user_mapping = NULL) {
   
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
   
-  # Default mapping of RIS fields to x columns
+  # Default mapping of RIS fields to citations columns
   default_mapping <- list(
     "DB" = "cite_source_include",
     "C7" = "cite_label_include",
@@ -92,10 +92,10 @@ export_ris <- function(x, filename = "output.ris", user_mapping = NULL) {
     }
   }
   
-  # Rename the x columns according to the final mapping
+  # Rename the citations columns according to the final mapping
   for (field in names(default_mapping)) {
-    if (default_mapping[[field]] %in% names(x)) {
-      x <- x %>% dplyr::rename(!!field := .data[[default_mapping[[field]]]])
+    if (default_mapping[[field]] %in% names(citations)) {
+      citations <- citations %>% dplyr::rename(!!field := .data[[default_mapping[[field]]]])
     }
   }
   
