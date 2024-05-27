@@ -83,6 +83,7 @@ jobs:
           folder: docs      
 
   R-CMD-check:
+    if: ${{ always() }}
     needs: document-and-deploy
     strategy:
       matrix:
@@ -105,7 +106,12 @@ jobs:
         run: ./run.sh bootstrap
 
       - name: Install rcmdcheck
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          R -e "install.packages('rcmdcheck')"
+          R -e "
+            install.packages(c('rcmdcheck', 'devtools'));
+            devtools::install_local()
+          "
 
       - uses: r-lib/actions/check-r-package@v2
