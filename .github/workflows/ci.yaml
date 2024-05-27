@@ -34,10 +34,11 @@ jobs:
 
       - name: All Dependencies
         run: ./run.sh install_all
-     
-      - name: Test
-        run: ./run.sh run_tests
 
-      #- name: Coverage
-      #  if: ${{ matrix.os == 'ubuntu-latest' }}
-      #  run: ./run.sh coverage
+      - name: Install dependencies and deploy
+        run: |
+          R -e "
+            install.packages(rsconnect'));   
+            rsconnect::setAccountInfo(name='${{secrets.SHINY_LUKAS_ACCOUNT}}', token='${{secrets.SHINY_LUKAS_TOKEN}}', secret='${{secrets.SHINY_LUKAS_SECRET}}'); 
+            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource')"   
+
