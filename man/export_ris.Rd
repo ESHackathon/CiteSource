@@ -4,14 +4,14 @@
 \alias{export_ris}
 \title{Export data frame to RIS file}
 \usage{
-export_ris(x, filename = "output.ris", user_mapping = NULL)
+export_ris(citations, filename = "output.ris", user_mapping = NULL)
 }
 \arguments{
+\item{citations}{Dataframe to be exported to RIS file}
+
 \item{filename}{Name (and path) of file, should end in .ris}
 
 \item{user_mapping}{List. Custom mapping of RIS fields to data frame columns. If NULL, a default mapping is used.}
-
-\item{citations}{Dataframe to be exported to RIS file}
 }
 \description{
 This function saves a data frame as a RIS file with specified columns mapped to RIS fields. Note that
