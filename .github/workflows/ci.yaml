@@ -101,6 +101,9 @@ jobs:
       - name: Setup
         uses: eddelbuettel/github-actions/r-ci-setup@master
 
+      - name: Bootstrap
+        run: ./run.sh bootstrap
+
       - name: Install rcmdcheck
         run: |
           R -e "install.packages('rcmdcheck')"
