@@ -1,11 +1,12 @@
 # Run CI for R using https://eddelbuettel.github.io/r-ci/
 
-name: ci
+name: document-and-deploy
 
 on:
   push:
   pull_request:
-
+  release:
+  
 env:
   _R_CHECK_FORCE_SUGGESTS_: "false"
 
@@ -52,6 +53,7 @@ jobs:
           git push origin || echo "No changes to commit"
     
       - name: Deploy
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -75,43 +77,9 @@ jobs:
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: true
           branch: gh-pages
           folder: docs      
-
-  R-CMD-check:
-    if: ${{ always() }}
-    needs: document-and-deploy
-    strategy:
-      matrix:
-        include:
-          - {os: macOS-latest}
-          - {os: ubuntu-latest}
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: r-lib/actions/setup-pandoc@v2
-
-      - name: Setup
-        uses: eddelbuettel/github-actions/r-ci-setup@master
-
-      - name: Bootstrap
-        run: ./run.sh bootstrap
-
-      - name: Install rcmdcheck
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          R -e "
-            install.packages(c('rcmdcheck', 'devtools'));
-            devtools::install_local()
-          "
-
-      - uses: r-lib/actions/check-r-package@v2
