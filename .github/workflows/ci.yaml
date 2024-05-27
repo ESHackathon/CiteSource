@@ -83,6 +83,7 @@ jobs:
           folder: docs      
 
   R-CMD-check:
+    needs: document-and-deploy
     strategy:
       matrix:
         include:
@@ -99,15 +100,6 @@ jobs:
 
       - name: Setup
         uses: eddelbuettel/github-actions/r-ci-setup@master
-
-      - name: Bootstrap
-        run: ./run.sh bootstrap
-
-      #- name: Dependencies
-      #  run: ./run.sh install_deps
-
-      - name: All Dependencies
-        run: ./run.sh install_all
 
       - name: Install rcmdcheck
         run: |
