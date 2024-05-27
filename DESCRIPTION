@@ -55,6 +55,7 @@ Suggests:
     rmarkdown,
     shiny,
     shinyalert,
+    shinyjs,
     progressr,
     shinybusy,
     shinyWidgets,

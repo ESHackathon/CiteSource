@@ -58,7 +58,9 @@ jobs:
       - name: Deploy
         run: |
           R -e "
-            install.packages('rsconnect');   
+            install.packages(c('rsconnect', 'remotes'));
+            bspm::disable();
+            remotes::install_github("ESHackathon/CiteSource", force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
@@ -66,14 +68,12 @@ jobs:
         if: github.event_name == 'release' && github.event.release.tag_name != '*test*'
         run: |
           R -e "
-            install.packages('rsconnect');   
-            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
         run: |
           R -e "
-            install.packages('pkgdown'));   
+            install.packages('pkgdown');   
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
