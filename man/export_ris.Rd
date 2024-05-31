@@ -4,13 +4,7 @@
 \alias{export_ris}
 \title{Export data frame to RIS file}
 \usage{
-export_ris(
-  citations,
-  filename = "citations.ris",
-  source_field = "DB",
-  label_field = "C7",
-  string_field = "C8"
-)
+export_ris(citations, filename = "output.ris", user_mapping = NULL)
 }
 \arguments{
 \item{citations}{Dataframe to be exported to RIS file}
