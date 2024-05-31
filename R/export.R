@@ -72,42 +72,48 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
 #'   export_ris(dedup_results$unique, "cite_sources.ris", user_mapping = list("DB" = "cite_source_include", "C7" = "cite_label_include"))
 #' }
 
-export_ris <- function(citations, filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8") {
-
+export_ris <- function(citations, filename = "output.ris", user_mapping = NULL) {
+  
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
-
-  if (!is.null(source_field) && source_field %in% names(citations)) {
-    citations <- citations %>% dplyr::rename(cite_source_include = .data[[source_field]])
+  
+  # Default mapping of RIS fields to citations columns
+  default_mapping <- list(
+    "DB" = "cite_source_include",
+    "C7" = "cite_label_include",
+    "C8" = "cite_string_include",
+    "C1" = "duplicate_id",
+    "C2" = "record_ids"
+  )
+  
+  # If user_mapping is provided, override the default mapping
+  if (!is.null(user_mapping)) {
+    for (field in names(user_mapping)) {
+      default_mapping[[field]] <- user_mapping[[field]]
+    }
   }
-
-  if (!is.null(label_field) && label_field %in% names(citations)) {
-    citations <- citations %>% dplyr::rename(cite_label_include = .data[[label_field]])
+  
+  # Rename the citations columns according to the final mapping
+  for (field in names(default_mapping)) {
+    if (default_mapping[[field]] %in% names(citations)) {
+      citations <- citations %>% dplyr::rename(!!field := .data[[default_mapping[[field]]]])
+    }
   }
-
-  if (!is.null(string_field) && string_field %in% names(citations)) {
-    citations <- citations %>% dplyr::rename(cite_string_include = .data[[string_field]])
-  }
-
-  select_cols <- c("source_type", "duplicate_id") %in% names(citations)
-  citations <- citations %>%
-    dplyr::select(c("source_type", "duplicate_id")[select_cols], dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "record_id")))
-
-  synthesisr_codes <- dplyr::bind_rows(
-    tibble::tribble(
-      ~code, ~field, ~ris_synthesisr,
-      source_field, "cite_source_include", TRUE,
-      string_field, "cite_string_include", TRUE,
-      label_field, "cite_label_include", TRUE,
-      "C1", "duplicate_id", TRUE,
-      "C2", "record_ids", TRUE
-    ),
-    synthesisr_code_lookup %>% dplyr::filter(.data$ris_synthesisr)
-  ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
-
-  # Currently, write_refs does not accept tibbles, thus converted
-  write_refs(as.data.frame(citations), file = filename, tag_naming = synthesisr_codes)
+  
+# Print the final mapping and ask the user if they want to proceed
+cat("\nFinal Mapping:\n")
+for (field in names(default_mapping)) {
+  cat(field, ":", default_mapping[[field]], "\n")
 }
 
+proceed <- readline("Do you want to proceed with this mapping? (yes/no): ")
+
+if (tolower(proceed) == "yes") {
+  # Currently, write_refs does not accept tibbles, thus converted
+  write_refs(as.data.frame(citations), file = filename)
+} else {
+  message("Export cancelled. Please modify your user_mapping argument and try again.")
+}
+}
 
 
 #' Export deduplicated citations to .bib file
