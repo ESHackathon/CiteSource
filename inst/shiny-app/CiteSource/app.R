@@ -842,7 +842,7 @@ server <- function(input, output, session) {
 
   output$downloadRis <- shiny::downloadHandler(
     filename = function() {
-      paste("data-", Sys.Date(), ".bib", sep = "")
+      paste("data-", Sys.Date(), ".ris", sep = "")
     },
     content = function(file) {
       export_ris(rv$latest_unique, file)
