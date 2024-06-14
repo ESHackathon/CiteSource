@@ -76,14 +76,15 @@ ui <- shiny::navbarPage("CiteSource",
         # Sidebar layout with input and output definitions ----
         shiny::sidebarLayout(
           shiny::sidebarPanel( # Input: Select a file ----
-            shiny::h5("Step 1: Upload your citation files"),
-            shiny::fileInput("file", "",
+            shiny::h3("Step 1:"),
+            shiny::h5("Option 1: Upload your citation files"),
+            shiny::fileInput("file", "Select .ris, .bib, or .txt files",
               multiple = TRUE,
               accept = c(".ris", ".txt", ".bib")
             ),
             shiny::hr(),
-            shiny::h5("OR: Re-upload a file exported from CiteSource"),
-            shiny::fileInput("file_reimport", "",
+            shiny::h5("Option 2: Re-upload a CiteSource file"),
+            shiny::fileInput("file_reimport", "Select a file exported from CiteSource,
               multiple = TRUE,
               accept = c(".ris", ".csv", ".bib")
             )
@@ -91,7 +92,9 @@ ui <- shiny::navbarPage("CiteSource",
 
           # Main panel for displaying outputs ----
           shiny::mainPanel(
-            shiny::h5("Step 2: Double click the row to edit sources, labels, and strings"),
+            shiny::h3("Step 2:"),
+            shiny::h5("Add custom metadata"),
+            shiny::h5("Double click the cells to add data to Source, String, or Label fields"),
             # Output: Data file ----
             DT::dataTableOutput("tbl_out")
           )
