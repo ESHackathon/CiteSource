@@ -102,7 +102,7 @@ ui <- shiny::navbarPage("CiteSource",
         )
       )
     )
-  ),
+  )
   shiny::tabPanel(
     "Deduplicate",
     shiny::tabsetPanel(
