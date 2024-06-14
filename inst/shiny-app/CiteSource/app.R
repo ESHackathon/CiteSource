@@ -98,7 +98,7 @@ ui <- shiny::navbarPage("CiteSource",
             shiny::h5("Double click the cells to add data to Source, String, or Label fields"),
             # Output: Data file ----
             DT::dataTableOutput("tbl_out")
-          )
+          ),
         )
       )
     )
