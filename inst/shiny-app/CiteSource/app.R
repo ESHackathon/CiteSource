@@ -84,9 +84,10 @@ ui <- shiny::navbarPage("CiteSource",
             ),
             shiny::hr(),
             shiny::h5("Option 2: Re-upload a CiteSource file"),
-            shiny::fileInput("file_reimport", "Select a file exported from CiteSource,
+            shiny::fileInput("file_reimport", "Select a file exported from CiteSource"),
               multiple = TRUE,
-              accept = c(".ris", ".csv", ".bib")
+              accept = c(".ris", ".csv", ".bib"),
+            shiny::h6("Note: reimported files do not require deduplication, skip to visuals or tables")
             )
           ),
 
