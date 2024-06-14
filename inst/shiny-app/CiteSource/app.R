@@ -85,7 +85,7 @@ ui <- shiny::navbarPage("CiteSource",
             shiny::h5("OR: Re-upload a file exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
               multiple = TRUE,
-              accept = c(".ris", ".csv")
+              accept = c(".ris", ".csv", ".bib")
             )
           ),
 
@@ -407,8 +407,10 @@ server <- function(input, output, session) {
       rv$latest_unique <- reimport_csv(input$file_reimport$datapath)
     } else if (file_extension == "ris") {
       rv$latest_unique <- reimport_ris(input$file_reimport$datapath)
+    } else if (file_extension == "bib") {
+      rv$latest_unique <- reimport_bib(input$file_reimport$datapath)
     } else {
-      warning("Invalid file extension, needs to be .ris or .csv")
+      warning("Invalid file extension, needs to be .ris, .csv, or .bib")
     }
   })
 
