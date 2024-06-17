@@ -8,7 +8,7 @@ library(ggplot2)
 library(dplyr)
 library(knitr)
 
-citation_files <- list.files(path= "shinytest", pattern = "\\.ris", full.names = TRUE)
+citation_files <- list.files(path= "tests/shinytest", pattern = "\\.ris", full.names = TRUE)
 citation_files
 
 #Read in citations and specify sources. Note that labels and strings are not relevant for this use case.
@@ -91,62 +91,6 @@ n_unique %>%
   xlab("") + ylab("Number of citations") +
   geom_text(stat="count", aes(label=..count..))
 
-
-#Get unique records from each source and add bibliographic data
-unique_WOS <- n_unique %>% filter(cite_source=="WOS", unique == TRUE) %>% inner_join(unique_citations, by = "duplicate_id")
-
-unique_DIM <- n_unique %>% 
-  filter(cite_source=="DIM", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-unique_ASFA <- n_unique %>% 
-  filter(cite_source=="ASFA", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-unique_LENS2 <- n_unique %>% 
-  filter(cite_source=="LENS2", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-unique_LENS <- n_unique %>% 
-  filter(cite_source=="LENS", unique == TRUE) %>%
-  inner_join(unique_citations, by = "duplicate_id")
-
-### Analyze journal titles 
-
-#Analyze journal titles for unique records
-journals_WOS <- unique_WOS %>% 
-  group_by(journal) %>% 
-  summarise(count = n()) %>%
-  arrange(desc(count))
-
-#Use the knitr:kable function to print a nice looking table of the top 10 journals
-kable(journals_WOS[1:10, ])
-
-
-## Analyze publication years
-
-
-#Group by year, count and produced a line graph
-unique_WOS %>% group_by(year) %>% 
-  summarise(count = n()) %>%  
-  ggplot(aes(year, count, group=1)) +
-  geom_line() +
-  geom_point() +
-  xlab("Publication year") + ylab("Unique records")
-
-
-
-#Combine all unique record dataframes into a single dataframe. Note that we'll leave Criminal Justice Abstracts out since there is only one unique record.
-all_unique <- bind_rows(unique_WOS,unique_DIM,unique_ASFA,unique_LENS2, unique_LENS)
-
-#Group by year and source, count and produced a faceted line graph
-all_unique %>% group_by(cite_source.x, year) %>% 
-  summarise(count = n()) %>%  
-  ggplot(aes(year, count, group=1)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ cite_source.x) +
-  xlab("Publication year") + ylab("Unique records")
 
 calculated_counts<-calculate_record_counts(unique_citations, citations, n_unique, "cite_source")
 record_summary_table(calculated_counts)
