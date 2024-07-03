@@ -72,9 +72,8 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
 #'   export_ris(dedup_results$unique, "cite_sources.ris", user_mapping = list("DB" = "cite_source_include", "C7" = "cite_label_include"))
 #' }
 
+# Define the export_ris function
 export_ris <- function(citations, filename = "output.ris", user_mapping = NULL) {
-  
-  if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
   
   # Default mapping of RIS fields to citations columns
   default_mapping <- list(
@@ -99,20 +98,8 @@ export_ris <- function(citations, filename = "output.ris", user_mapping = NULL) 
     }
   }
   
-# Print the final mapping and ask the user if they want to proceed
-cat("\nFinal Mapping:\n")
-for (field in names(default_mapping)) {
-  cat(field, ":", default_mapping[[field]], "\n")
-}
-
-proceed <- readline("Do you want to proceed with this mapping? (yes/no): ")
-
-if (tolower(proceed) == "yes") {
-  # Currently, write_refs does not accept tibbles, thus converted
+  # Write the RIS file
   write_refs(as.data.frame(citations), file = filename)
-} else {
-  message("Export cancelled. Please modify your user_mapping argument and try again.")
-}
 }
 
 
