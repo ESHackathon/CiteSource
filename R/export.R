@@ -20,11 +20,11 @@
 #'   export_csv(dedup_results, "cite_sources.csv", separate = "cite_source")
 #' }
 
-
-
 export_csv <- function(citations, filename = "citations.csv", separate = NULL, trim_abstracts = 32000) {
   if (tolower(tools::file_ext(filename)) != "csv") warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
 
+  citations <- count_unique(citations, include_references = TRUE) %>% dplyr::select(-type)
+  
   if (!is.null(separate)) {
     separate <- match.arg(separate, choices = c("cite_source", "cite_label", "cite_string"), several.ok = TRUE)
 
@@ -45,6 +45,7 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
     if (!is.null(trim_abstracts)) {
       citations <- citations %>% dplyr::mutate(abstract = stringr::str_sub(.data$abstract, 1, trim_abstracts))
     }
+    
 
     citations <- citations %>%
       dplyr::select(-tidyselect::all_of(separate)) %>%
