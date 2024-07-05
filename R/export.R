@@ -102,7 +102,6 @@ export_ris <- function(citations, filename = "output.ris", user_mapping = NULL) 
   write_refs(as.data.frame(citations), file = filename)
 }
 
-
 #' Export deduplicated citations to .bib file
 #'
 #' This function saves deduplicated citations as a BibTex file with sources, labels and strings
