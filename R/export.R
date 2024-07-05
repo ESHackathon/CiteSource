@@ -75,28 +75,12 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
 
-  if (!is.null(source_field) && source_field %in% names(citations)) {
-    citations <- citations %>% dplyr::rename(cite_source_include = .data[[source_field]])
-  }
-
-  if (!is.null(label_field) && label_field %in% names(citations)) {
-    citations <- citations %>% dplyr::rename(cite_label_include = .data[[label_field]])
-  }
-
-  if (!is.null(string_field) && string_field %in% names(citations)) {
-    citations <- citations %>% dplyr::rename(cite_string_include = .data[[string_field]])
-  }
-
-  select_cols <- c("source_type", "duplicate_id") %in% names(citations)
-  citations <- citations %>%
-    dplyr::select(c("source_type", "duplicate_id")[select_cols], dplyr::everything(), -tidyselect::any_of(c("cite_source", "cite_string", "cite_label", "record_id")))
-
   synthesisr_codes <- dplyr::bind_rows(
     tibble::tribble(
       ~code, ~field, ~ris_synthesisr,
-      source_field, "cite_source_include", TRUE,
-      string_field, "cite_string_include", TRUE,
-      label_field, "cite_label_include", TRUE,
+      source_field, "cite_source", TRUE,
+      string_field, "cite_string", TRUE,
+      label_field, "cite_label", TRUE,
       "C1", "duplicate_id", TRUE,
       "C2", "record_ids", TRUE
     ),
