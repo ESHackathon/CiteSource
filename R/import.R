@@ -137,14 +137,9 @@ read_citations <- function(files = NULL,
     message(paste0(utils::capture.output(report), collapse = "\n"))
   }
 
-  refs <- ref_list %>%
+  ref_list %>%
     purrr::map(tibble::as_tibble) %>%
     purrr::reduce(dplyr::bind_rows)
-  
-  missing_fields <- setdiff(key_fields, colnames(refs))
-  refs[missing_fields] <- NA
-
-  refs
   
 }
 
