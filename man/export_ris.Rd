@@ -17,7 +17,11 @@ export_ris(
 
 \item{filename}{Name (and path) of file, should end in .ris}
 
-\item{user_mapping}{List. Custom mapping of RIS fields to data frame columns. If NULL, a default mapping is used.}
+\item{source_field}{Field in \code{citations} representing the source. Default is "DB".}
+
+\item{label_field}{Field in \code{citations} representing the label. Default is "C7".}
+
+\item{string_field}{Field in \code{citations} representing additional string information. Default is "C8".}
 }
 \description{
 This function saves a data frame as a RIS file with specified columns mapped to RIS fields. Note that
