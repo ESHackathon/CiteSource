@@ -61,7 +61,9 @@ export_csv <- function(citations, filename = "citations.csv", separate = NULL, t
 #'
 #' @param citations Dataframe to be exported to RIS file
 #' @param filename Name (and path) of file, should end in .ris
-#' @param user_mapping List. Custom mapping of RIS fields to data frame columns. If NULL, a default mapping is used.
+#' @param source_field Field in `citations` representing the source. Default is "DB".
+#' @param label_field Field in `citations` representing the label. Default is "C7".
+#' @param string_field Field in `citations` representing additional string information. Default is "C8".
 #' @export
 #' @examples
 #' if (interactive()) {
