@@ -532,7 +532,7 @@ server <- function(input, output, session) {
   # remove manually selected duplicates 
   observeEvent(input$manualdedupsubmit,{
     
-    after <- dedup_citations_add_manual(rv$latest_unique,
+    after <- ASySD::dedup_citations_add_manual(rv$latest_unique,
                                         additional_pairs = rv$pairs_removed)
     
     # update latest unique df reactive value
