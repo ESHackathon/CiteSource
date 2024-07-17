@@ -477,8 +477,10 @@ server <- function(input, output, session) {
       shiny::req(FALSE)
     }
     
+    
     #Set here, otherwise manual deduplication fails if there are duplicate IDs
-    rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
+    rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number())) %>%
+      dplyr::mutate(title = gsub('</?i>', '', title))
     
     # results of auto dedup
     dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags=TRUE)
