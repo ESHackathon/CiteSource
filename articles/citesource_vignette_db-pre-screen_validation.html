@@ -67,7 +67,7 @@
       <h1>Assessing Usefulness of Databases for Evidence Synthesis</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-07-09</h4>
+            <h4 data-toc-skip class="date">2024-07-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_vignette_db-pre-screen_validation.Rmd" class="external-link"><code>vignettes/citesource_vignette_db-pre-screen_validation.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_vignette_db-pre-screen_validation.Rmd</code></div>
@@ -115,7 +115,7 @@ packages.</p>
 <span><span class="co">#remotes::install_github("ESHackathon/CiteSource")</span></span>
 <span></span>
 <span><span class="co">#Load the necessary libraries</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.eshackathon.org/CiteSource/" class="external-link">CiteSource</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.eshackathon.org/CiteSource" class="external-link">CiteSource</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -726,6 +726,15 @@ these numbers.</p>
 #mwlefoodfi .gt_indent_5 {
   text-indent: 25px;
 }
+
+#mwlefoodfi .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#mwlefoodfi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
 </style>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
@@ -775,7 +784,7 @@ these numbers.</p>
 <td headers="search  Precision" class="gt_row gt_right">—</td>
 </tr>
 <tr>
-<td headers="search  Sources" class="gt_row gt_left">Total<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>
+<td headers="search  Sources" class="gt_row gt_left">Total<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span>
 </td>
 <td headers="search  Records_total" class="gt_row gt_right">112</td>
 <td headers="search  Records_unique" class="gt_row gt_right">59</td>
@@ -819,7 +828,7 @@ these numbers.</p>
 <td headers="benchmark  Precision" class="gt_row gt_right">4.35%</td>
 </tr>
 <tr>
-<td headers="benchmark  Sources" class="gt_row gt_left">Total<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>
+<td headers="benchmark  Sources" class="gt_row gt_left">Total<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span>
 </td>
 <td headers="benchmark  Records_total" class="gt_row gt_right">13</td>
 <td headers="benchmark  Records_unique" class="gt_row gt_right">9</td>
@@ -829,8 +838,7 @@ these numbers.</p>
 </tr>
 </tbody>
 <tfoot class="gt_sourcenotes"><tr>
-<td class="gt_sourcenote" colspan="6">
-<strong>Included fields:</strong>
+<td class="gt_sourcenote" colspan="6"><span class="gt_from_md"><strong>Included fields:</strong>
 <ul>
 <li>
 <p><strong><em>Total</em> records</strong> are all records returned by that source, while <strong><em>unique</em> records</strong> are found in only that source (or, in the Total rows, in only one source).</p>
@@ -844,12 +852,11 @@ these numbers.</p>
 <li>
 <p><strong>Precision</strong> is the share of initial records in that source that are retained for inclusion at that stage.</p>
 </li>
-</ul>
-</td>
+</ul></span></td>
     </tr></tfoot>
 <tfoot class="gt_footnotes"><tr>
 <td class="gt_footnote" colspan="6">
-<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> After deduplication</td>
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height: 0;"><sup>1</sup></span> After deduplication</td>
     </tr></tfoot>
 </table>
 </div>
