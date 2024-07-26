@@ -14,7 +14,7 @@ found and then enables users to compare the contribution of different sources
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://www.eshackathon.org/CiteSource/}
+  \item \url{https://www.eshackathon.org/CiteSource}
   \item Report bugs at \url{https://github.com/ESHackathon/CiteSource/issues}
 }
 
