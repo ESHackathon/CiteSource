@@ -23,6 +23,7 @@
 #' record_level_table(return = "DT")
 
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
+  
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
 
   if (is.null(indicator_absence)) {
@@ -50,6 +51,10 @@ record_level_table <- function(citations, include = "sources", include_empty = T
     citations <- citations %>% dplyr::filter(.data$duplicate_id %in% sources$duplicate_id)
   }
 
+  if (! "url" %in% colnames(citations)) {
+    citations$url <- NA
+  }
+  
   citations <- citations %>%
     dplyr::mutate(
       citation = generate_apa_citation(.data$author, .data$year),
