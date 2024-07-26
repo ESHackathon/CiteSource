@@ -28,7 +28,7 @@ Description: This package was developed in order to provide researchers the abil
              table. Users are also able to export and reimport data in .ris, and csv. 
              files. The package includes a shiny application for interactive use.
 License: GPL (>= 3)
-URL: https://www.eshackathon.org/CiteSource/
+URL: https://www.eshackathon.org/CiteSource
 BugReports: https://github.com/ESHackathon/CiteSource/issues
 Imports: 
     ASySD (>= 0.3.0),
