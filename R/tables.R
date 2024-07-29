@@ -52,7 +52,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
   }
 
   if (! "url" %in% colnames(citations)) {
-    citations$url <- NA
+    citations$url <- NA_character_
   }
   
   citations <- citations %>%
