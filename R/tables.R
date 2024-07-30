@@ -506,20 +506,53 @@ processed_names$last_names <-
 
 
 generate_apa_reference <- function(authors, year, title, source, volume, issue, doi, weblink, return_html = FALSE, format_journal_case = TRUE) {
+  
   id <- seq_along(authors)
+  
+  # Helper function to handle NULL and missing columns
+  handle_missing <- function(arg, arg_name) {
+    result <- tryCatch({
+      if (is.null(arg)) stop()
+      arg
+    }, error = function(e) {
+      warning("Column ", arg_name, " missing from citation data when generating references", call. = FALSE)
+      NA_character_
+    })
+    result
+  }
+  
+  # Apply the helper function to each other than authors
+  year <- handle_missing(year, "year")
+  title <- handle_missing(title, "title")
+  source <- handle_missing(source, "source")
+  volume <- handle_missing(volume, "volume")
+  issue <- handle_missing(issue, "issue")
+  doi <- handle_missing(doi, "doi")
+  weblink <- handle_missing(weblink, "weblink")
+  
   # Extract last names and initials
   citations <- tibble::tibble(id, authors, year, title, source, volume, issue, doi, weblink) %>%
-    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ dplyr::na_if(.x, ""))) %>%
+    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ as.character(.x) %>% dplyr::na_if(""))) %>%
     dplyr::mutate(
       last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
-      initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
+      initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~{
+        out <- .x
+        out[!stringr::str_detect(.x, ",")] <- ""
+        
+        .x <- .x[stringr::str_detect(.x, ",")]
+        
+
+        out[!out == ""] <- stringr::str_remove(.x, "^.*?,") %>%
                                                                                     stringr::str_remove_all("\\.") %>%
                                                                                     stringr::str_trim() %>%
                                                                                     stringr::str_split(pattern = " ") %>%
                                                                                     purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
                                                                                     purrr::map(stringr::str_c, collapse = ". ") %>%
                                                                                     purrr::flatten_chr() %>%
-                                                                                    paste0("."))
+                                                                                    paste0(".")
+        out
+        })
+  
     )
   
   # Merge initials to names
@@ -527,7 +560,9 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
     dplyr::select("last_names", "initials") %>%
     as.list() %>%
     purrr::transpose() %>%
-    purrr::map(~ paste(.x[[1]], .x[[2]], sep = ", "))
+    purrr::map(~ {
+       purrr::map2_chr(.x$last_names, .x$initials, ~ if (.y == "" | is.na(.y)) .x else paste(.x, .y, sep = ", "))
+    })
 
   if (format_journal_case) {
     citations <- citations %>% dplyr::mutate(source = stringr::str_to_title(source))
@@ -544,13 +579,13 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
     doi = dplyr::if_else(stringr::str_detect(doi, "http"), doi, paste0("https://doi.org/", doi)),
     link = dplyr::coalesce(doi, weblink)
   )
-
+  
   if (return_html) {
     citations %>%
       dplyr::rowwise() %>%
       dplyr::mutate(
         reference = glue::glue("
-                              {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {title}. {nNA(source, pre = '<i>', '</i>')}{nNA(volume, pre = '<i>, ', '</i>')}{nNA(issue, pre = '(', ')')}. {nNA(link, pre = '<a href = \"', '\">')}{nNA(link, '</a>')}
+                              {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {nNA(title, '.')} {nNA(source, pre = '<i>', '</i>')}{nNA(volume, pre = '<i>, ', '</i>')}{nNA(issue, pre = '(', ')')}. {nNA(link, pre = '<a href = \"', '\">')}{nNA(link, '</a>')}
                                                      ")
       ) %>%
       dplyr::pull(.data$reference)
@@ -559,7 +594,7 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
       dplyr::rowwise() %>%
       dplyr::mutate(
         reference = glue::glue("
-                              {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {title}. {nNA(source)}{nNA(volume, pre = ', ')}{nNA(issue, pre = '(', ')')}. {nNA(link)}
+                              {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {nNA(title, '.')} {nNA(source)}{nNA(volume, pre = ', ')}{nNA(issue, pre = '(', ')')}. {nNA(link)}
                                                      ")
       ) %>%
       dplyr::pull(.data$reference)

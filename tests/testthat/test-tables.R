@@ -22,3 +22,13 @@ expect_equal(generate_apa_citation(authors, years),
 )
   })
 
+
+
+test_that("missing columns do not fail", {
+  expect_warning(generate_apa_reference(LETTERS[1:5]))
+})
+
+test_that("numeric columns do not fail", {
+    expect_warning(generate_apa_reference(paste(LETTERS[1:5], LETTERS[1:5], sep = ", "),  2000:2004))
+   })
+    
