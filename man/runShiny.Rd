@@ -2,6 +2,7 @@
 % Please edit documentation in R/runShiny.R
 \name{runShiny}
 \alias{runShiny}
+\alias{run_shiny}
 \title{A wrapper function to run Shiny Apps from \code{CiteSource}.}
 \usage{
 runShiny(app = "CiteSource", offer_install = interactive())
