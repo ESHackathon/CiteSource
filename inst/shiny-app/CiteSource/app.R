@@ -90,7 +90,7 @@ ui <- shiny::navbarPage("CiteSource",
           shiny::mainPanel(
             shiny::h5("Step 2: Double click the row to edit sources, labels, and strings"),
             # Output: Data file ----
-            DT::dataTableOutput("tbl_out")
+            uiOutput("tbl_out")
           )
         )
       )
@@ -383,19 +383,20 @@ server <- function(input, output, session) {
 
 
   ## display summary input table - summary of files added
-  output$tbl_out <- DT::renderDataTable({
-    if (!is.null(input$file_reimport)) {
-      shiny::req(FALSE)
+  output$tbl_out <- output$tbl_out <- shiny::renderUI({
+    if (is.null(input$file_reimport)) {
+      DT::datatable(rv$df,
+                    editable = TRUE,
+                    options = list(
+                      paging = FALSE,
+                      searching = FALSE,
+                      columnDefs = list(list(visible = FALSE, targets = c(0)))
+                    ),
+                    rownames = FALSE
+      )
+    } else {
+      shiny::p("You have reimported data. Meta-data can only be edited here for fresh imports, so please proceed to visualisation and tables.")
     }
-    DT::datatable(rv$df,
-      editable = TRUE,
-      options = list(
-        paging = FALSE,
-        searching = FALSE,
-        columnDefs = list(list(visible=FALSE, targets=c(0)))
-      ),
-      rownames = FALSE
-    )
   })
 
   shiny::observeEvent(input$file_reimport, {
@@ -473,11 +474,20 @@ server <- function(input, output, session) {
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups, {
     if (nrow(rv$upload_df) == 0) {
+      if (nrow(rv$latest_unique) > 0) {
+        shinyalert::shinyalert("Deduplications already complete",
+          "You have reimported a dataset that has already been deduplicated. In that case, further deduplication is not possible here, but would need to take place outside the app.",
+          type = "error"
+        )
+
+      } else {
+      
       shinyalert::shinyalert("Data needed",
         "Please import your citations first.",
         type = "error"
       )
       # Stop plotting
+      }
       shiny::req(FALSE)
     }
     
