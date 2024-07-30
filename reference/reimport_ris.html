@@ -66,6 +66,8 @@ after the import.</p>
 <span>  source_field <span class="op">=</span> <span class="st">"DB"</span>,</span>
 <span>  label_field <span class="op">=</span> <span class="st">"C7"</span>,</span>
 <span>  string_field <span class="op">=</span> <span class="st">"C8"</span>,</span>
+<span>  duplicate_id_field <span class="op">=</span> <span class="st">"C1"</span>,</span>
+<span>  record_id_field <span class="op">=</span> <span class="st">"C2"</span>,</span>
 <span>  tag_naming <span class="op">=</span> <span class="st">"ris_synthesisr"</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -89,6 +91,14 @@ after the import.</p>
 
 <dt id="arg-string-field">string_field<a class="anchor" aria-label="anchor" href="#arg-string-field"></a></dt>
 <dd><p>Character. Which RIS field should cite_strings be read from? NULL to set to missing</p></dd>
+
+
+<dt id="arg-duplicate-id-field">duplicate_id_field<a class="anchor" aria-label="anchor" href="#arg-duplicate-id-field"></a></dt>
+<dd><p>Character. Which RIS field should duplicate IDs be read from? NULL to recreate based on row number (note that neither duplicate nor record IDs directly affect CiteSource analyses - they can only allow you to connect processed data with raw data)</p></dd>
+
+
+<dt id="arg-record-id-field">record_id_field<a class="anchor" aria-label="anchor" href="#arg-record-id-field"></a></dt>
+<dd><p>Character. Which RIS field should record IDs be read from? NULL to recreate based on row number</p></dd>
 
 
 <dt id="arg-tag-naming">tag_naming<a class="anchor" aria-label="anchor" href="#arg-tag-naming"></a></dt>
