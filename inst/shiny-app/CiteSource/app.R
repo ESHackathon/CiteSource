@@ -520,8 +520,14 @@ server <- function(input, output, session) {
     )
   })
 
-  # Action button: remove manually selected duplicates
-  observeEvent(input$manualdedupsubmit, {
+
+  
+
+  ## Manual deduplication -----
+  
+  # Action button: remove manually selected duplicates [merged two segments into one]
+  # remove manually selected duplicates 
+  observeEvent(input$manualdedupsubmit,{
     
     rv$pairs_removed <- rv$pairs_to_check[input$manual_dedup_dt_rows_selected,]
     rv$pairs_to_check <- rv$pairs_to_check[-input$manual_dedup_dt_rows_selected,]
@@ -530,14 +536,6 @@ server <- function(input, output, session) {
       shinyalert("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
       return()
     }
-    
-  })
-  
-
-  ## Manual deduplication -----
-  
-  # remove manually selected duplicates 
-  observeEvent(input$manualdedupsubmit,{
     
     after <- dedup_citations_add_manual(rv$latest_unique,
                                         additional_pairs = rv$pairs_removed)
@@ -675,9 +673,9 @@ server <- function(input, output, session) {
     out <- rv$latest_unique %>%
       dplyr::group_by(duplicate_id) %>%
       tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
-      dplyr::filter(cite_source %in% sources) %>%
-      dplyr::filter(cite_string %in% strings) %>%
-      dplyr::filter(cite_label %in% labels) %>%
+      dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
+      dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
+      dplyr::filter(length(labels) == 0 | cite_label %in% labels) %>%
       dplyr::summarise(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
       dplyr::ungroup()
     
@@ -692,6 +690,7 @@ server <- function(input, output, session) {
       # Stop plotting
       shiny::req(FALSE)
     }
+    
     # for each unique citation, which sources/ strings/ labels are present
     source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
     plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
@@ -740,9 +739,9 @@ server <- function(input, output, session) {
       out <- rv$latest_unique %>%
         dplyr::group_by(duplicate_id) %>%
         tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
-        dplyr::filter(cite_source %in% sources) %>%
-        dplyr::filter(cite_string %in% strings) %>%
-        dplyr::filter(cite_label %in% labels) %>%
+        dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
+        dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
+        dplyr::filter(length(labels) == 0 | cite_label %in% labels) %>%
         dplyr::mutate(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
         unique() %>%
         dplyr::ungroup()
@@ -795,8 +794,6 @@ server <- function(input, output, session) {
     }
     unique_citations <- unique_filtered_table()
     full_citations <- full_filtered_table()
-    
-    # browser()
     
     calculated_counts <- calculate_record_counts(unique_citations, full_citations, count_unique(unique_citations), paste0("cite_", input$summary_type))
     record_summary_table(calculated_counts)
