@@ -215,11 +215,12 @@ ui <- shiny::navbarPage("CiteSource",
                 shiny::tabsetPanel(
                   shiny::tabPanel(
                     "Plot overlap as a heatmap matrix",
+                    shiny::downloadButton("downloadHeatPlot"),
                     plotly::plotlyOutput("plotgraph1")
                   ),
                   shiny::tabPanel(
                     "Plot overlap as an upset plot",
-                    shiny::downloadButton("downloadPlot"),
+                    shiny::downloadButton("downloadUpsetPlot"),
                     shiny::plotOutput("plotgraph2")
                   )
                 )
@@ -305,7 +306,7 @@ ui <- shiny::navbarPage("CiteSource",
         12,
         shiny::mainPanel(
           shiny::h5("Step 7: Export citations"),
-          shiny::h6("Note that you can only download the data after you have run the deduplication."),
+          shiny::h6("Note that you can only download the data after you have run the deduplication. Also, you are only able to re-upload CSV and RIS files to continue with CiteSource, so please use these formats if you want that option."),
           shiny::downloadButton("downloadCsv", "Download csv"),
           shiny::downloadButton("downloadRis", "Download RIS"),
           shiny::downloadButton("downloadBib", "Download BibTex")
@@ -404,11 +405,15 @@ server <- function(input, output, session) {
       rv$latest_unique <- reimport_csv(input$file_reimport$datapath)
     } else if (file_extension == "ris") {
       rv$latest_unique <- reimport_ris(input$file_reimport$datapath)
-    } else if (file_extension == "bib") {
-      rv$latest_unique <- reimport_bib(input$file_reimport$datapath)
     } else {
-      warning("Invalid file extension, needs to be .ris, .csv, or .bib")
+      warning("Invalid file extension, needs to be .ris or .csv")
     }
+    
+  shinyalert::shinyalert("Re-import successful",
+                         paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
+                         type = "success"
+  )
+  
   })
 
   ## Update filters
@@ -681,6 +686,11 @@ server <- function(input, output, session) {
     
   })
 
+  plotHeat <- shiny::reactive({
+    source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
+    plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
+  })
+  
   output$plotgraph1 <- plotly::renderPlotly({
     if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
@@ -691,15 +701,27 @@ server <- function(input, output, session) {
       shiny::req(FALSE)
     }
     
-    # for each unique citation, which sources/ strings/ labels are present
-    source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
-    plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
+    print(plotHeat())
+    
   })
 
-  plotInput <- shiny::reactive({
+  
+  output$downloadHeatPlot <- shiny::downloadHandler(
+    filename = function() {
+      paste("heatmap", ".png", sep = "")
+    },
+    content = function(file) {
+      png(file)
+      print(plotUpset())
+      dev.off()
+    }
+  )
+  
+  plotUpset <- shiny::reactive({
     source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
     plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
   })
+  
 
   output$plotgraph2 <- shiny::renderPlot({
     if (nrow(rv$latest_unique) == 0) {
@@ -710,16 +732,16 @@ server <- function(input, output, session) {
       # Stop plotting
       shiny::req(FALSE)
     }
-    print(plotInput())
+    print(plotUpset())
   })
 
-  output$downloadPlot <- shiny::downloadHandler(
+  output$downloadUpsetPlot <- shiny::downloadHandler(
     filename = function() {
       paste("upset", ".png", sep = "")
     },
     content = function(file) {
       png(file)
-      print(plotInput())
+      print(plotUpset())
       dev.off()
     }
   )
@@ -792,6 +814,7 @@ server <- function(input, output, session) {
       # Stop plotting
       shiny::req(FALSE)
     }
+    
     unique_citations <- unique_filtered_table()
     full_citations <- full_filtered_table()
     

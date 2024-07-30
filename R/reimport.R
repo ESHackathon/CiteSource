@@ -47,6 +47,8 @@ reimport_csv <- function(filename) {
 #' @param source_field Character. Which RIS field should cite_sources be read from? NULL to set to missing
 #' @param label_field Character. Which RIS field should cite_labels be read from? NULL to set to missing
 #' @param string_field Character. Which RIS field should cite_strings be read from? NULL to set to missing
+#' @param duplicate_id_field Character. Which RIS field should duplicate IDs be read from? NULL to recreate based on row number (note that neither duplicate nor record IDs directly affect CiteSource analyses - they can only allow you to connect processed data with raw data)
+#' @param record_id_field Character. Which RIS field should record IDs be read from? NULL to recreate based on row number
 #' @param tag_naming Synthesisr option specifying how RIS tags should be replaced with names. This should not
 #' be changed when using this function to reimport a file exported from CiteSource. If you import your own
 #' RIS, check `names(CiteSource:::synthesisr_code_lookup)` and select any of the options that start with `ris_`
@@ -59,7 +61,10 @@ reimport_csv <- function(filename) {
 #'   unique_citations2 <- reimport_ris("citations.ris")
 #' }
 #'
-reimport_ris <- function(filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8", tag_naming = "ris_synthesisr", verbose = TRUE) {
+reimport_ris <- function(filename = "citations.ris", 
+                         source_field = "DB", label_field = "C7", string_field = "C8",
+                         duplicate_id_field = "C1", record_id_field = "C2", 
+                         tag_naming = "ris_synthesisr", verbose = TRUE) {
 
   if (!tag_naming %in% names(synthesisr_code_lookup)) {
     stop("tag_naming must be one of ", names(synthesisr_code_lookup) %>% stringr::str_subset("^ris_") %>%
@@ -69,16 +74,20 @@ reimport_ris <- function(filename = "citations.ris", source_field = "DB", label_
   if (is.null(source_field)) source_field <- NA
   if (is.null(string_field)) string_field <- NA
   if (is.null(label_field)) label_field <- NA
+  if (is.null(duplicate_id_field)) duplicate_id_field <- NA
+  if (is.null(record_id_field)) record_id_field <- NA
 
+  
   custom_codes <- tibble::tribble(
     ~code, ~field, ~tag_naming,
     source_field, "cite_source", TRUE,
     string_field, "cite_string", TRUE,
-    label_field, "cite_label", TRUE
+    label_field, "cite_label", TRUE,
+    duplicate_id_field, "duplicate_id", TRUE,
+    record_id_field, "record_ids", TRUE
   )
 
   names(custom_codes)[3] <- tag_naming
-
 
   synthesisr_codes <- dplyr::bind_rows(
     custom_codes,
@@ -104,11 +113,21 @@ reimport_ris <- function(filename = "citations.ris", source_field = "DB", label_
     citations$cite_label <- NA
   }
 
-  citations$duplicate_id <- seq_len(nrow(citations))
-
-  if (verbose) {
-    message("Import of ", basename(filename), " completed. Imported ", nrow(citations), " entries. You can
-              use dplyr::count(citations, cite_source) etc to get an overview over allocation of metadata.")
+  if (!"duplicate_id" %in% names(citations)) {
+    message("Duplicate IDs not found - will be recreated based on row number")
+    citations$duplicate_id <- seq_len(nrow(citations))
+  } else if (any(is.na(citations$duplicate_id))) {
+    message("Some duplicate IDs are missing - these will be recreated based on row number")
+    citations$duplicate_id[is.na(citations$duplicate_id)] <- seq_len(sum(is.na(citations$duplicate_id)))
   }
+  
+  if (!"record_ids" %in% names(citations)) {
+    message("Record IDs not found - will be recreated based on row number")
+    citations$record_ids <- seq_len(nrow(citations))
+  } else if (any(is.na(citations$record_ids))) {
+    message("Some record IDs are missing - these will be recreated based on row number")
+    citations$record_ids[is.na(citations$record_ids)] <- seq_len(sum(is.na(citations$record_ids)))
+  }
+
   citations
 }
