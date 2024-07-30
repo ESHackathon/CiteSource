@@ -80,10 +80,10 @@ ui <- shiny::navbarPage("CiteSource",
               accept = c(".ris", ".txt", ".bib")
             ),
             shiny::hr(),
-            shiny::h5("OR: Re-upload a file exported from CiteSource"),
+            shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
               multiple = TRUE,
-              accept = c(".ris", ".csv", ".bib")
+              accept = c(".ris", ".csv")
             )
           ),
           # Main panel for displaying outputs ----
