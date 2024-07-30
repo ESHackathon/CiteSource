@@ -15,7 +15,7 @@ plot_source_overlap_heatmap(
 }
 \arguments{
 \item{data}{A tibble with one record per row, an id column and then one column
-per source indicating whether the record was found in that source.}
+per source indicating whether the record was found in that source (usually obtained from \code{compare_sources()})}
 
 \item{cells}{Variable to display in the cells. Should be 'source', 'label' or 'string'}
 
