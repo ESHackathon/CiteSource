@@ -6,6 +6,7 @@
 #' @param app Defaults to CiteSource - possibly other apps will be included in the future
 #' @param offer_install Should user be prompted to install required packages if they are missing?
 #' @export
+#' @aliases run_shiny
 #' @examples 
 #' if (interactive()) {
 #'   # To run the CiteSource Shiny app:
@@ -34,3 +35,7 @@ runShiny <- function(app = "CiteSource", offer_install = interactive()) {
 
   shiny::runApp(appDir, display.mode = "normal")
 }
+
+# Alias to offer function in line with usual snake_case style
+#' @export
+run_shiny <- runShiny

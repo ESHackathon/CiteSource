@@ -23,7 +23,19 @@ ui <- shiny::navbarPage("CiteSource",
   id = "tabs",
   header = shiny::tagList(
     shinybusy::add_busy_spinner(spin = "circle"),
-    shinyjs::useShinyjs()
+    shinyjs::useShinyjs(),
+    #header text colour
+    tags$head(
+      tags$style(HTML("
+      h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+        margin-top: 0;
+        margin-bottom: .5rem;
+        font-weight: 500;
+        line-height: 1.2;
+        color: #23395B;
+      }
+    "))
+    )
   ),
   theme = bslib::bs_theme(
     bg = "rgb(251, 251, 251)",
@@ -39,20 +51,6 @@ ui <- shiny::navbarPage("CiteSource",
     input_bg = "#E0E0E0",  # Set the background color for input boxes
     input_border_color = "#23395B"  # Set the border color for input boxes
   ),
-  
-  #header text colour
-  tags$head(
-    tags$style(HTML("
-      h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
-        margin-top: 0;
-        margin-bottom: .5rem;
-        font-weight: 500;
-        line-height: 1.2;
-        color: #23395B;
-      }
-    "))
-  ),
-
   # Home tab
   shiny::tabPanel(
     "Home",
@@ -505,9 +503,19 @@ server <- function(input, output, session) {
     n_unique <- nrow(rv$latest_unique)
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
+    if (n_pairs_manual > 0) {
+      message <- paste(
+        "From a total of", n_citations, "citations added, there are", n_unique, 
+        "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
+      )
+    } else {
+      message <- paste(
+        "From a total of", n_citations, "citations added, there are", n_unique, 
+        "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
+      )
+    }
     shinyalert::shinyalert("Auto-deduplication complete",
-      paste("From a total of", n_citations, "citations added, there are", n_unique, "unique citations. Head to the manual deduplication
-                   tab to check ", n_pairs_manual, " potential duplicates"),
+      message,
       type = "success"
     )
   })
