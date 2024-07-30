@@ -9,6 +9,8 @@ reimport_ris(
   source_field = "DB",
   label_field = "C7",
   string_field = "C8",
+  duplicate_id_field = "C1",
+  record_id_field = "C2",
   tag_naming = "ris_synthesisr",
   verbose = TRUE
 )
@@ -21,6 +23,10 @@ reimport_ris(
 \item{label_field}{Character. Which RIS field should cite_labels be read from? NULL to set to missing}
 
 \item{string_field}{Character. Which RIS field should cite_strings be read from? NULL to set to missing}
+
+\item{duplicate_id_field}{Character. Which RIS field should duplicate IDs be read from? NULL to recreate based on row number (note that neither duplicate nor record IDs directly affect CiteSource analyses - they can only allow you to connect processed data with raw data)}
+
+\item{record_id_field}{Character. Which RIS field should record IDs be read from? NULL to recreate based on row number}
 
 \item{tag_naming}{Synthesisr option specifying how RIS tags should be replaced with names. This should not
 be changed when using this function to reimport a file exported from CiteSource. If you import your own
