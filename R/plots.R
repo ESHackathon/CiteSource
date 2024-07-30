@@ -4,7 +4,7 @@
 #' number or the percentages of shared records between any pair of sources.
 #'
 #' @param data A tibble with one record per row, an id column and then one column
-#' per source indicating whether the record was found in that source.
+#' per source indicating whether the record was found in that source (usually obtained from `compare_sources()`)
 #' @param cells Variable to display in the cells. Should be 'source', 'label' or 'string'
 #' @param facets Variable in data used for facets (i.e. sub-plots). Should be NULL, 'source', 'label' or 'string'
 #' @param plot_type Either `counts` (number of shared records) or `percentages`
@@ -34,7 +34,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
   if (!plot_type %in% c("counts", "percentages")) {
     stop("plot_type must be counts or percentages")
   }
-
+  
   data <- data %>% dplyr::select(tidyselect::vars_select_helpers$where(is.logical))
 
   if (sort_sources) {
