@@ -120,6 +120,7 @@ ui <- shiny::navbarPage("CiteSource",
         "Manual deduplication",
         br(),
         shiny::h5("Step 4: Review potential duplicates manually"),
+        shiny::p("The following records were identified as potential duplicates. Potential duplicates are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
         shiny::textOutput("Manual_pretext"),
         shiny::br(),
 
