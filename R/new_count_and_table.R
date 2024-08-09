@@ -48,13 +48,13 @@ count_records <- function(unique_citations, labels_to_include = NULL) {
   # Split and expand the cite_source column
   df_expanded <- unique_citations %>%
     separate_rows(cite_source, sep = ",") %>%
-    mutate(cite_source = trimws(cite_source))
+    mutate(.data$cite_source = trimws(cite_source))
   
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
     pattern <- paste(labels_to_include, collapse = "|")
     df_filtered <- df_expanded %>%
-      filter(grepl(pattern, cite_label, ignore.case = TRUE))
+      filter(.data$grepl(pattern, cite_label, ignore.case = TRUE))
   } else {
     df_filtered <- df_expanded
   }
@@ -66,16 +66,16 @@ count_records <- function(unique_citations, labels_to_include = NULL) {
   
   # Count the occurrences of each source to determine the "Records Imported"
   records_imported <- df_filtered %>%
-    group_by(cite_source) %>%
-    summarise(Records_Imported = n(), .groups = 'drop')
+    group_by(.data$cite_source) %>%
+    summarise(.data$Records_Imported = n(), .groups = 'drop')
   
   # Count the unique duplicate_id values for each source to determine the "Distinct Records"
   distinct_records <- df_filtered %>%
-    group_by(cite_source) %>%
-    summarise(Distinct_Records = n_distinct(duplicate_id), .groups = 'drop')
+    group_by(.data$cite_source) %>%
+    summarise(.data$Distinct_Records = n_distinct(duplicate_id), .groups = 'drop')
   
   # Merge the two dataframes to get the final result
-  initial_counts <- left_join(records_imported, distinct_records, by = "cite_source")
+  initial_counts <- left_join(.data$records_imported, distinct_records, by = "cite_source")
   
   # Calculate the total counts
   total_records_imported <- sum(initial_counts$Records_Imported)
@@ -152,13 +152,13 @@ calculate_detailed_record_counts <- function(unique_citations, n_unique, labels_
   # Split and expand the cite_source column
   df_expanded <- unique_citations %>%
     separate_rows(cite_source, sep = ",") %>%
-    mutate(cite_source = trimws(cite_source))
+    mutate(.data$cite_source = trimws(cite_source))
   
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
     pattern <- paste(labels_to_include, collapse = "|")
     df_filtered <- df_expanded %>%
-      filter(grepl(pattern, cite_label, ignore.case = TRUE))
+      filter(.data$grepl(pattern, cite_label, ignore.case = TRUE))
   } else {
     df_filtered <- df_expanded
   }
@@ -170,35 +170,35 @@ calculate_detailed_record_counts <- function(unique_citations, n_unique, labels_
   
   # Count the occurrences of each source to determine the "Records Imported"
   records_imported <- df_filtered %>%
-    group_by(cite_source) %>%
-    summarise(`Records Imported` = n(), .groups = 'drop')
+    group_by(.data$cite_source) %>%
+    summarise(`.data$Records Imported` = n(), .groups = 'drop')
   
   # Count the unique duplicate_id values for each source to determine the "Distinct Records"
   distinct_records <- df_filtered %>%
-    group_by(cite_source) %>%
-    summarise(`Distinct Records` = n_distinct(duplicate_id), .groups = 'drop')
+    group_by(.data$cite_source) %>%
+    summarise(`.data$Distinct Records` = n_distinct(duplicate_id), .groups = 'drop')
   
   # Filter n_unique data to only include records with 'search' as the citation label
   n_unique_citations_count <- n_unique %>%
-    filter(cite_label == "search") %>%
-    group_by(cite_source) %>%
-    summarise(`Unique records` = sum(unique), .groups = 'drop') %>%
-    filter(cite_source != "") %>%
-    arrange(cite_source)
+    filter(.data$cite_label == "search") %>%
+    group_by(.data$cite_source) %>%
+    summarise(`.data$Unique records` = sum(unique), .groups = 'drop') %>%
+    filter(.data$cite_source != "") %>%
+    arrange(.data$cite_source)
   
   # Merge the three counts (initial, distinct, unique) into a single dataframe
-  detailed_counts <- left_join(records_imported, distinct_records, by = "cite_source") %>%
-    left_join(n_unique_citations_count, by = "cite_source")
+  detailed_counts <- left_join(.data$records_imported, distinct_records, by = "cite_source") %>%
+    left_join(.data$n_unique_citations_count, by = "cite_source")
   
   # Calculate the number of non-unique records by subtracting the number of unique records from the total records
   detailed_counts <- detailed_counts %>%
-    mutate(`Non-unique Records` = `Distinct Records` - `Unique records`)
+    mutate(`.data$Non-unique Records` = `Distinct Records` - `Unique records`)
   
   # Calculate and add three percentages: the contribution of each source to the total,
   # the contribution of unique records of each source to the total unique records,
   # and the proportion of unique records in each source's distinct records
   detailed_counts <- detailed_counts %>%
-    mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
+    mutate(`.data$Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
            `Source Unique Contribution %` = `Unique records` / sum(`Unique records`, na.rm = TRUE),
            `Source Unique %` = `Unique records` / `Distinct Records`)
   
@@ -290,46 +290,46 @@ calculate_phase_counts <- function(unique_citations, n_unique, db_colname) {
   # Split the cite_label column and count any occurrence of "screened" and "final"
   total_screened <- unique_citations %>%
     tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
-    filter(cite_label == "screened") %>%
+    filter(.data$cite_label == "screened") %>%
     nrow()
   
   total_final <- unique_citations %>%
     tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
-    filter(cite_label == "final") %>%
+    filter(.data$cite_label == "final") %>%
     nrow()
   
   # Step 2: Proceed with the regular calculation for distinct records by source
   distinct_count <- unique_citations %>%
     tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") %>%
-    filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
-    group_by(!!rlang::sym(db_colname)) %>%
-    summarise(Distinct_Records = n_distinct(duplicate_id), .groups = "drop") %>%
+    filter(!(!!.data$rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
+    group_by(!!.data$rlang::sym(db_colname)) %>%
+    summarise(.data$Distinct_Records = n_distinct(duplicate_id), .groups = "drop") %>%
     rename(Source = !!rlang::sym(db_colname))
   
   # Calculate the number of "screened" and "final" records for each source after expanding
   source_phase <- unique_citations %>%
-    dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) %>%
+    dplyr::select(!!.data$rlang::sym(db_colname), cite_label, duplicate_id) %>%
     tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") %>%
     tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
     distinct() %>%
-    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
-    dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
+    dplyr::filter(!(!!.data$rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
+    dplyr::mutate(.data$screened = ifelse(cite_label == "screened", 1, 0),
                   final = ifelse(cite_label == "final", 1, 0)) %>%
-    dplyr::group_by(!!rlang::sym(db_colname)) %>%
-    dplyr::summarise(screened = sum(screened),
+    dplyr::group_by(!!.data$rlang::sym(db_colname)) %>%
+    dplyr::summarise(.data$screened = sum(screened),
                      final = sum(final),
                      .groups = "drop") %>%
     dplyr::rename(Source = !!rlang::sym(db_colname))
   
   # Combine the distinct counts with the source_phase
-  combined_counts <- left_join(distinct_count, source_phase, by = "Source")
+  combined_counts <- left_join(.data$distinct_count, source_phase, by = "Source")
   combined_counts[is.na(combined_counts)] <- 0
   
   # Step 3: Calculate Precision and Recall
   combined_counts <- combined_counts %>%
-    mutate(Precision = ifelse(Distinct_Records != 0, round((final / Distinct_Records) * 100, 2), 0)) %>%
+    mutate(.data$Precision = ifelse(Distinct_Records != 0, round((final / Distinct_Records) * 100, 2), 0)) %>%
     rowwise() %>%
-    mutate(Recall = ifelse(total_final != 0, round((final / total_final) * 100, 2), 0))
+    mutate(.data$Recall = ifelse(total_final != 0, round((final / total_final) * 100, 2), 0))
   
   # Step 4: Calculate the total row using the pre-expansion totals
   totals <- tibble::tibble(
