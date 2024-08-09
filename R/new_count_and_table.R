@@ -152,7 +152,8 @@ calculate_detailed_record_counts <- function(unique_citations, n_unique, labels_
   # Split and expand the cite_source column
   df_expanded <- unique_citations %>%
     separate_rows(cite_source, sep = ",") %>%
-    mutate(.data$cite_source = trimws(cite_source))
+    mutate(cite_source = .data$trimws(cite_source))
+  
   
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
@@ -313,7 +314,7 @@ calculate_phase_counts <- function(unique_citations, n_unique, db_colname) {
     tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
     distinct() %>%
     dplyr::filter(!(!!.data$rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
-    dplyr::mutate(.data$screened = ifelse(cite_label == "screened", 1, 0),
+    dplyr::mutate(screened = .data$ifelse(cite_label == "screened", 1, 0),
                   final = ifelse(cite_label == "final", 1, 0)) %>%
     dplyr::group_by(!!.data$rlang::sym(db_colname)) %>%
     dplyr::summarise(.data$screened = sum(screened),
@@ -327,9 +328,9 @@ calculate_phase_counts <- function(unique_citations, n_unique, db_colname) {
   
   # Step 3: Calculate Precision and Recall
   combined_counts <- combined_counts %>%
-    mutate(.data$Precision = ifelse(Distinct_Records != 0, round((final / Distinct_Records) * 100, 2), 0)) %>%
+    mutate(Precision = .data$ifelse(Distinct_Records != 0, round((final / Distinct_Records) * 100, 2), 0)) %>%
     rowwise() %>%
-    mutate(.data$Recall = ifelse(total_final != 0, round((final / total_final) * 100, 2), 0))
+    mutate(Recall = .data$ifelse(total_final != 0, round((final / total_final) * 100, 2), 0))
   
   # Step 4: Calculate the total row using the pre-expansion totals
   totals <- tibble::tibble(
