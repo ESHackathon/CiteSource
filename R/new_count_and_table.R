@@ -511,7 +511,7 @@ detailed_record_table <- function(data) {
     )
 }
 
-#' Precision and Sensitivity Table
+#' Count and Precision/Sensitivity Table
 #'
 #' This function generates a formatted table that displays the precision 
 #' and sensitivity (recall) metrics for each citation source, along with 
@@ -542,8 +542,8 @@ detailed_record_table <- function(data) {
 #'   Recall = c(40.0, 60.0, 100.0),
 #'   screened = c(90, 140, 230)
 #' )
-#' precision_sensitivity_table(sample_data)
-precision_sensitivity_table <- function(data) {
+#' count_precision_sensitivity_table(sample_data)
+count_precision_sensitivity_table <- function(data) {
   # First, we check if all values in the "screened" column are 0
   all_zero_screened <- all(data$screened == 0)
   
