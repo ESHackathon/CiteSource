@@ -48,7 +48,7 @@ count_records <- function(unique_citations, labels_to_include = NULL) {
   # Split and expand the cite_source column
   df_expanded <- unique_citations %>%
     separate_rows(cite_source, sep = ",") %>%
-    mutate(.data$cite_source = trimws(cite_source))
+    mutate(cite_source = trimws(.data$cite_source))
   
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
