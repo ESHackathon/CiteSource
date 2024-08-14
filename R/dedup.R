@@ -18,7 +18,11 @@
 #' dedup_results <- dedup_citations(examplecitations)
 #'
 #' # Deduplicate citations with manual specification of pairs and showing unknown tags
-#' dedup_results_manual_unknown <- dedup_citations(examplecitations, manual = TRUE, show_unknown_tags = TRUE)
+#' dedup_results_manual_unknown <- dedup_citations(
+#'   examplecitations, 
+#'   manual = TRUE, 
+#'   show_unknown_tags = TRUE
+#'   )
 
 dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE){
   
