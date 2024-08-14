@@ -29,5 +29,9 @@ examplecitations <- readRDS(examplecitations_path)
 dedup_results <- dedup_citations(examplecitations)
 
 # Deduplicate citations with manual specification of pairs and showing unknown tags
-dedup_results_manual_unknown <- dedup_citations(examplecitations, manual = TRUE, show_unknown_tags = TRUE)
+dedup_results_manual_unknown <- dedup_citations(
+  examplecitations, 
+  manual = TRUE, 
+  show_unknown_tags = TRUE
+  )
 }
