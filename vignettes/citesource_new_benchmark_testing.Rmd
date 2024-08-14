@@ -1,0 +1,127 @@
+---
+title: "Benchmark Testing"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Benchmark Testing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+# This code chunk sets global options for all subsequent code chunks in the document using the `knitr` package in R.
+knitr::opts_chunk$set(
+  collapse = TRUE,   # Collapses output with no extra whitespace.
+  comment = "#>",    # Uses `#>` to comment out code in output.
+  warning = FALSE,   # Turns off warnings for all code chunks.
+  fig.width = 6,     # Sets default figure width to 6 inches.
+  fig.height = 6     # Sets default figure height to 6 inches.
+)
+```
+## About this vignette
+
+When estimating the comprehensiveness of a search, researchers often compile a list of relevant studies and evaluate whether or not they are found using their search strategy. While benchmarking is an important step in testing the sensitivity of a search, this process can be  time consuming if variations of a string are being tested.
+
+This vignette will provide an example of how CiteSource can be used to speed up the process of benchmarking especially when comparing variations of search strings or search strategies. 
+
+## 1. Installation of packages and loading libraries
+
+Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package. This vignette also uses functions from the ggplot2 and dplyr packages.
+
+```{r, results = FALSE, message=FALSE, warning=FALSE}
+#Install the remotes packages to enable installation from GitHub
+#install.packages("remotes")
+#library(remotes)
+
+#Install CiteSource
+#remotes::install_github("ESHackathon/CiteSource")
+
+#Load the necessary libraries
+library(CiteSource)
+#library(ggplot2)
+#library(dplyr)
+```
+## 2. Import files from multiple sources
+
+Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. In this case we are uploading the results from five different strings, which were run in Web of Science.
+
+```{r}
+# Import citation files from folder
+citation_files <- list.files(path = "new_benchmark_data", pattern = "\\.ris", full.names = TRUE)
+
+# Print list of citation files to console
+citation_files
+
+# Set the path to the directory containing the citation files
+file_path <- "./new_benchmark_data/"
+
+# Create a tibble that contains metadata about the citation files
+metadata_tbl <- tibble::tribble(
+  ~files,            ~cite_sources,   ~cite_labels, 
+  "benchmark_15.ris", "benchmark",     "benchmark",    
+  "search1_166.ris",    "search1",       "search",    
+  "search2_278.ris",    "search2",       "search",    
+  "search3_302.ris",    "search3",       "search",     
+  "search4_460.ris",    "search4",       "search",    
+  "search5_495.ris",    "search5",       "search"
+) %>% 
+# Append the file path to each file name in the 'files' column
+dplyr::mutate(files = paste0(file_path, files))
+# Read in citations using metadata table
+citations <- read_citations(metadata = metadata_tbl)
+```
+## 3. Deduplication and source information
+
+CiteSource allows users to merge duplicates while maintaining information in the cite_source metadata field. Thus, information about the origin of the records is not lost in the deduplication process. The next few steps produce the dataframes that we can use in subsequent analyses, along with a summary of records from each source.
+
+```{r, results = FALSE, message=FALSE, warning=FALSE}
+
+#Deduplicate citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.
+unique_citations <- dedup_citations(citations)
+
+#Count number of unique and non-unique citations from different sources and labels 
+n_unique <- count_unique(unique_citations)
+
+#For each unique citation, determine which sources were present
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+
+#Initial upload/post internal deduplication table creation
+initial_counts<-record_counts(unique_citations, citations, "cite_source")
+record_counts_table(initial_counts)
+
+```
+
+## 4. Upset plot to compare discovery of benchmarking articles
+
+An upset plot is useful for visualizing overlap across multiple sources and provides detail about the number of shared and unique records. Using this data we'll outline a few potential uses when benchmarking testing a search.
+
+We have uploaded 15 benchmarking articles. Of these 15 articles, the upset plot shows us that all but 4 were found across the five searches. We can see the number of benchmarking articles that were discovered by each string as well as the number of articles that were shared between searches. 
+
+```{r}
+#Generate a source comparison upset plot.
+plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+
+```
+
+Looking at the first column, we see that 9 benchmarking articles were found across every search. One may hypothesize that the 157 citations that follow in the second column may have a high number of relevant articles due to the fact that they were also discovered across the five searches. If a researcher was interested in building a larger group of benchmarking articles, they may want to review these articles first.
+
+Looking at the plot we can see that search #4 and #5 have the largest number of results, at close to 500 each. Of these, 180 are unique to those two searches. We can also see that search #4 and #5 found two of the benchmarking articles that would not have been found otherwise. While a researcher may want to ensure that they capture the highest number of benchmarking articles, the addition of close to 200 articles more than search #2 and #3 may not be efficient when the result is only 2 benchmarking articles. Instead of including this search in their final strategy, they may consider reviewing the two articles that were found by this search and work to adjust their other searches instead.
+
+Another decision in this case may be to drop search #2 and #3 as each of these strings do not contribute uniquely to the discovery of any benchmarking articles. While the data backs up this decision, there may also be more to consider. For example, if benchmarking articles are biased for any known reason, certain search strategies may be employed with an understanding that benchmarking data may not accurately reflect their potential contribution. (e.g. benchmarking articles were gathered from previous systematic reviews that focused on a specific geographic region and the current review is global in nature). 
+
+Finally, as we'll see in the next step, we can examine closely the four articles that weren't found in any search approach. This will help us adjust our search to better capture relevant studies. 
+
+## 5. Reviewing the record table
+This record table is helpful in reviewing which citations were found across each database as well as quickly checking to see which benchmarking articles were not found in the search.
+
+```{r}
+
+unique_citations %>%
+  dplyr::filter(stringr::str_detect(cite_label, "benchmark")) %>%
+  record_level_table(return = "DT")
+
+```

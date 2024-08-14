@@ -1,0 +1,54 @@
+TY  - JOUR
+AU  - Mueller, Julie M.
+AU  - Loomis, John B.
+AD  - Northern AZ U
+AD  - CO State U
+T1  - Spatial Dependence in Hedonic Property Models: Do Different Corrections for Spatial Dependence Result in Economically Significant Differences in Estimated Implicit Prices?
+JO  - Journal of Agricultural and Resource Economics
+JF  - Journal of Agricultural and Resource Economics
+Y1  - 2008/08//
+VL  - 33
+IS  - 2
+SP  - 212
+EP  - 231
+SN  - 10685502
+N1  - Accession Number: 0992879; Keywords: Hedonic;  Spatial; Geographic Descriptors: U.S.; Geographic Region: Northern America; Publication Type: Journal Article; Update Code: 20080901
+N2  - While data used in hedonic property models are inherently spatial in nature, to date the majority of past regression analyses have used OLS models that overlook possible spatial dependence in the data when estimating implicit prices for environmental hazards. This paper explicitly addresses spatial dependence in a hedonic property model. We use robust testing procedures to determine the existence and type of spatial dependence in our OLS Model. After identifying the nature of the spatial dependence, OLS estimates of the implicit price of wildfire risk are compared to implicit prices obtained using a spatial error model with three different spatial weighting matrices. Spatially corrected estimates of implicit prices are found to be nearly the same as those obtained using OLS. Our results indicate that the inefficiency of OLS in the presence of spatially correlated errors may not always be economically significant, suggesting nonspatial hedonic property models may provide results useful for policy analysis, and spatial and nonspatial hedonic property models might be pooled in meta-analysis.
+KW  - Valuation of Environmental Effects Q51
+KW  - Urban, Rural, Regional, Real Estate, and Transportation Economics: Housing Demand R21
+KW  - Housing Supply and Markets R31
+UR  - https://search.ebscohost.com/login.aspx?direct=true&AuthType=ip,sso&db=ecn&AN=0992879&site=ehost-live&scope=site&custid=s8368349
+DP  - EBSCOhost
+DB  - ecn
+ER  - 
+
+TY  - THES
+AU  - Ma, Qiuhua
+T1  - Systematic Investigation of the Effect of Wildfire Events and Risks on Property Values
+PB  -  University of New Mexico
+Y1  - 2017/05//
+N1  - Accession Number: 1678288; Geographic Descriptors: U.S.; Geographic Region: Northern America; Publication Type: Dissertation; Update Code: 20171201
+N2  - Wildfires frequency and severity have been increasing in the western United States over the past few decades. Previous hedonic studies investigating wildfire examined the effect of occurrence and risk independently, overlooking the potentially confounding influence. Further, these studies find mixed and/or inconsistent results, which are complicated by a variety of data availability issues as well as varied econometric modeling decisions made by analysts. This analysis applies spatial econometrics modeling strategies in a hedonic pricing model framework to examine the joint effect of both past fire occurrence and current risk on property values in Santa Fe County, New Mexico. Overall, variations in data and econometric modeling techniques yield 2,000 regression results for hedonic models. Using hedonic results as primary estimates, I then employ an internal meta-analysis to investigate what factors explain variation in wildfire effects.
+M1  - Ph.D.
+KW  - Renewable Resources and Conservation: Forestry Q23
+KW  - Climate; Natural Disasters and Their Management; Global Warming Q54
+KW  - Ecological Economics: Ecosystem Services; Biodiversity Conservation; Bioeconomics; Industrial Ecology Q57
+UR  - https://search.ebscohost.com/login.aspx?direct=true&AuthType=ip,sso&db=ecn&AN=1678288&site=ehost-live&scope=site&custid=s8368349
+DP  - EBSCOhost
+DB  - ecn
+ER  - 
+
+TY  - THES
+AU  - Prante, Tyler
+T1  - Developing Social Capital as a Response to the Wildfire Problem
+PB  -  University of New Mexico
+Y1  - 2008/08//
+N1  - Accession Number: 1075662; Keywords: Natural Resource;  Revealed Preference;  Social Capital; Geographic Descriptors: U.S.; Geographic Region: Northern America; Publication Type: Dissertation; Update Code: 20091201
+N2  - This research analyzes the use of natural resource management techniques that attempt to build social capital. As an application, a primary focus is on the policy response to wildfire. The principal research is segmented into 3 related chapters. First, meta-analysis is used to statistically summarize the literature of Coasean bargaining experiments. Results from this analysis suggest that the social dimensions characterizing an experiment impact bargaining behavior on a magnitude similar to that of variables that describe transaction costs. This result suggests an increased focus in future experimental work on the impact of social dimension characteristics is warranted. Next, revealed preference analysis is applied to a unique forest management program in New Mexico. The Collaborative Forest Restoration Program includes stakeholders actively in the creation and implantation of management on federal forested lands. Statistical analysis of the funding pattern from the program reveals that developing social capital and maintaining forest health stand out among a set of potentially divergent goals, while implementing projects that span multiple land jurisdictions is argued to be a missed opportunity for developing social capital. Finally, experimental economics is used to analyze the effectiveness of a set of potential policy tools to induce private spending on wildfire risk mitigation. The policy tools considered here are shown to have the opposite impact, reducing private spending. When success is assessed alternatively by the probability of engaging in risk mitigation, these policy tools have the desired effect. Given the potential to crowd out private expenditure and the sensitivity to the specific mitigation objective, the implementation of these policy tools takes on greater significance.
+M1  - Ph.D.
+KW  - Ecological Economics: Ecosystem Services; Biodiversity Conservation; Bioeconomics; Industrial Ecology Q57
+KW  - Economic Sociology; Economic Anthropology; Language; Social and Economic Stratification Z13
+UR  - https://search.ebscohost.com/login.aspx?direct=true&AuthType=ip,sso&db=ecn&AN=1075662&site=ehost-live&scope=site&custid=s8368349
+DP  - EBSCOhost
+DB  - ecn
+ER  - 
