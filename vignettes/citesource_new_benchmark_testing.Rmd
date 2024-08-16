@@ -1,12 +1,12 @@
 ---
-title: "Benchmark Testing"
+title: "New Benchmark Testing"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Benchmark Testing}
+  %\VignetteIndexEntry{New Benchmark Testing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

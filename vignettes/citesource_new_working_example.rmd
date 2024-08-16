@@ -1,12 +1,12 @@
 ---
-title: "Source Analysis Across Screening Phases"
+title: "New Source Analysis Across Screening Phases"
 
 author: ""
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Source Analysis Across Screening Phases}
+  %\VignetteIndexEntry{New Source Analysis Across Screening Phases}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
