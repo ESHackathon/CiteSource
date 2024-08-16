@@ -7,6 +7,7 @@ articles:
   navbar: ~
   contents:
   - citesource_working_example
+  - citesource_new_working_example
   - citesource_benchmark_testing
   - citesource_new_benchmark_testing
   - citesource_vignette_db-pre-screen_validation
