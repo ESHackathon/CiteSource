@@ -45,34 +45,32 @@ library(CiteSource)
 #library(ggplot2)
 #library(dplyr)
 ```
-## 2. Import files from multiple sources
+## 2. Import citation files
 
 Users can import multiple .ris or .bib files into CiteSource, which the user can label with source information such as database or platform. In this case we are uploading the results from five different strings, which were run in Web of Science.
 
 ```{r}
-# Import citation files from folder
-citation_files <- list.files(path = "new_benchmark_data", pattern = "\\.ris", full.names = TRUE)
+#Import citation files from a folder
+file_path <- "../vignettes/new_benchmark_data/"
+citation_files <- list.files(path = file_path, pattern = "\\.ris", full.names = TRUE)
 
-# Print list of citation files to console
+#Print citation_files to double check the order in which R imported the files.
 citation_files
 
-# Set the path to the directory containing the citation files
-file_path <- "./new_benchmark_data/"
-
 # Create a tibble that contains metadata about the citation files
-metadata_tbl <- tibble::tribble(
+imported_tbl <- tibble::tribble(
   ~files,            ~cite_sources,   ~cite_labels, 
-  "benchmark_15.ris", "benchmark",     "benchmark",    
-  "search1_166.ris",    "search1",       "search",    
-  "search2_278.ris",    "search2",       "search",    
-  "search3_302.ris",    "search3",       "search",     
-  "search4_460.ris",    "search4",       "search",    
-  "search5_495.ris",    "search5",       "search"
+  "benchmark_15.ris",   "benchmark",     "benchmark",    
+  "search1_166.ris",    "search 1",       "search",    
+  "search2_278.ris",    "search 2",       "search",    
+  "search3_302.ris",    "search 3",       "search",     
+  "search4_460.ris",    "search 4",       "search",    
+  "search5_495.ris",    "search 5",       "search"
 ) %>% 
 # Append the file path to each file name in the 'files' column
 dplyr::mutate(files = paste0(file_path, files))
 # Read in citations using metadata table
-citations <- read_citations(metadata = metadata_tbl)
+raw_citations <- read_citations(metadata = imported_tbl)
 ```
 ## 3. Deduplication and source information
 
@@ -81,7 +79,7 @@ CiteSource allows users to merge duplicates while maintaining information in the
 ```{r, results = FALSE, message=FALSE, warning=FALSE}
 
 #Deduplicate citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.
-unique_citations <- dedup_citations(citations)
+unique_citations <- dedup_citations(raw_citations)
 
 #Count number of unique and non-unique citations from different sources and labels 
 n_unique <- count_unique(unique_citations)
@@ -90,8 +88,13 @@ n_unique <- count_unique(unique_citations)
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 #Initial upload/post internal deduplication table creation
-initial_counts<-record_counts(unique_citations, citations, "cite_source")
-record_counts_table(initial_counts)
+initial_records_search <- calculate_initial_records(unique_citations, target_labels = "search")
+initial_record_table_search <- create_initial_record_table(initial_records_search)
+initial_record_table_search
+
+initial_records_all <- calculate_initial_records(unique_citations)
+initial_record_table_all <- create_initial_record_table(initial_records_all)
+initial_record_table_all
 
 ```
 
