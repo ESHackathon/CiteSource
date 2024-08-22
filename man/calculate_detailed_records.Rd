@@ -19,7 +19,7 @@ by specific criteria (e.g., \code{cite_label == "search"}).}
 
 \item{labels_to_include}{An optional character vector of labels to filter the citations.
 If provided, only citations matching these labels will be included in the counts.
-Default is NULL, meaning no filtering will be applied.}
+if 'NULL' all labels are included. Default is 'NULL'.}
 }
 \value{
 A data frame with detailed counts for each citation source, including:
@@ -34,11 +34,14 @@ A data frame with detailed counts for each citation source, including:
 }
 }
 \description{
-This function calculates detailed record counts from unique citations, including
-the number of records imported, distinct records, unique records, and non-unique records
-for each citation source. It also calculates contribution percentages for each source.
+Calculate Detailed Record Counts
 }
 \details{
+This function processes a dataset and expands the 'cite_source' column, filters on
+user-specified labels (if provided), and calculates detailed counts such as the records imported,
+distinct records, unique records, non-unique records, and several percentage contributions for
+each citation source/method it also adds a total row summarizing these counts.
+
 The function first checks if the required columns are present in the input data frames.
 It then expands the \code{cite_source} column, filters the data based on the provided labels (if any),
 and calculates various counts and percentages for each citation source. The function also adds
@@ -56,5 +59,5 @@ n_unique <- data.frame(
   cite_label = c("search", "search", "search"),
   unique = c(10, 20, 30)
 )
-calculate_detailed_records(unique_citations, n_unique)
+calculate_detailed_records(unique_citations, n_unique, labels_to_include = "search")
 }

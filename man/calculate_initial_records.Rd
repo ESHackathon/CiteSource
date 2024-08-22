@@ -2,7 +2,7 @@
 % Please edit documentation in R/new_count_and_table.R
 \name{calculate_initial_records}
 \alias{calculate_initial_records}
-\title{calculate initial records Unique Citations (tested on working example 8/9/2024)}
+\title{Calculate Initial Records Unique Citations}
 \usage{
 calculate_initial_records(unique_citations, labels_to_include = NULL)
 }
