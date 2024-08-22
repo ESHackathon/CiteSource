@@ -124,3 +124,41 @@ unique_citations %>%
   record_level_table(return = "DT")
 
 ```
+  
+## 6. Exporting for further analysis
+
+We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save them in a convenient format for subsequent use. CiteSource offers a set of export functions called `export_csv`, `export_ris` and `export_bib` that will save dataframes as a .csv file, .ris file or .bib file, respectively. 
+
+You can then reimport exported files to pick up a project or analysis without having to start from scratch, or after making manual adjustments (such as adding missing abstract data) to a file. 
+
+### Generate a .csv file 
+The separate argument can be used to create separate columns for cite_source, cite_label or cite_string to facilitate analysis.
+
+```{r}
+#export_csv(unique_citations, filename = "citesource_export.csv", separate = "cite_source")
+```
+
+### Generate a .ris file 
+Generate and .ris and indicate custom field location for cite_source, cite_label or cite_string. In this example, we'll be using EndNote, so we put cite_sources in the DB field, which will appear as the "Name of Database" field in EndNote and cite_labels into C5, which will appear as the "Custom 5" metadata field in EndNote.
+
+```{r}
+#export_ris(unique_citations, filename = "citesource_export.ris", source_field = "DB", label_field = "C5")
+```
+
+### Generate a bibtex file 
+Generate a bibtex file and include data from cite_source, cite_label or cite_string.**
+
+```{r}
+#export_bib(unique_citations, filename = "citesource_export.bib", include = c("sources", "labels", "strings"))
+```
+
+### Re-import a CiteSource exported file
+In order to reimport a .csv or a .ris you can use the following. Here is an example of how you would re-import the file if it were on your desktop
+
+```{r}
+#citesource_working_example <-reimport_csv("citesource_export.csv")
+
+#citesource_working_example <-reimport_ris("citesource_export.ris")
+
+```
+
