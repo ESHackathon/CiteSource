@@ -211,25 +211,25 @@ Like the contributions plot, the precision/sensitivity table takes into consider
 
 In our example, we can see that of the 340 records from LENS, 100 were included after title/abstract screening, and 16 were included after full-text screening. 
 
-#### **Precision Calculation in the Function**:
-- The function calculates precision as:
+### **Precision Calculation in the Function**:
+The function calculates precision as:
 
 $$
 \text{Precision} = \frac{\text{Final Records from Source}}{\text{Distinct Records from Source}}
 $$
 
-  - **Final Records from Source** (`final`): The number of records from a specific source that were included in the final synthesis.
-  - **Distinct Records from Source** (`Distinct Records`): The total number of unique records (after deduplication) from that source.
+  - Final Records from Source (`final`): The number of records from a specific source that were included in the final synthesis.
+  - Distinct Records from Source (`Distinct Records`): The total number of unique records (after deduplication) from that source.
 
-#### **Sensitivity Calculation in the Function**:
-- The function calculates recall as:
+### **Sensitivity Calculation in the Function**:
+The function calculates recall as:
 
 $$
 \text{Recall} = \frac{\text{Final Records from Source}}{\text{Total Final Records Across All Sources}}
 $$
 
-  - **Final Records from Source** (`final`): The number of records from a specific source that were included in the final synthesis.
-  - **Total Final Records Across All Sources** (`Total final records`): The total number of records that made it into the final synthesis from all sources combined.
+  - Final Records from Source (`final`): The number of records from a specific source that were included in the final synthesis.
+  - Total Final Records Across All Sources(`Total final records`): The total number of records that made it into the final synthesis from all sources combined.
 
 
 ```{r}
@@ -254,29 +254,33 @@ We may want to export our deduplicated set of results (or any of our dataframes)
 
 You can then reimport exported files to pick up a project or analysis without having to start from scratch, or after making manual adjustments (such as adding missing abstract data) to a file. 
 
-**Generate a .csv file.** The separate argument can be used to create separate columns for cite_source, cite_label or cite_string to facilitate analysis.
+### Generate a .csv file 
+The separate argument can be used to create separate columns for cite_source, cite_label or cite_string to facilitate analysis.
 
 ```{r}
-#export_csv(unique_citations, filename = "citesource_working_example.csv", separate = "cite_source")
+#export_csv(unique_citations, filename = "citesource_export.csv", separate = "cite_source")
 ```
 
-**Generate a .ris file and indicate custom field location for cite_source, cite_label or cite_string.** In this example, we'll be using EndNote, so we put cite_sources in the DB field, which will appear as the *Name of Database* field in EndNote and cite_labels into C5, which will appear as the *Custom 5* metadata field in EndNote.
+### Generate a .ris file 
+Generate and .ris and indicate custom field location for cite_source, cite_label or cite_string. In this example, we'll be using EndNote, so we put cite_sources in the DB field, which will appear as the "Name of Database" field in EndNote and cite_labels into C5, which will appear as the "Custom 5" metadata field in EndNote.
 
 ```{r}
-#export_ris(unique_citations, filename = "citesource_working_example.ris", source_field = "DB", label_field = "C5")
+#export_ris(unique_citations, filename = "citesource_export.ris", source_field = "DB", label_field = "C5")
 ```
 
-**Generate a bibtex file and include data from cite_source, cite_label or cite_string.**
+### Generate a bibtex file 
+Generate a bibtex file and include data from cite_source, cite_label or cite_string.**
 
 ```{r}
-#export_bib(unique_citations, filename = "citesource_working_example.bib", include = c("sources", "labels", "strings"))
+#export_bib(unique_citations, filename = "citesource_export.bib", include = c("sources", "labels", "strings"))
 ```
 
-In order to reimport a .csv or a .ris you can use the following. Here is an example of how you would reimport the file if it were on your desktop
+### Re-import a CiteSource exported file
+In order to reimport a .csv or a .ris you can use the following. Here is an example of how you would re-import the file if it were on your desktop
 
 ```{r}
-#citesource_working_example <-reimport_csv("citesource_working_example.csv")
+#citesource_working_example <-reimport_csv("citesource_export.csv")
 
-#citesource_working_example <-reimport_ris("citesource_working_example.ris")
+#citesource_working_example <-reimport_ris("citesource_export.ris")
 
 ```
