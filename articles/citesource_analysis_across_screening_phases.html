@@ -65,7 +65,7 @@
       <h1>Analysis Across Screening Phases</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-08-16</h4>
+            <h4 data-toc-skip class="date">2024-08-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_analysis_across_screening_phases.rmd" class="external-link"><code>vignettes/citesource_analysis_across_screening_phases.rmd</code></a></small>
       <div class="d-none name"><code>citesource_analysis_across_screening_phases.rmd</code></div>
@@ -210,7 +210,7 @@ raw_citations.</p>
 <span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   6%</span></span>
+<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file       cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1        wos_278.ris               WoS        &lt;NA&gt;     search       278</span></span>
@@ -1516,46 +1516,39 @@ vs. unique records.</p>
 <p>In our example, we can see that of the 340 records from LENS, 100
 were included after title/abstract screening, and 16 were included after
 full-text screening.</p>
-<div class="section level4">
-<h4 id="precision-calculation-in-the-function">
+</div>
+<div class="section level3">
+<h3 id="precision-calculation-in-the-function">
 <strong>Precision Calculation in the Function</strong>:<a class="anchor" aria-label="anchor" href="#precision-calculation-in-the-function"></a>
-</h4>
-<ul>
-<li>The function calculates precision as:</li>
-</ul>
+</h3>
+<p>The function calculates precision as:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Precision</mtext><mo>=</mo><mfrac><mtext mathvariant="normal">Final Records from Source</mtext><mtext mathvariant="normal">Distinct Records from Source</mtext></mfrac></mrow><annotation encoding="application/x-tex">
 \text{Precision} = \frac{\text{Final Records from Source}}{\text{Distinct Records from Source}}
 </annotation></semantics></math></p>
 <ul>
-<li>
-<strong>Final Records from Source</strong> (<code>final</code>): The
-number of records from a specific source that were included in the final
+<li>Final Records from Source (<code>final</code>): The number of
+records from a specific source that were included in the final
 synthesis.</li>
-<li>
-<strong>Distinct Records from Source</strong>
-(<code>Distinct Records</code>): The total number of unique records
-(after deduplication) from that source.</li>
+<li>Distinct Records from Source (<code>Distinct Records</code>): The
+total number of unique records (after deduplication) from that
+source.</li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="sensitivity-calculation-in-the-function">
+<div class="section level3">
+<h3 id="sensitivity-calculation-in-the-function">
 <strong>Sensitivity Calculation in the Function</strong>:<a class="anchor" aria-label="anchor" href="#sensitivity-calculation-in-the-function"></a>
-</h4>
-<ul>
-<li>The function calculates recall as:</li>
-</ul>
+</h3>
+<p>The function calculates recall as:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Recall</mtext><mo>=</mo><mfrac><mtext mathvariant="normal">Final Records from Source</mtext><mtext mathvariant="normal">Total Final Records Across All Sources</mtext></mfrac></mrow><annotation encoding="application/x-tex">
 \text{Recall} = \frac{\text{Final Records from Source}}{\text{Total Final Records Across All Sources}}
 </annotation></semantics></math></p>
 <ul>
-<li>
-<strong>Final Records from Source</strong> (<code>final</code>): The
-number of records from a specific source that were included in the final
+<li>Final Records from Source (<code>final</code>): The number of
+records from a specific source that were included in the final
 synthesis.</li>
-<li>
-<strong>Total Final Records Across All Sources</strong>
-(<code>Total final records</code>): The total number of records that
-made it into the final synthesis from all sources combined.</li>
+<li>Total Final Records Across All
+Sources(<code>Total final records</code>): The total number of records
+that made it into the final synthesis from all sources combined.</li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">phase_count</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/calculate_phase_records.html">calculate_phase_records</a></span><span class="op">(</span><span class="va">unique_citations</span>, <span class="va">citations</span>, <span class="st">"cite_source"</span><span class="op">)</span></span>
@@ -2131,7 +2124,6 @@ made it into the final synthesis from all sources combined.</li>
 </table>
 </div>
 </div>
-</div>
 <div class="section level3">
 <h3 id="creating-a-citation-record-table">Creating a Citation Record Table<a class="anchor" aria-label="anchor" href="#creating-a-citation-record-table"></a>
 </h3>
@@ -2161,30 +2153,44 @@ file or .bib file, respectively.</p>
 <p>You can then reimport exported files to pick up a project or analysis
 without having to start from scratch, or after making manual adjustments
 (such as adding missing abstract data) to a file.</p>
-<p><strong>Generate a .csv file.</strong> The separate argument can be
-used to create separate columns for cite_source, cite_label or
-cite_string to facilitate analysis.</p>
+<div class="section level3">
+<h3 id="generate-a--csv-file">Generate a .csv file<a class="anchor" aria-label="anchor" href="#generate-a--csv-file"></a>
+</h3>
+<p>The separate argument can be used to create separate columns for
+cite_source, cite_label or cite_string to facilitate analysis.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#export_csv(unique_citations, filename = "citesource_working_example.csv", separate = "cite_source")</span></span></code></pre></div>
-<p><strong>Generate a .ris file and indicate custom field location for
-cite_source, cite_label or cite_string.</strong> In this example, we’ll
-be using EndNote, so we put cite_sources in the DB field, which will
-appear as the <em>Name of Database</em> field in EndNote and cite_labels
-into C5, which will appear as the <em>Custom 5</em> metadata field in
-EndNote.</p>
+<code class="sourceCode R"><span><span class="co">#export_csv(unique_citations, filename = "citesource_export.csv", separate = "cite_source")</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="generate-a--ris-file">Generate a .ris file<a class="anchor" aria-label="anchor" href="#generate-a--ris-file"></a>
+</h3>
+<p>Generate and .ris and indicate custom field location for cite_source,
+cite_label or cite_string. In this example, we’ll be using EndNote, so
+we put cite_sources in the DB field, which will appear as the “Name of
+Database” field in EndNote and cite_labels into C5, which will appear as
+the “Custom 5” metadata field in EndNote.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#export_ris(unique_citations, filename = "citesource_working_example.ris", source_field = "DB", label_field = "C5")</span></span></code></pre></div>
-<p><strong>Generate a bibtex file and include data from cite_source,
-cite_label or cite_string.</strong></p>
+<code class="sourceCode R"><span><span class="co">#export_ris(unique_citations, filename = "citesource_export.ris", source_field = "DB", label_field = "C5")</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="generate-a-bibtex-file">Generate a bibtex file<a class="anchor" aria-label="anchor" href="#generate-a-bibtex-file"></a>
+</h3>
+<p>Generate a bibtex file and include data from cite_source, cite_label
+or cite_string.**</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#export_bib(unique_citations, filename = "citesource_working_example.bib", include = c("sources", "labels", "strings"))</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">#export_bib(unique_citations, filename = "citesource_export.bib", include = c("sources", "labels", "strings"))</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="re-import-a-citesource-exported-file">Re-import a CiteSource exported file<a class="anchor" aria-label="anchor" href="#re-import-a-citesource-exported-file"></a>
+</h3>
 <p>In order to reimport a .csv or a .ris you can use the following. Here
-is an example of how you would reimport the file if it were on your
+is an example of how you would re-import the file if it were on your
 desktop</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#citesource_working_example &lt;-reimport_csv("citesource_working_example.csv")</span></span>
+<code class="sourceCode R"><span><span class="co">#citesource_working_example &lt;-reimport_csv("citesource_export.csv")</span></span>
 <span></span>
-<span><span class="co">#citesource_working_example &lt;-reimport_ris("citesource_working_example.ris")</span></span></code></pre></div>
+<span><span class="co">#citesource_working_example &lt;-reimport_ris("citesource_export.ris")</span></span></code></pre></div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
