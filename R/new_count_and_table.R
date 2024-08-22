@@ -1,6 +1,4 @@
-#Updated CiteSource Functions for allowing full functionality with reimported data
-
-#' calculate initial records Unique Citations (tested on working example 8/9/2024)
+#' Calculate Initial Records Unique Citations
 #'
 #' This function processes a dataset of unique citations, expands the `cite_source` column,
 #' filters based on user-specified labels (if provided), and then calculates the number
@@ -98,19 +96,23 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
 }
 
 
+
 #' Calculate Detailed Record Counts
 #'
-#' This function calculates detailed record counts from unique citations, including 
-#' the number of records imported, distinct records, unique records, and non-unique records 
-#' for each citation source. It also calculates contribution percentages for each source.
-#'
+#' 
+#' 
+#' This function processes a dataset and expands the 'cite_source' column, filters on
+#' user-specified labels (if provided), and calculates detailed counts such as the records imported,
+#' distinct records, unique records, non-unique records, and several percentage contributions for 
+#' each citation source/method it also adds a total row summarizing these counts.
+#' 
 #' @param unique_citations A data frame containing unique citations. 
 #'   The data frame must include the columns `cite_source`, `cite_label`, and `duplicate_id`.
 #' @param n_unique A data frame containing counts of unique records, typically filtered 
 #'   by specific criteria (e.g., `cite_label == "search"`).
 #' @param labels_to_include An optional character vector of labels to filter the citations. 
 #'   If provided, only citations matching these labels will be included in the counts.
-#'   Default is NULL, meaning no filtering will be applied.
+#'   if 'NULL' all labels are included. Default is 'NULL'.
 #'
 #' @return A data frame with detailed counts for each citation source, including:
 #'   - `Records Imported`: Total number of records imported.
@@ -144,7 +146,7 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
 #'   cite_label = c("search", "search", "search"),
 #'   unique = c(10, 20, 30)
 #' )
-#' calculate_detailed_records(unique_citations, n_unique)
+#' calculate_detailed_records(unique_citations, n_unique, labels_to_include = "search")
 calculate_detailed_records <- function(unique_citations, n_unique, labels_to_include = NULL) {
   
   # Explicitly define variables as NULL to avoid binding warnings
@@ -185,8 +187,8 @@ calculate_detailed_records <- function(unique_citations, n_unique, labels_to_inc
                       `Distinct Records` = integer(), 
                       `Unique Records` = integer(), 
                       `Non-unique Records` = integer()
-                      )
-           )
+    )
+    )
   }
   
   # Count the occurrences of each source to determine the "Records Imported"
@@ -680,4 +682,3 @@ create_precision_sensitivity_table <- function(data) {
       locations = gt::cells_body(columns = "Precision", rows = "Total")
     )
 }
-
