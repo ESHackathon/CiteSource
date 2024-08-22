@@ -58,8 +58,13 @@
 
 
 
-
-<div class="row">
+<link href="citesource_analysis_across_screening_phases_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="citesource_analysis_across_screening_phases_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><link href="citesource_analysis_across_screening_phases_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="citesource_analysis_across_screening_phases_files/datatables-binding-0.33/datatables.js"></script><link href="citesource_analysis_across_screening_phases_files/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="citesource_analysis_across_screening_phases_files/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="citesource_analysis_across_screening_phases_files/dt-core-1.13.6/js/jquery.dataTables.min.js"></script><link href="citesource_analysis_across_screening_phases_files/dt-ext-buttons-1.13.6/css/buttons.dataTables.min.css" rel="stylesheet">
+<script src="citesource_analysis_across_screening_phases_files/dt-ext-buttons-1.13.6/js/dataTables.buttons.min.js"></script><script src="citesource_analysis_across_screening_phases_files/dt-ext-buttons-1.13.6/js/buttons.html5.min.js"></script><script src="citesource_analysis_across_screening_phases_files/dt-ext-buttons-1.13.6/js/buttons.colVis.min.js"></script><script src="citesource_analysis_across_screening_phases_files/dt-ext-buttons-1.13.6/js/buttons.print.min.js"></script><link href="citesource_analysis_across_screening_phases_files/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="citesource_analysis_across_screening_phases_files/crosstalk-1.2.1/js/crosstalk.min.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Analysis Across Screening Phases</h1>
@@ -94,11 +99,11 @@ can arise about how critical a particular database is or question the
 return on investment of weeks of gray literature searching on the web.
 While the answers to these questions will vary based on the topic and
 scope of a project, CiteSource can assist in better informing the
-Evdence Synthesis community when data from projects are shared</p>
+Evidence Synthesis community when data from projects are shared</p>
 <p>The goal of this vignette is to show you how CiteSource can help you
 gather information on the ways sources and methods impact a review. The
 data in this vignette is based on a mock project. It looks at the result
-of searches for systematic reviews and meta-analyises on the health,
+of searches for systematic reviews and meta-analyses on the health,
 environmental and economic impacts of wildfires. We’ll walk through how
 CiteSource can import original search results, compare those information
 sources and methods, and determine how each source and method
@@ -114,16 +119,18 @@ board</a> on github!</p>
 lives on GitHub, so you may need to first install the remotes
 package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Install and load the remotes packages</span></span>
+<code class="sourceCode R"><span><span class="co">#Install the remotes packages to enable installation from GitHub</span></span>
 <span><span class="co">#install.packages("remotes")</span></span>
 <span><span class="co">#library(remotes)</span></span>
 <span></span>
-<span><span class="co">#Install and load CiteSource using the remotes package</span></span>
+<span><span class="co">#Install CiteSource</span></span>
 <span><span class="co">#remotes::install_github("ESHackathon/CiteSource")</span></span>
+<span></span>
+<span><span class="co">#Load the CiteSource</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.eshackathon.org/CiteSource" class="external-link">CiteSource</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="import-reference-files-and-add-custom-cite_data">2. Import Reference Files and Add Custom “cite_data”<a class="anchor" aria-label="anchor" href="#import-reference-files-and-add-custom-cite_data"></a>
+<h2 id="import-and-tag-citation-files-with-custom-metadata">2. Import and tag citation files with custom metadata<a class="anchor" aria-label="anchor" href="#import-and-tag-citation-files-with-custom-metadata"></a>
 </h2>
 <p>Start by importing multiple .ris or .bib files into CiteSource. When
 working from a local directory you will need to provide the path to
@@ -131,12 +138,13 @@ folder that contains the files you wish to upload. You can print
 citation_files to your console to ensure all the files you expect are
 there and to see their order, which will be important in labeling the
 data.</p>
-<p>CiteSource works with .ris/.bib files straight from any
+<p>CiteSource works with .ris and .bib files straight from any
 database/resource, however, the deduplication functionality relies on
 the metadata provided. Higher quality metadata will ensure more accurate
 results.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Import citation files from a folder</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="co">#Import citation files from a folder</span></span>
 <span><span class="va">file_path</span> <span class="op">&lt;-</span> <span class="st">"../vignettes/new_stage_data/"</span></span>
 <span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">file_path</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -150,26 +158,6 @@ results.</p>
 <span><span class="co">#&gt; [6] "../vignettes/new_stage_data//medline_84.ris"    </span></span>
 <span><span class="co">#&gt; [7] "../vignettes/new_stage_data//screened_128.ris"  </span></span>
 <span><span class="co">#&gt; [8] "../vignettes/new_stage_data//wos_278.ris"</span></span></code></pre></div>
-<p>, which they can then label with three custom metadata fields:
-cite_source, cite_string, and cite_label.</p>
-<p>Using the cite_source field, the user can label individual files with
-source information such as database or platform. Beyond source
-information, users may also use the cite_source field to provide search
-results using various search methodologies.</p>
-<p>The second field, cite_label, can be used to apply yet another
-variable. This label was intended to be used in combination with the
-label cite_source, to track the inclusion or exclusion of citations from
-a specific source over the course of title/abstract and full text
-screening.</p>
-<p>As a note, CiteSource does provide a third metadata field,
-cite_string, which can be used to specify another attribute or variable.
-For example, a use of cite_source and cite_string may be used to examine
-the unique and crossover citations that occur between databases, while
-simultaneously evaluating unique search string results. While it’s
-possible to use cite_string, we have not fully integrated this third
-field into any of our tables and plots and it is not used in this
-vignette. As we continue to develop CiteSource and get feedback from
-users, we’ll continue to update this and other vignettes.</p>
 </div>
 <div class="section level2">
 <h2 id="assigning-custom-metadata">3. Assigning custom metadata<a class="anchor" aria-label="anchor" href="#assigning-custom-metadata"></a>
@@ -195,7 +183,7 @@ screening and are labeled accordingly.</p>
 <p>Once we tag these files accordingly we will save them as
 raw_citations.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#read in citation files and tag accordingly</span></span>
+<code class="sourceCode R"><span><span class="co"># Create a tibble that contains metadata about the citation files</span></span>
 <span><span class="va">imported_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span><span class="va">files</span>,                <span class="op">~</span><span class="va">cite_sources</span>,        <span class="op">~</span><span class="va">cite_labels</span>, </span>
 <span>   <span class="st">"wos_278.ris"</span>,        <span class="st">"WoS"</span>,                <span class="st">"search"</span>,    </span>
@@ -210,7 +198,7 @@ raw_citations.</p>
 <span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span>
+<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   6%</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file       cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1        wos_278.ris               WoS        &lt;NA&gt;     search       278</span></span>
@@ -819,13 +807,12 @@ the same 82 citations only represent 24% of the 340 citations imported
 from LENS</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_heatmap_count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, plot_type <span class="op">=</span> <span class="st">"percentages"</span><span class="op">)</span></span>
-<span></span>
 <span><span class="va">my_heatmap_count</span></span></code></pre></div>
 <p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_heatmap_percent</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, plot_type <span class="op">=</span> <span class="st">"percentages"</span><span class="op">)</span></span>
+<span><span class="va">my_heatmap_percent</span></span></code></pre></div>
 <p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-2.png" width="960"></p>
 </div>
 <div class="section level3">
@@ -849,7 +836,6 @@ plot to other use cases.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_overlap_across_sources</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Plotting a large number of groups. Consider reducing nset or sub-setting the data.</span></span>
-<span></span>
 <span><span class="va">plot_overlap_across_sources</span></span></code></pre></div>
 <p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
 </div>
@@ -2124,9 +2110,10 @@ that made it into the final synthesis from all sources combined.</li>
 </table>
 </div>
 </div>
-<div class="section level3">
-<h3 id="creating-a-citation-record-table">Creating a Citation Record Table<a class="anchor" aria-label="anchor" href="#creating-a-citation-record-table"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="citation-record-tables">7. Citation Record Tables<a class="anchor" aria-label="anchor" href="#citation-record-tables"></a>
+</h2>
 <p>Another useful table that can be exported as a .csv is the
 record-level table. This table allows users to quickly identify which
 individual citations in the screened and/or final records were
@@ -2134,15 +2121,16 @@ present/absent from each source. The source tag is the default (include
 = “sources”), but can be replaced or expanded with ‘labels’ and/or
 ‘strings’</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">records_by_source</span><span class="op">&lt;-</span><span class="va">unique_citations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">citation_table_final</span><span class="op">&lt;-</span><span class="va">unique_citations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">cite_label</span>, <span class="st">"final"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/record_level_table.html">record_level_table</a></span><span class="op">(</span>return <span class="op">=</span> <span class="st">"DT"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">records_by_phase</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/record_level_table.html">record_level_table</a></span><span class="op">(</span><span class="va">unique_citations</span>, include <span class="op">=</span> <span class="st">"labels"</span>, return <span class="op">=</span> <span class="st">"DT"</span><span class="op">)</span></span></code></pre></div>
-</div>
+<span><span class="va">citation_table_final</span></span></code></pre></div>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"filter":"none","vertical":false,"class":"display","extensions":["Buttons"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"],["&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;"],["Amjad et al. (2021)","Barros et al. (2023)","Dittrich & McCallum (2020)","Erdozain et al. (2024)","Foo et al. (2024)","Gao et al. (2023)","Geary et al. (2020)","Groot et al. (2019)","Henry et al. (2021)","Isaac et al. (2021)","Isaza et al. (2022)","Jiao et al. (2024)","Jolly et al. (2022)","Kondo et al. (2019)","Lee (2018)","Liu et al. (2015)","Mattioli et al. (2022)","Padula & Raynes‐Greenow (2023)","Sanderfoot et al. (2021)","Thomaz (2021)","Vasconcelos et al. (2017)","Vukomanovic & Steelman (2019)","Q. Wang et al. (2012)","Zhang et al. (2024)"],["Amjad, S., Chojecki, D., Osornio-Vargas, A. & Ospina, M. (2021). Wildfire exposure during pregnancy and the risk of adverse birth outcomes: A systematic review. <i>Environment International<\/i><i>, 156<\/i>(du1, 7807270). <a href = \"https://doi.org/10.1016/j.envint.2021.106644\">https://doi.org/10.1016/j.envint.2021.106644<\/a>","Barros, B., Oliveira, M. & Morais, S. (2023). Continent-based systematic review of the short-term health impacts of wildfire emissions. <i>Journal Of Toxicology And Environmental Health-Part B-Critical Reviews<\/i><i>, 26<\/i>(7). <a href = \"https://doi.org/10.1080/10937404.2023.2236548\">https://doi.org/10.1080/10937404.2023.2236548<\/a>","Dittrich, R. & McCallum, S. (2020). How to measure the economic health cost of wildfires - A systematic review of the literature for northern America. <i>International Journal Of Wildland Fire<\/i><i>, 29<\/i>(11). <a href = \"https://doi.org/10.1071/WF19091\">https://doi.org/10.1071/WF19091<\/a>","Erdozain, M., Cardil, A. & de-Miguel, S. (2024). Fire impacts on the biology of stream ecosystems: A synthesis of current knowledge to guide future research and integrated fire management. <i>Global Change Biology<\/i><i>, 30<\/i>(7). <a href = \"https://doi.org/10.1111/gcb.17389\">https://doi.org/10.1111/gcb.17389<\/a>","Foo, D., Stewart, R., Heo, S., Dhamrait, G., Choi, H., Song, Y. & Bell, M. (2024). Wildfire smoke exposure during pregnancy and perinatal, obstetric, and early childhood health outcomes: A systematic review and meta-analysis. <i>Environmental Research<\/i><i>, 241<\/i>(ei2, 0147621). <a href = \"https://doi.org/10.1016/j.envres.2023.117527\">https://doi.org/10.1016/j.envres.2023.117527<\/a>","Gao, Y., Huang, W., Yu, P., Xu, R., Yang, Z., Gasevic, D., Ye, T., Guo, Y. & Li, S. (2023). Long-term impacts of non-occupational wildfire exposure on human health: A systematic review. <i>Environmental Pollution<\/i><i>, 320<\/i>(dvl, 8804476). <a href = \"https://doi.org/10.1016/j.envpol.2023.121041\">https://doi.org/10.1016/j.envpol.2023.121041<\/a>","Geary, W., Doherty, T., Nimmo, D., Tulloch, A. & Ritchie, E. (2020). Predator responses to fire: A global systematic review and meta-analysis. <i>Journal Of Animal Ecology<\/i><i>, 89<\/i>(4). <a href = \"https://doi.org/10.1111/1365-2656.13153\">https://doi.org/10.1111/1365-2656.13153<\/a>","Groot, E., Caturay, A., Khan, Y. & Copes, R. (2019). A SYSTEMATIC REVIEW OF THE HEALTH IMPACTS OF OCCUPATIONAL EXPOSURE TO WILDLAND FIRES. <i>International Journal Of Occupational Medicine And Environmental Health<\/i><i>, 32<\/i>(2). <a href = \"https://doi.org/10.13075/ijomeh.1896.01326\">https://doi.org/10.13075/ijomeh.1896.01326<\/a>","Henry, S., Ospina, M., Dennett, L. & Hicks, A. (2021). Assessing the Risk of Respiratory-Related Healthcare Visits Associated with Wildfire Smoke Exposure in Children 0-18 Years Old: A Systematic Review. <i>International Journal Of Environmental Research And Public Health<\/i><i>, 18<\/i>(16). <a href = \"https://doi.org/10.3390/ijerph18168799\">https://doi.org/10.3390/ijerph18168799<\/a>","Isaac, F., Toukhsati, S., Di Benedetto, M. & Kennedy, G. (2021). A Systematic Review of the Impact of Wildfires on Sleep Disturbances. <i>International Journal Of Environmental Research And Public Health<\/i><i>, 18<\/i>(19). <a href = \"https://doi.org/10.3390/ijerph181910152\">https://doi.org/10.3390/ijerph181910152<\/a>","Isaza, D., Cramp, R. & Franklin, C. (2022). Fire and rain: A systematic review of the impacts of wildfire and associated runoff on aquatic fauna. <i>Global Change Biology<\/i><i>, 28<\/i>(8). <a href = \"https://doi.org/10.1111/gcb.16088\">https://doi.org/10.1111/gcb.16088<\/a>","Jiao, A., Headon, K., Han, T., Umer, W. & Wu, J. (2024). Associations between short-term exposure to wildfire particulate matter and respiratory outcomes: A systematic review. <i>Science Of The Total Environment<\/i><i>, 907<\/i>. <a href = \"https://doi.org/10.1016/j.scitotenv.2023.168134\">https://doi.org/10.1016/j.scitotenv.2023.168134<\/a>","Jolly, C., Dickman, C., Doherty, T., Eeden, L., Geary, W., Legge, S., Woinarski, J. & Nimmo, D. (2022). Animal mortality during fire. <i>Global Change Biology<\/i><i>, 28<\/i>(6). <a href = \"https://doi.org/10.1111/gcb.16044\">https://doi.org/10.1111/gcb.16044<\/a>","Kondo, M., De Roos, A., White, L., Heilman, W., Mockrin, M., Gross-Davis, C. & Burstyn, I. (2019). Meta-Analysis of Heterogeneity in the Effects of Wildfire Smoke Exposure on Respiratory Health in North America. <i>International Journal Of Environmental Research And Public Health<\/i><i>, 16<\/i>(6). <a href = \"https://doi.org/10.3390/ijerph16060960\">https://doi.org/10.3390/ijerph16060960<\/a>","Lee, D. (2018). Spotted Owls and forest fire: a systematic review and meta-analysis of the evidence. <i>Ecosphere<\/i><i>, 9<\/i>(7). <a href = \"https://doi.org/10.1002/ecs2.2354\">https://doi.org/10.1002/ecs2.2354<\/a>","Liu, J., Pereira, G., Uhl, S., Bravo, M. & Bell, M. (2015). A systematic review of the physical health impacts from non-occupational exposure to wildfire smoke. <i>Environmental Research<\/i><i>, 136<\/i>(ei2, 0147621). <a href = \"https://doi.org/10.1016/j.envres.2014.10.015\">https://doi.org/10.1016/j.envres.2014.10.015<\/a>","Mattioli, W., Ferrara, C., Lombardo, E., Barbati, A., Salvati, L. & Tomao, A. (2022). Estimating wildfire suppression costs: a systematic review. <i>International Forestry Review<\/i><i>, 24<\/i>(1). <a href = \"https://doi.org/10.1505/146554822835224801\">https://doi.org/10.1505/146554822835224801<\/a>","Padula, A. M. & Raynes‐Greenow, C. (2023). Health Effects of Wildfire Smoke During Pregnancy and Childhood. <i>Landscape Fire, Smoke, And Health<\/i>. <a href = \"https://doi.org/10.1002/9781119757030.ch13\">https://doi.org/10.1002/9781119757030.ch13<\/a>","Sanderfoot, O. V., Bassing, S. B., Brusa, J. L., Emmet, R. L., Gillman, S. J., Swift, K. & Gardner, B. (2021). A review of the effects of wildfire smoke on the health and behavior of wildlife. <i>Environmental Research Letters<\/i><i>, 16<\/i>(12). <a href = \"https://doi.org/10.1088/1748-9326/ac30f6\">https://doi.org/10.1088/1748-9326/ac30f6<\/a>","Thomaz, E. (2021). Effects of fire on the aggregate stability of clayey soils: A meta-analysis. <i>Earth-Science Reviews<\/i><i>, 221<\/i>. <a href = \"https://doi.org/10.1016/j.earscirev.2021.103802\">https://doi.org/10.1016/j.earscirev.2021.103802<\/a>","Vasconcelos, H., Maravalhas, J. & Cornelissen, T. (2017). Effects of fire disturbance on ant abundance and diversity: a global meta-analysis. <i>Biodiversity And Conservation<\/i><i>, 26<\/i>(1). <a href = \"https://doi.org/10.1007/s10531-016-1234-3\">https://doi.org/10.1007/s10531-016-1234-3<\/a>","Vukomanovic, J. & Steelman, T. (2019). A Systematic Review of Relationships Between Mountain Wildfire and Ecosystem Services. <i>Landscape Ecology<\/i><i>, 34<\/i>(5). <a href = \"https://doi.org/10.1007/s10980-019-00832-9\">https://doi.org/10.1007/s10980-019-00832-9<\/a>","Wang, Q., Zhong, M. & Wang, S. (2012). A meta-analysis on the response of microbial biomass, dissolved organic matter, respiration, and N mineralization in mineral soil to fire in forest ecosystems. <i>Forest Ecology And Management<\/i><i>, 271<\/i>. <a href = \"https://doi.org/10.1016/j.foreco.2012.02.006\">https://doi.org/10.1016/j.foreco.2012.02.006<\/a>","Zhang, Y., Tingting, Y., Huang, W., Yu, P., Chen, G., Xu, R., Song, J., Guo, Y. & Li, S. (2024). Health Impacts of Wildfire Smoke on Children and Adolescents: A Systematic Review and Meta-analysis. <i>Current Environmental Health Reports<\/i><i>, 11<\/i>(1). <a href = \"https://doi.org/10.1007/s40572-023-00420-9\">https://doi.org/10.1007/s40572-023-00420-9<\/a>"],[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,true,true,true,true,true],[true,true,false,true,true,true,true,true,true,true,true,false,true,true,false,true,false,false,false,false,false,false,false,true],[true,true,true,true,true,true,true,true,false,false,true,true,true,false,true,true,false,false,false,false,true,true,true,false],[true,true,true,true,true,true,true,false,true,true,true,true,true,true,true,true,true,false,true,false,true,true,true,true],[true,true,true,true,true,true,true,false,true,true,true,true,true,true,true,true,true,true,false,false,true,true,true,true],["&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;"],["&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#x2717;","&#x2717;","&#x2717;","&#x2717;","&#x2717;","&#x2717;","&#x2717;","&#10004;"],["&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#x2717;","&#x2717;","&#10004;","&#10004;","&#10004;","&#x2717;"],["&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;"],["&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th rowspan=\"2\" colspan=\"2\">&nbsp;<\/th>\n      <th rowspan=\"2\" colspan=\"2\">Citation<\/th>\n      <th colspan=\"10\">Source<\/th>\n    <\/tr>\n    <tr>\n      <th>WoS<\/th>\n      <th>Medline<\/th>\n      <th>Environment Index<\/th>\n      <th>Dimensions<\/th>\n      <th>Lens.org<\/th>\n      <th>WoS <\/th>\n      <th>Medline <\/th>\n      <th>Environment Index <\/th>\n      <th>Dimensions <\/th>\n      <th>Lens.org <\/th>\n    <\/tr>\n  <\/thead>\n  <tfoot>\n    <td colspan=\"14\">Click on the &oplus; to view the full reference<\/td>\n  <\/tfoot>\n<\/table>","options":{"columnDefs":[{"visible":false,"targets":[0,3,4,5,6,7,8]},{"orderable":false,"className":"details-control","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":" ","targets":1},{"name":"citation","targets":2},{"name":"html_reference","targets":3},{"name":"source__WoS","targets":4},{"name":"source__Medline","targets":5},{"name":"source__Environment Index","targets":6},{"name":"source__Dimensions","targets":7},{"name":"source__Lens.org","targets":8},{"name":"source__WoS ","targets":9},{"name":"source__Medline ","targets":10},{"name":"source__Environment Index ","targets":11},{"name":"source__Dimensions ","targets":12},{"name":"source__Lens.org ","targets":13}],"dom":"Bfrtip","buttons":["print",{"extend":"csv","filename":"CiteSource_record_summary","text":"Download csv","exportOptions":{"columns":[0,2,3,4,5,6,7,8]}}],"order":[],"autoWidth":false,"orderClasses":false},"callback":"function(table) {\n\n              table.column(1).nodes().to$().css({cursor: 'pointer'});\n              var format = function(d) {\n                return '<div style=\"background-color:#eee; padding: .5em;\">' +\n                        d[3];\n              };\n              table.on('click', 'td.details-control', function() {\n                var td = $(this), row = table.row(td.closest('tr'));\n                if (row.child.isShown()) {\n                  row.child.hide();\n                  td.html('&oplus;');\n                } else {\n                  row.child(format(row.data())).show();\n                  td.html('&CircleMinus;');\n                }\n              });\n}","selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":["callback"],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
-<h2 id="exporting-for-further-analysis">7. Exporting for further analysis<a class="anchor" aria-label="anchor" href="#exporting-for-further-analysis"></a>
+<h2 id="exporting-for-further-analysis">8. Exporting for further analysis<a class="anchor" aria-label="anchor" href="#exporting-for-further-analysis"></a>
 </h2>
 <p>We may want to export our deduplicated set of results (or any of our
 dataframes) for further analysis or to save them in a convenient format
