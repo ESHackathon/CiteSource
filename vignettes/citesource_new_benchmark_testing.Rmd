@@ -60,7 +60,7 @@ citation_files
 # Create a tibble that contains metadata about the citation files
 imported_tbl <- tibble::tribble(
   ~files,            ~cite_sources,   ~cite_labels, 
-  "benchmark_15.ris",   "benchmark",     "benchmark",    
+  "benchmark_15.ris",   NA,               "benchmark",    
   "search1_166.ris",    "search 1",       "search",    
   "search2_278.ris",    "search 2",       "search",    
   "search3_302.ris",    "search 3",       "search",     
@@ -88,13 +88,9 @@ n_unique <- count_unique(unique_citations)
 source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 #Initial upload/post internal deduplication table creation
-initial_records_search <- calculate_initial_records(unique_citations, target_labels = "search")
+initial_records_search <- calculate_initial_records(unique_citations, labels_to_include = "search")
 initial_record_table_search <- create_initial_record_table(initial_records_search)
 initial_record_table_search
-
-initial_records_all <- calculate_initial_records(unique_citations)
-initial_record_table_all <- create_initial_record_table(initial_records_all)
-initial_record_table_all
 
 ```
 
