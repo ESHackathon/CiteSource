@@ -32,7 +32,7 @@ The goal of this vignette is to show you how CiteSource can help you gather info
 
 If you have any questions, feedback, ideas, etc. about this vignette or others be sure to check out our [discussion board](https://github.com/ESHackathon/CiteSource/discussions/100) on github! 
 
-## 1. Install and Load CiteSource 
+## 1. Install and load CiteSource 
 
 Use the following code to install CiteSource. Currently, CiteSource lives on GitHub, so you may need to first install the remotes package.
 
@@ -48,7 +48,7 @@ Use the following code to install CiteSource. Currently, CiteSource lives on Git
 library(CiteSource)
 ```
 
-## 2. Import and tag citation files with custom metadata
+## 2. Import citation files
 
 Start by importing multiple .ris or .bib files into CiteSource. When working from a local directory you will need to provide the path to folder that contains the files you wish to upload. You can print citation_files to  your console to ensure all the files you expect are there and to see their order, which will be important in labeling the data.
 
@@ -56,7 +56,6 @@ CiteSource works with .ris and .bib files straight from any database/resource, h
 
 
 ```{r}
-
 #Import citation files from a folder
 file_path <- "../vignettes/new_stage_data/"
 citation_files <- list.files(path = file_path, pattern = "\\.ris", full.names = TRUE)
@@ -65,7 +64,7 @@ citation_files <- list.files(path = file_path, pattern = "\\.ris", full.names = 
 citation_files
 ```
 
-## 3. Assigning custom metadata
+## 3. Assign custom metadata
 
 NOTE: CiteSource allows you to label records in three custom fields: cite_source, cite_string, and cite_label. currently cite_source and cite_label are the primary fields that CiteSource employs, cite_string operates like cite_label, and there are plans to further integrate this field into future package functionality
 
@@ -95,7 +94,7 @@ dplyr::mutate(files = paste0(file_path, files))
 raw_citations <- read_citations(metadata = imported_tbl)
 ```
 
-## 4. Deduplication & Identifying Overlapping Records
+## 4. Deduplicate & create data tables
 
 Having added the custom metadata to the files, we are now able to compare the records within and between the files. CiteSource uses the ASySD package to identify and merge metadata from duplicate records, maintaining the cite_source, cite_label,and cite_string fields of each record. Note that pre-prints and similar results will not be identified as duplicates, to learn more about the algorithm employed in identifying duplicate records see (ASySD).
 
@@ -111,7 +110,7 @@ source_comparison <- compare_sources(unique_citations, comp_type = "sources")
 
 ```
 
-## 5. Reviewing Internal Source Duplication
+## 5. Review internal duplication
 
 Once we have imported, added custom metadata, and identified duplicates, it can be helpful to review the initial record count data to ensure everything looks okay. As a part of the deduplication process, duplicate records may have been identified within sources. The initial record table will provide you with a count of how many records were initially in each source file, and the count of distinct records that will vary if there were any duplicates identified within the source file. 
 
@@ -125,11 +124,11 @@ initial_record_table
 ```
 
 
-## 6. Analyzing Overlap Across Sournces & Methods
+## 6. Analyze overlap across sources & methods
 
 When teams are selecting databases for inclusion in a review it can be extremely difficult to determine the best resources and determine the return on investment in terms of the time it takes to apply searches. This is especially true in fields where research relies on cross-disciplinary resources. By tracking and reporting where/how each citation was found, the evidence synthesis community could in turn track the utility of various databases/platforms and identify the most relevant resources as it relates to their research topic. This idea can be extended to search string comparison as well as various search strategies and methodologies.
 
-### Plot overlap as a heatmap matrix & heatmap percent matrix
+### Heatmaps
 
 Looking at the first heatmap we can see that the heatmap is organized by source in order of record count. The source count is located at the top of each of source's column. The count within the cells represents the number of records that overlapped between those two sources. Looking at the records imported from LENS.org we can see of the 340 records, 212 were also found in Dimensions and 146 were found in Web of Science. We can also see that of the 100 records imported from Environmental Index, 82 were found in LENS.
 
@@ -143,7 +142,7 @@ my_heatmap_percent <- plot_source_overlap_heatmap(source_comparison, plot_type =
 my_heatmap_percent
 ```
 
-### Plot overlap as an upset plot
+### Upset Plot
 
 A more powerful way of looking at overlap of sources is through the use of an upset plot, which provides details on overlap across all sources. The upset plot also provides information on number of unique contributions of any given source.
 
@@ -156,13 +155,13 @@ plot_overlap_across_sources <- plot_source_overlap_upset(source_comparison, decr
 plot_overlap_across_sources
 ```
 
-## 7. Analyzing Records Across Screening Phases
+## 7. Analyze records across Phases
 
 Until now we have only reviewed overlap across sources. In the following, we will now include the cite_label data as well in order to track each source's records across screening phases. 
 
 In this case we uploaded an .ris file for all citations that were included after title and abstract screening as well as after full-text screening. Using the contributions plot we can easily see the number of records from each source, both overlapping and unique, across these phases.
 
-### Assessing contribution of sources by review stage
+### Assess contribution across phases
 
 Looking at the plot there are three bar plots for each source in the order search, screened, final. The green bar within each phase is the count of unique records from that source, while the red bar shows the number of records from that source that overlapped at least one other source. In this case we can see that despite the high number of unique records from LENS and Web of Science, each only contributed a single unique citation in the end.
 
@@ -175,11 +174,11 @@ plot_contributions_over_phases <- plot_contributions(n_unique,
 plot_contributions_over_phases
 ```
 
-## 8. Analyzing Data Using Tables
+## 8. Analyze data with tables
 
 Visualizations are great, but so are tables! CiteSource provides the ability to create tables for additional analysis. Presenting data in the form of a search summary table can provide an overview of each source's impact (see [Bethel et al. 2021](https://doi.org/10.5195/jmla.2021.809) for more about search summary tables). 
 
-### Creating a Detailed Record Table
+### Detailed record table
 The detailed record provides more details regarding unique records. Let's break down the columns.
 
 Starting with the first two columns, we can see that this is the same data that was provided in the initial record table. Since the number of records imported and the actual number of distinct records from that source may differ, this information is provided again due to the fact that the distinct record count is what calculations are based on. The one difference here is that the total distinct records in this table is the number after deduplication, this is done in order to give an accurate number of records that were screened.
@@ -196,7 +195,7 @@ detailed_count<-calculate_detailed_records(unique_citations, n_unique, "search")
 create_detailed_record_table(detailed_count)
 ```
 
-### Creating a Precision/Sensitivity Table
+### Precision/Sensitivity Table
 
 Like the contributions plot, the precision/sensitivity table takes into consideration data from screening phases. Alongside the distinct records, and records included a the title/abstract and screening phases for each source, the table also calculates the precision and sensitivity (also known as recall). This table does not differentiate overlapping vs. unique records.
 
@@ -228,7 +227,7 @@ phase_count<-calculate_phase_records(unique_citations, citations, "cite_source")
 create_precision_sensitivity_table(phase_count)
 ```
 
-## 9. Citation Record Tables
+## 9. Record level table
 
 Another useful table that can be exported as a .csv is the record-level table. This table allows users to quickly identify which individual citations in the screened and/or final records were present/absent from each source. The source tag is the default (include = "sources"), but can be replaced or expanded with 'labels' and/or 'strings'
 ```{r}
