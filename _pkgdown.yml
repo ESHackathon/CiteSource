@@ -3,7 +3,7 @@ template:
   bootstrap: 5
 
 articles:
-- title: Articles
+- title: Vignettes
   navbar: ~
   contents:
   - citesource_working_example
@@ -12,3 +12,4 @@ articles:
   - citesource_vignette_db-pre-screen_validation
   - citesource_vignette_db-topic-coverage
   - citesource_analysis_across_screening_phases
+  
