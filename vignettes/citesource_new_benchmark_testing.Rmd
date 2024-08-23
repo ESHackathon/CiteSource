@@ -122,7 +122,7 @@ This record table is helpful in reviewing which citations were found across each
 ```{r}
 
 unique_citations %>%
-  dplyr::filter(stringr::str_detect(cite_label, "benchmark")) %>%
+  dplyr::filter(stringr::str_detect(cite_source, "benchmark")) %>%
   record_level_table(return = "DT")
 
 ```
