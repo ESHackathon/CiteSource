@@ -34,14 +34,12 @@ A data frame with detailed counts for each citation source, including:
 }
 }
 \description{
-Calculate Detailed Record Counts
-}
-\details{
 This function processes a dataset and expands the 'cite_source' column, filters on
 user-specified labels (if provided), and calculates detailed counts such as the records imported,
 distinct records, unique records, non-unique records, and several percentage contributions for
 each citation source/method it also adds a total row summarizing these counts.
-
+}
+\details{
 The function first checks if the required columns are present in the input data frames.
 It then expands the \code{cite_source} column, filters the data based on the provided labels (if any),
 and calculates various counts and percentages for each citation source. The function also adds

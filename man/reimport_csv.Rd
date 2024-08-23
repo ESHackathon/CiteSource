@@ -9,6 +9,9 @@ reimport_csv(filename)
 \arguments{
 \item{filename}{Name (and path) of CSV file to be reimported, should end in .csv}
 }
+\value{
+A data frame containing the imported citation data if all required columns are present.
+}
 \description{
 This function reimports a csv file that was tagged and deduplicated by CiteSource.
 It allows to continue with further analyses without repeating that step, and also
@@ -16,10 +19,9 @@ allows users to make any manual corrections to tagging or deduplication. Note th
 this function only works on CSV files that were written with \code{export_csv(..., separate = NULL)}
 }
 \examples{
-if (interactive()) {
-  dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-  export_csv(dedup_results, "citations.csv")
-  unique_citations <- reimport_csv("citations.csv")
+\dontrun{
+#example usage
+citations <- reimport_csv("path/to/citations.csv")
 }
 
 }

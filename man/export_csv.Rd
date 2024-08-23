@@ -2,17 +2,17 @@
 % Please edit documentation in R/export.R
 \name{export_csv}
 \alias{export_csv}
-\title{Export deduplicated citations with source data as csv file}
+\title{Export deduplicated citations with source data as CSV file}
 \usage{
 export_csv(
-  citations,
-  filename = "citations.csv",
+  unique_citations,
+  filename = "citesource_exported_citations.csv",
   separate = NULL,
   trim_abstracts = 32000
 )
 }
 \arguments{
-\item{citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
+\item{unique_citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
 
 \item{filename}{Name (and path) of file, should end in .csv}
 
@@ -22,8 +22,11 @@ export_csv(
 which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 NULL to retain abstracts as they are.}
 }
+\value{
+The function saves the deduplicated citations as a CSV file to the specified location.
+}
 \description{
-This function saves deduplicated citations as a csv file for further analysis and/or reporting.
+This function saves deduplicated citations as a CSV file for further analysis and/or reporting.
 Metadata can be separated into one column per source, label or string, which facilitates analysis.
 Note that \emph{existing files are overwritten without warning.}
 }
