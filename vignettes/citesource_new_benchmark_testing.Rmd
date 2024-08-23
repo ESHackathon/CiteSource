@@ -102,7 +102,7 @@ An upset plot is useful for visualizing overlap across multiple sources and prov
 
 We have uploaded 15 benchmarking articles. Of these 15 articles, the upset plot shows us that all but 4 were found across the five searches. We can see the number of benchmarking articles that were discovered by each string as well as the number of articles that were shared between searches. 
 
-```{r}
+```{r, fig.alt="An upset plot visualizing the overlap of benchmarking articles found across five search strategies. The plot highlights that nine articles were identified by all five searches, while four benchmarking articles were missed entirely. Additional columns show the number of articles shared across different combinations of search strategies."}
 #Generate a source comparison upset plot.
 plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
 
