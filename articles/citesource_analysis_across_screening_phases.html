@@ -112,7 +112,7 @@ or others be sure to check out our <a href="https://github.com/ESHackathon/CiteS
 board</a> on github!</p>
 </div>
 <div class="section level2">
-<h2 id="install-and-load-citesource">1. Install and Load CiteSource<a class="anchor" aria-label="anchor" href="#install-and-load-citesource"></a>
+<h2 id="install-and-load-citesource">1. Install and load CiteSource<a class="anchor" aria-label="anchor" href="#install-and-load-citesource"></a>
 </h2>
 <p>Use the following code to install CiteSource. Currently, CiteSource
 lives on GitHub, so you may need to first install the remotes
@@ -129,7 +129,7 @@ package.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.eshackathon.org/CiteSource" class="external-link">CiteSource</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="import-and-tag-citation-files-with-custom-metadata">2. Import and tag citation files with custom metadata<a class="anchor" aria-label="anchor" href="#import-and-tag-citation-files-with-custom-metadata"></a>
+<h2 id="import-citation-files">2. Import citation files<a class="anchor" aria-label="anchor" href="#import-citation-files"></a>
 </h2>
 <p>Start by importing multiple .ris or .bib files into CiteSource. When
 working from a local directory you will need to provide the path to
@@ -142,8 +142,7 @@ database/resource, however, the deduplication functionality relies on
 the metadata provided. Higher quality metadata will ensure more accurate
 results.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">#Import citation files from a folder</span></span>
+<code class="sourceCode R"><span><span class="co">#Import citation files from a folder</span></span>
 <span><span class="va">file_path</span> <span class="op">&lt;-</span> <span class="st">"../vignettes/new_stage_data/"</span></span>
 <span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">file_path</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -159,7 +158,7 @@ results.</p>
 <span><span class="co">#&gt; [8] "../vignettes/new_stage_data//wos_278.ris"</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="assigning-custom-metadata">3. Assigning custom metadata<a class="anchor" aria-label="anchor" href="#assigning-custom-metadata"></a>
+<h2 id="assign-custom-metadata">3. Assign custom metadata<a class="anchor" aria-label="anchor" href="#assign-custom-metadata"></a>
 </h2>
 <p>NOTE: CiteSource allows you to label records in three custom fields:
 cite_source, cite_string, and cite_label. currently cite_source and
@@ -197,7 +196,7 @@ raw_citations.</p>
 <span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   6%</span></span>
+<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file       cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1        wos_278.ris               WoS        &lt;NA&gt;     search       278</span></span>
@@ -210,7 +209,7 @@ raw_citations.</p>
 <span><span class="co">#&gt; 8       final_24.ris              &lt;NA&gt;        &lt;NA&gt;      final        24</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="deduplication-identifying-overlapping-records">4. Deduplication &amp; Identifying Overlapping Records<a class="anchor" aria-label="anchor" href="#deduplication-identifying-overlapping-records"></a>
+<h2 id="deduplicate-create-data-tables">4. Deduplicate &amp; create data tables<a class="anchor" aria-label="anchor" href="#deduplicate-create-data-tables"></a>
 </h2>
 <p>Having added the custom metadata to the files, we are now able to
 compare the records within and between the files. CiteSource uses the
@@ -238,7 +237,7 @@ duplicate records see (ASySD).</p>
 <span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="reviewing-internal-source-duplication">5. Reviewing Internal Source Duplication<a class="anchor" aria-label="anchor" href="#reviewing-internal-source-duplication"></a>
+<h2 id="review-internal-duplication">5. Review internal duplication<a class="anchor" aria-label="anchor" href="#review-internal-duplication"></a>
 </h2>
 <p>Once we have imported, added custom metadata, and identified
 duplicates, it can be helpful to review the initial record count data to
@@ -772,7 +771,7 @@ duplicate citations within this source as both counts read 84.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="analyzing-overlap-across-sournces-methods">6. Analyzing Overlap Across Sournces &amp; Methods<a class="anchor" aria-label="anchor" href="#analyzing-overlap-across-sournces-methods"></a>
+<h2 id="analyze-overlap-across-sources-methods">6. Analyze overlap across sources &amp; methods<a class="anchor" aria-label="anchor" href="#analyze-overlap-across-sources-methods"></a>
 </h2>
 <p>When teams are selecting databases for inclusion in a review it can
 be extremely difficult to determine the best resources and determine the
@@ -785,7 +784,7 @@ relevant resources as it relates to their research topic. This idea can
 be extended to search string comparison as well as various search
 strategies and methodologies.</p>
 <div class="section level3">
-<h3 id="plot-overlap-as-a-heatmap-matrix-heatmap-percent-matrix">Plot overlap as a heatmap matrix &amp; heatmap percent matrix<a class="anchor" aria-label="anchor" href="#plot-overlap-as-a-heatmap-matrix-heatmap-percent-matrix"></a>
+<h3 id="heatmaps">Heatmaps<a class="anchor" aria-label="anchor" href="#heatmaps"></a>
 </h3>
 <p>Looking at the first heatmap we can see that the heatmap is organized
 by source in order of record count. The source count is located at the
@@ -815,7 +814,7 @@ from LENS</p>
 <p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-2.png" width="960"></p>
 </div>
 <div class="section level3">
-<h3 id="plot-overlap-as-an-upset-plot">Plot overlap as an upset plot<a class="anchor" aria-label="anchor" href="#plot-overlap-as-an-upset-plot"></a>
+<h3 id="upset-plot">Upset Plot<a class="anchor" aria-label="anchor" href="#upset-plot"></a>
 </h3>
 <p>A more powerful way of looking at overlap of sources is through the
 use of an upset plot, which provides details on overlap across all
@@ -840,7 +839,7 @@ plot to other use cases.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="analyzing-records-across-screening-phases">7. Analyzing Records Across Screening Phases<a class="anchor" aria-label="anchor" href="#analyzing-records-across-screening-phases"></a>
+<h2 id="analyze-records-across-phases">7. Analyze records across Phases<a class="anchor" aria-label="anchor" href="#analyze-records-across-phases"></a>
 </h2>
 <p>Until now we have only reviewed overlap across sources. In the
 following, we will now include the cite_label data as well in order to
@@ -851,7 +850,7 @@ screening. Using the contributions plot we can easily see the number of
 records from each source, both overlapping and unique, across these
 phases.</p>
 <div class="section level3">
-<h3 id="assessing-contribution-of-sources-by-review-stage">Assessing contribution of sources by review stage<a class="anchor" aria-label="anchor" href="#assessing-contribution-of-sources-by-review-stage"></a>
+<h3 id="assess-contribution-across-phases">Assess contribution across phases<a class="anchor" aria-label="anchor" href="#assess-contribution-across-phases"></a>
 </h3>
 <p>Looking at the plot there are three bar plots for each source in the
 order search, screened, final. The green bar within each phase is the
@@ -871,7 +870,7 @@ unique citation in the end.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="analyzing-data-using-tables">8. Analyzing Data Using Tables<a class="anchor" aria-label="anchor" href="#analyzing-data-using-tables"></a>
+<h2 id="analyze-data-with-tables">8. Analyze data with tables<a class="anchor" aria-label="anchor" href="#analyze-data-with-tables"></a>
 </h2>
 <p>Visualizations are great, but so are tables! CiteSource provides the
 ability to create tables for additional analysis. Presenting data in the
@@ -879,7 +878,7 @@ form of a search summary table can provide an overview of each source’s
 impact (see <a href="https://doi.org/10.5195/jmla.2021.809" class="external-link">Bethel et
 al. 2021</a> for more about search summary tables).</p>
 <div class="section level3">
-<h3 id="creating-a-detailed-record-table">Creating a Detailed Record Table<a class="anchor" aria-label="anchor" href="#creating-a-detailed-record-table"></a>
+<h3 id="detailed-record-table">Detailed record table<a class="anchor" aria-label="anchor" href="#detailed-record-table"></a>
 </h3>
 <p>The detailed record provides more details regarding unique records.
 Let’s break down the columns.</p>
@@ -1490,7 +1489,7 @@ the source unique percent of 5% is the lowest of any source.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="creating-a-precisionsensitivity-table">Creating a Precision/Sensitivity Table<a class="anchor" aria-label="anchor" href="#creating-a-precisionsensitivity-table"></a>
+<h3 id="precisionsensitivity-table">Precision/Sensitivity Table<a class="anchor" aria-label="anchor" href="#precisionsensitivity-table"></a>
 </h3>
 <p>Like the contributions plot, the precision/sensitivity table takes
 into consideration data from screening phases. Alongside the distinct
@@ -2111,7 +2110,7 @@ that made it into the final synthesis from all sources combined.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="citation-record-tables">9. Citation Record Tables<a class="anchor" aria-label="anchor" href="#citation-record-tables"></a>
+<h2 id="record-level-table">9. Record level table<a class="anchor" aria-label="anchor" href="#record-level-table"></a>
 </h2>
 <p>Another useful table that can be exported as a .csv is the
 record-level table. This table allows users to quickly identify which
