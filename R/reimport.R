@@ -6,29 +6,32 @@
 #' this function only works on CSV files that were written with `export_csv(..., separate = NULL)`
 #'
 #' @param filename Name (and path) of CSV file to be reimported, should end in .csv
-#'
+#' @return A data frame containing the imported citation data if all required columns are present.
+#' @throws An error if the required columns (`cite_source`, `cite_label`, `cite_string`, `duplicate_id`, `record_ids`) are not found in the file.
 #' @export
 #' @examples
-#' if (interactive()) {
-#'   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-#'   export_csv(dedup_results, "citations.csv")
-#'   unique_citations <- reimport_csv("citations.csv")
+#' \dontrun{
+#' #example usage
+#' citations <- reimport_csv("path/to/citations.csv")
 #' }
 #'
 reimport_csv <- function(filename) {
+  # Warn if the filename doesn't end with .csv
   if (tolower(tools::file_ext(filename)) != "csv") warning("Function reads a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
 
-  citations <- utils::read.csv(filename, stringsAsFactors = FALSE)
+  # Read the CSV file
+  unique_citations_imported <- utils::read.csv(filename, stringsAsFactors = FALSE)
 
-  if (!all(c("cite_source", "cite_label", "cite_string") %in% names(citations))) {
+  # Check if the required columns are present
+  if (!all(c("cite_source", "cite_label", "cite_string", "duplicate_id", "record_ids") %in% names(unique_citations_imported))) {
     stop(
-      "CiteSource meta-data (i.e. columns cite_source, cite_label and cite_string) were not found in ", filename,
-      ". This function is inteded to be used for files exported from CiteSource and thus requires these fields.",
+      "CiteSource meta-data (i.e. columns cite_source, cite_label cite_string, duplicate_id, record_ids) were not found in ", filename,
+      ". This function is intended to be used for files exported from CiteSource and thus requires these fields.",
       " Note that export_csv must be called with separate = NULL (the default value)."
     )
   }
 
-  citations
+  unique_citations_imported
 }
 
 #' Reimport a RIS-file exported from CiteSource
