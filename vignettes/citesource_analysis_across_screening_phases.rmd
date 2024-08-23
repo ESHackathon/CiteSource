@@ -228,7 +228,7 @@ phase_count<-calculate_phase_records(unique_citations, citations, "cite_source")
 create_precision_sensitivity_table(phase_count)
 ```
 
-## 7. Citation Record Tables
+## 9. Citation Record Tables
 
 Another useful table that can be exported as a .csv is the record-level table. This table allows users to quickly identify which individual citations in the screened and/or final records were present/absent from each source. The source tag is the default (include = "sources"), but can be replaced or expanded with 'labels' and/or 'strings'
 ```{r}
@@ -239,7 +239,7 @@ citation_table_final<-unique_citations %>%
 citation_table_final
 ```
   
-## 8. Exporting for further analysis
+## 10. Exporting for further analysis
 
 We may want to export our deduplicated set of results (or any of our dataframes) for further analysis or to save them in a convenient format for subsequent use. CiteSource offers a set of export functions called `export_csv`, `export_ris` and `export_bib` that will save dataframes as a .csv file, .ris file or .bib file, respectively. 
 
