@@ -7,7 +7,6 @@
 #'
 #' @param filename Name (and path) of CSV file to be reimported, should end in .csv
 #' @return A data frame containing the imported citation data if all required columns are present.
-#' @throws An error if the required columns (`cite_source`, `cite_label`, `cite_string`, `duplicate_id`, `record_ids`) are not found in the file.
 #' @export
 #' @examples
 #' \dontrun{
