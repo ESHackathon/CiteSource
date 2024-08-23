@@ -98,9 +98,8 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
 
 
 #' Calculate Detailed Record Counts
-#'
 #' 
-#' 
+#' @description
 #' This function processes a dataset and expands the 'cite_source' column, filters on
 #' user-specified labels (if provided), and calculates detailed counts such as the records imported,
 #' distinct records, unique records, non-unique records, and several percentage contributions for 
