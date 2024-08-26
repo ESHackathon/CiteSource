@@ -52,6 +52,10 @@ dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE
   unique_post_dedup$cite_source = unique_post_dedup$source
   unique_post_dedup$cite_label = unique_post_dedup$label
   
+  # Remove temporary columns
+  unique_post_dedup <- unique_post_dedup %>%
+    dplyr::select(-source, -label)
+  
   return(unique_post_dedup)
   
   } else {
@@ -59,6 +63,10 @@ dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE
     unique_post_dedup <- dedup_results
     unique_post_dedup$unique$cite_source = unique_post_dedup$unique$source
     unique_post_dedup$unique$cite_label = unique_post_dedup$unique$label
+    
+    # Remove temporary columns
+    unique_post_dedup$unique <- unique_post_dedup$unique %>%
+      dplyr::select(-source, -label)
     
     return(unique_post_dedup)
   }
@@ -92,6 +100,10 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
 
   dedup_results$cite_source <- dedup_results$source
   dedup_results$cite_label <- dedup_results$label
+  
+  # Remove temporary columns
+  dedup_results <- dedup_results %>%
+    dplyr::select(-source, -label)
   
   return(dedup_results)
   
