@@ -69,7 +69,7 @@
       <h1>New Benchmark Testing</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-08-23</h4>
+            <h4 data-toc-skip class="date">2024-08-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_new_benchmark_testing.Rmd" class="external-link"><code>vignettes/citesource_new_benchmark_testing.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_new_benchmark_testing.Rmd</code></div>
@@ -159,10 +159,12 @@ synthesis.</p>
 <p>CiteSource allows users to merge duplicates while maintaining
 information in the cite_source metadata field. Thus, information about
 the origin of the records is not lost in the deduplication process. The
-next few steps produce the dataframes that we can use in subsequent
-analyses, along with a summary of records from each source.</p>
+next few steps produce the dataframes that are used in subsequent plots
+and tables.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Deduplicate citations. This yields a dataframe of all records with duplicates merged, but the originating source information maintained in a new variable called cite_source.</span></span>
+<code class="sourceCode R"><span><span class="co">#Deduplicating yields a dataframe. Each record has a duplicate_id which is unique, </span></span>
+<span><span class="co">#citations that were duplicated will retain each duplicate_id in the record_ids column.</span></span>
+<span><span class="co">#source and label tags from each duplicate will be merged as a list in their respective columns.</span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">raw_citations</span><span class="op">)</span></span>
 <span><span class="co">#&gt; formatting data...</span></span>
 <span><span class="co">#&gt; identifying potential duplicates...</span></span>
@@ -173,7 +175,7 @@ analyses, along with a summary of records from each source.</p>
 <span><span class="co">#&gt; 1217 duplicate citations removed...</span></span>
 <span><span class="co">#&gt; 499 unique citations remaining!</span></span>
 <span></span>
-<span><span class="co">#Count number of unique and non-unique citations from different sources and labels </span></span>
+<span><span class="co">#Count_unique yields another dataframe which is used in creation of plots and tables</span></span>
 <span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#For each unique citation, determine which sources were present</span></span>
@@ -769,20 +771,21 @@ benchmarking articles were not found in the search.</p>
 <div class="section level2">
 <h2 id="exporting-for-further-analysis">8. Exporting for further analysis<a class="anchor" aria-label="anchor" href="#exporting-for-further-analysis"></a>
 </h2>
-<p>We may want to export our deduplicated set of results (or any of our
-dataframes) for further analysis or to save them in a convenient format
-for subsequent use. CiteSource offers a set of export functions called
+<p>We may want to export the deduplicated set of results for further
+analysis. CiteSource offers a set of export functions called
 <code>export_csv</code>, <code>export_ris</code> and
 <code>export_bib</code> that will save dataframes as a .csv file, .ris
 file or .bib file, respectively.</p>
-<p>You can then reimport exported files to pick up a project or analysis
-without having to start from scratch, or after making manual adjustments
-(such as adding missing abstract data) to a file.</p>
+<p>You can then reimport .csv and .ris files to pick up a project or
+analysis without having to start from scratch, or after making manual
+adjustments (such as adding missing abstract data) to a file.</p>
 <div class="section level3">
 <h3 id="generate-a--csv-file">Generate a .csv file<a class="anchor" aria-label="anchor" href="#generate-a--csv-file"></a>
 </h3>
 <p>The separate argument can be used to create separate columns for
-cite_source, cite_label or cite_string to facilitate analysis.</p>
+cite_source, cite_label or cite_string to facilitate analysis. CSV files
+can be reimported into CiteSource in order to recreate all plots and
+tables.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#export_csv(unique_citations, filename = "citesource_export.csv")</span></span></code></pre></div>
 </div>
@@ -801,18 +804,27 @@ the “Custom 5” metadata field in EndNote.</p>
 <h3 id="generate-a-bibtex-file">Generate a bibtex file<a class="anchor" aria-label="anchor" href="#generate-a-bibtex-file"></a>
 </h3>
 <p>Generate a bibtex file and include data from cite_source, cite_label
-or cite_string.**</p>
+or cite_string.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#export_bib(unique_citations, filename = "citesource_export.bib", include = c("sources", "labels", "strings"))</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="re-import-a-citesource-exported-file">Re-import a CiteSource exported file<a class="anchor" aria-label="anchor" href="#re-import-a-citesource-exported-file"></a>
+<h3 id="re-importing-citesource-a-citesource-exported-file">Re-importing CiteSource a CiteSource exported file<a class="anchor" aria-label="anchor" href="#re-importing-citesource-a-citesource-exported-file"></a>
 </h3>
 <p>In order to reimport a .csv or a .ris you can use the following. Here
 is an example of how you would re-import the file if it were on your
-desktop</p>
+desktop.</p>
+<p>When reimporting you can simply name the data ‘unique_citations’ as
+this is the primary dataframe that all other functions use. See the
+following example.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#citesource_working_example &lt;-reimport_csv("citesource_export.csv")</span></span>
+<code class="sourceCode R"><span><span class="co">#reimpor the citaitons and name 'unique_citations'</span></span>
+<span><span class="co">#unique_citations &lt;-reimport_csv("citesource_export.csv")</span></span>
+<span></span>
+<span><span class="co">#create other datasets required for visualizations</span></span>
+<span><span class="co">#n_unique &lt;- count_unique(unique_citations)</span></span>
+<span><span class="co">#source_comparison &lt;- compare_sources(unique_citations, comp_type = "sources")</span></span>
+<span></span>
 <span></span>
 <span><span class="co">#citesource_working_example &lt;-reimport_ris("citesource_export.ris")</span></span></code></pre></div>
 </div>
