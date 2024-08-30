@@ -90,7 +90,7 @@ ui <- shiny::navbarPage("CiteSource",
           shiny::mainPanel(
             shiny::h5("Step 2: Double click the row to edit sources, labels, and strings"),
             # Output: Data file ----
-            uiOutput("tbl_out")
+            DT::dataTableOutput("tbl_out")
           )
         )
       )
@@ -321,7 +321,6 @@ ui <- shiny::navbarPage("CiteSource",
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
   rv <- shiny::reactiveValues()
-
   rv$df <- data.frame()
   rv$upload_df <- data.frame()
   rv$latest_unique <- data.frame()
@@ -332,7 +331,6 @@ server <- function(input, output, session) {
   # upload on click
   shiny::observeEvent(input$file, {
     shiny::validate(need(input$file != "", "Select your bibliographic file to upload..."))
-
     if (is.null(input$file)) {
       return(NULL)
     } else {
@@ -353,7 +351,6 @@ server <- function(input, output, session) {
         dplyr::group_by(cite_source) %>%
         dplyr::count(name = "records") %>%
         dplyr::rename(source = cite_source)
-
       # create a dataframe summarising inputs
       df <- data.frame(
         "file" = input$file,
@@ -361,11 +358,9 @@ server <- function(input, output, session) {
         "label" = rep("", length(input$file$datapath)),
         "string" = rep("", length(input$file$datapath))
       )
-
       upload_df <- dplyr::left_join(upload_df, df, by = c("cite_source" = "suggested_source")) %>%
         dplyr::select(-label, -string) %>%
         dplyr::select(cite_source, cite_label, cite_string, dplyr::everything())
-
       # make sure required cols are present
       required_cols <- c(
         "title", "doi", "label", "isbn", "source",
@@ -373,33 +368,29 @@ server <- function(input, output, session) {
         "abstract"
       )
       upload_df[required_cols[!(required_cols %in% colnames(upload_df))]] <- NA
-
       df <- dplyr::left_join(upload_length, df, by = c("source" = "suggested_source")) %>%
         dplyr::select(file.datapath, file.name, records, source, label, string)
-
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
     }
   })
-
-
+  
+  
   ## display summary input table - summary of files added
-  output$tbl_out <- output$tbl_out <- shiny::renderUI({
-    if (is.null(input$file_reimport)) {
-      DT::datatable(rv$df,
-                    editable = TRUE,
-                    options = list(
-                      paging = FALSE,
-                      searching = FALSE,
-                      columnDefs = list(list(visible = FALSE, targets = c(0)))
-                    ),
-                    rownames = FALSE
-      )
-    } else {
-      shiny::p("You have reimported data. Meta-data can only be edited here for fresh imports, so please proceed to visualisation and tables.")
+  output$tbl_out <- DT::renderDataTable({
+    if (!is.null(input$file_reimport)) {
+      shiny::req(FALSE)
     }
+    DT::datatable(rv$df,
+                  editable = TRUE,
+                  options = list(
+                    paging = FALSE,
+                    searching = FALSE,
+                    columnDefs = list(list(visible=FALSE, targets=c(0)))
+                  ),
+                  rownames = FALSE
+    )
   })
-
   shiny::observeEvent(input$file_reimport, {
     file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
 
