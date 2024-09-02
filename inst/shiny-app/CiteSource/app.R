@@ -173,132 +173,161 @@ ui <- shiny::navbarPage("CiteSource",
     "Visualise",
     
     # Sidebar layout with input and output definitions ----
-            shiny::sidebarLayout(
-
-              # Sidebar panel for inputs ----
-              shiny::sidebarPanel(
-                width = 3,
-                id = "sidebar",
-                shiny::h5("Step 5: Visualise overlap"),
-                shinyWidgets::prettyRadioButtons(
-                  inputId = "comp_type",
-                  label = "Chose a comparison",
-                  inline = TRUE,
-                  choices = c(
-                    "sources",
-                    "labels", "strings"
-                  ),
-                  status = "primary"
-                ),
-                selectInput(
-                  inputId = "sources_visual",
-                  "Sources to include",
-                  list(),
-                  multiple = TRUE,
-                  selectize = TRUE
-                ),
-                selectInput(
-                  inputId = "labels_visual",
-                  "Labels to include",
-                  list(),
-                  multiple = TRUE,
-                  selectize = TRUE
-                ),
-                selectInput(
-                  inputId = "strings_visual",
-                  "Strings to include",
-                  list(),
-                  multiple = TRUE,
-                  selectize = TRUE
-                )
-              ),
-              shiny::mainPanel(
-                shiny::tabsetPanel(
-                  shiny::tabPanel(
-                    "Plot overlap as a heatmap matrix",
-                    shiny::downloadButton("downloadHeatPlot"),
-                    plotly::plotlyOutput("plotgraph1")
-                  ),
-                  shiny::tabPanel(
-                    "Plot overlap as an upset plot",
-                    shiny::downloadButton("downloadUpsetPlot"),
-                    shiny::plotOutput("plotgraph2")
-                  )
-                )
-              )
-            )),
+    shiny::sidebarLayout(
+      
+      # Sidebar panel for inputs ----
+      shiny::sidebarPanel(
+        width = 3,
+        id = "sidebar",
+        shiny::h5("Step 5: Visualise overlap"),
+        shinyWidgets::prettyRadioButtons(
+          inputId = "comp_type",
+          label = "Choose a comparison",
+          inline = TRUE,
+          choices = c(
+            "sources",
+            "labels", "strings"
+          ),
+          status = "primary"
+        ),
+        selectInput(
+          inputId = "sources_visual",
+          "Sources to include",
+          list(),
+          multiple = TRUE,
+          selectize = TRUE
+        ),
+        selectInput(
+          inputId = "labels_visual",
+          "Labels to include",
+          list(),
+          multiple = TRUE,
+          selectize = TRUE
+        ),
+        selectInput(
+          inputId = "strings_visual",
+          "Strings to include",
+          list(),
+          multiple = TRUE,
+          selectize = TRUE
+        )
+      ),
+      
+      # Main panel for displaying outputs ----
+      shiny::mainPanel(
+        shiny::tabsetPanel(
+          shiny::tabPanel(
+            "Plot overlap as a heatmap matrix",
+            shiny::downloadButton("downloadHeatPlot"),
+            plotly::plotlyOutput("plotgraph1")
+          ),
+          shiny::tabPanel(
+            "Plot overlap as an upset plot",
+            shiny::downloadButton("downloadUpsetPlot"),
+            shiny::plotOutput("plotgraph2")
+          ),
+          shiny::tabPanel(
+            "Phase Analysis",  # New Tab for Phase Analysis
+            shiny::downloadButton("downloadPhasePlot"),
+            shiny::plotOutput("phasePlot")
+          )
+        )
+      )
+    )
+  ),
   
   shiny::tabPanel(
     "Tables",
     
-    # Sidebar layout with input and output definitions ----
-          shiny::sidebarLayout(
-
-              # Sidebar panel for inputs ----
-              shiny::sidebarPanel(
-                id = "sidebar",
-                width = 3,
-                shiny::h5("Step 6: Summary tables"),
-                selectInput(
-                  inputId = "sources_tables",
-                  "Sources to include",
-                  list(),
-                  multiple = TRUE,
-                  selectize = TRUE
-                ),
-                selectInput(
-                  inputId = "labels_tables",
-                  "Labels to include",
-                  list(),
-                  multiple = TRUE,
-                  selectize = TRUE
-                ),
-                selectInput(
-                  inputId = "strings_tables",
-                  "Strings to include",
-                  list(),
-                  multiple = TRUE,
-                  selectize = TRUE
-                )
-              ),
-              shiny::mainPanel(
-                shiny::tabsetPanel(
-                  
-                  shiny::tabPanel(
-                    "View summary table",
-                    shiny::div("The first table will summarise the results by source. If your labels include 'search', 'screened' and 'final', a second table will summarise the contribution of each source across these stages."),
-                    shiny::selectInput("summary_type", "Select grouping for summary table:",
-                               choices = c("source", "label", "string")),
-                    shinyWidgets::actionBttn(
-                      "generateSummaryTable", "Generate the table(s)",
-                      style = "jelly",
-                      icon = shiny::icon("table"),
-                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-              
-                    shiny::br(),
-                    shiny::br(" "),
-                    gt::gt_output("summaryRecordTab"),
-                    shiny::br(),
-                    shiny::br(" "),
-                    gt::gt_output("summaryPrecTab")
-                  ),
-                  shiny::tabPanel(
-                    "Review individual records",
-                    shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
-                    shiny::br(),
-                    shinyWidgets::actionBttn(
-                      "generateRecordTable", "Generate the table",
-                      style = "jelly",
-                      icon = shiny::icon("table"),
-                      color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-                    
-                    shiny::br(),
-                    shiny::br(" "),
-                    DT::dataTableOutput("reviewTab")
-                  )
-                )
-              ))
-    ),
+    shiny::sidebarLayout(
+      
+      shiny::sidebarPanel(
+        id = "sidebar",
+        width = 3,
+        shiny::h5("Step 6: Summary tables"),
+        selectInput(
+          inputId = "sources_tables",
+          "Sources to include",
+          list(),
+          multiple = TRUE,
+          selectize = TRUE
+        ),
+        selectInput(
+          inputId = "labels_tables",
+          "Labels to include",
+          list(),
+          multiple = TRUE,
+          selectize = TRUE
+        ),
+        selectInput(
+          inputId = "strings_tables",
+          "Strings to include",
+          list(),
+          multiple = TRUE,
+          selectize = TRUE
+        )
+      ),
+      
+      shiny::mainPanel(
+        shiny::tabsetPanel(
+          
+          shiny::tabPanel(
+            "Initial Records Table",
+            shiny::div("View the initial record counts and deduplication results."),
+            shinyWidgets::actionBttn(
+              "generateInitialRecordTable", "Generate Initial Records Table",
+              style = "jelly",
+              icon = shiny::icon("table"),
+              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+            shiny::br(),
+            shiny::br(),
+            gt::gt_output("initialRecordTab")
+          ),
+          
+          shiny::tabPanel(
+            "Detailed Record Table",
+            shiny::div("Summary of unique and non-unique records by source."),
+            shinyWidgets::actionBttn(
+              "generateDetailedRecordTable", "Generate Detailed Record Table",
+              style = "jelly",
+              icon = shiny::icon("table"),
+              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+            shiny::br(),
+            shiny::br(),
+            gt::gt_output("summaryRecordTab")
+          ),
+          
+          shiny::tabPanel(
+            "Precision/Sensitivity Table",
+            shiny::div("Precision and Sensitivity of records across screening phases."),
+            shinyWidgets::actionBttn(
+              "generatePrecisionTable", "Generate Precision/Sensitivity Table",
+              style = "jelly",
+              icon = shiny::icon("table"),
+              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+            shiny::br(),
+            shiny::br(),
+            gt::gt_output("summaryPrecTab")
+          ),
+          
+          shiny::tabPanel(
+            "Review individual records",
+            shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
+            shiny::br(),
+            shinyWidgets::actionBttn(
+              "generateRecordTable", "Generate the table",
+              style = "jelly",
+              icon = shiny::icon("table"),
+              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+            
+            shiny::br(),
+            shiny::br(" "),
+            DT::dataTableOutput("reviewTab")
+          )
+        )
+      )
+    )
+  ),
     
   shiny::tabPanel(
     "Export",
@@ -322,9 +351,13 @@ ui <- shiny::navbarPage("CiteSource",
 server <- function(input, output, session) {
   rv <- shiny::reactiveValues()
   rv$df <- data.frame()
+  #for original uploads
   rv$upload_df <- data.frame()
+  #for reimported data
   rv$latest_unique <- data.frame()
+  #for potential duplicates/manual dedup
   rv$pairs_to_check <- data.frame()
+  #for removed records
   rv$pairs_removed <- data.frame()
   
   #### Upload files tab section ------
@@ -333,43 +366,58 @@ server <- function(input, output, session) {
     shiny::validate(need(input$file != "", "Select your bibliographic file to upload..."))
     if (is.null(input$file)) {
       return(NULL)
-    } else {
+    } 
+    else {
       # upload files one-by-one
       path_list <- input$file$datapath
-      rv$upload_number <- 0
-      rv$upload_number <- rv$upload_number + 1
-      suggested_source <- stringr::str_replace_all(input$file$name, ".ris", "")
-      suggested_source <- stringr::str_replace_all(suggested_source, ".bib", "")
-      suggested_source <- stringr::str_replace_all(suggested_source, ".txt", "")
+      
+      # Increment the upload number
+      if (is.null(rv$upload_number)) {
+        rv$upload_number <- 1
+      } else {
+        rv$upload_number <- rv$upload_number + 1
+      }
+      
+      suggested_source <- stringr::str_replace_all(input$file$name, "\\.(ris|bib|txt)$", "")
+      
+      empty_strings <- rep("", length(input$file$datapath))
+      
+      # Read the uploaded citations
       upload_df <- CiteSource::read_citations(
-        files = input$file$datapath,
+        files = path_list,
         cite_sources = suggested_source,
-        cite_labels = rep("", length(input$file$datapath)),
-        cite_strings = rep("", length(input$file$datapath))
+        cite_labels = empty_strings,
+        cite_strings = empty_strings
       )
+      
+      # Summarize the number of records by citation source
       upload_length <- upload_df %>%
         dplyr::group_by(cite_source) %>%
         dplyr::count(name = "records") %>%
         dplyr::rename(source = cite_source)
-      # create a dataframe summarising inputs
+      
+      # Create a data frame summarizing the uploaded files
       df <- data.frame(
         "file" = input$file,
         "suggested_source" = suggested_source,
-        "label" = rep("", length(input$file$datapath)),
-        "string" = rep("", length(input$file$datapath))
+        "label" = empty_strings,
+        "string" = empty_strings
       )
+      
+      # Join upload_df with df to match on cite_source
       upload_df <- dplyr::left_join(upload_df, df, by = c("cite_source" = "suggested_source")) %>%
         dplyr::select(-label, -string) %>%
         dplyr::select(cite_source, cite_label, cite_string, dplyr::everything())
-      # make sure required cols are present
-      required_cols <- c(
-        "title", "doi", "label", "isbn", "source",
-        "year", "journal", "pages", "volume", "number",
-        "abstract"
-      )
+      
+      # Ensure required columns are present in upload_df
+      required_cols <- c("title", "doi", "label", "isbn", "source", "year", "journal", "pages", "volume", "number", "abstract")
       upload_df[required_cols[!(required_cols %in% colnames(upload_df))]] <- NA
+      
+      # Update the summary data frame df with record counts
       df <- dplyr::left_join(upload_length, df, by = c("source" = "suggested_source")) %>%
         dplyr::select(file.datapath, file.name, records, source, label, string)
+      
+      # Append the results to the reactive values
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
     }
@@ -378,19 +426,16 @@ server <- function(input, output, session) {
   
   ## display summary input table - summary of files added
   output$tbl_out <- DT::renderDataTable({
-    if (!is.null(input$file_reimport)) {
-      shiny::req(FALSE)
+    if (is.null(input$file_reimport)) {
+      DT::datatable(rv$df,
+                    editable = TRUE,
+                    options = list(paging = FALSE,
+                                   searching = FALSE,
+                                   columnDefs = list(list(visible = FALSE, targets = c(0)))),
+                    rownames = FALSE)
     }
-    DT::datatable(rv$df,
-                  editable = TRUE,
-                  options = list(
-                    paging = FALSE,
-                    searching = FALSE,
-                    columnDefs = list(list(visible=FALSE, targets=c(0)))
-                  ),
-                  rownames = FALSE
-    )
   })
+  
   shiny::observeEvent(input$file_reimport, {
     file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
 
@@ -401,6 +446,8 @@ server <- function(input, output, session) {
     } else {
       warning("Invalid file extension, needs to be .ris or .csv")
     }
+    
+    rv$n_unique <- count_unique(rv$latest_unique)
     
   shinyalert::shinyalert("Re-import successful",
                          paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
@@ -468,67 +515,46 @@ server <- function(input, output, session) {
     if (nrow(rv$upload_df) == 0) {
       if (nrow(rv$latest_unique) > 0) {
         shinyalert::shinyalert("Deduplications already complete",
-          "You have reimported a dataset that has already been deduplicated. In that case, further deduplication is not possible here, but would need to take place outside the app.",
-          type = "error"
+                               "You have reimported a dataset that has already been deduplicated. In that case, further deduplication is not possible here, but would need to take place outside the app.",
+                               type = "error"
         )
-
       } else {
-      
-      shinyalert::shinyalert("Data needed",
-        "Please import your citations first.",
-        type = "error"
-      )
-      # Stop plotting
+        shinyalert::shinyalert("Data needed",
+                               "Please import your citations first.",
+                               type = "error"
+        )
       }
-      shiny::req(FALSE)
+      return()  # Early return to stop further execution
     }
     
-    #Set here, otherwise manual deduplication fails if there are duplicate IDs
+    # Assign unique IDs to avoid issues with manual deduplication
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
     
-    # results of auto dedup
-    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags=TRUE)
-
-    # Possible way of PRIORITISING manual dedup 
-    # priority_df <- rv$upload_df %>%
-    #   filter(cite_label %in% c("final", "screened")) %>%
-    #   select(record_id)
-    
-    # manual_to_review <- dedup_results$manual_dedup %>%
-    #   mutate(match_score_ls = RecordLinkage::levenshteinSim(title1, title2)) %>%
-    #   arrange(desc(match_score_ls)) %>%
-    #   mutate(priority = ifelse(record_id1 %in% priority_df$record_id, "Yes", "No")) %>%
-    #   mutate(priority = ifelse(record_id2 %in% priority_df$record_id, "Yes", priority)) %>%
-    #   arrange(desc(priority)) %>%
-    #   filter(priority == "Yes")
-    
+    # Perform deduplication
+    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = TRUE)
     rv$pairs_to_check <- dedup_results$manual_dedup
     rv$latest_unique <- dedup_results$unique
-
-    # generate shiny alert with dedup results
+    rv$n_unique <- count_unique(rv$latest_unique)  # Generate the n_unique data
+    
+    # Generate a summary message based on deduplication results
     n_citations <- nrow(rv$upload_df)
-    n_unique <- nrow(rv$latest_unique)
+    n_unique_records <- nrow(rv$n_unique)  # Changed variable name to avoid conflict
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
-    if (n_pairs_manual > 0) {
-      message <- paste(
-        "From a total of", n_citations, "citations added, there are", n_unique, 
+    message <- if (n_pairs_manual > 0) {
+      paste(
+        "From a total of", n_citations, "citations added, there are", n_unique_records, 
         "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
       )
     } else {
-      message <- paste(
-        "From a total of", n_citations, "citations added, there are", n_unique, 
+      paste(
+        "From a total of", n_citations, "citations added, there are", n_unique_records, 
         "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
       )
     }
-    shinyalert::shinyalert("Auto-deduplication complete",
-      message,
-      type = "success"
-    )
+    
+    shinyalert::shinyalert("Auto-deduplication complete", message, type = "success")
   })
-
-
-  
 
   ## Manual deduplication -----
   
@@ -667,9 +693,9 @@ server <- function(input, output, session) {
 
 
   #### Visualise tab ####
-
+  
+  # Reactive expression to filter the data for visualization
   unique_filtered_visual <- shiny::reactive({
-    
     sources <- input$sources_visual 
     sources <- ifelse(sources == "_blank_", "unknown", sources)
     strings <- input$strings_visual
@@ -685,9 +711,9 @@ server <- function(input, output, session) {
       dplyr::filter(length(labels) == 0 | cite_label %in% labels) %>%
       dplyr::summarise(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
       dplyr::ungroup()
-    
   })
-
+  
+  # Heatmap plot
   plotHeat <- shiny::reactive({
     source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
     plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
@@ -696,17 +722,14 @@ server <- function(input, output, session) {
   output$plotgraph1 <- plotly::renderPlotly({
     if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
-        "Please import and deduplicate your citations first.",
-        type = "error"
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
       )
-      # Stop plotting
       shiny::req(FALSE)
     }
     
     print(plotHeat())
-    
   })
-
   
   output$downloadHeatPlot <- shiny::downloadHandler(
     filename = function() {
@@ -714,29 +737,28 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       png(file)
-      print(plotUpset())
+      print(plotHeat())
       dev.off()
     }
   )
   
+  # Upset plot
   plotUpset <- shiny::reactive({
     source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
     plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
   })
   
-
   output$plotgraph2 <- shiny::renderPlot({
     if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
-        "Please import and deduplicate your citations first.",
-        type = "error"
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
       )
-      # Stop plotting
       shiny::req(FALSE)
     }
     print(plotUpset())
   })
-
+  
   output$downloadUpsetPlot <- shiny::downloadHandler(
     filename = function() {
       paste("upset", ".png", sep = "")
@@ -747,11 +769,51 @@ server <- function(input, output, session) {
       dev.off()
     }
   )
-
+  
+  # Phase Analysis plot
+  # Update n_unique based on the filtered data
+  rv$n_unique <- shiny::reactive({
+    filtered_data <- unique_filtered_visual()
+    count_unique(filtered_data) 
+  })
+  
+  output$phasePlot <- shiny::renderPlot({
+    unique_citations <- unique_filtered_visual()
+    rv$n_unique<- count_unique(unique_citations)
+    plot_contributions(
+      data = rv$n_unique,
+      center = TRUE,
+      bar_order = c("search", "screened", "final"),
+      color_order = c("unique", "duplicated")
+    )
+  })
+  
+  output$downloadPhasePlot <- shiny::downloadHandler(
+    filename = function() {
+      paste("phase_analysis", ".png", sep = "")
+    },
+    content = function(file) {
+      png(file)
+      print(
+        plot_contributions(
+          data = rv$n_unique,
+          center = TRUE,
+          bar_order = c("search", "screened", "final"),
+          color_order = c("unique", "duplicated")
+        )
+      )
+      dev.off()
+    }
+  )
+  
   #### Table tab ####
+  
+  # Event reactive for filtering the data used in the record table and summary table
   unique_filtered_table <- shiny::eventReactive(
-      c(input$generateRecordTable,
-      input$generateSummaryTable),
+    c(input$generateRecordTable, input$generateSummaryTable, 
+      input$sources_tables, input$strings_tables, input$labels_tables,
+      input$generateInitialRecordTable, input$generateDetailedRecordTable, 
+      input$generatePrecisionTable),
     {
       sources <- input$sources_tables 
       sources <- ifelse(sources == "_blank_", "unknown", sources)
@@ -760,7 +822,7 @@ server <- function(input, output, session) {
       labels <- input$labels_tables
       labels <- ifelse(labels == "_blank_", "unknown", labels)
       
-      out <- rv$latest_unique %>%
+      rv$latest_unique %>%
         dplyr::group_by(duplicate_id) %>%
         tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
         dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
@@ -771,78 +833,69 @@ server <- function(input, output, session) {
         dplyr::ungroup()
     }
   )
-
-  output$reviewTab <- DT::renderDataTable({
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-        "Please import and deduplicate your citations first.",
-        type = "error"
-      )
-      # Stop plotting
-      shiny::req(FALSE)
-    }
-
-    citations <- unique_filtered_table()
-    citations$source <- citations$cite_source
-    record_level_table(citations = citations, return = "DT")
-  }) %>% shiny::bindEvent(input$generateRecordTable)
-
-  full_filtered_table <- reactive({
-    sources <- input$sources_tables 
-    sources <- ifelse(sources == "_blank_", "", sources)
-    strings <- input$strings_tables
-    strings <- ifelse(strings == "_blank_", "", strings)
-    labels <- input$labels_tables 
-    labels <- ifelse(labels == "_blank_", "", labels)
-    
-    out <- rv$upload_df  %>%
-      dplyr::mutate(cite_source = ifelse(is.na(cite_source), "", cite_source)) %>%
-      dplyr::mutate(cite_string = ifelse(is.na(cite_string), "", cite_string)) %>%
-      dplyr::mutate(cite_label = ifelse(is.na(cite_label), "", cite_label)) %>%
-      dplyr::filter(cite_source %in% sources) %>%
-      dplyr::filter(cite_string %in% strings) %>%
-      dplyr::filter(cite_label %in% labels) %>%
-      unique() %>%
-      dplyr::ungroup()
-    }
-  ) %>%  shiny::bindEvent(input$generateSummaryTable)
   
-  output$summaryRecordTab <- gt::render_gt({
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-        "Please import and deduplicate your citations first.",
-        type = "error"
-      )
-      # Stop plotting
-      shiny::req(FALSE)
-    }
-    
-    unique_citations <- unique_filtered_table()
-    full_citations <- full_filtered_table()
-    
-    calculated_counts <- calculate_record_counts(unique_citations, full_citations, count_unique(unique_citations), paste0("cite_", input$summary_type))
-    record_summary_table(calculated_counts)
-  }) %>% shiny::bindEvent(input$generateSummaryTable)
-
-  output$summaryPrecTab <- gt::render_gt({
+  # Rendering the initial record table
+  output$initialRecordTab <- gt::render_gt({
     if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
                              "Please import and deduplicate your citations first.",
                              type = "error"
       )
-      # Stop plotting
       shiny::req(FALSE)
     }
+    
     unique_citations <- unique_filtered_table()
-    full_citations <- full_filtered_table()
+    initial_records <- calculate_initial_records(unique_citations, "search")
+    create_initial_record_table(initial_records)
+  }) %>% shiny::bindEvent(input$generateInitialRecordTable)
+  
+  # Rendering the detailed record table
+  output$summaryRecordTab <- gt::render_gt({
+    if (nrow(rv$latest_unique) == 0) {
+      shinyalert::shinyalert("Data needed",
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
+      )
+      shiny::req(FALSE)
+    }
     
-    # Table only makes sense if screening stages are provided and sources or strings compared
-    if (!any(stringr::str_detect(tolower(unique_citations$cite_label), "final")) ||
-        !input$summary_type %in% c("source", "string")) shiny::req(FALSE)
+    unique_citations <- unique_filtered_table()
+    detailed_count <- calculate_detailed_records(unique_citations, rv$n_unique, "search")
+    create_detailed_record_table(detailed_count)
+  }) %>% shiny::bindEvent(input$generateDetailedRecordTable)
+  
+  # Rendering the precision and sensitivity table
+  output$summaryPrecTab <- gt::render_gt({
+
+    unique_citations <- unique_filtered_table()
     
-    phase_counts <- calculate_phase_count(unique_citations, full_citations, paste0("cite_", input$summary_type))
-    precision_sensitivity_table(phase_counts)
-  }) %>% shiny::bindEvent(input$generateSummaryTable)
+    # The table is only for phase comparison, include "final" in labels for comparison
+    if (!any(stringr::str_detect(tolower(unique_citations$cite_label), "final"))) {
+      shiny::req(FALSE)
+    }
+    
+    unique_citations <- unique_filtered_table()
+    phase_counts <- calculate_phase_records(unique_citations, n_unique, "cite_source")
+    create_precision_sensitivity_table(phase_counts)
+  }) %>% shiny::bindEvent(input$generatePrecisionTable)
+  
+  
+  # Rendering the record-level table
+  output$reviewTab <- DT::renderDataTable({
+   
+     if (nrow(rv$latest_unique) == 0) {
+      shinyalert::shinyalert("Data needed",
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
+      )
+       shiny::req(FALSE)
+    }
+    
+    citations <- unique_filtered_table()
+    citations$source <- citations$cite_source
+    record_level_table(citations = citations, return = "DT")
+  }) %>% shiny::bindEvent(input$generateRecordTable)
+  
   
 
   #### Export tab ####
