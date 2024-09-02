@@ -248,7 +248,7 @@ You can then reimport exported files to pick up a project or analysis without ha
 The separate argument can be used to create separate columns for cite_source, cite_label or cite_string to facilitate analysis.
 
 ```{r}
-#export_csv(unique_citations, filename = "citesource_export.csv", separate = "cite_source")
+#export_csv(unique_citations, filename = "citesource_export_phases.csv")
 ```
 
 ### Generate a .ris file 
