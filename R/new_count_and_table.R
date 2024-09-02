@@ -445,7 +445,8 @@ create_initial_record_table <- function(data) {
 #' This function generates a formatted summary table using the `gt` package, 
 #' which displays detailed counts for each citation source. The table includes 
 #' columns for the number of records imported, distinct records, unique records, 
-#' non-unique records, and various contribution percentages.
+#' non-unique records, and various contribution percentages. Data from the 
+#' function calculate_detailed_records is pre-formatted for this table.
 #'
 #' @param data A data frame containing the detailed counts for each citation source. 
 #'   The data frame must include the following columns:
