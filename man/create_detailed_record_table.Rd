@@ -27,7 +27,8 @@ A \code{gt} table object summarizing the detailed record counts for each citatio
 This function generates a formatted summary table using the \code{gt} package,
 which displays detailed counts for each citation source. The table includes
 columns for the number of records imported, distinct records, unique records,
-non-unique records, and various contribution percentages.
+non-unique records, and various contribution percentages. Data from the
+function calculate_detailed_records is pre-formatted for this table.
 }
 \details{
 The function checks for the presence of all required columns in the input data frame.
