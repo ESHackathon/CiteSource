@@ -52,8 +52,8 @@ jobs:
           git commit -m 'Documentation' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
     
-      - name: Deploy
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      - name: Deploy latest
+        if: github.ref == 'refs/heads/dev' (from dev)
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -64,8 +64,8 @@ jobs:
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
-      - name: Deploy release version conditionally
-        if: github.ref == 'refs/heads/dev'
+      - name: Deploy stable version (from main)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           R -e "
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
