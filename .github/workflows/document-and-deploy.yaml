@@ -65,7 +65,7 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Deploy release version conditionally
-        if: github.event_name == 'release' && github.event.release.tag_name != '*test*'
+        if: github.ref == 'refs/heads/dev'
         run: |
           R -e "
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
