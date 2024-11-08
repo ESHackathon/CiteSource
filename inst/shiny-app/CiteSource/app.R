@@ -545,19 +545,19 @@ server <- function(input, output, session) {
     # Generate a summary message based on deduplication results
     n_citations <- nrow(rv$upload_df)
     n_distinct_records <- nrow(rv$n_unique)
-    n_unique_records <- nrow(unique_citations)
+    n_unique_records <- nrow(dedup_results$unique)
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
     message <- if (n_pairs_manual > 0) {
       paste(
-        "From the", n_citations, "records, that were uploaded, there were", n_disctinct_records, 
+        "From the", n_citations, "records, that were uploaded, there were", n_distinct_records, 
         "distinct records identified after internal source deduplication. 
         Of these distinct records, there were", n_unique_records, "unique records.
         Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
       )
     } else {
       paste(
-        "From the", n_citations, "records, that were uploaded, there were", n_disctinct_records, 
+        "From the", n_citations, "records, that were uploaded, there were", n_distinct_records, 
         "distinct records identified after internal source deduplication. 
         There were no potential duplicates identifid for manual review. 
         You can proceed to the visualization tab."
