@@ -79,6 +79,12 @@ ui <- shiny::navbarPage("CiteSource",
               multiple = TRUE,
               accept = c(".ris", ".txt", ".bib")
             ),
+            shiny::p(
+              HTML("NOTE: OVID citations may be incompatible.<br> 
+                   Import and export them using citation software<br>
+                  before uploading for accurate metadata mapping."),
+              style = "font-size: 85%; color: black;"
+            ),
             shiny::hr(),
             shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
@@ -538,18 +544,23 @@ server <- function(input, output, session) {
     
     # Generate a summary message based on deduplication results
     n_citations <- nrow(rv$upload_df)
-    n_unique_records <- nrow(rv$n_unique)  # Changed variable name to avoid conflict
+    n_distinct_records <- nrow(rv$n_unique)
+    n_unique_records <- nrow(unique_citations)
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
     message <- if (n_pairs_manual > 0) {
       paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
+        "From the", n_citations, "records, that were uploaded, there were", n_disctinct_records, 
+        "distinct records identified after internal source deduplication. 
+        Of these distinct records, there were", n_unique_records, "unique records.
+        Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
       )
     } else {
       paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
+        "From the", n_citations, "records, that were uploaded, there were", n_disctinct_records, 
+        "distinct records identified after internal source deduplication. 
+        There were no potential duplicates identifid for manual review. 
+        You can proceed to the visualization tab."
       )
     }
     
