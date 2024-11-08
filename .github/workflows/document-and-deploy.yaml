@@ -63,7 +63,7 @@ jobs:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            options(repos = c(CRAN = 'https://cran.r-project.org'));
+            options(repos = c(CRAN = 'https://cloud.r-project.org'));
             install.packages(c('rsconnect', 'remotes'));
             bspm::disable();
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
@@ -74,7 +74,7 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           R -e "
-             options(repos = c(CRAN = 'https://cran.r-project.org'));
+             options(repos = c(CRAN = 'https://cloud.r-project.org'));
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
