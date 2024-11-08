@@ -466,18 +466,44 @@ server <- function(input, output, session) {
   shiny::observe({
     if (nrow(rv$latest_unique) > 0) {
       
-      sources <- unique(rv$latest_unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort() 
-      labels <- unique(rv$latest_unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
-      strings <- unique(rv$latest_unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      # Handle cite_source
+      sources <- rv$latest_unique$cite_source
+      if (all(is.na(sources) | sources == "")) {
+        sources <- NULL  # Leave it as NULL or NA
+      } else {
+        sources <- unique(sources[!is.na(sources) & sources != ""]) %>%
+          stringr::str_split(", ") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+      }
       
-      sources <- sources[sources != "unknown"]
-      labels  <- labels[labels != "unknown"]
-      strings <- strings[strings != "unknown"]
+      # Handle cite_label
+      labels <- rv$latest_unique$cite_label
+      if (all(is.na(labels) | labels == "")) {
+        labels <- NULL  # Leave it as NULL or NA
+      } else {
+        labels <- unique(labels[!is.na(labels) & labels != ""]) %>%
+          stringr::str_split(", ") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+        
+      }
       
-      if (any(rv$latest_unique$cite_source == "unknown")) sources <- c(sources, "_blank_")
-      if (any(rv$latest_unique$cite_label == "unknown")) labels <- c(labels, "_blank_")
-      if (any(rv$latest_unique$cite_string == "unknown")) strings <- c(strings, "_blank_")
+      # Handle cite_string
+      strings <- rv$latest_unique$cite_string
+      if (all(is.na(strings) | strings == "")) {
+        strings <- NULL  # Leave it as NULL or NA
+      } else {
+        strings <- unique(strings[!is.na(strings) & strings != ""]) %>%
+          stringr::str_split(", ") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+      }
       
+      # Update select inputs
       shiny::updateSelectInput(inputId = "sources_visual", choices = sources, selected = sources)
       shiny::updateSelectInput(inputId = "labels_visual", choices = labels, selected = labels)
       shiny::updateSelectInput(inputId = "strings_visual", choices = strings, selected = strings)
