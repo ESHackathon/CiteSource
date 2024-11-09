@@ -72,11 +72,10 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
-        if: github.ref == 'refs/heads/main'
         run: |
           R -e "
             install.packages('pkgdown');
-            if (!require(CiteSource))
+            if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
