@@ -52,7 +52,7 @@ jobs:
           git push origin || echo "No changes to commit"
     
       - name: Deploy latest from dev
-        if: ${{ github.ref_name }} == 'dev'
+        if: github.ref == 'refs/heads/dev'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -63,7 +63,7 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Deploy stable version from main
-        if: ${{ github.ref_name }} == 'main' || ${{ github.ref_name }} == 'master'
+        if: github.ref == 'refs/heads/main'
         run: |
           R -e "
             install.packages(c('rsconnect', 'remotes'));
@@ -72,9 +72,11 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
+        if: github.ref == 'refs/heads/main'
         run: |
           R -e "
-            install.packages('pkgdown');   
+            install.packages('pkgdown');
+            if (!require(CiteSource))
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
