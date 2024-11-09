@@ -32,15 +32,11 @@ jobs:
       - name: Set up R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: devtools
-
-      - name: set up devtools system 
-        run: sudo apt install libharfbuzz-dev libfribidi-dev libtiff5-dev
+          extra-packages: devtools, plogr, roxygen2, remotes, rsconnect, pkgdown
 
       - name: Create documentation
         run: |
           R -e "
-            install.packages(c('rcmdcheck', 'roxygen2', 'devtools'));
             file.remove('NAMESPACE');
             descr <- readLines('DESCRIPTION');
             descr <- stringr::str_replace(descr, '^Date.*$', paste('Date:', Sys.Date()));
@@ -63,7 +59,6 @@ jobs:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            install.packages(c('rsconnect', 'remotes'));
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
@@ -74,7 +69,6 @@ jobs:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            install.packages(c('rsconnect', 'remotes'));
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
@@ -84,7 +78,6 @@ jobs:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            install.packages('pkgdown');
             if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
