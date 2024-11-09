@@ -1144,6 +1144,8 @@ remove_factors <- function(z) {
   return(z)
 }
 
+#' @export
+
 as.data.frame.bibliography <- function(x, ...) {
   # Solves https://github.com/mjwestgate/synthesisr/issues/25 - but could likely be faster
   x <- purrr::map(x, \(x) {
