@@ -65,7 +65,7 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Deploy stable version (from main)
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           R -e "
             install.packages(c('rsconnect', 'remotes'));
@@ -75,6 +75,7 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
+        if: github.ref == 'refs/heads/main'
         run: |
           R -e "
             install.packages('pkgdown');   
