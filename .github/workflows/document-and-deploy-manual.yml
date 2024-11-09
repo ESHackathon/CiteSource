@@ -28,6 +28,9 @@ jobs:
         with:
           r-version: ${{ github.event.inputs.rversion }}
 
+      - name: Set up System Dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+
       - name: Create documentation
         run: |
           R -e "
