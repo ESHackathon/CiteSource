@@ -64,6 +64,8 @@ jobs:
 
       - name: Deploy stable version from main
         if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
             install.packages(c('rsconnect', 'remotes'));
@@ -72,6 +74,8 @@ jobs:
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
             install.packages('pkgdown');
