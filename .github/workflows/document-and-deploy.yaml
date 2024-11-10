@@ -9,7 +9,6 @@ on:
   
 env:
   _R_CHECK_FORCE_SUGGESTS_: "false"
-  R_DEFAULT_REPOS: 'https://cloud.r-project.org/'
 
 jobs:
   document-and-deploy:
@@ -36,7 +35,6 @@ jobs:
       - name: Create documentation
         run: |
           R -e "
-            options(repos = c(CRAN = 'https://cloud.r-project.org/'));
             install.packages(c('rcmdcheck', 'roxygen2', 'devtools'));
             file.remove('NAMESPACE');
             descr <- readLines('DESCRIPTION');
@@ -54,30 +52,38 @@ jobs:
           git commit -m 'Documentation' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
     
-      - name: Deploy latest from dev
+      - name: Deploy latest  (from dev)
         if: github.ref == 'refs/heads/dev'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            options(repos = c(CRAN = 'https://cloud.r-project.org/'));
+            install.packages(c('rsconnect', 'remotes'));
+            bspm::disable();
+            remotes::install_github('ESHackathon/CiteSource', ref = "dev", force = TRUE);
+            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
+            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
+
+      - name: Deploy stable version (from main)
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          R -e "
             install.packages(c('rsconnect', 'remotes'));
             bspm::disable();
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
-            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
-
-      - name: Deploy stable version from main
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        run: |
-          R -e "
-             options(repos = c(CRAN = 'https://cloud.r-project.org/'));
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
             install.packages('pkgdown');   
+            bspm::disable();
+            if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
