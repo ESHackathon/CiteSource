@@ -83,7 +83,7 @@ ui <- shiny::navbarPage("CiteSource",
               HTML("NOTE: OVID citations may be incompatible.<br> 
                    Import and export them using citation software<br>
                   before uploading for accurate metadata mapping."),
-              style = "font-size: 85%; color: black;"
+              style = "font-size: 85%; color: darkgrey;"
             ),
             shiny::hr(),
             shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
