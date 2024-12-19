@@ -387,7 +387,9 @@ server <- function(input, output, session) {
         files = path_list,
         cite_sources = suggested_source,
         cite_labels = empty_strings,
-        cite_strings = empty_strings
+        cite_strings = empty_strings,
+        only_key_fields = FALSE
+
       )
       
       # Summarize the number of records by citation source
