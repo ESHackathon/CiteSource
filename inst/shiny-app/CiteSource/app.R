@@ -33,7 +33,20 @@ ui <- shiny::navbarPage("CiteSource",
         font-weight: 500;
         line-height: 1.2;
         color: #23395B;
-      }
+        }
+    blockquote {
+          border-left: 5px solid #008080; /* Use theme primary color for border */
+          background-color: #f8f9fa;    /* A very light grey background */
+          padding: 10px 20px;           /* Add padding */
+          margin-bottom: 1rem;          /* Add space below */
+          color: #212529;              /* Ensure text color contrasts well */
+        }
+        summary strong {
+          font-size: 1.15rem; /* Adjust size similar to h5, tweak as needed */
+          /* font-weight: bold; /* Handled by strong, but can be explicit */
+          /* Optional: Adjust vertical alignment slightly if needed */
+           vertical-align: middle;
+        }
     "))
     )
   ),
@@ -63,9 +76,17 @@ ui <- shiny::navbarPage("CiteSource",
         title = "Use Cases",
         htmltools::includeMarkdown("www/use-cases.md")
       ),
+      # User Guide
+      shiny::tabPanel(
+        title = "User Guide",
+        # Load the external Markdown file
+        htmltools::includeMarkdown("www/user_guide.md")
+      ), # End tabPanel,
+      
       widths = c(2, 10)
-    )
-  ),
+    ) # End navlistPanel
+  ), # End Home tabPanel
+  
   shiny::tabPanel(
     "File upload",
     shiny::fluidRow(
@@ -73,24 +94,28 @@ ui <- shiny::navbarPage("CiteSource",
         12,
         # Sidebar layout with input and output definitions ----
         shiny::sidebarLayout(
-          shiny::sidebarPanel( # Input: Select a file ----
+          shiny::sidebarPanel( 
             shiny::h5("Step 1: Upload your citation files"),
+            
             shiny::fileInput("file", "",
-              multiple = TRUE,
-              accept = c(".ris", ".txt", ".bib")
+                             multiple = TRUE,
+                             accept = c(".ris", ".txt", ".bib")
             ),
-            shiny::p(
-              HTML("NOTE: OVID citations may be incompatible.<br> 
-                   Import and export them using citation software<br>
-                  before uploading for accurate metadata mapping."),
-              style = "font-size: 85%; color: black;"
+            
+            shiny::selectInput("upload_label_select",
+                               label = "Set Label for Uploaded File(s):",
+                               choices = c("search", "screened", "final"), 
+                               selected = "search" 
             ),
+
             shiny::hr(),
-            shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
+            shiny::br(),
+            shiny::h5("Re-upload an .ris or .csv exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
-              multiple = TRUE,
-              accept = c(".ris", ".csv")
-            )
+                             multiple = TRUE,
+                             accept = c(".ris", ".csv")
+            ),
+            shiny::helpText("Re-uploading skips deduplication (Steps 3 & 4) and uses the metadata already present in the exported file. Proceed directly to 'Visualise' or 'Tables'.", style="font-size: 85%;"),
           ),
           # Main panel for displaying outputs ----
           shiny::mainPanel(
@@ -109,8 +134,9 @@ ui <- shiny::navbarPage("CiteSource",
         "Automated deduplication",
         br(),
         shiny::h5("Step 3: Deduplicate"),
-        shiny::p("Click the button below to detect and remove duplicates automatically"),
-
+        shiny::p(shiny::p("CiteSource uses ASySD to identify duplicates."),
+        shiny::p(shiny::p("Dedplication takes place *within* each file (Internal Deduplication) and *across* all uploaded files (External Deduplication).")),
+        ),
         # Action button: identify duplicates in uploaded dataset
         shinyWidgets::actionBttn(
           "identify_dups", "Find duplicates",
@@ -126,7 +152,7 @@ ui <- shiny::navbarPage("CiteSource",
         "Manual deduplication",
         br(),
         shiny::h5("Step 4: Review potential duplicates manually"),
-        shiny::p("The following records were identified as potential duplicates. Potential duplicates are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
+        shiny::p("The following records were identified as potential duplicate pairs. Pairs are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
         shiny::textOutput("Manual_pretext"),
         shiny::br(),
 
@@ -318,7 +344,6 @@ ui <- shiny::navbarPage("CiteSource",
           
           shiny::tabPanel(
             "Review individual records",
-            shiny::div("Note that the record table will take a long time to create if you include more than a few hundred references ... so you might want to filter your data first."),
             shiny::br(),
             shinyWidgets::actionBttn(
               "generateRecordTable", "Generate the table",
@@ -327,7 +352,54 @@ ui <- shiny::navbarPage("CiteSource",
               color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
             
             shiny::br(),
-            shiny::br(" "),
+            
+            shiny::wellPanel(
+              style = "background-color: #f0f8ff; border-color: #bce8f1; margin-top: 15px; margin-bottom: 15px; padding: 15px;", # Style
+              shiny::tags$h5(shiny::icon("info-circle", lib = "font-awesome"), " Using the Interactive Record Table", style = "margin-top: 0; color: #31708f;"), # Title
+              shiny::tags$p("After clicking 'Generate the table', you can explore the records using these features:"), # Introduction
+              
+              # Performance Note
+              shiny::tags$p(
+                style = "margin-bottom: 12px;", # Add space below this paragraph
+                # Using exclamation-triangle icon for warning
+                shiny::icon("exclamation-triangle", lib = "font-awesome"), shiny::tags$strong(" Performance Note:"),
+                " The record table may take a long time to generate if you include more than a few hundred references. Consider filtering your data first using the sidebar selectors before generating."
+              ),
+              
+              # Instruction 1: Expand/Collapse
+              shiny::tags$p(
+                style = "margin-bottom: 12px;",
+                shiny::icon("expand", lib = "font-awesome"), shiny::tags$strong(" Expand/Collapse Row:"),
+                " Click the ", shiny::tags$code(HTML("&oplus;")), " symbol in a row to view the full APA reference. Click ", shiny::tags$code(HTML("&CircleMinus;")), " to hide it again."
+              ),
+              
+              # Instruction 2: Single Sort
+              shiny::tags$p(
+                style = "margin-bottom: 12px;",
+                shiny::icon("sort", lib = "font-awesome"), shiny::tags$strong(" Sort by Single Column:"),
+                " Click any column header (like 'Citation' or a source name) to sort the table by that column's values. Click the header again to reverse the sort order."
+              ),
+              
+              # Instruction 3: Multi Sort
+              shiny::tags$p(
+                style = "margin-bottom: 12px;",
+                shiny::icon("bars", lib = "font-awesome"), shiny::tags$strong(" Sort by Multiple Columns:"),
+                " Click the primary column header you want to sort by. Then, hold down the ", shiny::tags$strong("Shift"), " key on your keyboard and click a second column header. You can repeat this for more sorting levels."
+              ),
+              
+              # Instruction 4: Filter/Search
+              shiny::tags$p(
+                style = "margin-bottom: 12px;",
+                shiny::icon("filter", lib = "font-awesome"), shiny::tags$strong(" Filter/Search:"),
+                " Type into the search box located at the top-right of the table to dynamically filter records based on any information displayed."
+              ),
+              
+              # Instruction 5: Download (No bottom margin needed on the last item)
+              shiny::tags$p(
+                shiny::icon("download", lib = "font-awesome"), shiny::tags$strong(" Download Data:"),
+                " Click the 'Download CSV' button (located above the table, next to 'Print') to save the data currently shown in the table (including applied filters) as a CSV file."
+              )
+            ),
             DT::dataTableOutput("reviewTab")
           )
         )
@@ -342,7 +414,8 @@ ui <- shiny::navbarPage("CiteSource",
         12,
         shiny::mainPanel(
           shiny::h5("Step 7: Export citations"),
-          shiny::h6("Note that you can only download the data after you have run the deduplication. Also, you are only able to re-upload CSV and RIS files to continue with CiteSource, so please use these formats if you want that option."),
+          shiny::h6("Data is only availabel after deduplication. CiteSource currently only supports re-upload of CSV and RIS files"),
+          shiny::h6("CiteSource currently only supports re-upload of CSV and RIS files"),
           shiny::downloadButton("downloadCsv", "Download csv"),
           shiny::downloadButton("downloadRis", "Download RIS"),
           shiny::downloadButton("downloadBib", "Download BibTex")
@@ -356,15 +429,11 @@ ui <- shiny::navbarPage("CiteSource",
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
   rv <- shiny::reactiveValues()
-  rv$df <- data.frame()
-  #for original uploads
-  rv$upload_df <- data.frame()
-  #for reimported data
-  rv$latest_unique <- data.frame()
-  #for potential duplicates/manual dedup
-  rv$pairs_to_check <- data.frame()
-  #for removed records
-  rv$pairs_removed <- data.frame()
+  rv$df <- data.frame() 
+  rv$upload_df <- data.frame()#for original uploads
+  rv$latest_unique <- data.frame() #for reimported data
+  rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
+  rv$pairs_removed <- data.frame()#for removed records
   
   #### Upload files tab section ------
   # upload on click
@@ -372,60 +441,97 @@ server <- function(input, output, session) {
     shiny::validate(need(input$file != "", "Select your bibliographic file to upload..."))
     if (is.null(input$file)) {
       return(NULL)
-    } 
-    else {
-      # upload files one-by-one
-      path_list <- input$file$datapath
+    } else {
+      # --- NEW: Read the selected label from the dropdown ---
+      selected_label <- input$upload_label_select
+      # Ensure it's not NULL or empty if that's possible
+      if (is.null(selected_label) || selected_label == "") {
+        warning("No label selected for upload. Defaulting to 'search'.")
+        selected_label <- "search" # Use the default from the selectInput if needed
+      }
       
-      # Increment the upload number
+      # Get file paths and names (as before)
+      path_list <- input$file$datapath
+      file_names <- input$file$name
+      
+      # Generate suggested source names (as before)
+      suggested_source <- stringr::str_replace_all(file_names, "\\.(ris|bib|txt)$", "")
+      
+      # --- MODIFIED: Create label vector using the selected label ---
+      # Repeat the single selected label for each file being uploaded in this batch
+      labels_for_upload <- rep(selected_label, length(path_list))
+      # Keep strings empty unless you add a similar input for them
+      empty_strings <- rep("", length(path_list))
+      
+      # Increment upload number (as before)
       if (is.null(rv$upload_number)) {
         rv$upload_number <- 1
       } else {
         rv$upload_number <- rv$upload_number + 1
       }
       
-      suggested_source <- stringr::str_replace_all(input$file$name, "\\.(ris|bib|txt)$", "")
+      # --- MODIFIED: Call read_citations with the selected labels ---
+      # Use tryCatch for better error handling during file reading
+      upload_df <- tryCatch({
+        CiteSource::read_citations(
+          files = path_list,
+          cite_sources = suggested_source,
+          cite_labels = labels_for_upload, # Use the label from the dropdown
+          cite_strings = empty_strings,    # Keep strings empty
+          only_key_fields = FALSE
+        )
+      }, error = function(e) {
+        shiny::showNotification(paste("Error reading file(s):", e$message), type = "error", duration = 10)
+        return(NULL) # Return NULL on error
+      })
       
-      empty_strings <- rep("", length(input$file$datapath))
+      # Stop processing if read_citations failed
+      if(is.null(upload_df) || nrow(upload_df) == 0) {
+        # Optionally clear the file input if reading failed completely for all files
+        # resetFileInput("file") # You would need a function like this using shinyjs
+        return(NULL)
+      }
       
-      # Read the uploaded citations
-      upload_df <- CiteSource::read_citations(
-        files = path_list,
-        cite_sources = suggested_source,
-        cite_labels = empty_strings,
-        cite_strings = empty_strings
+      # --- MODIFIED: Create the summary df with the selected label ---
+      # Ensure df has columns corresponding to the uploaded files in this batch
+      df <- data.frame(
+        file.datapath = path_list[1:length(suggested_source)], # Match length just in case
+        file.name = file_names[1:length(suggested_source)],
+        suggested_source = suggested_source,
+        label = labels_for_upload[1:length(suggested_source)], # Assign the label chosen in the dropdown
+        string = empty_strings[1:length(suggested_source)],    # Keep strings empty
+        stringsAsFactors = FALSE # Good practice
       )
       
-      # Summarize the number of records by citation source
+      # Summarize record counts from the successfully read data (as before)
       upload_length <- upload_df %>%
         dplyr::group_by(cite_source) %>%
         dplyr::count(name = "records") %>%
+        dplyr::ungroup() %>% # Ungroup after counting
         dplyr::rename(source = cite_source)
       
-      # Create a data frame summarizing the uploaded files
-      df <- data.frame(
-        "file" = input$file,
-        "suggested_source" = suggested_source,
-        "label" = empty_strings,
-        "string" = empty_strings
-      )
+      # Update the summary data frame df with record counts (as before)
+      # Join counts back to the summary df for display
+      df <- dplyr::left_join(df, upload_length, by = c("suggested_source" = "source")) %>%
+        dplyr::select(file.datapath, file.name, records, source = suggested_source, label, string) # Reorder/rename for consistency
       
-      # Join upload_df with df to match on cite_source
-      upload_df <- dplyr::left_join(upload_df, df, by = c("cite_source" = "suggested_source")) %>%
-        dplyr::select(-label, -string) %>%
-        dplyr::select(cite_source, cite_label, cite_string, dplyr::everything())
+      # Ensure required columns are present in upload_df (label is now cite_label)
+      # No need to join the label/string from df to upload_df anymore, it came from read_citations
+      required_cols <- c("cite_source", "cite_label", "cite_string", "title", "doi", "isbn", "year", "journal", "pages", "volume", "number", "abstract")
+      # Add missing required columns as NA
+      missing_cols <- setdiff(required_cols, colnames(upload_df))
+      if(length(missing_cols) > 0) {
+        upload_df[missing_cols] <- NA
+      }
+      # Select a reasonable default order including new cite_* columns
+      upload_df <- upload_df %>%
+        dplyr::select(dplyr::any_of(c("cite_source", "cite_label", "cite_string")), dplyr::everything())
       
-      # Ensure required columns are present in upload_df
-      required_cols <- c("title", "doi", "label", "isbn", "source", "year", "journal", "pages", "volume", "number", "abstract")
-      upload_df[required_cols[!(required_cols %in% colnames(upload_df))]] <- NA
       
-      # Update the summary data frame df with record counts
-      df <- dplyr::left_join(upload_length, df, by = c("source" = "suggested_source")) %>%
-        dplyr::select(file.datapath, file.name, records, source, label, string)
-      
-      # Append the results to the reactive values
+      # Append the results to the reactive values (as before)
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
+      
     }
   })
   
@@ -574,23 +680,28 @@ server <- function(input, output, session) {
     n_unique_records <- nrow(dedup_results$unique)
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
-    message <- if (n_pairs_manual > 0) {
-      paste(
-        "From the", n_citations, "records, that were uploaded, there were", n_distinct_records, 
-        "distinct records identified after internal source deduplication. 
-        Of these distinct records, there were", n_unique_records, "unique records.
-        Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
+    # Title for the alert
+    alert_title <- "Automated Deduplication Complete"
+    
+    # Text for the alert body
+    if (n_pairs_manual > 0) {
+      alert_text <- sprintf(
+        "Process Summary:\n - Started with %d uploaded records.\n - Found %d distinct records (after removing duplicates within each source file).\n - Found %d unique records (after removing duplicates across source files).\n\nAction Required:\n%d potential duplicate pairs require your review. Please go to the 'Manual deduplication' sub-tab.",
+        n_citations, n_distinct_records, n_unique_records, n_pairs_manual
       )
     } else {
-      paste(
-        "From the", n_citations, "records, that were uploaded, there were", n_distinct_records, 
-        "distinct records identified after internal source deduplication. 
-        There were no potential duplicates identifid for manual review. 
-        You can proceed to the visualization tab."
+      alert_text <- sprintf(
+        "Process Summary:\n - Started with %d uploaded records.\n - Found %d distinct records (after removing duplicates withi* each source file).\n - Found %d unique records (after removing duplicates across source files).\n\nNo potential duplicates were flagged for manual review.\n\nNext Step:\nYou can now proceed to the 'Visualise' tab.",
+        n_citations, n_distinct_records, n_unique_records
       )
     }
     
-    shinyalert::shinyalert("Auto-deduplication complete", message, type = "success")
+    # Show the alert
+    shinyalert::shinyalert(title = alert_title, 
+                           text = alert_text, 
+                           type = "success",
+                           size = "l")
+    
   })
 
   ## Manual deduplication -----
@@ -629,11 +740,17 @@ server <- function(input, output, session) {
 
       })
 
-  observe({
-   shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
-                      choices = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
-                      selected = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
-  })
+    observe({
+      all_cols <- names(rv$pairs_to_check)
+      base_cols <- unique(gsub("(1|2)$", "", all_cols)) # Remove "1" or "2" suffix
+      
+      # Initial selection
+      initial_base_selection <- c("author", "title", "year", "journal", "abstract", "doi", "pages")
+      
+      shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
+                                      choices = base_cols,
+                                      selected = initial_base_selection)
+    })
   
   
   # if no manual dedup, proceed to visualisations
@@ -659,18 +776,40 @@ server <- function(input, output, session) {
   # Output: manual dedup datatable
   manual_dedup_data <- reactive({
     
-    data <- rv$pairs_to_check[,1:36]
-    data <- data[,c(paste0(input$manual_dedup_cols))]
+    data <- rv$pairs_to_check[, 1:36]
+    selected_cols <- input$manual_dedup_cols
     
+    # Define the desired base order
+    core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string")
+    
+    # Create the desired interleaved order of columns to select
+    desired_table_order <- character(0)
+    for (base_col in core_col_order) {
+      col1 <- paste0(base_col, "1")
+      col2 <- paste0(base_col, "2")
+      desired_table_order <- c(desired_table_order, col1, col2)
+    }
+    
+    # Intersect with the actual and selected columns to maintain order and presence
+    cols_to_show <- intersect(desired_table_order, colnames(data))
+    cols_to_show <- intersect(cols_to_show, paste0(selected_cols, rep(c("1", "2"), each = length(selected_cols))))
+    
+    ordered_data <- data %>%
+      dplyr::select(any_of(cols_to_show))
+    
+    # Define match_cols INSIDE the reactive expression
     match_cols <- c("title", "author", "doi", "volume",
                     "pages", "number", "year", "abstract", "journal", "isbn")
     
+    ordered_data <- ordered_data %>% dplyr::select(-any_of(match_cols))
     
-    data <- data %>% dplyr::select(-any_of(match_cols))
-   match_number_cols <- rv$pairs_to_check[,c(paste0(match_cols))]
-   
-   data <- cbind(data,match_number_cols)
-   
+    # Add the match_number_cols at the end (if they exist)
+    match_number_cols_to_add <- intersect(paste0(match_cols), colnames(data))
+    if (length(match_number_cols_to_add) > 0) {
+      ordered_data <- cbind(ordered_data, data[, match_number_cols_to_add])
+    }
+    
+    ordered_data
   })
   output$manual_dedup_dt <- DT::renderDataTable({
     
@@ -679,7 +818,7 @@ server <- function(input, output, session) {
     format_cols <- c(
       "title1", "author1", "doi1", "volume1",
       "pages1", "number1", "year1", "abstract1", "journal1", "isbn1",
-      "title2", "author2", "doi2", "volume2",
+      "title2", "author2", "doi2", "volume2", 
       "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
     )
     
@@ -687,23 +826,33 @@ server <- function(input, output, session) {
     shinyjs::useShinyjs()
     
     datatable(data,
+              extensions = c('FixedHeader', 'FixedColumns'),
               options = list(
-                pageLength = 100, info = FALSE,
-                               lengthMenu = list(c(100, -1), c("100", "All")),
-                columnDefs =
+                fixedHeader = TRUE,                   
+                fixedColumns = list(leftColumns = 2), 
+                scrollX = TRUE,
+                pageLength = 100,
+                info = FALSE,
+                lengthMenu = list(c(100, -1), c("100", "All")),
+                columnDefs = list(
                   list(
-                    list(visible = FALSE, 
-                         targets = columns2hide),
-                    list(
-                      targets = "_all",
-                      render = JS(
-                        "function(data, type, row, meta) {",
-                        "return type === 'display' && data != null && data.length > 25 ?",
-                        "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
-                        "}"
-                      )
+                    targets = "_all",
+                    render = JS(
+                      "function(data, type, row, meta) {",
+                      "  if (type === 'display' && data != null && typeof data === 'string' && data.length > 25) {",
+                      "    var rawData = data;",
+                      "    return '<span title=\"' + rawData + '\">' + rawData.substr(0, 25) + '...</span>';",
+                      "  } else {",
+                      "    return data;",
+                      "  }",
+                      "}"
                     )
+                  ),
+                  list(
+                    visible = FALSE,
+                    targets = columns2hide
                   )
+                ) 
               ))
     # ) %>%
     #   DT::formatStyle(
@@ -731,7 +880,7 @@ server <- function(input, output, session) {
 
   #### Visualise tab ####
   
-  # Reactive expression to filter the data for visualization
+  # Reactive expression to filter the data for visualization 
   unique_filtered_visual <- shiny::reactive({
     sources <- input$sources_visual 
     sources <- ifelse(sources == "_blank_", "unknown", sources)
@@ -741,7 +890,9 @@ server <- function(input, output, session) {
     labels <- ifelse(labels == "_blank_", "unknown", labels)
     
     out <- rv$latest_unique %>%
+      # Group by the ID representing unique/duplicate groups
       dplyr::group_by(duplicate_id) %>%
+      # Separate comma-separated values into individual rows
       tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
       dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
       dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
