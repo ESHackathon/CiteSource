@@ -101,7 +101,6 @@ ui <- shiny::navbarPage("CiteSource",
                              multiple = TRUE,
                              accept = c(".ris", ".txt", ".bib")
             ),
-            
             shiny::selectInput("upload_label_select",
                                label = "Set Label for Uploaded File(s):",
                                choices = c("search", "screened", "final"), 

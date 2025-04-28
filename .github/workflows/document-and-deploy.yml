@@ -1,15 +1,9 @@
-# Run CI for R using https://eddelbuettel.github.io/r-ci/
-
 name: document-and-deploy
 
 on:
   push:
   pull_request:
   release:
-  
-env:
-  _R_CHECK_FORCE_SUGGESTS_: "false"
-  R_DEFAULT_REPOS: 'https://cloud.r-project.org/'
 
 jobs:
   document-and-deploy:
@@ -18,31 +12,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Set up R version
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: '4.3.1'  # Compatible version for ShinyApps.io
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Setup
-        uses: eddelbuettel/github-actions/r-ci-setup@master
+      - name: Set up R version
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "oldrel" # As shinyapps.io needs some time to catch up after releases
+          use-public-rspm: true
 
-      - name: Bootstrap
-        run: ./run.sh bootstrap
-
-      #- name: Dependencies
-      #  run: ./run.sh install_deps
-
-      - name: All Dependencies
-        run: ./run.sh install_all
+      - name: Set up R Dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: devtools, plogr, roxygen2, remotes, rsconnect, pkgdown
 
       - name: Create documentation
         run: |
           R -e "
-            options(repos = c(CRAN = 'https://cloud.r-project.org/'));
-            install.packages(c('rcmdcheck', 'roxygen2', 'devtools'));
             file.remove('NAMESPACE');
             descr <- readLines('DESCRIPTION');
             descr <- stringr::str_replace(descr, '^Date.*$', paste('Date:', Sys.Date()));
@@ -65,28 +51,30 @@ jobs:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            options(repos = c(CRAN = 'https://cloud.r-project.org/'));
-            install.packages(c('rsconnect', 'remotes'));
-            bspm::disable();
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Deploy stable version from main
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-             options(repos = c(CRAN = 'https://cloud.r-project.org/'));
+            remotes::install_github('ESHackathon/CiteSource', force = TRUE);
+            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
             rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
 
       - name: Create pkgdown
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            install.packages('pkgdown');   
+            if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: ${{ github.ref_name }} == 'main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: true

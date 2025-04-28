@@ -1,0 +1,90 @@
+# Run CI for R using https://eddelbuettel.github.io/r-ci/
+
+name: document-and-deploy-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      rversion:
+        description: 'R version to use (compatible with shinyapps.io)'
+        required: true
+        default: '4.4.1'
+  
+env:
+  _R_CHECK_FORCE_SUGGESTS_: "false"
+
+jobs:
+  document-and-deploy-manual:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Set up R version
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ github.event.inputs.rversion }}
+          use-public-rspm: true
+
+      - name: Set up R Dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: devtools, plogr, roxygen2, remotes, rsconnect, pkgdown
+
+      - name: Create documentation
+        run: |
+          R -e "
+            file.remove('NAMESPACE');
+            descr <- readLines('DESCRIPTION');
+            descr <- stringr::str_replace(descr, '^Date.*$', paste('Date:', Sys.Date()));
+            writeLines(descr, 'DESCRIPTION');
+            roxygen2::roxygenise();
+            try(devtools::build_manual())
+          "
+        
+      - name: commit
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add -f man/\* NAMESPACE
+          git commit -m 'Documentation' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
+    
+      - name: Deploy latest from dev
+        if: github.ref == 'refs/heads/dev'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          R -e "
+            remotes::install_github('ESHackathon/CiteSource', force = TRUE);
+            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
+            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
+
+      - name: Deploy stable version from main
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          R -e "
+            remotes::install_github('ESHackathon/CiteSource', force = TRUE);
+            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
+            rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
+
+      - name: Create pkgdown
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          R -e "
+            if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
+            pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
+      
+      - name: Deploy to GitHub pages 🚀
+        if: ${{ github.ref_name }} == 'main' || ${{ github.ref_name }} == 'master'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          clean: true
+          branch: gh-pages
+          folder: docs      
