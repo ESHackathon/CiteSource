@@ -354,48 +354,47 @@ ui <- shiny::navbarPage("CiteSource",
             
             shiny::wellPanel(
               style = "background-color: #f0f8ff; border-color: #bce8f1; margin-top: 15px; margin-bottom: 15px; padding: 15px;", # Style
-              shiny::tags$h5(shiny::icon("info-circle", lib = "font-awesome"), " Using the Interactive Record Table", style = "margin-top: 0; color: #31708f;"), # Title
+              shiny::tags$h5(" Using the Interactive Record Table", style = "margin-top: 0; color: #31708f;"), # Title
               shiny::tags$p("After clicking 'Generate the table', you can explore the records using these features:"), # Introduction
               
               # Performance Note
               shiny::tags$p(
                 style = "margin-bottom: 12px;", # Add space below this paragraph
-                # Using exclamation-triangle icon for warning
-                shiny::icon("exclamation-triangle", lib = "font-awesome"), shiny::tags$strong(" Performance Note:"),
+                 shiny::tags$strong(" Performance Note:"),
                 " The record table may take a long time to generate if you include more than a few hundred references. Consider filtering your data first using the sidebar selectors before generating."
               ),
               
               # Instruction 1: Expand/Collapse
               shiny::tags$p(
                 style = "margin-bottom: 12px;",
-                shiny::icon("expand", lib = "font-awesome"), shiny::tags$strong(" Expand/Collapse Row:"),
+                shiny::tags$strong(" Expand/Collapse Row:"),
                 " Click the ", shiny::tags$code(HTML("&oplus;")), " symbol in a row to view the full APA reference. Click ", shiny::tags$code(HTML("&CircleMinus;")), " to hide it again."
               ),
               
               # Instruction 2: Single Sort
               shiny::tags$p(
                 style = "margin-bottom: 12px;",
-                shiny::icon("sort", lib = "font-awesome"), shiny::tags$strong(" Sort by Single Column:"),
+                shiny::tags$strong(" Sort by Single Column:"),
                 " Click any column header (like 'Citation' or a source name) to sort the table by that column's values. Click the header again to reverse the sort order."
               ),
               
               # Instruction 3: Multi Sort
               shiny::tags$p(
                 style = "margin-bottom: 12px;",
-                shiny::icon("bars", lib = "font-awesome"), shiny::tags$strong(" Sort by Multiple Columns:"),
+                shiny::tags$strong(" Sort by Multiple Columns:"),
                 " Click the primary column header you want to sort by. Then, hold down the ", shiny::tags$strong("Shift"), " key on your keyboard and click a second column header. You can repeat this for more sorting levels."
               ),
               
               # Instruction 4: Filter/Search
               shiny::tags$p(
                 style = "margin-bottom: 12px;",
-                shiny::icon("filter", lib = "font-awesome"), shiny::tags$strong(" Filter/Search:"),
+                shiny::tags$strong(" Filter/Search:"),
                 " Type into the search box located at the top-right of the table to dynamically filter records based on any information displayed."
               ),
               
               # Instruction 5: Download (No bottom margin needed on the last item)
               shiny::tags$p(
-                shiny::icon("download", lib = "font-awesome"), shiny::tags$strong(" Download Data:"),
+                shiny::tags$strong(" Download Data:"),
                 " Click the 'Download CSV' button (located above the table, next to 'Print') to save the data currently shown in the table (including applied filters) as a CSV file."
               )
             ),
