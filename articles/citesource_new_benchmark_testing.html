@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>New Benchmark Testing • CiteSource</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../deps/jquery-3.6.1/jquery-3.6.1.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -69,9 +69,9 @@
       <h1>New Benchmark Testing</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-04-28</h4>
+            <h4 data-toc-skip class="date">2025-04-29</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/dev/vignettes/citesource_new_benchmark_testing.Rmd" class="external-link"><code>vignettes/citesource_new_benchmark_testing.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_new_benchmark_testing.Rmd" class="external-link"><code>vignettes/citesource_new_benchmark_testing.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_new_benchmark_testing.Rmd</code></div>
     </div>
 
@@ -151,8 +151,7 @@ synthesis.</p>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Save the imported citations as raw_citations</span></span>
-<span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span></code></pre></div>
+<span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="deduplicate-create-data-tables">4. Deduplicate &amp; create data tables<a class="anchor" aria-label="anchor" href="#deduplicate-create-data-tables"></a>
@@ -167,6 +166,9 @@ and tables.</p>
 <span><span class="co">#citations that were duplicated will retain each duplicate_id in the record_ids column.</span></span>
 <span><span class="co">#source and label tags from each duplicate will be merged as a list in their respective columns.</span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">raw_citations</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'synthesisr':</span></span>
+<span><span class="co">#&gt;   method                     from      </span></span>
+<span><span class="co">#&gt;   as.data.frame.bibliography CiteSource</span></span>
 <span><span class="co">#&gt; formatting data...</span></span>
 <span><span class="co">#&gt; identifying potential duplicates...</span></span>
 <span><span class="co">#&gt; identified duplicates!</span></span>
@@ -841,7 +843,7 @@ following example.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

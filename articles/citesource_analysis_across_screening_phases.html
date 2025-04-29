@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Analysis Across Screening Phases • CiteSource</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../deps/jquery-3.6.1/jquery-3.6.1.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -69,9 +69,9 @@
       <h1>Analysis Across Screening Phases</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-04-28</h4>
+            <h4 data-toc-skip class="date">2025-04-29</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/dev/vignettes/citesource_analysis_across_screening_phases.rmd" class="external-link"><code>vignettes/citesource_analysis_across_screening_phases.rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_analysis_across_screening_phases.rmd" class="external-link"><code>vignettes/citesource_analysis_across_screening_phases.rmd</code></a></small>
       <div class="d-none name"><code>citesource_analysis_across_screening_phases.rmd</code></div>
     </div>
 
@@ -196,7 +196,7 @@ raw_citations.</p>
 <span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span>
+<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   6%</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file       cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1        wos_278.ris               WoS        &lt;NA&gt;     search       278</span></span>
@@ -221,6 +221,9 @@ duplicate records see (ASySD).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Identify overlapping records and consolidate unique citations</span></span>
 <span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">raw_citations</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'synthesisr':</span></span>
+<span><span class="co">#&gt;   method                     from      </span></span>
+<span><span class="co">#&gt;   as.data.frame.bibliography CiteSource</span></span>
 <span><span class="co">#&gt; formatting data...</span></span>
 <span><span class="co">#&gt; identifying potential duplicates...</span></span>
 <span><span class="co">#&gt; identified duplicates!</span></span>
@@ -2189,7 +2192,7 @@ desktop</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
