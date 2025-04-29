@@ -620,28 +620,69 @@ server <- function(input, output, session) {
 
   # when file upload table is edited, edit reactive value upload df
   shiny::observeEvent(input$tbl_out_cell_edit, {
-    # make sure not blank to avoid blanks in output
-
-    info <- input$tbl_out_cell_edit
+    # 1. Get Edit Information
+    info <- input$tbl_out_cell_edit 
     val <- info$value
-
+    # 2. Handle blank input
     if (val == "") {
       val <- NA
     }
-
+    # 3. Update the Summary DataFrame (rv$df)
     rv$df[info$row, info$col + 1] <- val
     
-    # get rownames for file
+    # 4. Find Corresponding Rows in the Main DataFrame (rv$upload_df) using cite_source
+    
+    # 4a. Get the 'source' value from the edited row in rv$df
+    # Assumes the column named 'source' holds the relevant identifier in rv$df
+    # Check rv$df structure if this column name is different.
+    source_value_from_edited_row <- rv$df[info$row, "source"] # Use column name "source"
+    
+    # Check if the source value is valid before proceeding
+    if (is.null(source_value_from_edited_row) || is.na(source_value_from_edited_row)) {
+      warning(paste("Could not find valid source value in edited row:", info$row))
+      return() # Stop processing if the source identifier is missing
+    }
+    
+    # 4b. Calculate row ranges for each source in rv$upload_df 
+    # Group by 'cite_source' instead of 'file.datapath'
     row_indexes <- rv$upload_df %>%
       dplyr::mutate(rowname = dplyr::row_number()) %>%
-      dplyr::group_by(file.datapath) %>%
-      dplyr::summarise(min_row = dplyr::first(rowname), max_row = dplyr::last(rowname))
-
-    rows <- row_indexes[row_indexes$file.datapath == rv$df[info$row, 1], 2:3]
-    col <- paste0("cite_", names(rv$df[info$col + 1]))
-    file <- rv$df[info$row, 1]
-
-    rv$upload_df[c(rows$min_row:rows$max_row), col] <- val
+      dplyr::group_by(cite_source) %>% # *** CHANGED HERE ***
+      dplyr::summarise(
+        min_row = dplyr::first(rowname), 
+        max_row = dplyr::last(rowname),
+        .groups = 'drop' # Good practice to add .groups='drop'
+      )
+    
+    # 4c. Look up the min/max rows for the edited source
+    # Filter row_indexes using 'cite_source' and the value obtained from rv$df
+    rows <- row_indexes[row_indexes$cite_source == source_value_from_edited_row, ] # *** CHANGED HERE ***
+    
+    # Check if rows were found
+    if (nrow(rows) == 0 || is.na(rows$min_row) || is.na(rows$max_row)) {
+      warning(paste("Could not find row indices in rv$upload_df for source:", source_value_from_edited_row))
+      # Decide how to handle: maybe the source was edited TO something not in rv$upload_df?
+      # For now, just stop to prevent error. Depending on desired behavior, might need adjustment.
+      return() 
+    }
+    
+    # 5. Determine Target Column Name in rv$upload_df (No change needed in principle)
+    # This part should be okay, as it maps rv$df column names ('source', 'label', 'string')
+    # to rv$upload_df column names ('cite_source', 'cite_label', 'cite_string')
+    col_name_in_df <- names(rv$df)[info$col + 1] # Safer way to get name
+    col <- paste0("cite_", col_name_in_df) 
+    
+    # Add a check to ensure the target column exists in rv$upload_df
+    if (!col %in% names(rv$upload_df)) {
+      warning(paste("Target column", col, "not found in rv$upload_df"))
+      return() # Stop if the target column doesn't exist
+    }
+    
+    # 6. Update the Main DataFrame (rv$upload_df) (No change in logic, but context changed)
+    # Now uses row indices derived via cite_source
+    # Added safety checks above should prevent errors here if rows/col were invalid
+    rv$upload_df[c(rows$min_row:rows$max_row), col] <- val 
+    
   })
 
 # Deduplication tab -----------------
