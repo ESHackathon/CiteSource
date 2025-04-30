@@ -15,423 +15,401 @@ shiny::tags$head(shiny::tags$style(
 ))
 
 columns2hide <- c("title", "author", "doi", "volume",
-                "pages", "number", "year", "abstract", "journal", "isbn")
+                  "pages", "number", "year", "abstract", "journal", "isbn")
 
 
 # Define UI for data upload app ----
 ui <- shiny::navbarPage("CiteSource",
-  id = "tabs",
-  header = shiny::tagList(
-    shinybusy::add_busy_spinner(spin = "circle"),
-    shinyjs::useShinyjs(),
-    #header text colour
-    tags$head(
-      tags$style(HTML("
+                        id = "tabs",
+                        header = shiny::tagList(
+                          shinybusy::add_busy_spinner(spin = "circle"),
+                          shinyjs::useShinyjs(),
+                          #header text colour
+                          tags$head(
+                            tags$style(HTML("
       h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
         margin-top: 0;
         margin-bottom: .5rem;
         font-weight: 500;
         line-height: 1.2;
         color: #23395B;
-        }
-    blockquote {
-          border-left: 5px solid #008080; /* Use theme primary color for border */
-          background-color: #f8f9fa;    /* A very light grey background */
-          padding: 10px 20px;           /* Add padding */
-          margin-bottom: 1rem;          /* Add space below */
-          color: #212529;              /* Ensure text color contrasts well */
-        }
-        summary strong {
-          font-size: 1.15rem; /* Adjust size similar to h5, tweak as needed */
-          /* font-weight: bold; /* Handled by strong, but can be explicit */
-          /* Optional: Adjust vertical alignment slightly if needed */
-           vertical-align: middle;
-        }
+      }
     "))
-    )
-  ),
-  theme = bslib::bs_theme(
-    bg = "rgb(251, 251, 251)",
-    primary = "#008080",
-    secondary = "#CBF7ED",
-    success = "#23395B",
-    info = "#82D173",
-    warning = "#FFC07F",
-    danger = "#008080",
-    font_scale = NULL,
-    bootswatch = "cerulean",
-    fg = "#000",
-    input_bg = "#E0E0E0",  # Set the background color for input boxes
-    input_border_color = "#23395B"  # Set the border color for input boxes
-  ),
-  # Home tab
-  shiny::tabPanel(
-    "Home",
-    shiny::navlistPanel(
-      shiny::tabPanel(
-        title = "About",
-        htmltools::includeMarkdown("www/about.md")
-      ),
-      shiny::tabPanel(
-        title = "Use Cases",
-        htmltools::includeMarkdown("www/use-cases.md")
-      ),
-      # User Guide
-      shiny::tabPanel(
-        title = "User Guide",
-        # Load the external Markdown file
-        htmltools::includeMarkdown("www/user_guide.md")
-      ), # End tabPanel,
-      
-      widths = c(2, 10)
-    ) # End navlistPanel
-  ), # End Home tabPanel
-  
-  shiny::tabPanel(
-    "File upload",
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        # Sidebar layout with input and output definitions ----
-        shiny::sidebarLayout(
-          shiny::sidebarPanel( 
-            shiny::h5("Step 1: Upload your citation files"),
-            
-            shiny::fileInput("file", "",
-                             multiple = TRUE,
-                             accept = c(".ris", ".txt", ".bib")
-            ),
-            shiny::selectInput("upload_label_select",
-                               label = "Set Label for Uploaded File(s):",
-                               choices = c("search", "screened", "final"), 
-                               selected = "search" 
-            ),
-
-            shiny::hr(),
-            shiny::br(),
-            shiny::h5("Re-upload an .ris or .csv exported from CiteSource"),
-            shiny::fileInput("file_reimport", "",
-                             multiple = TRUE,
-                             accept = c(".ris", ".csv")
-            ),
-            shiny::helpText("Re-uploading skips deduplication (Steps 3 & 4) and uses the metadata already present in the exported file. Proceed directly to 'Visualise' or 'Tables'.", style="font-size: 85%;"),
-          ),
-          # Main panel for displaying outputs ----
-          shiny::mainPanel(
-            shiny::h5("Step 2: Double click the row to edit sources, labels, and strings"),
-            # Output: Data file ----
-            DT::dataTableOutput("tbl_out")
-          )
-        )
-      )
-    )
-  ),
-  shiny::tabPanel(
-    "Deduplicate",
-    shiny::tabsetPanel(
-      shiny::tabPanel(
-        "Automated deduplication",
-        br(),
-        shiny::h5("Step 3: Deduplicate"),
-        shiny::p(shiny::p("CiteSource uses ASySD to identify duplicates."),
-        shiny::p(shiny::p("Dedplication takes place *within* each file (Internal Deduplication) and *across* all uploaded files (External Deduplication).")),
-        ),
-        # Action button: identify duplicates in uploaded dataset
-        shinyWidgets::actionBttn(
-          "identify_dups", "Find duplicates",
-          style = "jelly",
-          color = "primary",
-          icon = shiny::icon("search")
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
-
-        # Output: datatable of deduplication results
-        DT::dataTableOutput("dedup_results")
-      ),
-      shiny::tabPanel(
-        "Manual deduplication",
-        br(),
-        shiny::h5("Step 4: Review potential duplicates manually"),
-        shiny::p("The following records were identified as potential duplicate pairs. Pairs are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
-        shiny::textOutput("Manual_pretext"),
-        shiny::br(),
-
-        
-        # Button
-        shinyWidgets::actionBttn(
-          inputId = "nomanualdedup",
-          label = "Go to visualisations",
-          style = "jelly",
-          icon = shiny::icon("arrow-right"),
-          color = "primary"
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173"),
-        br(),
-        shinyWidgets::actionBttn(
-          inputId = "manualdedupsubmit",
-          label = "Remove additional duplicates",
-          style = "jelly",
-          icon = shiny::icon("reply"),
-          color = "primary" # Hide the button initially
-        ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-        
-        shinyWidgets::dropdown(
-          
-          tags$h3("Select columns to display"),
-
-          shinyWidgets::pickerInput(
-            inputId = "manual_dedup_cols",
-            label = "Choose columns",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            options = list(
-              `live-search` = TRUE,
-              `actions-box` = TRUE,
-              style = "btn-primary")
-          ), 
-          icon = icon("filter"),
-          inline =TRUE,
-          status = "danger", width = "600px",
-          tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")),
-    
-        DT::DTOutput("manual_dedup_dt"),
-        tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
+                          )
+                        ),
+                        theme = bslib::bs_theme(
+                          bg = "rgb(251, 251, 251)",
+                          primary = "#008080",
+                          secondary = "#CBF7ED",
+                          success = "#23395B",
+                          info = "#82D173",
+                          warning = "#FFC07F",
+                          danger = "#008080",
+                          font_scale = NULL,
+                          bootswatch = "cerulean",
+                          fg = "#000",
+                          input_bg = "#E0E0E0",  # Set the background color for input boxes
+                          input_border_color = "#23395B"  # Set the border color for input boxes
+                        ),
+                        # Home tab
+                        shiny::tabPanel(
+                          "Home",
+                          shiny::navlistPanel(
+                            shiny::tabPanel(
+                              title = "About",
+                              htmltools::includeMarkdown("www/about.md")
+                            ),
+                            shiny::tabPanel(
+                              title = "Use Cases",
+                              htmltools::includeMarkdown("www/use-cases.md")
+                            ),
+                            # User Guide
+                            shiny::tabPanel(
+                              title = "User Guide",
+                              # Load the external Markdown file
+                              htmltools::includeMarkdown("www/user_guide.md")
+                            ),
+                            widths = c(2, 10)
+                          )
+                        ),
+                        shiny::tabPanel(
+                          "File upload",
+                          shiny::fluidRow(
+                            shiny::column(
+                              12,
+                              # Sidebar layout with input and output definitions ----
+                              shiny::sidebarLayout(
+                                shiny::sidebarPanel( # Input: Select a file ----
+                                                     shiny::h5("Step 1: Upload your citation files"),
+                                                     shiny::fileInput("file", "",
+                                                                      multiple = TRUE,
+                                                                      accept = c(".ris", ".txt", ".bib")
+                                                     ),
+                                                     shiny::hr(),
+                                                     shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
+                                                     shiny::fileInput("file_reimport", "",
+                                                                      multiple = TRUE,
+                                                                      accept = c(".ris", ".csv")
+                                                     )
+                                ),
+                                # Main panel for displaying outputs ----
+                                shiny::mainPanel(
+                                  shiny::h5("Step 2: Double click on a column to edit sources, labels, and strings. Use *Ctrl+Enter* to save edits, one column at a time"),
+                                  # Output: Data file ----
+                                  DT::dataTableOutput("tbl_out")
+                                )
+                              )
+                            )
+                          )
+                        ),
+                        shiny::tabPanel(
+                          "Deduplicate",
+                          shiny::tabsetPanel(
+                            shiny::tabPanel(
+                              "Automated deduplication",
+                              br(),
+                              shiny::h5("Step 3: Deduplicate"),
+                              shiny::p("Click the button below to detect and remove duplicates automatically"),
+                              
+                              # Action button: identify duplicates in uploaded dataset
+                              shinyWidgets::actionBttn(
+                                "identify_dups", "Find duplicates",
+                                style = "jelly",
+                                color = "primary",
+                                icon = shiny::icon("search")
+                              ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
+                              
+                              # Output: datatable of deduplication results
+                              DT::dataTableOutput("dedup_results")
+                            ),
+                            shiny::tabPanel(
+                              "Manual deduplication",
+                              br(),
+                              shiny::h5("Step 4: Review potential duplicates manually"),
+                              shiny::p("The following records were identified as potential duplicates. Potential duplicates are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
+                              shiny::textOutput("Manual_pretext"),
+                              shiny::br(),
+                              
+                              
+                              # Button
+                              shinyWidgets::actionBttn(
+                                inputId = "nomanualdedup",
+                                label = "Go to visualisations",
+                                style = "jelly",
+                                icon = shiny::icon("arrow-right"),
+                                color = "primary"
+                              ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173"),
+                              br(),
+                              shinyWidgets::actionBttn(
+                                inputId = "manualdedupsubmit",
+                                label = "Remove additional duplicates",
+                                style = "jelly",
+                                icon = shiny::icon("reply"),
+                                color = "primary" # Hide the button initially
+                              ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                              
+                              shinyWidgets::dropdown(
+                                
+                                tags$h3("Select columns to display"),
+                                
+                                shinyWidgets::pickerInput(
+                                  inputId = "manual_dedup_cols",
+                                  label = "Choose columns",
+                                  choices = NULL,
+                                  selected = NULL,
+                                  multiple = TRUE,
+                                  options = list(
+                                    `live-search` = TRUE,
+                                    `actions-box` = TRUE,
+                                    style = "btn-primary")
+                                ), 
+                                icon = icon("filter"),
+                                inline =TRUE,
+                                status = "danger", width = "600px",
+                                tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")),
+                              
+                              DT::DTOutput("manual_dedup_dt"),
+                              tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
             background-color: #CBF7ED!important; color: black!important}")),
-        
-      )
-    )
-  ),
-  shiny::tabPanel(
-    "Visualise",
-    
-    # Sidebar layout with input and output definitions ----
-    shiny::sidebarLayout(
-      
-      # Sidebar panel for inputs ----
-      shiny::sidebarPanel(
-        width = 3,
-        id = "sidebar",
-        shiny::h5("Step 5: Visualise overlap"),
-        shinyWidgets::prettyRadioButtons(
-          inputId = "comp_type",
-          label = "Choose a comparison",
-          inline = TRUE,
-          choices = c(
-            "sources",
-            "labels", "strings"
-          ),
-          status = "primary"
-        ),
-        selectInput(
-          inputId = "sources_visual",
-          "Sources to include",
-          list(),
-          multiple = TRUE,
-          selectize = TRUE
-        ),
-        selectInput(
-          inputId = "labels_visual",
-          "Labels to include",
-          list(),
-          multiple = TRUE,
-          selectize = TRUE
-        ),
-        selectInput(
-          inputId = "strings_visual",
-          "Strings to include",
-          list(),
-          multiple = TRUE,
-          selectize = TRUE
-        )
-      ),
-      
-      # Main panel for displaying outputs ----
-      shiny::mainPanel(
-        shiny::tabsetPanel(
-          shiny::tabPanel(
-            "Plot overlap as a heatmap matrix",
-            shiny::downloadButton("downloadHeatPlot"),
-            plotly::plotlyOutput("plotgraph1")
-          ),
-          shiny::tabPanel(
-            "Plot overlap as an upset plot",
-            shiny::downloadButton("downloadUpsetPlot"),
-            shiny::plotOutput("plotgraph2")
-          ),
-          shiny::tabPanel(
-            "Phase Analysis",  # New Tab for Phase Analysis
-            shiny::downloadButton("downloadPhasePlot"),
-            shiny::plotOutput("phasePlot")
-          )
-        )
-      )
-    )
-  ),
-  
-  shiny::tabPanel(
-    "Tables",
-    
-    shiny::sidebarLayout(
-      
-      shiny::sidebarPanel(
-        id = "sidebar",
-        width = 3,
-        shiny::h5("Step 6: Summary tables"),
-        selectInput(
-          inputId = "sources_tables",
-          "Sources to include",
-          list(),
-          multiple = TRUE,
-          selectize = TRUE
-        ),
-        selectInput(
-          inputId = "labels_tables",
-          "Labels to include",
-          list(),
-          multiple = TRUE,
-          selectize = TRUE
-        ),
-        selectInput(
-          inputId = "strings_tables",
-          "Strings to include",
-          list(),
-          multiple = TRUE,
-          selectize = TRUE
-        )
-      ),
-      
-      shiny::mainPanel(
-        shiny::tabsetPanel(
-          
-          shiny::tabPanel(
-            "Initial Records Table",
-            shiny::div("View the initial record counts and deduplication results."),
-            shinyWidgets::actionBttn(
-              "generateInitialRecordTable", "Generate Initial Records Table",
-              style = "jelly",
-              icon = shiny::icon("table"),
-              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-            shiny::br(),
-            shiny::br(),
-            gt::gt_output("initialRecordTab")
-          ),
-          
-          shiny::tabPanel(
-            "Detailed Record Table",
-            shiny::div("Summary of unique and non-unique records by source."),
-            shinyWidgets::actionBttn(
-              "generateDetailedRecordTable", "Generate Detailed Record Table",
-              style = "jelly",
-              icon = shiny::icon("table"),
-              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-            shiny::br(),
-            shiny::br(),
-            gt::gt_output("summaryRecordTab")
-          ),
-          
-          shiny::tabPanel(
-            "Precision/Sensitivity Table",
-            shiny::div("Precision and Sensitivity of records across screening phases."),
-            shinyWidgets::actionBttn(
-              "generatePrecisionTable", "Generate Precision/Sensitivity Table",
-              style = "jelly",
-              icon = shiny::icon("table"),
-              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-            shiny::br(),
-            shiny::br(),
-            gt::gt_output("summaryPrecTab")
-          ),
-          
-          shiny::tabPanel(
-            "Review individual records",
-            shiny::br(),
-            shinyWidgets::actionBttn(
-              "generateRecordTable", "Generate the table",
-              style = "jelly",
-              icon = shiny::icon("table"),
-              color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-            
-            shiny::br(),
-            
-            shiny::wellPanel(
-              style = "background-color: #f0f8ff; border-color: #bce8f1; margin-top: 15px; margin-bottom: 15px; padding: 15px;", # Style
-              shiny::tags$h5(" Using the Interactive Record Table", style = "margin-top: 0; color: #31708f;"), # Title
-              shiny::tags$p("After clicking 'Generate the table', you can explore the records using these features:"), # Introduction
-              
-              # Performance Note
-              shiny::tags$p(
-                style = "margin-bottom: 12px;", # Add space below this paragraph
-                 shiny::tags$strong(" Performance Note:"),
-                " The record table may take a long time to generate if you include more than a few hundred references. Consider filtering your data first using the sidebar selectors before generating."
-              ),
-              
-              # Instruction 1: Expand/Collapse
-              shiny::tags$p(
-                style = "margin-bottom: 12px;",
-                shiny::tags$strong(" Expand/Collapse Row:"),
-                " Click the ", shiny::tags$code(HTML("&oplus;")), " symbol in a row to view the full APA reference. Click ", shiny::tags$code(HTML("&CircleMinus;")), " to hide it again."
-              ),
-              
-              # Instruction 2: Single Sort
-              shiny::tags$p(
-                style = "margin-bottom: 12px;",
-                shiny::tags$strong(" Sort by Single Column:"),
-                " Click any column header (like 'Citation' or a source name) to sort the table by that column's values. Click the header again to reverse the sort order."
-              ),
-              
-              # Instruction 3: Multi Sort
-              shiny::tags$p(
-                style = "margin-bottom: 12px;",
-                shiny::tags$strong(" Sort by Multiple Columns:"),
-                " Click the primary column header you want to sort by. Then, hold down the ", shiny::tags$strong("Shift"), " key on your keyboard and click a second column header. You can repeat this for more sorting levels."
-              ),
-              
-              # Instruction 4: Filter/Search
-              shiny::tags$p(
-                style = "margin-bottom: 12px;",
-                shiny::tags$strong(" Filter/Search:"),
-                " Type into the search box located at the top-right of the table to dynamically filter records based on any information displayed."
-              ),
-              
-              # Instruction 5: Download (No bottom margin needed on the last item)
-              shiny::tags$p(
-                shiny::tags$strong(" Download Data:"),
-                " Click the 'Download CSV' button (located above the table, next to 'Print') to save the data currently shown in the table (including applied filters) as a CSV file."
-              )
-            ),
-            DT::dataTableOutput("reviewTab")
-          )
-        )
-      )
-    )
-  ),
-    
-  shiny::tabPanel(
-    "Export",
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::mainPanel(
-          shiny::h5("Step 7: Export citations"),
-          shiny::h6("Data is only availabel after deduplication. CiteSource currently only supports re-upload of CSV and RIS files"),
-          shiny::h6("CiteSource currently only supports re-upload of CSV and RIS files"),
-          shiny::downloadButton("downloadCsv", "Download csv"),
-          shiny::downloadButton("downloadRis", "Download RIS"),
-          shiny::downloadButton("downloadBib", "Download BibTex")
-        )
-      )
-    )
-  )
+                              
+                            )
+                          )
+                        ),
+                        shiny::tabPanel(
+                          "Visualise",
+                          
+                          # Sidebar layout with input and output definitions ----
+                          shiny::sidebarLayout(
+                            
+                            # Sidebar panel for inputs ----
+                            shiny::sidebarPanel(
+                              width = 3,
+                              id = "sidebar",
+                              shiny::h5("Step 5: Visualise overlap"),
+                              shinyWidgets::prettyRadioButtons(
+                                inputId = "comp_type",
+                                label = "Choose a comparison",
+                                inline = TRUE,
+                                choices = c(
+                                  "sources",
+                                  "labels", "strings"
+                                ),
+                                status = "primary"
+                              ),
+                              selectInput(
+                                inputId = "sources_visual",
+                                "Sources to include",
+                                list(),
+                                multiple = TRUE,
+                                selectize = TRUE
+                              ),
+                              selectInput(
+                                inputId = "labels_visual",
+                                "Labels to include",
+                                list(),
+                                multiple = TRUE,
+                                selectize = TRUE
+                              ),
+                              selectInput(
+                                inputId = "strings_visual",
+                                "Strings to include",
+                                list(),
+                                multiple = TRUE,
+                                selectize = TRUE
+                              )
+                            ),
+                            
+                            # Main panel for displaying outputs ----
+                            shiny::mainPanel(
+                              shiny::tabsetPanel(
+                                shiny::tabPanel(
+                                  "Plot overlap as a heatmap matrix",
+                                  shiny::downloadButton("downloadHeatPlot"),
+                                  plotly::plotlyOutput("plotgraph1")
+                                ),
+                                shiny::tabPanel(
+                                  "Plot overlap as an upset plot",
+                                  shiny::downloadButton("downloadUpsetPlot"),
+                                  shiny::plotOutput("plotgraph2")
+                                ),
+                                shiny::tabPanel(
+                                  "Phase Analysis",  # New Tab for Phase Analysis
+                                  shiny::downloadButton("downloadPhasePlot"),
+                                  shiny::plotOutput("phasePlot")
+                                )
+                              )
+                            )
+                          )
+                        ),
+                        
+                        shiny::tabPanel(
+                          "Tables",
+                          
+                          shiny::sidebarLayout(
+                            
+                            shiny::sidebarPanel(
+                              id = "sidebar",
+                              width = 3,
+                              shiny::h5("Step 6: Summary tables"),
+                              selectInput(
+                                inputId = "sources_tables",
+                                "Sources to include",
+                                list(),
+                                multiple = TRUE,
+                                selectize = TRUE
+                              ),
+                              selectInput(
+                                inputId = "labels_tables",
+                                "Labels to include",
+                                list(),
+                                multiple = TRUE,
+                                selectize = TRUE
+                              ),
+                              selectInput(
+                                inputId = "strings_tables",
+                                "Strings to include",
+                                list(),
+                                multiple = TRUE,
+                                selectize = TRUE
+                              )
+                            ),
+                            
+                            shiny::mainPanel(
+                              shiny::tabsetPanel(
+                                
+                                shiny::tabPanel(
+                                  "Initial Records Table",
+                                  shiny::div("View the initial record counts and deduplication results."),
+                                  shinyWidgets::actionBttn(
+                                    "generateInitialRecordTable", "Generate Initial Records Table",
+                                    style = "jelly",
+                                    icon = shiny::icon("table"),
+                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                                  shiny::br(),
+                                  shiny::br(),
+                                  gt::gt_output("initialRecordTab")
+                                ),
+                                
+                                shiny::tabPanel(
+                                  "Detailed Record Table",
+                                  shiny::div("Summary of unique and non-unique records by source."),
+                                  shinyWidgets::actionBttn(
+                                    "generateDetailedRecordTable", "Generate Detailed Record Table",
+                                    style = "jelly",
+                                    icon = shiny::icon("table"),
+                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                                  shiny::br(),
+                                  shiny::br(),
+                                  gt::gt_output("summaryRecordTab")
+                                ),
+                                
+                                shiny::tabPanel(
+                                  "Precision/Sensitivity Table",
+                                  shiny::div("Precision and Sensitivity of records across screening phases."),
+                                  shinyWidgets::actionBttn(
+                                    "generatePrecisionTable", "Generate Precision/Sensitivity Table",
+                                    style = "jelly",
+                                    icon = shiny::icon("table"),
+                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                                  shiny::br(),
+                                  shiny::br(),
+                                  gt::gt_output("summaryPrecTab")
+                                ),
+                                
+                                shiny::tabPanel(
+                                  "Review individual records",
+                                  shiny::br(),
+                                  shinyWidgets::actionBttn(
+                                    "generateRecordTable", "Generate the table",
+                                    style = "jelly",
+                                    icon = shiny::icon("table"),
+                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
+                                  
+                                  shiny::br(),
+                                  
+                                  shiny::wellPanel(
+                                    style = "background-color: #f0f8ff; border-color: #bce8f1; margin-top: 15px; margin-bottom: 15px; padding: 15px;", # Style
+                                    shiny::tags$h5(" Using the Interactive Record Table", style = "margin-top: 0; color: #31708f;"), # Title
+                                    shiny::tags$p("After clicking 'Generate the table', you can explore the records using these features:"), # Introduction
+                                    
+                                    # Performance Note
+                                    shiny::tags$p(
+                                      style = "margin-bottom: 12px;", # Add space below this paragraph
+                                      shiny::tags$strong(" Performance Note:"),
+                                      " The record table may take a long time to generate if you include more than a few hundred references. Consider filtering your data first using the sidebar selectors before generating."
+                                    ),
+                                    
+                                    # Instruction 1: Expand/Collapse
+                                    shiny::tags$p(
+                                      style = "margin-bottom: 12px;",
+                                      shiny::tags$strong(" Expand/Collapse Row:"),
+                                      " Click the ", shiny::tags$code(HTML("&oplus;")), " symbol in a row to view the full APA reference. Click ", shiny::tags$code(HTML("&CircleMinus;")), " to hide it again."
+                                    ),
+                                    
+                                    # Instruction 2: Single Sort
+                                    shiny::tags$p(
+                                      style = "margin-bottom: 12px;",
+                                      shiny::tags$strong(" Sort by Single Column:"),
+                                      " Click any column header (like 'Citation' or a source name) to sort the table by that column's values. Click the header again to reverse the sort order."
+                                    ),
+                                    
+                                    # Instruction 3: Multi Sort
+                                    shiny::tags$p(
+                                      style = "margin-bottom: 12px;",
+                                      shiny::tags$strong(" Sort by Multiple Columns:"),
+                                      " Click the primary column header you want to sort by. Then, hold down the ", shiny::tags$strong("Shift"), " key on your keyboard and click a second column header. You can repeat this for more sorting levels."
+                                    ),
+                                    
+                                    # Instruction 4: Filter/Search
+                                    shiny::tags$p(
+                                      style = "margin-bottom: 12px;",
+                                      shiny::tags$strong(" Filter/Search:"),
+                                      " Type into the search box located at the top-right of the table to dynamically filter records based on any information displayed."
+                                    ),
+                                    
+                                    # Instruction 5: Download (No bottom margin needed on the last item)
+                                    shiny::tags$p(
+                                      shiny::tags$strong(" Download Data:"),
+                                      " Click the 'Download CSV' button (located above the table, next to 'Print') to save the data currently shown in the table (including applied filters) as a CSV file."
+                                    )
+                                  ),
+                                  DT::dataTableOutput("reviewTab")
+                                )
+                              )
+                            )
+                          )
+                        ),
+                        
+                        shiny::tabPanel(
+                          "Export",
+                          shiny::fluidRow(
+                            shiny::column(
+                              12,
+                              shiny::mainPanel(
+                                shiny::h5("Step 7: Export citations"),
+                                shiny::h6("Note that you can only download the data after you have run the deduplication. Also, you are only able to re-upload CSV and RIS files to continue with CiteSource, so please use these formats if you want that option."),
+                                shiny::downloadButton("downloadCsv", "Download csv"),
+                                shiny::downloadButton("downloadRis", "Download RIS"),
+                                shiny::downloadButton("downloadBib", "Download BibTex")
+                              )
+                            )
+                          )
+                        )
 )
 
 
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
   rv <- shiny::reactiveValues()
-  rv$df <- data.frame() 
-  rv$upload_df <- data.frame()#for original uploads
-  rv$latest_unique <- data.frame() #for reimported data
-  rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
-  rv$pairs_removed <- data.frame()#for removed records
+  rv$df <- data.frame()
+  #for original uploads
+  rv$upload_df <- data.frame()
+  #for reimported data
+  rv$latest_unique <- data.frame()
+  #for potential duplicates/manual dedup
+  rv$pairs_to_check <- data.frame()
+  #for removed records
+  rv$pairs_removed <- data.frame()
   
   #### Upload files tab section ------
   # upload on click
@@ -439,97 +417,62 @@ server <- function(input, output, session) {
     shiny::validate(need(input$file != "", "Select your bibliographic file to upload..."))
     if (is.null(input$file)) {
       return(NULL)
-    } else {
-      # --- NEW: Read the selected label from the dropdown ---
-      selected_label <- input$upload_label_select
-      # Ensure it's not NULL or empty if that's possible
-      if (is.null(selected_label) || selected_label == "") {
-        warning("No label selected for upload. Defaulting to 'search'.")
-        selected_label <- "search" # Use the default from the selectInput if needed
-      }
-      
-      # Get file paths and names (as before)
+    } 
+    else {
+      # upload files one-by-one
       path_list <- input$file$datapath
-      file_names <- input$file$name
       
-      # Generate suggested source names (as before)
-      suggested_source <- stringr::str_replace_all(file_names, "\\.(ris|bib|txt)$", "")
-      
-      # --- MODIFIED: Create label vector using the selected label ---
-      # Repeat the single selected label for each file being uploaded in this batch
-      labels_for_upload <- rep(selected_label, length(path_list))
-      # Keep strings empty unless you add a similar input for them
-      empty_strings <- rep("", length(path_list))
-      
-      # Increment upload number (as before)
+      # Increment the upload number
       if (is.null(rv$upload_number)) {
         rv$upload_number <- 1
       } else {
         rv$upload_number <- rv$upload_number + 1
       }
       
-      # --- MODIFIED: Call read_citations with the selected labels ---
-      # Use tryCatch for better error handling during file reading
-      upload_df <- tryCatch({
-        CiteSource::read_citations(
-          files = path_list,
-          cite_sources = suggested_source,
-          cite_labels = labels_for_upload, # Use the label from the dropdown
-          cite_strings = empty_strings,    # Keep strings empty
-          only_key_fields = FALSE
-        )
-      }, error = function(e) {
-        shiny::showNotification(paste("Error reading file(s):", e$message), type = "error", duration = 10)
-        return(NULL) # Return NULL on error
-      })
+      suggested_source <- stringr::str_replace_all(input$file$name, "\\.(ris|bib|txt)$", "")
       
-      # Stop processing if read_citations failed
-      if(is.null(upload_df) || nrow(upload_df) == 0) {
-        # Optionally clear the file input if reading failed completely for all files
-        # resetFileInput("file") # You would need a function like this using shinyjs
-        return(NULL)
-      }
+      empty_strings <- rep("", length(input$file$datapath))
       
-      # --- MODIFIED: Create the summary df with the selected label ---
-      # Ensure df has columns corresponding to the uploaded files in this batch
-      df <- data.frame(
-        file.datapath = path_list[1:length(suggested_source)], # Match length just in case
-        file.name = file_names[1:length(suggested_source)],
-        suggested_source = suggested_source,
-        label = labels_for_upload[1:length(suggested_source)], # Assign the label chosen in the dropdown
-        string = empty_strings[1:length(suggested_source)],    # Keep strings empty
-        stringsAsFactors = FALSE # Good practice
+      # Read the uploaded citations
+      upload_df <- CiteSource::read_citations(
+        files = path_list,
+        cite_sources = suggested_source,
+        cite_labels = empty_strings,
+        cite_strings = empty_strings,
+        only_key_fields = FALSE
+        
       )
       
-      # Summarize record counts from the successfully read data (as before)
+      # Summarize the number of records by citation source
       upload_length <- upload_df %>%
         dplyr::group_by(cite_source) %>%
         dplyr::count(name = "records") %>%
-        dplyr::ungroup() %>% # Ungroup after counting
         dplyr::rename(source = cite_source)
       
-      # Update the summary data frame df with record counts (as before)
-      # Join counts back to the summary df for display
-      df <- dplyr::left_join(df, upload_length, by = c("suggested_source" = "source")) %>%
-        dplyr::select(file.datapath, file.name, records, source = suggested_source, label, string) # Reorder/rename for consistency
+      # Create a data frame summarizing the uploaded files
+      df <- data.frame(
+        "file" = input$file,
+        "suggested_source" = suggested_source,
+        "label" = empty_strings,
+        "string" = empty_strings
+      )
       
-      # Ensure required columns are present in upload_df (label is now cite_label)
-      # No need to join the label/string from df to upload_df anymore, it came from read_citations
-      required_cols <- c("cite_source", "cite_label", "cite_string", "title", "doi", "isbn", "year", "journal", "pages", "volume", "number", "abstract")
-      # Add missing required columns as NA
-      missing_cols <- setdiff(required_cols, colnames(upload_df))
-      if(length(missing_cols) > 0) {
-        upload_df[missing_cols] <- NA
-      }
-      # Select a reasonable default order including new cite_* columns
-      upload_df <- upload_df %>%
-        dplyr::select(dplyr::any_of(c("cite_source", "cite_label", "cite_string")), dplyr::everything())
+      # Join upload_df with df to match on cite_source
+      upload_df <- dplyr::left_join(upload_df, df, by = c("cite_source" = "suggested_source")) %>%
+        dplyr::select(-label, -string) %>%
+        dplyr::select(cite_source, cite_label, cite_string, dplyr::everything())
       
+      # Ensure required columns are present in upload_df
+      required_cols <- c("title", "doi", "label", "isbn", "source", "year", "journal", "pages", "volume", "number", "abstract")
+      upload_df[required_cols[!(required_cols %in% colnames(upload_df))]] <- NA
       
-      # Append the results to the reactive values (as before)
+      # Update the summary data frame df with record counts
+      df <- dplyr::left_join(upload_length, df, by = c("source" = "suggested_source")) %>%
+        dplyr::select(file.datapath, file.name, records, source, label, string)
+      
+      # Append the results to the reactive values
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
-      
     }
   })
   
@@ -537,18 +480,25 @@ server <- function(input, output, session) {
   ## display summary input table - summary of files added
   output$tbl_out <- DT::renderDataTable({
     if (is.null(input$file_reimport)) {
-      DT::datatable(rv$df,
-                    editable = TRUE,
-                    options = list(paging = FALSE,
-                                   searching = FALSE,
-                                   columnDefs = list(list(visible = FALSE, targets = c(0)))),
-                    rownames = FALSE)
+      DT::datatable(
+        rv$df,
+        options = list(
+          paging = FALSE,
+          searching = FALSE,
+          columnDefs = list(list(visible = FALSE, targets = c(0))) 
+        ),
+        editable = list(
+          target = 'column',
+          disable = list(columns = c(1, 2)) 
+        ),
+        rownames = FALSE
+      )
     }
   })
   
   shiny::observeEvent(input$file_reimport, {
     file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
-
+    
     if (file_extension == "csv") {
       rv$latest_unique <- reimport_csv(input$file_reimport$datapath)
     } else if (file_extension == "ris") {
@@ -559,13 +509,13 @@ server <- function(input, output, session) {
     
     rv$n_unique <- count_unique(rv$latest_unique)
     
-  shinyalert::shinyalert("Re-import successful",
-                         paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
-                         type = "success"
-  )
-  
+    shinyalert::shinyalert("Re-import successful",
+                           paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
+                           type = "success"
+    )
+    
   })
-
+  
   ## Update filters
   shiny::observe({
     if (nrow(rv$latest_unique) > 0) {
@@ -611,82 +561,137 @@ server <- function(input, output, session) {
       shiny::updateSelectInput(inputId = "sources_visual", choices = sources, selected = sources)
       shiny::updateSelectInput(inputId = "labels_visual", choices = labels, selected = labels)
       shiny::updateSelectInput(inputId = "strings_visual", choices = strings, selected = strings)
-
+      
       shiny::updateSelectInput(inputId = "sources_tables", choices = sources, selected = sources)
       shiny::updateSelectInput(inputId = "labels_tables", choices = labels, selected = labels)
       shiny::updateSelectInput(inputId = "strings_tables", choices = strings, selected = strings)
     }
   })
-
-  # when file upload table is edited, edit reactive value upload df
+  
+  # Robust Observer for Cell Edits in tbl_out
   shiny::observeEvent(input$tbl_out_cell_edit, {
-    # 1. Get Edit Information
-    info <- input$tbl_out_cell_edit 
-    val <- info$value
-    # 2. Handle blank input
-    if (val == "") {
-      val <- NA
+    # This observer handles edits made to the summary table (rv$df)
+    # and propagates relevant changes (source, label, string)
+    # to the corresponding records in the detailed table (rv$upload_df).
+    
+    info <- input$tbl_out_cell_edit
+    
+    # Ensure rv$df and rv$upload_df are valid data frames before proceeding
+    if (!is.data.frame(rv$df) || nrow(rv$df) == 0) {
+      # Silently return if summary data isn't ready (e.g., during initial load)
+      return()
     }
-    # 3. Update the Summary DataFrame (rv$df)
-    rv$df[info$row, info$col + 1] <- val
-    
-    # 4. Find Corresponding Rows in the Main DataFrame (rv$upload_df) using cite_source
-    
-    # 4a. Get the 'source' value from the edited row in rv$df
-    # Assumes the column named 'source' holds the relevant identifier in rv$df
-    # Check rv$df structure if this column name is different.
-    source_value_from_edited_row <- rv$df[info$row, "source"] # Use column name "source"
-    
-    # Check if the source value is valid before proceeding
-    if (is.null(source_value_from_edited_row) || is.na(source_value_from_edited_row)) {
-      warning(paste("Could not find valid source value in edited row:", info$row))
-      return() # Stop processing if the source identifier is missing
+    if (!is.data.frame(rv$upload_df)) {
+      # Log warning if detailed data structure is missing, but allow proceeding
+      # if only rv$df needs update (though propagation will fail later)
+      warning("rv$upload_df is not a valid data frame. Edits cannot be propagated.")
+      # Depending on desired behavior, could 'return()' here too.
     }
     
-    # 4b. Calculate row ranges for each source in rv$upload_df 
-    # Group by 'cite_source' instead of 'file.datapath'
-    row_indexes <- rv$upload_df %>%
-      dplyr::mutate(rowname = dplyr::row_number()) %>%
-      dplyr::group_by(cite_source) %>% # *** CHANGED HERE ***
-      dplyr::summarise(
-        min_row = dplyr::first(rowname), 
-        max_row = dplyr::last(rowname),
-        .groups = 'drop' # Good practice to add .groups='drop'
-      )
+    # Get column names from the summary data frame
+    df_col_names <- names(rv$df)
     
-    # 4c. Look up the min/max rows for the edited source
-    # Filter row_indexes using 'cite_source' and the value obtained from rv$df
-    rows <- row_indexes[row_indexes$cite_source == source_value_from_edited_row, ] # *** CHANGED HERE ***
+    # Determine the number of edits reported in this event
+    n_edits <- length(info$row)
     
-    # Check if rows were found
-    if (nrow(rows) == 0 || is.na(rows$min_row) || is.na(rows$max_row)) {
-      warning(paste("Could not find row indices in rv$upload_df for source:", source_value_from_edited_row))
-      # Decide how to handle: maybe the source was edited TO something not in rv$upload_df?
-      # For now, just stop to prevent error. Depending on desired behavior, might need adjustment.
-      return() 
-    }
-    
-    # 5. Determine Target Column Name in rv$upload_df (No change needed in principle)
-    # This part should be okay, as it maps rv$df column names ('source', 'label', 'string')
-    # to rv$upload_df column names ('cite_source', 'cite_label', 'cite_string')
-    col_name_in_df <- names(rv$df)[info$col + 1] # Safer way to get name
-    col <- paste0("cite_", col_name_in_df) 
-    
-    # Add a check to ensure the target column exists in rv$upload_df
-    if (!col %in% names(rv$upload_df)) {
-      warning(paste("Target column", col, "not found in rv$upload_df"))
-      return() # Stop if the target column doesn't exist
-    }
-    
-    # 6. Update the Main DataFrame (rv$upload_df) (No change in logic, but context changed)
-    # Now uses row indices derived via cite_source
-    # Added safety checks above should prevent errors here if rows/col were invalid
-    rv$upload_df[c(rows$min_row:rows$max_row), col] <- val 
+    # Process each reported edit individually
+    for (i in 1:n_edits) {
+      # Extract information for the current (i-th) edit
+      target_row_df <- as.integer(info$row[i]) # 1-based row index for rv$df
+      target_col_dt <- as.integer(info$col[i]) # 0-based column index from DT
+      target_col_df <- target_col_dt + 1       # Convert to 1-based R index for rv$df
+      val <- if (is.list(info$value)) info$value[[i]] else info$value[i] # Handle list/vector values
+      
+      # Convert blank input ("") to logical NA
+      if (length(val) == 1 && !is.na(val) && val == "") {
+        val <- NA
+      }
+      
+      # --- Validate indices against rv$df ---
+      if (target_row_df <= 0 || target_row_df > nrow(rv$df) ||
+          target_col_df <= 0 || target_col_df > ncol(rv$df)) {
+        warning(paste("Invalid row/column index received from DT edit. Row:",
+                      target_row_df, "Col:", target_col_df, ". Skipping this edit."))
+        next # Skip to the next edit
+      }
+      
+      # --- 1. Update rv$df (the summary table data) ---
+      # Use tryCatch to handle potential errors during assignment (e.g., type mismatch)
+      tryCatch({
+        rv$df[target_row_df, target_col_df] <- val
+      }, error = function(e) {
+        warning(paste("Error updating rv$df[", target_row_df, ",", target_col_df, "]:", e$message))
+        # Continue to the next edit even if this one failed
+        next
+      })
+      
+      # --- 2. Propagate change to rv$upload_df (if applicable) ---
+      
+      # Get the file.datapath associated with the edited row in rv$df
+      # This assumes column 1 of rv$df is 'file.datapath'
+      if (df_col_names[1] != "file.datapath") {
+        warning("Column 1 of rv$df is not 'file.datapath'. Cannot link edits to rv$upload_df.")
+        next # Skip propagation for this edit
+      }
+      edited_datapath <- rv$df[[target_row_df, 1]]
+      
+      # Check if the datapath is valid for lookup
+      if (is.na(edited_datapath) || edited_datapath == "") {
+        # Don't warn every time, might be expected if datapath is missing
+        next # Cannot link without a valid datapath
+      }
+      
+      # Check if rv$upload_df is ready for update
+      if (nrow(rv$upload_df) == 0 || !"file.datapath" %in% names(rv$upload_df)) {
+        # Silently skip if detailed data isn't ready or lacks the key column
+        next
+      }
+      
+      # Find rows in rv$upload_df matching the datapath
+      target_rows_upload_idx <- which(rv$upload_df$file.datapath == edited_datapath)
+      
+      if (length(target_rows_upload_idx) == 0) {
+        # No matching rows found in detailed data, nothing to propagate
+        next
+      }
+      
+      # Determine the target column name in rv$upload_df based on the edited column in rv$df
+      col_name_df <- df_col_names[target_col_df] # Name of edited column in summary table
+      col_name_upload <- NULL # Target column name in detailed table
+      
+      # Define the mapping for propagation
+      if (col_name_df == "source") {
+        col_name_upload <- "cite_source"
+      } else if (col_name_df == "label") {
+        col_name_upload <- "cite_label"
+      } else if (col_name_df == "string") {
+        col_name_upload <- "cite_string"
+      } else {
+        # If the edited column (e.g., 'records') shouldn't be propagated, skip
+        next
+      }
+      
+      # Check if the target column exists in rv$upload_df
+      if (!col_name_upload %in% names(rv$upload_df)) {
+        warning(paste("Target column '", col_name_upload, "' not found in rv$upload_df. Cannot propagate edit."))
+        next
+      }
+      
+      # Perform the update on all matching rows in the detailed data frame
+      tryCatch({
+        rv$upload_df[target_rows_upload_idx, col_name_upload] <- val
+      }, error = function(e) {
+        warning(paste("Error updating rv$upload_df rows for datapath", edited_datapath,
+                      "Column:", col_name_upload, ":", e$message))
+        # Continue to the next edit even if propagation failed
+      })
+      
+    } # End FOR loop iterating through edits reported by DT
     
   })
-
-# Deduplication tab -----------------
-
+  
+  # Deduplication tab -----------------
+  
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups, {
     if (nrow(rv$upload_df) == 0) {
@@ -715,34 +720,24 @@ server <- function(input, output, session) {
     
     # Generate a summary message based on deduplication results
     n_citations <- nrow(rv$upload_df)
-    n_distinct_records <- nrow(rv$n_unique)
-    n_unique_records <- nrow(dedup_results$unique)
+    n_unique_records <- nrow(rv$n_unique)  # Changed variable name to avoid conflict
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
-    # Title for the alert
-    alert_title <- "Automated Deduplication Complete"
-    
-    # Text for the alert body
-    if (n_pairs_manual > 0) {
-      alert_text <- sprintf(
-        "Process Summary:\n - Started with %d uploaded records.\n - Found %d distinct records (after removing duplicates within each source file).\n - Found %d unique records (after removing duplicates across source files).\n\nAction Required:\n%d potential duplicate pairs require your review. Please go to the 'Manual deduplication' sub-tab.",
-        n_citations, n_distinct_records, n_unique_records, n_pairs_manual
+    message <- if (n_pairs_manual > 0) {
+      paste(
+        "From a total of", n_citations, "citations added, there are", n_unique_records, 
+        "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
       )
     } else {
-      alert_text <- sprintf(
-        "Process Summary:\n - Started with %d uploaded records.\n - Found %d distinct records (after removing duplicates withi* each source file).\n - Found %d unique records (after removing duplicates across source files).\n\nNo potential duplicates were flagged for manual review.\n\nNext Step:\nYou can now proceed to the 'Visualise' tab.",
-        n_citations, n_distinct_records, n_unique_records
+      paste(
+        "From a total of", n_citations, "citations added, there are", n_unique_records, 
+        "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
       )
     }
     
-    # Show the alert
-    shinyalert::shinyalert(title = alert_title, 
-                           text = alert_text, 
-                           type = "success",
-                           size = "l")
-    
+    shinyalert::shinyalert("Auto-deduplication complete", message, type = "success")
   })
-
+  
   ## Manual deduplication -----
   
   # Action button: remove manually selected duplicates [merged two segments into one]
@@ -765,8 +760,8 @@ server <- function(input, output, session) {
     
   })
   
-    observeEvent(input$completed_manual_dedup,{
-      
+  observeEvent(input$completed_manual_dedup,{
+    
     # provide shiny alert
     shinyalert::shinyalert("Manual deduplication complete",
                            paste(
@@ -776,20 +771,14 @@ server <- function(input, output, session) {
                            ),
                            type = "success"
     )
-
-      })
-
-    observe({
-      all_cols <- names(rv$pairs_to_check)
-      base_cols <- unique(gsub("(1|2)$", "", all_cols)) # Remove "1" or "2" suffix
-      
-      # Initial selection
-      initial_base_selection <- c("author", "title", "year", "journal", "abstract", "doi", "pages")
-      
-      shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
-                                      choices = base_cols,
-                                      selected = initial_base_selection)
-    })
+    
+  })
+  
+  observe({
+    shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
+                                    choices = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
+                                    selected = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
+  })
   
   
   # if no manual dedup, proceed to visualisations
@@ -801,7 +790,7 @@ server <- function(input, output, session) {
       selected = "Visualise"
     )
   })
-
+  
   # if rows selected in manual dedup, make buttom appear
   observe({
     selected_rows <- input$manual_dedup_dt_rows_selected
@@ -815,40 +804,18 @@ server <- function(input, output, session) {
   # Output: manual dedup datatable
   manual_dedup_data <- reactive({
     
-    data <- rv$pairs_to_check[, 1:36]
-    selected_cols <- input$manual_dedup_cols
+    data <- rv$pairs_to_check[,1:36]
+    data <- data[,c(paste0(input$manual_dedup_cols))]
     
-    # Define the desired base order
-    core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string")
-    
-    # Create the desired interleaved order of columns to select
-    desired_table_order <- character(0)
-    for (base_col in core_col_order) {
-      col1 <- paste0(base_col, "1")
-      col2 <- paste0(base_col, "2")
-      desired_table_order <- c(desired_table_order, col1, col2)
-    }
-    
-    # Intersect with the actual and selected columns to maintain order and presence
-    cols_to_show <- intersect(desired_table_order, colnames(data))
-    cols_to_show <- intersect(cols_to_show, paste0(selected_cols, rep(c("1", "2"), each = length(selected_cols))))
-    
-    ordered_data <- data %>%
-      dplyr::select(any_of(cols_to_show))
-    
-    # Define match_cols INSIDE the reactive expression
     match_cols <- c("title", "author", "doi", "volume",
                     "pages", "number", "year", "abstract", "journal", "isbn")
     
-    ordered_data <- ordered_data %>% dplyr::select(-any_of(match_cols))
     
-    # Add the match_number_cols at the end (if they exist)
-    match_number_cols_to_add <- intersect(paste0(match_cols), colnames(data))
-    if (length(match_number_cols_to_add) > 0) {
-      ordered_data <- cbind(ordered_data, data[, match_number_cols_to_add])
-    }
+    data <- data %>% dplyr::select(-any_of(match_cols))
+    match_number_cols <- rv$pairs_to_check[,c(paste0(match_cols))]
     
-    ordered_data
+    data <- cbind(data,match_number_cols)
+    
   })
   output$manual_dedup_dt <- DT::renderDataTable({
     
@@ -857,7 +824,7 @@ server <- function(input, output, session) {
     format_cols <- c(
       "title1", "author1", "doi1", "volume1",
       "pages1", "number1", "year1", "abstract1", "journal1", "isbn1",
-      "title2", "author2", "doi2", "volume2", 
+      "title2", "author2", "doi2", "volume2",
       "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
     )
     
@@ -865,33 +832,23 @@ server <- function(input, output, session) {
     shinyjs::useShinyjs()
     
     datatable(data,
-              extensions = c('FixedHeader', 'FixedColumns'),
               options = list(
-                fixedHeader = TRUE,                   
-                fixedColumns = list(leftColumns = 2), 
-                scrollX = TRUE,
-                pageLength = 100,
-                info = FALSE,
+                pageLength = 100, info = FALSE,
                 lengthMenu = list(c(100, -1), c("100", "All")),
-                columnDefs = list(
+                columnDefs =
                   list(
-                    targets = "_all",
-                    render = JS(
-                      "function(data, type, row, meta) {",
-                      "  if (type === 'display' && data != null && typeof data === 'string' && data.length > 25) {",
-                      "    var rawData = data;",
-                      "    return '<span title=\"' + rawData + '\">' + rawData.substr(0, 25) + '...</span>';",
-                      "  } else {",
-                      "    return data;",
-                      "  }",
-                      "}"
+                    list(visible = FALSE, 
+                         targets = columns2hide),
+                    list(
+                      targets = "_all",
+                      render = JS(
+                        "function(data, type, row, meta) {",
+                        "return type === 'display' && data != null && data.length > 25 ?",
+                        "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
+                        "}"
+                      )
                     )
-                  ),
-                  list(
-                    visible = FALSE,
-                    targets = columns2hide
                   )
-                ) 
               ))
     # ) %>%
     #   DT::formatStyle(
@@ -906,20 +863,20 @@ server <- function(input, output, session) {
     #     color = JS("value >= 0.95 ? 'white' : null")
     #   )
   })
-
-
+  
+  
   # ASySD manual dedup pre text 
   output$Manual_pretext <- shiny::renderText({
-
+    
     paste(nrow(rv$pairs_to_check), "pairs of citations require manual deduplication. Review the pairs in the table
         below.")
-
+    
   })
-
-
+  
+  
   #### Visualise tab ####
   
-  # Reactive expression to filter the data for visualization 
+  # Reactive expression to filter the data for visualization
   unique_filtered_visual <- shiny::reactive({
     sources <- input$sources_visual 
     sources <- ifelse(sources == "_blank_", "unknown", sources)
@@ -929,9 +886,7 @@ server <- function(input, output, session) {
     labels <- ifelse(labels == "_blank_", "unknown", labels)
     
     out <- rv$latest_unique %>%
-      # Group by the ID representing unique/duplicate groups
       dplyr::group_by(duplicate_id) %>%
-      # Separate comma-separated values into individual rows
       tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
       dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
       dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
@@ -1093,7 +1048,7 @@ server <- function(input, output, session) {
   
   # Rendering the precision and sensitivity table
   output$summaryPrecTab <- gt::render_gt({
-
+    
     unique_citations <- unique_filtered_table()
     
     # The table is only for phase comparison, include "final" in labels for comparison
@@ -1109,13 +1064,13 @@ server <- function(input, output, session) {
   
   # Rendering the record-level table
   output$reviewTab <- DT::renderDataTable({
-   
-     if (nrow(rv$latest_unique) == 0) {
+    
+    if (nrow(rv$latest_unique) == 0) {
       shinyalert::shinyalert("Data needed",
                              "Please import and deduplicate your citations first.",
                              type = "error"
       )
-       shiny::req(FALSE)
+      shiny::req(FALSE)
     }
     
     citations <- unique_filtered_table()
@@ -1124,9 +1079,9 @@ server <- function(input, output, session) {
   }) %>% shiny::bindEvent(input$generateRecordTable)
   
   
-
+  
   #### Export tab ####
-
+  
   # # Downloadable bibtex ----
   # Downloadable bibtex ----
   output$downloadCsv <- shiny::downloadHandler(
@@ -1150,7 +1105,7 @@ server <- function(input, output, session) {
       export_bib(rv$latest_unique, file)
     }
   )
-
+  
   output$downloadRis <- shiny::downloadHandler(
     filename = function() {
       paste("data-", Sys.Date(), ".ris", sep = "")
