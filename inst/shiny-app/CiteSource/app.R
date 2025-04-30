@@ -79,6 +79,12 @@ ui <- shiny::navbarPage("CiteSource",
               multiple = TRUE,
               accept = c(".ris", ".txt", ".bib")
             ),
+            shiny::p(
+              HTML("NOTE: OVID citations may be incompatible.<br> 
+                   Import and export them using citation software<br>
+                  before uploading for accurate metadata mapping."),
+              style = "font-size: 85%; color: darkgrey;"
+            ),
             shiny::hr(),
             shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
             shiny::fileInput("file_reimport", "",
@@ -462,18 +468,44 @@ server <- function(input, output, session) {
   shiny::observe({
     if (nrow(rv$latest_unique) > 0) {
       
-      sources <- unique(rv$latest_unique$cite_source) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort() 
-      labels <- unique(rv$latest_unique$cite_label) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
-      strings <- unique(rv$latest_unique$cite_string) %>% stringr::str_split(", ") %>% unlist() %>% unique() %>% sort()
+      # Handle cite_source
+      sources <- rv$latest_unique$cite_source
+      if (all(is.na(sources) | sources == "")) {
+        sources <- NULL  # Leave it as NULL or NA
+      } else {
+        sources <- unique(sources[!is.na(sources) & sources != ""]) %>%
+          stringr::str_split(", ") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+      }
       
-      sources <- sources[sources != "unknown"]
-      labels  <- labels[labels != "unknown"]
-      strings <- strings[strings != "unknown"]
+      # Handle cite_label
+      labels <- rv$latest_unique$cite_label
+      if (all(is.na(labels) | labels == "")) {
+        labels <- NULL  # Leave it as NULL or NA
+      } else {
+        labels <- unique(labels[!is.na(labels) & labels != ""]) %>%
+          stringr::str_split(", ") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+        
+      }
       
-      if (any(rv$latest_unique$cite_source == "unknown")) sources <- c(sources, "_blank_")
-      if (any(rv$latest_unique$cite_label == "unknown")) labels <- c(labels, "_blank_")
-      if (any(rv$latest_unique$cite_string == "unknown")) strings <- c(strings, "_blank_")
+      # Handle cite_string
+      strings <- rv$latest_unique$cite_string
+      if (all(is.na(strings) | strings == "")) {
+        strings <- NULL  # Leave it as NULL or NA
+      } else {
+        strings <- unique(strings[!is.na(strings) & strings != ""]) %>%
+          stringr::str_split(", ") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+      }
       
+      # Update select inputs
       shiny::updateSelectInput(inputId = "sources_visual", choices = sources, selected = sources)
       shiny::updateSelectInput(inputId = "labels_visual", choices = labels, selected = labels)
       shiny::updateSelectInput(inputId = "strings_visual", choices = strings, selected = strings)
@@ -540,18 +572,23 @@ server <- function(input, output, session) {
     
     # Generate a summary message based on deduplication results
     n_citations <- nrow(rv$upload_df)
-    n_unique_records <- nrow(rv$n_unique)  # Changed variable name to avoid conflict
+    n_distinct_records <- nrow(rv$n_unique)
+    n_unique_records <- nrow(dedup_results$unique)
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
     message <- if (n_pairs_manual > 0) {
       paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
+        "From the", n_citations, "records, that were uploaded, there were", n_distinct_records, 
+        "distinct records identified after internal source deduplication. 
+        Of these distinct records, there were", n_unique_records, "unique records.
+        Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
       )
     } else {
       paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
+        "From the", n_citations, "records, that were uploaded, there were", n_distinct_records, 
+        "distinct records identified after internal source deduplication. 
+        There were no potential duplicates identifid for manual review. 
+        You can proceed to the visualization tab."
       )
     }
     
