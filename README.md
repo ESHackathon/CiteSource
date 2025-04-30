@@ -37,6 +37,10 @@ The CiteSource deduplication process is better described as a record merging pro
 
 Once records are deduplicated, users are able to easily create plots and tables to answer specific questions or to simply explore the data in an effort to develop new hypotheses. Examples of analysis may include how many unique records a specific source contributed or how traditional methods of searching fare against a new AI discovery tool in finding relevant articles. Users may want to understand the overlap in records between two different search strings or evaluate the impact of including Google Scholar in a review. Before searching, a user may even develop a targeted search to better understand the topical coverage across databases that they intend to search, and once the search has been developed, how a particular source, string, or method performed in discovering benchmarking articles. 
 
+**Exporting and Re-importing Data**
+
+Once records have been processed, users are able to export data in .csv, .ris, and .bib formats. Furthermore, users are able to reimport .csv and .ris files in order to recreate plots and tables.
+
 ## Getting Started
 **Installation**
 
