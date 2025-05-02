@@ -13,7 +13,7 @@ plot_contributions(
   bar_order = "keep",
   facet_order = "keep",
   color_order = "keep",
-  totals_in_legend = TRUE
+  totals_in_legend = FALSE
 )
 }
 \arguments{
