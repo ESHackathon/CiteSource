@@ -118,9 +118,6 @@ ui <- shiny::navbarPage("CiteSource",
                                 color = "primary",
                                 icon = shiny::icon("search")
                               ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
-                              
-                              # Output: datatable of deduplication results
-                              DT::dataTableOutput("dedup_results")
                             ),
                             shiny::tabPanel(
                               "Manual deduplication",
