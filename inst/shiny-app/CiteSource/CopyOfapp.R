@@ -515,55 +515,79 @@ server <- function(input, output, session) {
   
   ## Update filters
   shiny::observe({
-    if (nrow(rv$latest_unique) > 0) {
+    # Make sure rv$latest_unique is populated and is a data frame
+    if (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0) {
       
-      # Handle cite_source
-      sources <- rv$latest_unique$cite_source
-      if (all(is.na(sources) | sources == "")) {
-        sources <- NULL  # Leave it as NULL or NA
-      } else {
-        sources <- unique(sources[!is.na(sources) & sources != ""]) %>%
-          stringr::str_split(", ") %>%
+      # --- Handle cite_source ---
+      sources_raw <- rv$latest_unique$cite_source
+      sources_choices <- NULL # Initialize choices list
+      
+      if (!all(is.na(sources_raw) | sources_raw == "")) {
+        sources_choices <- sources_raw[!is.na(sources_raw) & sources_raw != ""] %>%
+          stringr::str_split(",\\s*") %>% # Use regex for robustness
           unlist() %>%
           unique() %>%
           sort()
       }
       
-      # Handle cite_label
-      labels <- rv$latest_unique$cite_label
-      if (all(is.na(labels) | labels == "")) {
-        labels <- NULL  # Leave it as NULL or NA
-      } else {
-        labels <- unique(labels[!is.na(labels) & labels != ""]) %>%
-          stringr::str_split(", ") %>%
-          unlist() %>%
-          unique() %>%
-          sort()
-        
+      # *** Calculate the default selection ONLY for sources_visual (exclude "unknown") ***
+      sources_visual_selected_default <- NULL
+      if (!is.null(sources_choices)) {
+        sources_visual_selected_default <- sources_choices[sources_choices != "unknown"]
+        # Handle edge case where only "unknown" was present
+        if (length(sources_visual_selected_default) == 0 && "unknown" %in% sources_choices) {
+          sources_visual_selected_default <- NULL
+        }
       }
+      # For sources_tables, the default remains all available choices (sources_choices)
       
-      # Handle cite_string
-      strings <- rv$latest_unique$cite_string
-      if (all(is.na(strings) | strings == "")) {
-        strings <- NULL  # Leave it as NULL or NA
-      } else {
-        strings <- unique(strings[!is.na(strings) & strings != ""]) %>%
-          stringr::str_split(", ") %>%
+      
+      # --- Handle cite_label ---
+      labels_raw <- rv$latest_unique$cite_label
+      labels_choices <- NULL
+      if (!all(is.na(labels_raw) | labels_raw == "")) {
+        labels_choices <- unique(labels_raw[!is.na(labels_raw) & labels_raw != ""]) %>%
+          stringr::str_split(",\\s*") %>%
           unlist() %>%
           unique() %>%
           sort()
       }
+      labels_selected_default <- labels_choices # Default: select all valid labels
       
-      # Update select inputs
-      shiny::updateSelectInput(inputId = "sources_visual", choices = sources, selected = sources)
-      shiny::updateSelectInput(inputId = "labels_visual", choices = labels, selected = labels)
-      shiny::updateSelectInput(inputId = "strings_visual", choices = strings, selected = strings)
+      # --- Handle cite_string ---
+      strings_raw <- rv$latest_unique$cite_string
+      strings_choices <- NULL
+      if (!all(is.na(strings_raw) | strings_raw == "")) {
+        strings_choices <- unique(strings_raw[!is.na(strings_raw) & strings_raw != ""]) %>%
+          stringr::str_split(",\\s*") %>%
+          unlist() %>%
+          unique() %>%
+          sort()
+      }
+      strings_selected_default <- strings_choices # Default: select all valid strings
       
-      shiny::updateSelectInput(inputId = "sources_tables", choices = sources, selected = sources)
-      shiny::updateSelectInput(inputId = "labels_tables", choices = labels, selected = labels)
-      shiny::updateSelectInput(inputId = "strings_tables", choices = strings, selected = strings)
+      
+      # --- Update select inputs ---
+      # Use the specific default (excluding "unknown") for sources_visual
+      shiny::updateSelectInput(session, inputId = "sources_visual", choices = sources_choices, selected = sources_visual_selected_default)
+      shiny::updateSelectInput(session, inputId = "labels_visual", choices = labels_choices, selected = labels_selected_default)
+      shiny::updateSelectInput(session, inputId = "strings_visual", choices = strings_choices, selected = strings_selected_default)
+      
+      # Use the original default (all choices) for sources_tables
+      shiny::updateSelectInput(session, inputId = "sources_tables", choices = sources_choices, selected = sources_choices) # Reverted to selecting all
+      shiny::updateSelectInput(session, inputId = "labels_tables", choices = labels_choices, selected = labels_selected_default)
+      shiny::updateSelectInput(session, inputId = "strings_tables", choices = strings_choices, selected = strings_selected_default)
+      
+    } else {
+      # Optional: Clear the inputs if rv$latest_unique is empty or not a data frame
+      shiny::updateSelectInput(session, inputId = "sources_visual", choices = character(0), selected = character(0))
+      shiny::updateSelectInput(session, inputId = "labels_visual", choices = character(0), selected = character(0))
+      shiny::updateSelectInput(session, inputId = "strings_visual", choices = character(0), selected = character(0))
+      shiny::updateSelectInput(session, inputId = "sources_tables", choices = character(0), selected = character(0))
+      shiny::updateSelectInput(session, inputId = "labels_tables", choices = character(0), selected = character(0))
+      shiny::updateSelectInput(session, inputId = "strings_tables", choices = character(0), selected = character(0))
     }
-  })
+  }) # End update filters observe
   
   # Robust Observer for Cell Edits in tbl_out
   shiny::observeEvent(input$tbl_out_cell_edit, {
