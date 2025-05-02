@@ -1,6 +1,6 @@
 ## CiteSource User Guide
 
-<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
 
 > CiteSource has a number of applications. This guide walks users through the step-wise process of uploading, deduplicating and analyzing data > within the shiny application. For step by step instructions for running CiteSource in R, [check out our vignettes](https://www.eshackathon.org/CiteSource/articles/)
 ---

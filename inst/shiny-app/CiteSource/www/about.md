@@ -1,6 +1,7 @@
 ## About CiteSource
 
-<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
+
 
 CiteSource is an R package and accompanying Shiny web application designed to support evidence data-driven decision-making during search strategy development. CiteSource also allows users to analyze and report on the impact of information sources and search methods.
 

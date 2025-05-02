@@ -24,7 +24,7 @@ ui <- shiny::navbarPage("CiteSource",
                         header = shiny::tagList(
                           shinybusy::add_busy_spinner(spin = "circle"),
                           shinyjs::useShinyjs(),
-                          #header text colour
+                          #header text color
                           tags$head(
                             tags$style(HTML("
       h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {

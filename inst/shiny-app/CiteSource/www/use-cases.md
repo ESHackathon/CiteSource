@@ -1,6 +1,6 @@
 ## CiteSource Use Cases: Overview
 
-<img src="https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
+<img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
 
 CiteSource provides a suite of tools to support data-driven decision-making throughout the evidence synthesis process. Its applications generally fall into two main categories: **Optimizing Search Strategies** (typically during protocol development and iterative searching) and **Analyzing Search Impact** (often after screening is complete, for reporting and methodological insights). Additional applications extend to training and resource management.
 
