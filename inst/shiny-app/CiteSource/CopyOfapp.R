@@ -403,7 +403,6 @@ server <- function(input, output, session) {
   rv$latest_unique <- data.frame()#for reimported data
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
-  rv$n_unique = NULL # Initialize n_unique
   
   #### Upload files tab section ------
   # upload on click
@@ -415,9 +414,7 @@ server <- function(input, output, session) {
     else {
       # upload files one-by-one
       path_list <- input$file$datapath
-
       suggested_source <- stringr::str_replace_all(input$file$name, "\\.(ris|bib|txt)$", "")
-      
       empty_strings <- rep("", length(input$file$datapath))
       
       # Read the uploaded citations
