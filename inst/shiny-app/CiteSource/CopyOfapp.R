@@ -1097,7 +1097,7 @@ server <- function(input, output, session) {
     count_unique(ufv) # Pass the wide, summarized, filtered data
   })
   
-  # Modified phase plot output
+  # Phase plot output
   output$phasePlot <- shiny::renderPlot({
     # Initial check if any data has been processed
     if (nrow(rv$latest_unique) == 0) {
@@ -1123,7 +1123,8 @@ server <- function(input, output, session) {
       data = plot_data, # Use the new reactive data
       center = TRUE,
       bar_order = c("search", "screened", "final"), # Keep or make dynamic?
-      color_order = c("unique", "duplicated")
+      color_order = c("unique", "duplicated"),
+      totals_in_legend = FALSE #legend total needs an update
     )
   })
   
@@ -1147,7 +1148,8 @@ server <- function(input, output, session) {
         data = plot_data, # Use the prepared reactive data
         center = TRUE,
         bar_order = c("search", "screened", "final"), # Make dynamic if needed
-        color_order = c("unique", "duplicated")
+        color_order = c("unique", "duplicated"),
+        totals_in_legend = FALSE
       )
       
       # Check if plot object was created successfully
