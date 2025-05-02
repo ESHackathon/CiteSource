@@ -1210,8 +1210,8 @@ server <- function(input, output, session) {
     # Apply initial filters for labels and strings only
     df_filtered_wide <- rv$latest_unique %>%
       dplyr::filter(
-        (is.null(labels_pattern) || stringr::str_detect(cite_label, labels_pattern)),
-        (is.null(strings_pattern) || stringr::str_detect(cite_string, strings_pattern))
+        (is.null(labels_pattern) | stringr::str_detect(cite_label, labels_pattern)),
+        (is.null(strings_pattern) | stringr::str_detect(cite_string, strings_pattern))
       )
     
     # Define the structure for returning an empty result
