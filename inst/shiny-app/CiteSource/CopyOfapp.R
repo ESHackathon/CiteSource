@@ -415,14 +415,7 @@ server <- function(input, output, session) {
     else {
       # upload files one-by-one
       path_list <- input$file$datapath
-      
-      # Increment the upload number
-      if (is.null(rv$upload_number)) {
-        rv$upload_number <- 1
-      } else {
-        rv$upload_number <- rv$upload_number + 1
-      }
-      
+
       suggested_source <- stringr::str_replace_all(input$file$name, "\\.(ris|bib|txt)$", "")
       
       empty_strings <- rep("", length(input$file$datapath))
