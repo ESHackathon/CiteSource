@@ -300,7 +300,7 @@ ui <- shiny::navbarPage("CiteSource",
                                     color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
                                   shiny::br(),
                                   shiny::br(),
-                                  gt::gt_output("summaryRecordTab")
+                                  gt::gt_output("detailedRecordTab")
                                 ),
                                 
                                 shiny::tabPanel(
@@ -1110,7 +1110,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # Pphase plot download
+  # Phase plot download
   output$downloadPhasePlot <- shiny::downloadHandler(
     filename = function() {
       paste("phase_analysis", ".png", sep = "")
@@ -1166,6 +1166,122 @@ server <- function(input, output, session) {
         dplyr::ungroup()
     }
   )
+  detailed_table_data <- reactive({
+    # Require base data to proceed
+    shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
+    
+    # Get current filter selections from the UI
+    sources_filt <- input$sources_tables
+    sources_filt <- ifelse(sources_filt == "_blank_", "unknown", sources_filt)
+    labels_filt <- input$labels_tables
+    labels_filt <- ifelse(labels_filt == "_blank_", "unknown", labels_filt)
+    strings_filt <- input$strings_tables
+    strings_filt <- ifelse(strings_filt == "_blank_", "unknown", strings_filt)
+    
+    # Create filter patterns for labels and strings (can still pre-filter these)
+    labels_pattern <- if (length(labels_filt) > 0) paste0("\\b(", paste(labels_filt, collapse = "|"), ")\\b") else NULL
+    strings_pattern <- if (length(strings_filt) > 0) paste0("\\b(", paste(strings_filt, collapse = "|"), ")\\b") else NULL
+    
+    # Apply initial filters for labels and strings only
+    df_filtered_wide <- rv$latest_unique %>%
+      dplyr::filter(
+        (is.null(labels_pattern) || stringr::str_detect(cite_label, labels_pattern)),
+        (is.null(strings_pattern) || stringr::str_detect(cite_string, strings_pattern))
+      )
+    
+    # Define the structure for returning an empty result
+    empty_result_df <- tibble::tibble(
+      Source = character(), `Records Imported` = integer(), `Distinct Records` = integer(),
+      `Unique Records` = integer(), `Non-unique Records` = integer(),
+      `Source Contribution %` = character(), `Source Unique Contribution %` = character(),
+      `Source Unique %` = character() )
+    
+    # Return empty structure if no records match initial filters
+    if (nrow(df_filtered_wide) == 0) { return(empty_result_df) }
+    
+    # Separate only the cite_source column for source-level aggregation
+    df_long_source <- df_filtered_wide %>%
+      dplyr::select(duplicate_id, cite_source) %>%
+      tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
+      dplyr::filter(!is.na(cite_source) & cite_source != "") # Filter out blank sources
+    
+    # *** Apply the source filter AFTER separating sources ***
+    df_long_source_filtered <- df_long_source %>%
+      dplyr::filter(length(sources_filt) == 0 | cite_source %in% sources_filt)
+    
+    # Return empty if no valid sources remain after filtering
+    if (nrow(df_long_source_filtered) == 0) { return(empty_result_df) }
+    
+    # --- All subsequent calculations use df_long_source_filtered ---
+    
+    # Calculate 'Records Imported' and 'Distinct Records' per source
+    source_base_counts <- df_long_source_filtered %>% # Use filtered data
+      dplyr::group_by(cite_source) %>%
+      dplyr::summarise(`Records Imported` = dplyr::n(), `Distinct Records` = dplyr::n_distinct(duplicate_id), .groups = 'drop')
+    
+    # Calculate how many sources each distinct record appears in (within the filtered set)
+    # Use the df_long_source_filtered data here too
+    record_source_counts <- df_long_source_filtered %>%
+      dplyr::group_by(duplicate_id) %>%
+      dplyr::summarise(n_sources = dplyr::n_distinct(cite_source), .groups = 'drop')
+    
+    # Identify records unique to one source within the filtered set
+    # Use the df_long_source_filtered data here too
+    unique_record_sources <- df_long_source_filtered %>%
+      dplyr::inner_join(record_source_counts, by = "duplicate_id") %>%
+      dplyr::filter(n_sources == 1) %>%
+      dplyr::distinct(duplicate_id, cite_source) # Get the source for unique records
+    
+    # Count the number of unique records per source
+    source_unique_counts <- unique_record_sources %>%
+      dplyr::group_by(cite_source) %>%
+      dplyr::summarise(`Unique Records` = dplyr::n(), .groups = 'drop')
+    
+    # Combine base counts with unique counts
+    detailed_counts_per_source <- source_base_counts %>%
+      dplyr::left_join(source_unique_counts, by = "cite_source") %>%
+      dplyr::mutate(`Unique Records` = tidyr::replace_na(`Unique Records`, 0)) %>%
+      dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique Records`)
+    
+    # Calculate totals consistently from the *filtered* data
+    total_records_imported <- sum(detailed_counts_per_source$`Records Imported`, na.rm = TRUE)
+    total_distinct_records <- dplyr::n_distinct(df_long_source_filtered$duplicate_id) # Use filtered data
+    total_unique_records <- sum(detailed_counts_per_source$`Unique Records`, na.rm = TRUE)
+    total_nonunique_records <- sum(detailed_counts_per_source$`Non-unique Records`, na.rm = TRUE)
+    
+    # Prepare for percentage calculation (avoid division by zero)
+    total_distinct_divisor <- ifelse(total_distinct_records == 0, 1, total_distinct_records)
+    total_unique_divisor <- ifelse(total_unique_records == 0, 1, total_unique_records)
+    
+    # Calculate and format percentages
+    detailed_counts_final <- detailed_counts_per_source %>%
+      dplyr::mutate(
+        perc_contr = `Distinct Records` / total_distinct_divisor,
+        perc_unique_contr = `Unique Records` / total_unique_divisor,
+        perc_source_unique = ifelse(`Distinct Records` == 0, 0, `Unique Records` / `Distinct Records`) ) %>%
+      dplyr::mutate(
+        `Source Contribution %` = scales::percent(perc_contr, accuracy = 0.1),
+        `Source Unique Contribution %` = scales::percent(perc_unique_contr, accuracy = 0.1),
+        `Source Unique %` = scales::percent(perc_source_unique, accuracy = 0.1) ) %>%
+      dplyr::select( # Select and order final columns
+        cite_source, `Records Imported`, `Distinct Records`, `Unique Records`,
+        `Non-unique Records`, `Source Contribution %`,
+        `Source Unique Contribution %`, `Source Unique %` )
+    
+    # Create the total row
+    total_row <- tibble::tibble(
+      cite_source = "Total", `Records Imported` = total_records_imported,
+      `Distinct Records` = total_distinct_records, `Unique Records` = total_unique_records,
+      `Non-unique Records` = total_nonunique_records, `Source Contribution %` = NA_character_,
+      `Source Unique Contribution %` = NA_character_,
+      `Source Unique %` = scales::percent(total_unique_records / total_distinct_divisor, accuracy = 0.1) )
+    
+    # Add total row and rename source column
+    detailed_counts_final <- dplyr::bind_rows(detailed_counts_final, total_row) %>%
+      dplyr::rename(Source = cite_source)
+    
+    return(detailed_counts_final)
+  })
   
   # Rendering the initial record table
   output$initialRecordTab <- gt::render_gt({
@@ -1183,18 +1299,22 @@ server <- function(input, output, session) {
   }) %>% shiny::bindEvent(input$generateInitialRecordTable)
   
   # Rendering the detailed record table
-  output$summaryRecordTab <- gt::render_gt({
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-                             "Please import and deduplicate your citations first.",
-                             type = "error"
-      )
-      shiny::req(FALSE)
+  output$detailedRecordTab <- gt::render_gt({
+    # Check if base data is loaded
+    if (!is.data.frame(rv$latest_unique) || nrow(rv$latest_unique) == 0) {
+      shinyalert::shinyalert("Data needed", "Please import and deduplicate your citations first.", type = "error")
+      shiny::req(FALSE) # Stop execution
     }
-    
-    unique_citations <- unique_filtered_table()
-    detailed_count <- calculate_detailed_records(unique_citations, rv$n_unique, "search")
-    create_detailed_record_table(detailed_count)
+    # Get the data from the new reactive
+    table_data <- detailed_table_data()
+    # Check if the reactive returned any data (e.g., after filtering)
+    shiny::validate(
+      shiny::need(is.data.frame(table_data) && nrow(table_data) > 0,
+                  "No records match the current filter selections for the Detailed Record Table.")
+    )
+    # Pass the prepared data frame to the formatting function
+    create_detailed_record_table(table_data)
+    # Bind to the same button trigger
   }) %>% shiny::bindEvent(input$generateDetailedRecordTable)
   
   # Rendering the precision and sensitivity table
