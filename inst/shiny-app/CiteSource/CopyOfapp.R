@@ -770,20 +770,7 @@ server <- function(input, output, session) {
     rv$latest_unique <- after
     
   })
-  
-  observeEvent(input$completed_manual_dedup,{
-    
-    # provide shiny alert
-    shinyalert::shinyalert("Manual deduplication complete",
-                           paste(
-                             "From a total of", nrow(rv$upload_df), "citations uploaded, there are", nrow(rv$latest_unique),
-                             "unique citations after automated and manual deduplication.
-                           Compare citations across sources, labels, and strings in the visualisation tab"
-                           ),
-                           type = "success"
-    )
-    
-  })
+
   
   observe({
     shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
