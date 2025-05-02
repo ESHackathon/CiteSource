@@ -861,11 +861,10 @@ server <- function(input, output, session) {
   
   #### Visualise tab ####
   
-  # --- Heatmap and Upset Plot Code ---
-  # Note: These plots WILL use unique_filtered_visual() which applies filters.
+  # Reactive expression to filter the data for visualization (used for Heatmap and Upset)
   unique_filtered_visual <- shiny::reactive({
-    # Require rv$latest_unique to be a valid, non-empty data frame
-    shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
+    # Ensure latest_unique has data before attempting filtering
+    shiny::req(nrow(rv$latest_unique) > 0)
     
     sources <- input$sources_visual
     sources <- ifelse(sources == "_blank_", "unknown", sources)
@@ -874,326 +873,246 @@ server <- function(input, output, session) {
     labels <- input$labels_visual
     labels <- ifelse(labels == "_blank_", "unknown", labels)
     
-    # Define potential columns to separate and summarise
-    cols_to_process <- c("record_ids", "cite_label", "cite_source", "cite_string")
-    # Find which of these columns actually exist in the data
-    existing_cols <- intersect(cols_to_process, names(rv$latest_unique))
-    # Ensure essential columns for filtering exist
-    shiny::req("cite_source" %in% names(rv$latest_unique),
-               "cite_label" %in% names(rv$latest_unique),
-               "cite_string" %in% names(rv$latest_unique))
+    out <- rv$latest_unique %>%
+      # Filter rows where *any* of the required sources/labels/strings are present before summarizing
+      dplyr::filter(
+        (length(sources) == 0 | stringr::str_detect(cite_source, paste0("\\b(", paste(sources, collapse="|"), ")\\b"))) &
+          (length(strings) == 0 | stringr::str_detect(cite_string, paste0("\\b(", paste(strings, collapse="|"), ")\\b"))) &
+          (length(labels) == 0 | stringr::str_detect(cite_label, paste0("\\b(", paste(labels, collapse="|"), ")\\b")))
+      ) %>%
+      # Now group and summarize
+      dplyr::group_by(duplicate_id) %>%
+      {
+        df_grouped <- .
+        df_separated <- df_grouped %>%
+          tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
+          dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
+          dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
+          dplyr::filter(length(labels) == 0 | cite_label %in% labels)
+        
+        # Check if df_separated is empty for this group before summarizing
+        if(nrow(df_separated) == 0) {
+          # Return a row with the group id and NAs or empty strings if nothing matches filters
+          tibble::tibble(duplicate_id = dplyr::first(df_grouped$duplicate_id),
+                         record_ids = "", cite_label = "", cite_source = "", cite_string = "")
+        } else {
+          df_separated %>%
+            dplyr::summarise(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(unique(na.omit(.)), collapse = ', '))))
+        }
+      } %>%
+      dplyr::ungroup()
     
-    # Need a local copy to modify within the reactive expression
-    current_latest_unique <- rv$latest_unique
+    # Ensure the output has the same columns even if empty
+    if (nrow(out) == 0) {
+      out <- tibble::tibble(duplicate_id=character(), record_ids=character(), cite_label=character(), cite_source=character(), cite_string=character()) # Adjust columns as needed
+    }
+    # Add back other columns from rv$latest_unique if needed by downstream functions
+    dplyr::left_join(out, dplyr::select(rv$latest_unique, -any_of(c("record_ids", "cite_label", "cite_source", "cite_string"))), by = "duplicate_id")
     
-    # Ensure existing_cols are character type before separate_rows
-    for (col in existing_cols) {
-      if (!is.character(current_latest_unique[[col]])) {
-        current_latest_unique[[col]] <- as.character(current_latest_unique[[col]])
-      }
+  })
+  
+  # REACTIVE for Phase Plot Data
+  unique_separated_phase <- shiny::reactive({
+    # Require rv$latest_unique to have data
+    shiny::req(nrow(rv$latest_unique) > 0)
+    
+    # Get filter inputs
+    sources_filt <- input$sources_visual
+    sources_filt <- ifelse(sources_filt == "_blank_", "unknown", sources_filt)
+    labels_filt <- input$labels_visual
+    labels_filt <- ifelse(labels_filt == "_blank_", "unknown", labels_filt)
+    
+    # Start with the base unique data, select columns needed
+    df <- rv$latest_unique %>%
+      dplyr::select(duplicate_id, cite_source, cite_label) # Add record_ids if needed
+    
+    # Separate rows for source and label
+    df_long <- df %>%
+      tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
+      tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
+      dplyr::filter(!is.na(cite_source) & cite_source != "", # Ensure no blank/NA sources/labels after separation
+                    !is.na(cite_label) & cite_label != "")
+    
+    # Apply filtering based on selected sources and labels for the plot
+    df_filtered <- df_long %>%
+      dplyr::filter(length(sources_filt) == 0 | cite_source %in% sources_filt) %>%
+      dplyr::filter(length(labels_filt) == 0 | cite_label %in% labels_filt)
+    
+    # Check if filtering resulted in empty data
+    if (nrow(df_filtered) == 0) {
+      # Return an empty tibble with correct columns/types if no data matches
+      return(tibble::tibble(
+        duplicate_id = character(),
+        cite_source = character(),
+        cite_label = character(),
+        type = factor(levels = c("unique", "duplicated"))
+      ))
     }
     
-    out <- current_latest_unique %>%
-      dplyr::group_by(duplicate_id) %>%
-      # Separate only the columns that exist
-      { if (length(existing_cols) > 0) tidyr::separate_rows(., tidyselect::all_of(existing_cols), sep = ", ") else . } %>%
-      # Filter based on existing columns
-      dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
-      dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
-      dplyr::filter(length(labels) == 0 | cite_label %in% labels) %>%
-      # Summarise only the columns that exist
-      dplyr::summarise(dplyr::across(tidyselect::all_of(existing_cols),
-                                     # Get unique non-NA values before pasting
-                                     ~ trimws(paste(na.omit(unique(.)), collapse = ', '))),
-                       .groups = "drop")
+    # Calculate 'type' based on uniqueness *within* each phase (label) for the *filtered* set
+    # A record is 'unique' in a phase if it's found in only 1 source within that phase in the filtered data
+    df_typed <- df_filtered %>%
+      dplyr::group_by(duplicate_id, cite_label) %>%
+      dplyr::mutate(n_sources_in_phase = dplyr::n_distinct(cite_source)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        type = factor(
+          ifelse(n_sources_in_phase == 1, "unique", "duplicated"),
+          levels = c("unique", "duplicated")
+        )
+      ) %>%
+      # Select relevant columns needed by plot_contributions
+      dplyr::select(duplicate_id, cite_source, cite_label, type)
     
-    return(out)
-  }) # End unique_filtered_visual reactive
+    # Return the long data frame, ensuring distinct rows
+    dplyr::distinct(df_typed)
+  })# End Phase Plot Reactive
   
   
-  # --- Heatmap Plot ---
+  # Heatmap plot (uses unique_filtered_visual)
   plotHeat <- shiny::reactive({
-    # Requires unique_filtered_visual() to run successfully
-    shiny::req(unique_filtered_visual())
-    # Use tryCatch for robustness
-    tryCatch({
-      source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
-      # Ensure plot_source_overlap_heatmap exists and is callable
-      if (exists("plot_source_overlap_heatmap") && is.function(plot_source_overlap_heatmap)) {
-        plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
-      } else {
-        warning("Function 'plot_source_overlap_heatmap' not found.")
-        NULL
-      }
-    }, error = function(e) {
-      shiny::showNotification(paste("Error generating heatmap data:", e$message), type = "warning")
-      NULL # Return NULL on error
-    })
+    # Add check if data is available
+    data_vis <- unique_filtered_visual()
+    shiny::req(nrow(data_vis) > 0)
+    source_comparison <- compare_sources(data_vis, comp_type = input$comp_type)
+    plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
   })
   
   output$plotgraph1 <- plotly::renderPlotly({
-    # Check for data before attempting to plot
-    shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
-    # Plotting depends on plotHeat() which depends on unique_filtered_visual()
-    heatmap_plot <- plotHeat()
-    shiny::req(heatmap_plot) # Require the plot object itself to be non-NULL
-    heatmap_plot
+    if (nrow(rv$latest_unique) == 0) {
+      shinyalert::shinyalert("Data needed",
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
+      )
+      shiny::req(FALSE)
+    }
+    # Add check specific to filtered data for this plot
+    shiny::req(nrow(unique_filtered_visual()) > 0, cancelOutput = TRUE)
+    print(plotHeat())
   })
   
   output$downloadHeatPlot <- shiny::downloadHandler(
-    filename = function() { paste("heatmap", ".png", sep = "") },
+    filename = function() {
+      paste("heatmap", ".png", sep = "")
+    },
     content = function(file) {
-      # Ensure data for plotting exists
-      heatmap_plot_obj <- plotHeat()
-      shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0, heatmap_plot_obj)
-      if (inherits(heatmap_plot_obj, "ggplot")) {
-        ggplot2::ggsave(filename = file, plot = heatmap_plot_obj, device = "png", width = 8, height = 6)
-      } else if (inherits(heatmap_plot_obj, "plotly")) {
-        tryCatch({
-          plotly::save_image(heatmap_plot_obj, file, width = 800, height = 600)
-        }, error = function(e){
-          shiny::showNotification("Error saving plotly heatmap. Ensure 'kaleido' or 'orca' is installed.", type="error")
-        })
-      } else {
-        png(file, width = 800, height = 600)
-        print(heatmap_plot_obj)
-        dev.off()
-      }
+      # Add check specific to filtered data for this plot
+      shiny::req(nrow(unique_filtered_visual()) > 0)
+      # Use a non-interactive device like png
+      grDevices::png(file, width = 800, height = 600) # Adjust size as needed
+      # Ensure the plot is printed
+      print(plotHeat())
+      grDevices::dev.off()
     }
   )
   
-  # --- Upset Plot ---
+  # Upset plot (uses unique_filtered_visual)
   plotUpset <- shiny::reactive({
-    # Requires unique_filtered_visual() to run successfully
-    shiny::req(unique_filtered_visual())
-    # Use tryCatch for robustness
-    tryCatch({
-      source_comparison <- compare_sources(unique_filtered_visual(), comp_type = input$comp_type)
-      # Ensure plot_source_overlap_upset exists and is callable
-      if (exists("plot_source_overlap_upset") && is.function(plot_source_overlap_upset)) {
-        plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
-      } else {
-        warning("Function 'plot_source_overlap_upset' not found.")
-        NULL
-      }
-    }, error = function(e) {
-      shiny::showNotification(paste("Error generating upset plot data:", e$message), type = "warning")
-      NULL # Return NULL on error
-    })
+    # Add check if data is available
+    data_vis <- unique_filtered_visual()
+    shiny::req(nrow(data_vis) > 0)
+    source_comparison <- compare_sources(data_vis, comp_type = input$comp_type)
+    plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
   })
   
   output$plotgraph2 <- shiny::renderPlot({
-    # Check for data before attempting to plot
-    shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
-    # Plotting depends on plotUpset() which depends on unique_filtered_visual()
-    upset_plot <- plotUpset()
-    shiny::req(upset_plot) # Require the plot object itself to be non-NULL
-    print(upset_plot) # Upset plot usually needs print()
+    if (nrow(rv$latest_unique) == 0) {
+      shinyalert::shinyalert("Data needed",
+                             "Please import and deduplicate your citations first.",
+                             type = "error"
+      )
+      shiny::req(FALSE)
+    }
+    # Add check specific to filtered data for this plot
+    shiny::req(nrow(unique_filtered_visual()) > 0, cancelOutput = TRUE)
+    print(plotUpset())
   })
   
   output$downloadUpsetPlot <- shiny::downloadHandler(
-    filename = function() { paste("upset", ".png", sep = "") },
+    filename = function() {
+      paste("upset", ".png", sep = "")
+    },
     content = function(file) {
-      # Ensure data for plotting exists
-      upset_plot_obj <- plotUpset()
-      shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0, upset_plot_obj)
-      if (inherits(upset_plot_obj, "ggplot") || inherits(upset_plot_obj, "grob")) {
-        ggplot2::ggsave(filename = file, plot = upset_plot_obj, device = "png", width = 10, height = 6)
-      } else {
-        png(file, width = 1000, height = 600)
-        print(upset_plot_obj)
-        dev.off()
-      }
+      # Add check specific to filtered data for this plot
+      shiny::req(nrow(unique_filtered_visual()) > 0)
+      # Use png for static plot
+      grDevices::png(file, width = 800, height = 600) # Adjust size as needed
+      # plotUpset() returns a complex plot object (often ggplot/patchwork) that needs printing
+      print(plotUpset())
+      grDevices::dev.off()
     }
   )
   
-  
-  # --- Phase Analysis Plot Section ---
-  
-  # Observer to calculate n_unique based on rv$latest_unique
-  # Includes pre-processing step to fill missing sources for later phases
-  shiny::observe({
-    # Check if rv$latest_unique is valid before proceeding
-    if (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0) {
-      
-      # --- Pre-processing Step ---
-      tryCatch({
-        # Convert blank strings to NA for easier handling
-        data_to_process <- rv$latest_unique %>%
-          dplyr::mutate(dplyr::across(tidyselect::any_of(c("cite_source", "cite_label", "cite_string")),
-                                      ~ dplyr::na_if(trimws(as.character(.)), ""))) # Ensure character
-        
-        # Find the source(s) for each duplicate_id (handle multiple sources)
-        source_lookup <- data_to_process %>%
-          dplyr::filter(!is.na(cite_source)) %>%
-          dplyr::group_by(duplicate_id) %>%
-          # Paste unique non-NA sources
-          dplyr::summarise(source_to_fill = paste(unique(na.omit(cite_source)), collapse = ", "), .groups = "drop") %>%
-          dplyr::filter(source_to_fill != "") # Ensure we don't have blank results
-        
-        # Join the lookup table back and fill NA sources
-        processed_data <- dplyr::left_join(data_to_process, source_lookup, by = "duplicate_id") %>%
-          dplyr::mutate(
-            # Fill cite_source only if it's NA AND we found a source_to_fill
-            cite_source = ifelse(is.na(cite_source) & !is.na(source_to_fill), source_to_fill, cite_source)
-          ) %>%
-          dplyr::select(-source_to_fill) # Remove the temporary column
-        
-        # --- Call Original count_unique ---
-        # Now call the original count_unique function on the pre-processed data
-        # Ensure the original count_unique function is available
-        if (exists("count_unique") && is.function(count_unique)) {
-          # Use the ORIGINAL count_unique function
-          rv$n_unique <- count_unique(processed_data)
-        } else {
-          stop("Original 'count_unique' function not found.")
-        }
-        
-      }, error = function(e) {
-        shiny::showNotification(paste("Error during pre-processing or count_unique:", e$message), type = "error")
-        rv$n_unique <- NULL # Set to NULL on error
-      })
-    } else {
-      # If rv$latest_unique is not valid, set n_unique to NULL
-      rv$n_unique <- NULL
-    }
-  }) # Triggered whenever rv$latest_unique changes
-  
-  
-  # Render the Phase Analysis plot
-  output$phasePlot <- shiny::renderPlot({
-    # Require that rv$n_unique has been calculated and is valid
-    shiny::req(!is.null(rv$n_unique),
-               is.data.frame(rv$n_unique),
-               nrow(rv$n_unique) > 0)
-    
-    # --- Apply visualization filters to rv$n_unique ---
-    sources_filt <- input$sources_visual
-    # REMOVED _blank_ mapping for sources
-    strings_filt <- input$strings_visual
-    strings_filt <- if (!is.null(strings_filt) && "_blank_" %in% strings_filt) {
-      c(setdiff(strings_filt, "_blank_"), NA_character_, "")
-    } else { strings_filt }
-    labels_filt <- input$labels_visual
-    labels_filt <- if (!is.null(labels_filt) && "_blank_" %in% labels_filt) {
-      c(setdiff(labels_filt, "_blank_"), NA_character_, "")
-    } else { labels_filt }
-    
-    # Filter the calculated rv$n_unique data for plotting sequentially
-    # rv$n_unique should have separated rows from original count_unique
-    plot_data <- rv$n_unique
-    
-    # Apply source filter (Simple %in% should work now)
-    if (!is.null(sources_filt) && length(sources_filt) > 0 && "cite_source" %in% names(plot_data)) {
-      # Exclude _blank_ selection if present, as NAs should be filled
-      actual_sources_selected <- setdiff(sources_filt, "_blank_")
-      if(length(actual_sources_selected) > 0) {
-        # Filter rows where cite_source is exactly one of the selected sources
-        # (original count_unique separates rows)
-        plot_data <- plot_data %>% dplyr::filter(.data$cite_source %in% actual_sources_selected)
-      } else {
-        # If only _blank_ was selected (or sources_filt is empty after removing _blank_)
-        # show nothing, as pre-processing should have removed blanks/NAs
-        plot_data <- plot_data[0,]
-      }
-    }
-    # Apply string filter
-    if (!is.null(strings_filt) && length(strings_filt) > 0 && "cite_string" %in% names(plot_data)) {
-      # Use %in% which handles NA correctly if NA is in strings_filt
-      plot_data <- plot_data %>% dplyr::filter(.data$cite_string %in% strings_filt)
-    }
-    # Apply label filter
-    if (!is.null(labels_filt) && length(labels_filt) > 0 && "cite_label" %in% names(plot_data)) {
-      # Use %in% which handles NA correctly if NA is in labels_filt
-      plot_data <- plot_data %>% dplyr::filter(.data$cite_label %in% labels_filt)
-    }
-    
-    # Require that the filtered data still has rows
-    shiny::req(nrow(plot_data) > 0)
-    
-    # Generate the plot using the *filtered* data
-    # Use the ORIGINAL plot_contributions function (that counts ROWS)
-    # Ensure the original plot_contributions function is available
-    if (exists("plot_contributions") && is.function(plot_contributions)) {
-      plot_contributions(
-        data = plot_data,          # Use the filtered data for plotting
-        center = TRUE,
-        bar_order = c("search", "screened", "final"),
-        color_order = c("unique", "duplicated")
-        # Default facets = cite_source is used
-      )
-    } else {
-      warning("Original 'plot_contributions' function not found.")
-      NULL
-    }
+  # Phase Analysis plot (uses unique_separated_phase reactive)
+  # Keep rv$n_unique definition as is for potential use in table functions,
+  # but note it relies on the potentially problematic unique_filtered_visual().
+  # If table functions are updated or don't rely on this specific structure,
+  # this reactive could be revisited or removed.
+  rv$n_unique <- shiny::reactive({
+    # Original logic based on unique_filtered_visual and count_unique
+    # Ensure unique_filtered_visual() is not empty
+    ufv <- unique_filtered_visual()
+    shiny::req(nrow(ufv) > 0)
+    count_unique(ufv) # Pass the wide, summarized, filtered data
   })
   
-  # Download handler uses the same plotting logic (including filtering)
+  # Modified phase plot output
+  output$phasePlot <- shiny::renderPlot({
+    # Initial check if any data has been processed
+    if (nrow(rv$latest_unique) == 0) {
+      shinyalert::shinyalert("Data needed",
+                             "Please import and deduplicate your citations first.",
+                             type = "error")
+      shiny::req(FALSE, cancelOutput = TRUE)
+    }
+    
+    # Use the reactive data specifically prepared for this plot
+    plot_data <- unique_separated_phase()
+    
+    # Check if the prepared data is empty after filtering
+    if (nrow(plot_data) == 0) {
+      # Optionally, display a message instead of just cancelling
+      plot.new()
+      mtext("No data matches the selected filters for Phase Analysis.")
+      shiny::req(FALSE, cancelOutput = TRUE)
+    }
+    
+    # Call plot_contributions with the prepared data
+    CiteSource::plot_contributions( # Explicitly call from CiteSource if needed
+      data = plot_data, # Use the new reactive data
+      center = TRUE,
+      bar_order = c("search", "screened", "final"), # Keep or make dynamic?
+      color_order = c("unique", "duplicated")
+    )
+  })
+  
+  # Pphase plot download
   output$downloadPhasePlot <- shiny::downloadHandler(
     filename = function() {
       paste("phase_analysis", ".png", sep = "")
     },
     content = function(file) {
-      # Require that rv$n_unique has been calculated and is valid
-      shiny::req(!is.null(rv$n_unique),
-                 is.data.frame(rv$n_unique),
-                 nrow(rv$n_unique) > 0)
+      # Use the NEW reactive data
+      plot_data <- unique_separated_phase()
       
-      # --- Apply visualization filters to rv$n_unique ---
-      sources_filt <- input$sources_visual
-      # REMOVED _blank_ mapping for sources
-      strings_filt <- input$strings_visual
-      strings_filt <- if (!is.null(strings_filt) && "_blank_" %in% strings_filt) {
-        c(setdiff(strings_filt, "_blank_"), NA_character_, "")
-      } else { strings_filt }
-      labels_filt <- input$labels_visual
-      labels_filt <- if (!is.null(labels_filt) && "_blank_" %in% labels_filt) {
-        c(setdiff(labels_filt, "_blank_"), NA_character_, "")
-      } else { labels_filt }
-      
-      # Filter the calculated rv$n_unique data for plotting sequentially
-      plot_data <- rv$n_unique
-      
-      # Apply source filter
-      if (!is.null(sources_filt) && length(sources_filt) > 0 && "cite_source" %in% names(plot_data)) {
-        actual_sources_selected <- setdiff(sources_filt, "_blank_")
-        if(length(actual_sources_selected) > 0) {
-          plot_data <- plot_data %>% dplyr::filter(.data$cite_source %in% actual_sources_selected)
-        } else {
-          plot_data <- plot_data[0,]
-        }
-      }
-      # Apply string filter
-      if (!is.null(strings_filt) && length(strings_filt) > 0 && "cite_string" %in% names(plot_data)) {
-        plot_data <- plot_data %>% dplyr::filter(.data$cite_string %in% strings_filt)
-      }
-      # Apply label filter
-      if (!is.null(labels_filt) && length(labels_filt) > 0 && "cite_label" %in% names(plot_data)) {
-        plot_data <- plot_data %>% dplyr::filter(.data$cite_label %in% labels_filt)
+      # Add check if data is empty
+      if (nrow(plot_data) == 0) {
+        # Stop execution or create a plot with a message
+        stop("No data available to plot based on current filters.")
       }
       
-      # Require that the filtered data still has rows
-      shiny::req(nrow(plot_data) > 0)
-      
-      # Generate the plot again for saving, using filtered data
-      # Use the ORIGINAL plot_contributions function
-      if (exists("plot_contributions") && is.function(plot_contributions)) {
-        phase_plot <- plot_contributions(
-          data = plot_data, # Use filtered data
+      grDevices::png(file, width = 800, height = 600) # Adjust size
+      print(
+        CiteSource::plot_contributions( # Explicitly call from CiteSource if needed
+          data = plot_data, # Use the new reactive data
           center = TRUE,
           bar_order = c("search", "screened", "final"),
           color_order = c("unique", "duplicated")
-          # Default facets = cite_source is used
         )
-        # Save the plot to the file
-        ggplot2::ggsave(filename = file, plot = phase_plot, device = "png", width = 8, height = 6)
-      } else {
-        warning("Original 'plot_contributions' function not found. Cannot save plot.")
-        file.create(file) # Create an empty file as placeholder
-      }
+      )
+      grDevices::dev.off()
     }
   )
-  
   
   
   #### Table tab ####
