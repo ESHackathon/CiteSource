@@ -1017,16 +1017,22 @@ server <- function(input, output, session) {
   
   output$downloadHeatPlot <- shiny::downloadHandler(
     filename = function() {
-      paste("heatmap", ".png", sep = "")
+      paste("heatmap-overlap", Sys.Date(), ".png", sep = "") # Added date for uniqueness
     },
     content = function(file) {
-      # Add check specific to filtered data for this plot
+      # Ensure data is available
       shiny::req(nrow(unique_filtered_visual()) > 0)
-      # Use a non-interactive device like png
-      grDevices::png(file, width = 800, height = 600) # Adjust size as needed
-      # Ensure the plot is printed
-      print(plotHeat())
-      grDevices::dev.off()
+      
+      # Generate the plot object
+      heat_plot_obj <- plotHeat()
+      
+      # Check if plot object was created successfully
+      if (!is.null(heat_plot_obj)) {
+        # Save the ggplot object directly using ggsave
+        ggplot2::ggsave(filename = file, plot = heat_plot_obj, device = "png", width = 10, height = 8, dpi = 300) # Adjust size/dpi as needed
+      } else {
+        stop("Failed to generate heatmap plot for download.")
+      }
     }
   )
   
@@ -1054,16 +1060,27 @@ server <- function(input, output, session) {
   
   output$downloadUpsetPlot <- shiny::downloadHandler(
     filename = function() {
-      paste("upset", ".png", sep = "")
+      paste("upset-overlap", Sys.Date(), ".png", sep = "") # Added date
     },
     content = function(file) {
-      # Add check specific to filtered data for this plot
+      # Ensure data is available
       shiny::req(nrow(unique_filtered_visual()) > 0)
-      # Use png for static plot
-      grDevices::png(file, width = 800, height = 600) # Adjust size as needed
-      # plotUpset() returns a complex plot object (often ggplot/patchwork) that needs printing
-      print(plotUpset())
-      grDevices::dev.off()
+      
+      # Generate the plot object (we need it to print)
+      upset_plot_obj <- plotUpset() # plotUpset() returns the plot object
+      
+      # Check if plot object was created successfully
+      if (!is.null(upset_plot_obj)) {
+        # Use png device for static plot
+        grDevices::png(file, width = 1200, height = 800, res = 100) # Adjust size/resolution
+        # Print the plot object to the device
+        print(upset_plot_obj)
+        # The device is automatically closed by downloadHandler
+        grDevices::dev.off() # Explicitly close device for clarity/safety
+      } else {
+        stop("Failed to generate upset plot for download.")
+
+      }
     }
   )
   
@@ -1113,7 +1130,7 @@ server <- function(input, output, session) {
   # Phase plot download
   output$downloadPhasePlot <- shiny::downloadHandler(
     filename = function() {
-      paste("phase_analysis", ".png", sep = "")
+      paste("phase-analysis", Sys.Date(), ".png", sep = "") # Added date
     },
     content = function(file) {
       # Use the NEW reactive data
@@ -1125,16 +1142,22 @@ server <- function(input, output, session) {
         stop("No data available to plot based on current filters.")
       }
       
-      grDevices::png(file, width = 800, height = 600) # Adjust size
-      print(
-        CiteSource::plot_contributions( # Explicitly call from CiteSource if needed
-          data = plot_data, # Use the new reactive data
-          center = TRUE,
-          bar_order = c("search", "screened", "final"),
-          color_order = c("unique", "duplicated")
-        )
+      # Generate the plot object itself
+      phase_plot_obj <- CiteSource::plot_contributions( # Explicitly call from CiteSource if needed
+        data = plot_data, # Use the prepared reactive data
+        center = TRUE,
+        bar_order = c("search", "screened", "final"), # Make dynamic if needed
+        color_order = c("unique", "duplicated")
       )
-      grDevices::dev.off()
+      
+      # Check if plot object was created successfully
+      if (!is.null(phase_plot_obj)) {
+        grDevices::png(file, width = 1000, height = 700, res=100) # Adjust size/resolution
+        print(phase_plot_obj) # Print the generated plot object
+        grDevices::dev.off() # Explicitly close device
+      } else {
+        stop("Failed to generate phase plot for download.")
+      }
     }
   )
   
