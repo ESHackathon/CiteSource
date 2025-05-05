@@ -2,7 +2,7 @@ library(DT)
 library(CiteSource)
 library(dplyr)
 
-# Set background colour
+# Set background color
 shiny::tags$head(shiny::tags$style(
   shiny::HTML('
                      #sidebar {
@@ -767,12 +767,17 @@ server <- function(input, output, session) {
     rv$latest_unique <- after
     
   })
-  
-  
   observe({
+    all_cols <- names(rv$pairs_to_check)
+    base_cols <- unique(gsub("(1|2)$", "", all_cols)) # Remove "1" or "2" suffix
+    
+    # Initial selection
+    initial_base_selection <- c("year", "author", "title", "journal", "abstract",
+                                "doi", "pages", "source", "label")
+
     shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
-                                    choices = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)],
-                                    selected = names(rv$pairs_to_check)[c(1,2,4,5,7,8,10,11,13,14,16,17,19,20,22,23,26,27,28,29,31,32,33,34,35,36)])
+                                    choices = base_cols,
+                                    selected = initial_base_selection)
   })
   
   
@@ -800,16 +805,39 @@ server <- function(input, output, session) {
   manual_dedup_data <- reactive({
     
     data <- rv$pairs_to_check[,1:36]
-    data <- data[,c(paste0(input$manual_dedup_cols))]
+    selected_cols <- input$manual_dedup_cols
+
+    # Define the desired base order
+    core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string")
+    # Create the desired interleaved order of columns to select
     
+    desired_table_order <- character(0)
+    for (base_col in core_col_order) {
+      col1 <- paste0(base_col, "1")
+      col2 <- paste0(base_col, "2")
+      desired_table_order <- c(desired_table_order, col1, col2)
+    }
+
+    # Intersect with the actual and selected columns to maintain order and presence
+    cols_to_show <- intersect(desired_table_order, colnames(data))
+    cols_to_show <- intersect(cols_to_show, paste0(selected_cols, rep(c("1", "2"), each = length(selected_cols))))
+    
+    ordered_data <- data %>%
+      dplyr::select(any_of(cols_to_show))
+    
+    # Define match_cols INSIDE the reactive expression
     match_cols <- c("title", "author", "doi", "volume",
                     "pages", "number", "year", "abstract", "journal", "isbn")
     
     
-    data <- data %>% dplyr::select(-any_of(match_cols))
-    match_number_cols <- rv$pairs_to_check[,c(paste0(match_cols))]
+    # Add the match_number_cols at the end (if they exist)
     
-    data <- cbind(data,match_number_cols)
+    match_number_cols_to_add <- intersect(paste0(match_cols), colnames(data))
+    if (length(match_number_cols_to_add) > 0) {
+      ordered_data <- cbind(ordered_data, data[, match_number_cols_to_add])
+    }
+
+    ordered_data
     
   })
   output$manual_dedup_dt <- DT::renderDataTable({
@@ -828,7 +856,8 @@ server <- function(input, output, session) {
     
     datatable(data,
               options = list(
-                pageLength = 100, info = FALSE,
+                pageLength = 100, 
+                info = FALSE,
                 lengthMenu = list(c(100, -1), c("100", "All")),
                 columnDefs =
                   list(
