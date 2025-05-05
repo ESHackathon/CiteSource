@@ -585,8 +585,8 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
       dplyr::rowwise() %>%
       dplyr::mutate(
         reference = glue::glue("
-                              {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {nNA(title, '.')} {nNA(source, pre = '<i>', '</i>')}{nNA(volume, pre = '<i>, ', '</i>')}{nNA(issue, pre = '(', ')')}. {nNA(link, pre = '<a href = \"', '\">')}{nNA(link, '</a>')}
-                                                     ")
+                               {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {nNA(title, '.')} {nNA(source, pre = '<i>', '</i>')}{nNA(volume, pre = '<i>, ', '</i>')}{nNA(issue, pre = '(', ')')}. {nNA(link, pre = '<a href=\"', '\" target=\"_blank\" rel=\"noopener noreferrer\">')}{nNA(link, '</a>')}
+                                     ")
       ) %>%
       dplyr::pull(.data$reference)
   } else {
