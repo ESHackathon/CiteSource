@@ -900,6 +900,60 @@ server <- function(input, output, session) {
     labels <- input$labels_visual
     labels <- ifelse(labels == "_blank_", "unknown", labels)
     
+    # --- BEGIN DEBUGGING ---
+    if (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0) {
+      print("CiteSource App Debug: Inspecting rv$latest_unique before separate_rows in unique_filtered_table")
+      
+      count_elements <- function(text_vector) {
+        sapply(text_vector, function(x) {
+          # Robustly handle NA and empty strings before splitting
+          char_x <- as.character(x)
+          if (is.na(char_x) || char_x == "" || char_x == "NA") return(0) # Or 1 if an empty string should count as one segment
+          length(stringr::str_split(char_x, pattern = ", ")[[1]])
+        })
+      }
+      
+      temp_debug_df <- rv$latest_unique %>%
+        dplyr::mutate(
+          n_record_ids = count_elements(record_ids),
+          n_cite_label = count_elements(cite_label),
+          n_cite_source = count_elements(cite_source),
+          n_cite_string = count_elements(cite_string)
+        ) %>%
+        dplyr::select(
+          # Try to include an identifier column if available
+          dplyr::any_of(c("duplicate_id", "record_id", "title")), 
+          record_ids, n_record_ids, 
+          cite_label, n_cite_label, 
+          cite_source, n_cite_source, 
+          cite_string, n_cite_string
+        ) %>%
+        dplyr::filter(
+          (n_record_ids > 0 | n_cite_label > 0 | n_cite_source > 0 | n_cite_string > 0) &
+            !(n_record_ids == n_cite_label & 
+                n_record_ids == n_cite_source & 
+                n_record_ids == n_cite_string)
+        )
+      
+      if (nrow(temp_debug_df) > 0) {
+        print("CiteSource App Debug: Problematic rows found in rv$latest_unique (item counts differ across columns):")
+        # Print first few problematic rows. Use as.data.frame for robust logging.
+        print(as.data.frame(head(temp_debug_df, 20))) 
+      } else {
+        print("CiteSource App Debug: No rows found in rv$latest_unique with inconsistent item counts upon this inspection.")
+      }
+      
+      # Optional: Print a few raw rows to see what's going into separate_rows
+      # print("CiteSource App Debug: First 5 rows of rv$latest_unique feeding into separate_rows:")
+      # print(as.data.frame(head(rv$latest_unique %>% 
+      #       dplyr::select(dplyr::any_of(c("duplicate_id", "record_id", "title")), 
+      #                     record_ids, cite_label, cite_source, cite_string), 5)))
+      
+    } else {
+      print("CiteSource App Debug: rv$latest_unique is empty or not a dataframe when unique_filtered_table is triggered.")
+    }
+    # --- END DEBUGGING ---
+    
     out <- rv$latest_unique %>%
       # Filter rows where *any* of the required sources/labels/strings are present before summarizing
       dplyr::filter(
