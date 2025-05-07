@@ -25,32 +25,32 @@
 record_level_table <- function(citations, include = "sources", include_empty = TRUE, return = c("tibble", "DT"), indicator_presence = NULL, indicator_absence = NULL) {
   
   if (!is.data.frame(citations) || nrow(citations) == 0) stop("Citations must be a tibble and cannot have 0 entries")
-
+  
   if (is.null(indicator_absence)) {
     indicator_absence <- switch(return[1],
-      tibble = FALSE,
-      DT = "&#x2717;"
+                                tibble = FALSE,
+                                DT = "&#x2717;"
     )
   }
   if (is.null(indicator_presence)) {
     indicator_presence <- switch(return[1],
-      tibble = TRUE,
-      DT = "&#10004;"
+                                 tibble = TRUE,
+                                 DT = "&#10004;"
     )
   }
   
   sources <- compare_sources(citations, comp_type = include)
-
+  
   if (nrow(sources) == 0) {
     warning("Citations provided contain no information on ", include, ". NA will be displayed, but check whether you intended to do a different comparison")
-  sources <- tibble::tibble(duplicate_id = citations$duplicate_id)
-   sources[[paste0(stringr::str_sub(include, 1, -2), "__NA")]] <- TRUE
+    sources <- tibble::tibble(duplicate_id = citations$duplicate_id)
+    sources[[paste0(stringr::str_sub(include, 1, -2), "__NA")]] <- TRUE
   }
   
   if (!include_empty == TRUE) {
     citations <- citations %>% dplyr::filter(.data$duplicate_id %in% sources$duplicate_id)
   }
-
+  
   if (! "url" %in% colnames(citations)) {
     citations$url <- NA_character_
   }
@@ -65,17 +65,17 @@ record_level_table <- function(citations, include = "sources", include_empty = T
     dplyr::arrange(stringr::str_extract(.data$author, "^.*?,"), .data$citation) %>%
     dplyr::select("duplicate_id", "citation", "reference", "html_reference") %>%
     dplyr::left_join(sources, by = "duplicate_id")
-
+  
   indicator_presence <- as.character(indicator_presence)
   indicator_absence <- as.character(indicator_absence)
-
+  
   to_display <- citations %>%
     dplyr::select(-(1:4)) %>%
     dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(.x, indicator_presence, indicator_absence))) %>%
     dplyr::rename_with(~ paste0(.x, " ")) # Add space to keep column names unique
-
+  
   citations <- dplyr::bind_cols(citations, to_display)
-
+  
   if (return[1] == "DT") {
     if (!rlang::is_installed("DT")) {
       warning('DT can only be returned when the DT package is installed. Please run install.packages("DT")')
@@ -88,7 +88,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
           stringr::str_remove(glue::glue("^{type}__"))
         list(type = type %>% stringr::str_to_title(), values = values)
       }) %>% purrr::transpose()
-
+      
       sketch <- htmltools::tags$table(
         class = "display",
         htmltools::tags$thead(
@@ -105,32 +105,33 @@ record_level_table <- function(citations, include = "sources", include_empty = T
           htmltools::tags$td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
         )
       )
-
-      # Data for DT: selected columns from citations, with an added details control column
+      
       citations %>%
-        dplyr::select(-"duplicate_id", -"reference") %>% # Keeps "citation", "html_reference", and the renamed source indicator columns
-        cbind(" " = "&oplus;", .)%>%
-
-      DT::datatable(
-        escape = FALSE,
-        extensions = "Buttons",
-        options = list(
-          dom = "Blfrtip", # Added 'l' for length changing input. Common placement: Buttons, length, filter, processing, table, info, pagination.
-          pageLength = 10,   # Sets the initial number of rows displayed.
-          lengthMenu = list(c(10, 25, 50, 100, -1), c('10', '25', '50', '100', 'All')), # Choices for "Show X entries" dropdown. -1 means "All".
+        dplyr::select(-"duplicate_id", -"reference") %>%
+        cbind(" " = "&oplus;", .) %>%
+        DT::datatable(
+          escape = FALSE,
+          extensions = "Buttons",
+          options = list(
+            pageLength = 10,
+            lengthMenu = list(c(10, 25, 50, 100, -1), c('10', '25', '50', '100', 'All')),
             columnDefs = list(
               list(visible = FALSE, targets = c(0, 3:(3 + ncol(to_display)))),
               list(orderable = FALSE, className = "details-control", targets = 1)
             ),
+            dom = "lBfrtip",
             buttons =
               list("print", list(
                 extend = "csv", filename = "CiteSource_record_summary",
                 text = "Download csv",
-                # Adjust exportOptions columns based on the actual structure of citations data and what you want to export
-                exportOptions = list(columns = c(1, 2, 4:(3 + (ncol(citations) - 3))))
+                exportOptions = list(
+                  columns = c(0, 2:(3 + ncol(to_display))),
+                  modifier = list(page = "all")
+                )
+                
               ))
           ), container = sketch,
-        callback = DT::JS("
+          callback = DT::JS("
               table.column(1).nodes().to$().css({cursor: 'pointer'});
               var format = function(d) {
                 return '<div style=\"background-color:#eee; padding: .5em;\">' +
@@ -150,8 +151,8 @@ record_level_table <- function(citations, include = "sources", include_empty = T
     }
   } else {
     citations %>%
-      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") %>% # Selects duplicate_id, citation, reference, and space-suffixed columns
-      dplyr::rename_with(stringr::str_trim) # Remove trailing spaces from column names
+      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") %>%
+      dplyr::rename_with(stringr::str_trim)
   }
 }
 
