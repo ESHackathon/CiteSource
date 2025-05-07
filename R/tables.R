@@ -106,47 +106,56 @@ record_level_table <- function(citations, include = "sources", include_empty = T
         )
       )
 
-      citations %>%
-        dplyr::select(-"duplicate_id", -"reference") %>%
-        cbind(" " = "&oplus;", .) %>%
-        DT::datatable(
-          escape = FALSE,
-          extensions = "Buttons",
-          options = list(
+      # Data for DT: selected columns from citations, with an added details control column
+      data_for_dt <- citations %>%
+        dplyr::select(-"duplicate_id", -"reference") %>% # Keeps "citation", "html_reference", and the renamed source indicator columns
+        cbind(" " = "&oplus;", .) # Adds a column named " " at the beginning for details control
+
+      DT::datatable(
+        data_for_dt, # Use the prepared data
+        escape = FALSE,
+        extensions = "Buttons",
+        options = list(
+          dom = "Blfrtip", # Added 'l' for length changing input. Common placement: Buttons, length, filter, processing, table, info, pagination.
+          pageLength = 10,   # Sets the initial number of rows displayed.
+          lengthMenu = list(c(10, 25, 50, 100, -1), c('10', '25', '50', '100', 'All')), # Choices for "Show X entries" dropdown. -1 means "All".
             columnDefs = list(
               list(visible = FALSE, targets = c(0, 3:(3 + ncol(to_display)))),
               list(orderable = FALSE, className = "details-control", targets = 1)
             ),
-            dom = "Bfrtip",
             buttons =
               list("print", list(
                 extend = "csv", filename = "CiteSource_record_summary",
                 text = "Download csv",
-                exportOptions = list(columns = c(0, 2:(3 + ncol(to_display))))
+                # Adjust exportOptions columns based on the actual structure of data_for_dt and what you want to export
+                exportOptions = list(columns = c(1, 2, 4:(3 + (ncol(data_for_dt) - 3))))
               ))
           ), container = sketch,
-          callback = DT::JS("
-              table.column(1).nodes().to$().css({cursor: 'pointer'});
-              var format = function(d) {
-                return '<div style=\"background-color:#eee; padding: .5em;\">' +
-                        d[3];
-              };
-              table.on('click', 'td.details-control', function() {
-                var td = $(this), row = table.row(td.closest('tr'));
-                if (row.child.isShown()) {
-                  row.child.hide();
-                  td.html('&oplus;');
-                } else {
-                  row.child(format(row.data())).show();
-                  td.html('&CircleMinus;');
-                }
-              });")
+        callback = DT::JS(paste0("
+          table.column(0).nodes().to$().css({cursor: 'pointer'}); // Assumes column 0 is the details-control
+          var format = function(d) {
+            // 'd' is the data array for the row. d[2] should be 'html_reference'
+            // (0-indexed: col 0 is ' ', col 1 is 'citation', col 2 is 'html_reference').
+            return '<div style=\"background-color:#eee; padding: .5em;\">' +
+                   d[2] + // This should be html_reference
+                   '</div>';
+          };
+          table.on('click', 'td.details-control', function() {
+            var td = $(this), row = table.row(td.closest('tr'));
+            if (row.child.isShown()) {
+              row.child.hide();
+              td.html('&oplus;');
+            } else {
+              row.child(format(row.data())).show();
+              td.html('&CircleMinus;'); // Unicode for circled minus
+            }
+          });"))
         )
     }
   } else {
     citations %>%
-      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") %>%
-      dplyr::rename_with(stringr::str_trim)
+      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") %>% # Selects duplicate_id, citation, reference, and space-suffixed columns
+      dplyr::rename_with(stringr::str_trim) # Remove trailing spaces from column names
   }
 }
 
