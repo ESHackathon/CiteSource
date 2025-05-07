@@ -1381,105 +1381,117 @@ server <- function(input, output, session) {
     strings_filt <- input$strings_tables
     strings_filt <- ifelse(strings_filt == "_blank_", "unknown", strings_filt)
     
-    # Create filter patterns for labels and strings (can still pre-filter these)
-    labels_pattern <- if (length(labels_filt) > 0) paste0("\\b(", paste(labels_filt, collapse = "|"), ")\\b") else NULL
-    strings_pattern <- if (length(strings_filt) > 0) paste0("\\b(", paste(strings_filt, collapse = "|"), ")\\b") else NULL
+    # Create filter patterns (ensure robust handling of empty/NA filter values)
+    labels_filt_cleaned <- labels_filt[!is.na(labels_filt) & labels_filt != ""]
+    labels_pattern <- if (length(labels_filt_cleaned) > 0) paste0("\\b(", paste(labels_filt_cleaned, collapse = "|"), ")\\b") else NULL
+    
+    strings_filt_cleaned <- strings_filt[!is.na(strings_filt) & strings_filt != ""]
+    strings_pattern <- if (length(strings_filt_cleaned) > 0) paste0("\\b(", paste(strings_filt_cleaned, collapse = "|"), ")\\b") else NULL
     
     # Apply initial filters for labels and strings only
     df_filtered_wide <- rv$latest_unique %>%
       dplyr::filter(
-        (is.null(labels_pattern) | stringr::str_detect(cite_label, labels_pattern)),
-        (is.null(strings_pattern) | stringr::str_detect(cite_string, strings_pattern))
+        (is.null(labels_pattern) | stringr::str_detect(as.character(cite_label), labels_pattern)),
+        (is.null(strings_pattern) | stringr::str_detect(as.character(cite_string), strings_pattern))
       )
     
-    # Define the structure for returning an empty result
-    empty_result_df <- tibble::tibble(
+    empty_result_df <- tibble::tibble( # Define structure for empty returns
       Source = character(), `Records Imported` = integer(), `Distinct Records` = integer(),
       `Unique Records` = integer(), `Non-unique Records` = integer(),
       `Source Contribution %` = character(), `Source Unique Contribution %` = character(),
       `Source Unique %` = character() )
     
-    # Return empty structure if no records match initial filters
     if (nrow(df_filtered_wide) == 0) { return(empty_result_df) }
     
-    # Separate only the cite_source column for source-level aggregation
+    # Separate cite_source column
     df_long_source <- df_filtered_wide %>%
-      dplyr::select(duplicate_id, cite_source) %>%
+      dplyr::select(duplicate_id, cite_source, cite_label, cite_string) %>% 
       tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
-      dplyr::filter(!is.na(cite_source) & cite_source != "") # Filter out blank sources
+      dplyr::mutate(cite_source = trimws(cite_source)) %>%
+      dplyr::filter(!is.na(cite_source) & cite_source != "")
     
-    # *** Apply the source filter AFTER separating sources ***
+    # Apply source filter
+    sources_filt_cleaned <- sources_filt[!is.na(sources_filt) & sources_filt != ""]
     df_long_source_filtered <- df_long_source %>%
-      dplyr::filter(length(sources_filt) == 0 | cite_source %in% sources_filt)
+      dplyr::filter(length(sources_filt_cleaned) == 0 | cite_source %in% sources_filt_cleaned)
     
-    # Return empty if no valid sources remain after filtering
     if (nrow(df_long_source_filtered) == 0) { return(empty_result_df) }
     
-    # --- All subsequent calculations use df_long_source_filtered ---
-    
     # Calculate 'Records Imported' and 'Distinct Records' per source
-    source_base_counts <- df_long_source_filtered %>% # Use filtered data
+    source_base_counts <- df_long_source_filtered %>%
       dplyr::group_by(cite_source) %>%
-      dplyr::summarise(`Records Imported` = dplyr::n(), `Distinct Records` = dplyr::n_distinct(duplicate_id), .groups = 'drop')
+      dplyr::summarise(
+        `Records Imported` = dplyr::n(),
+        `Distinct Records` = dplyr::n_distinct(duplicate_id), # 'Distinct Records' for this source
+        .groups = 'drop'
+      )
     
-    # Calculate how many sources each distinct record appears in (within the filtered set)
-    # Use the df_long_source_filtered data here too
+    if (nrow(source_base_counts) == 0) { return(empty_result_df) } # Ensure source_base_counts has rows for sum below
+    
+    # Calculate 'Unique Records' per source
     record_source_counts <- df_long_source_filtered %>%
       dplyr::group_by(duplicate_id) %>%
-      dplyr::summarise(n_sources = dplyr::n_distinct(cite_source), .groups = 'drop')
+      dplyr::summarise(n_sources_for_id = dplyr::n_distinct(cite_source), .groups = 'drop')
     
-    # Identify records unique to one source within the filtered set
-    # Use the df_long_source_filtered data here too
-    unique_record_sources <- df_long_source_filtered %>%
+    unique_record_sources <- df_long_source_filtered %>% # Records found in only one of the *currently filtered* sources
       dplyr::inner_join(record_source_counts, by = "duplicate_id") %>%
-      dplyr::filter(n_sources == 1) %>%
-      dplyr::distinct(duplicate_id, cite_source) # Get the source for unique records
+      dplyr::filter(n_sources_for_id == 1) %>%
+      dplyr::distinct(duplicate_id, cite_source) # Get the source for these unique records
     
-    # Count the number of unique records per source
     source_unique_counts <- unique_record_sources %>%
       dplyr::group_by(cite_source) %>%
-      dplyr::summarise(`Unique Records` = dplyr::n(), .groups = 'drop')
+      dplyr::summarise(`Unique Records` = dplyr::n_distinct(duplicate_id), .groups = 'drop')
     
-    # Combine base counts with unique counts
+    # Combine counts
     detailed_counts_per_source <- source_base_counts %>%
       dplyr::left_join(source_unique_counts, by = "cite_source") %>%
-      dplyr::mutate(`Unique Records` = tidyr::replace_na(`Unique Records`, 0)) %>%
-      dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique Records`)
+      dplyr::mutate(
+        `Unique Records` = tidyr::replace_na(`Unique Records`, 0),
+        `Non-unique Records` = `Distinct Records` - `Unique Records`
+      )
     
-    # Calculate totals consistently from the *filtered* data
-    total_records_imported <- sum(detailed_counts_per_source$`Records Imported`, na.rm = TRUE)
-    total_distinct_records <- dplyr::n_distinct(df_long_source_filtered$duplicate_id) # Use filtered data
-    total_unique_records <- sum(detailed_counts_per_source$`Unique Records`, na.rm = TRUE)
-    total_nonunique_records <- sum(detailed_counts_per_source$`Non-unique Records`, na.rm = TRUE)
+    # Denominator for 'Source Contribution %' should be the sum of 'Distinct Records' from each source.
+    denominator_source_contribution <- sum(detailed_counts_per_source$`Distinct Records`, na.rm = TRUE)
+    denominator_source_contribution_safe <- ifelse(denominator_source_contribution == 0, 1, denominator_source_contribution)
     
-    # Prepare for percentage calculation (avoid division by zero)
-    total_distinct_divisor <- ifelse(total_distinct_records == 0, 1, total_distinct_records) 
-    total_unique_divisor <- ifelse(total_unique_records == 0, 1, total_unique_records)
+    # Denominator for 'Source Unique Contribution %' (total unique records overall from *these filtered sources*)
+    total_overall_unique_records = dplyr::n_distinct(unique_record_sources$duplicate_id) # Count unique IDs from records that are unique to some source
+    denominator_source_unique_contribution_safe <- ifelse(total_overall_unique_records == 0, 1, total_overall_unique_records)
     
-    # Calculate and format percentages
+    
+    # Calculate percentages
     detailed_counts_final <- detailed_counts_per_source %>%
       dplyr::mutate(
-        perc_contr = `Distinct Records` / total_distinct_divisor, #incorrect percent testing 5/7 TR
-        perc_unique_contr = `Unique Records` / total_unique_divisor,
-        perc_source_unique = ifelse(`Distinct Records` == 0, 0, `Unique Records` / `Distinct Records`) ) %>%
+        perc_contr = `Distinct Records` / denominator_source_contribution_safe, # MODIFIED DENOMINATOR
+        perc_unique_contr = `Unique Records` / denominator_source_unique_contribution_safe,
+        perc_source_unique = ifelse(`Distinct Records` == 0, 0, `Unique Records` / `Distinct Records`)
+      ) %>%
       dplyr::mutate(
-        `Source Contribution %` = scales::percent(perc_contr, accuracy = 0.1), #incorrect percent testing 5/7 TR
+        `Source Contribution %` = scales::percent(perc_contr, accuracy = 0.1),
         `Source Unique Contribution %` = scales::percent(perc_unique_contr, accuracy = 0.1),
-        `Source Unique %` = scales::percent(perc_source_unique, accuracy = 0.1) ) %>%
-      dplyr::select( # Select and order final columns
+        `Source Unique %` = scales::percent(perc_source_unique, accuracy = 0.1)
+      ) %>%
+      dplyr::select( 
         cite_source, `Records Imported`, `Distinct Records`, `Unique Records`,
         `Non-unique Records`, `Source Contribution %`,
-        `Source Unique Contribution %`, `Source Unique %` )
+        `Source Unique Contribution %`, `Source Unique %`
+      )
     
-    # Create the total row
+    # --- TOTAL ROW ---
+    # 'Total Distinct Records' in the total row should be the overall number of unique duplicate_ids found.
+    overall_total_distinct_records <- dplyr::n_distinct(df_long_source_filtered$duplicate_id)
+    
     total_row <- tibble::tibble(
-      cite_source = "Total", `Records Imported` = total_records_imported,
-      `Distinct Records` = total_distinct_records, `Unique Records` = total_unique_records,
-      `Non-unique Records` = total_nonunique_records, `Source Contribution %` = NA_character_,
-      `Source Unique Contribution %` = NA_character_,
-      `Source Unique %` = scales::percent(total_unique_records / total_distinct_divisor, accuracy = 0.1) )
+      cite_source = "Total",
+      `Records Imported` = sum(detailed_counts_final$`Records Imported`, na.rm = TRUE),
+      `Distinct Records` = overall_total_distinct_records, # Overall unique items
+      `Unique Records` = sum(detailed_counts_final$`Unique Records`, na.rm = TRUE), 
+      `Non-unique Records` = sum(detailed_counts_final$`Non-unique Records`, na.rm = TRUE),
+      `Source Contribution %` = scales::percent(1.0, accuracy = 0.1), # Sum of these per-source % should now be 100%
+      `Source Unique Contribution %` = if(total_overall_unique_records > 0) scales::percent(1.0, accuracy = 0.1) else scales::percent(0.0, accuracy = 0.1), # Sum of these should be 100% if any uniques
+      `Source Unique %` = scales::percent(sum(detailed_counts_final$`Unique Records`, na.rm = TRUE) / ifelse(overall_total_distinct_records == 0, 1, overall_total_distinct_records), accuracy = 0.1)
+    )
     
-    # Add total row and rename source column
     detailed_counts_final <- dplyr::bind_rows(detailed_counts_final, total_row) %>%
       dplyr::rename(Source = cite_source)
     
