@@ -774,7 +774,7 @@ server <- function(input, output, session) {
     # Initial selection
     initial_base_selection <- c("year", "author", "title", "journal", "abstract",
                                 "doi", "pages", "source", "label")
-
+    
     shinyWidgets::updatePickerInput(session = session, "manual_dedup_cols",
                                     choices = base_cols,
                                     selected = initial_base_selection)
@@ -806,7 +806,7 @@ server <- function(input, output, session) {
     
     data <- rv$pairs_to_check[,1:36]
     selected_cols <- input$manual_dedup_cols
-
+    
     # Define the desired base order
     core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string")
     # Create the desired interleaved order of columns to select
@@ -817,7 +817,7 @@ server <- function(input, output, session) {
       col2 <- paste0(base_col, "2")
       desired_table_order <- c(desired_table_order, col1, col2)
     }
-
+    
     # Intersect with the actual and selected columns to maintain order and presence
     cols_to_show <- intersect(desired_table_order, colnames(data))
     cols_to_show <- intersect(cols_to_show, paste0(selected_cols, rep(c("1", "2"), each = length(selected_cols))))
@@ -836,7 +836,7 @@ server <- function(input, output, session) {
     if (length(match_number_cols_to_add) > 0) {
       ordered_data <- cbind(ordered_data, data[, match_number_cols_to_add])
     }
-
+    
     ordered_data
     
   })
@@ -890,52 +890,130 @@ server <- function(input, output, session) {
   
   # Reactive expression to filter the data for visualization (used for Heatmap and Upset)
   unique_filtered_visual <- shiny::reactive({
-    # Ensure latest_unique has data before attempting filtering
-    shiny::req(nrow(rv$latest_unique) > 0)
+    shiny::req(rv$latest_unique, is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
     
-    sources <- input$sources_visual
-    sources <- ifelse(sources == "_blank_", "unknown", sources)
-    strings <- input$strings_visual
-    strings <- ifelse(strings == "_blank_", "unknown", strings)
-    labels <- input$labels_visual
-    labels <- ifelse(labels == "_blank_", "unknown", labels)
+    data_in <- rv$latest_unique
     
-    out <- rv$latest_unique %>%
-      # Filter rows where *any* of the required sources/labels/strings are present before summarizing
-      dplyr::filter(
-        (length(sources) == 0 | stringr::str_detect(cite_source, paste0("\\b(", paste(sources, collapse="|"), ")\\b"))) &
-          (length(strings) == 0 | stringr::str_detect(cite_string, paste0("\\b(", paste(strings, collapse="|"), ")\\b"))) &
-          (length(labels) == 0 | stringr::str_detect(cite_label, paste0("\\b(", paste(labels, collapse="|"), ")\\b")))
-      ) %>%
-      # Now group and summarize
-      dplyr::group_by(duplicate_id) %>%
-      {
-        df_grouped <- .
-        df_separated <- df_grouped %>%
-          tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
-          dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
-          dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
-          dplyr::filter(length(labels) == 0 | cite_label %in% labels)
-        
-        # Check if df_separated is empty for this group before summarizing
-        if(nrow(df_separated) == 0) {
-          # Return a row with the group id and NAs or empty strings if nothing matches filters
-          tibble::tibble(duplicate_id = dplyr::first(df_grouped$duplicate_id),
-                         record_ids = "", cite_label = "", cite_source = "", cite_string = "")
-        } else {
-          df_separated %>%
-            dplyr::summarise(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(unique(na.omit(.)), collapse = ', '))))
-        }
-      } %>%
-      dplyr::ungroup()
+    sources_selected_in_input <- input$sources_visual
+    sources_selected_in_input <- sources_selected_in_input[!is.na(sources_selected_in_input) & sources_selected_in_input != ""]
     
-    # Ensure the output has the same columns even if empty
-    if (nrow(out) == 0) {
-      out <- tibble::tibble(duplicate_id=character(), record_ids=character(), cite_label=character(), cite_source=character(), cite_string=character()) # Adjust columns as needed
+    labels_selected_in_input <- input$labels_visual
+    labels_selected_in_input <- labels_selected_in_input[!is.na(labels_selected_in_input) & labels_selected_in_input != ""]
+    
+    strings_selected_in_input <- input$strings_visual
+    strings_selected_in_input <- strings_selected_in_input[!is.na(strings_selected_in_input) & strings_selected_in_input != ""]
+    
+    # Step 1: Filter rows to ensure they contain at least one selected item from ANY category
+    # This pre-filters, but the main goal is to correctly process the strings in Step 2
+    data_candidate_rows <- data_in
+    
+    # Apply row-level filtering if selections are made.
+    # If a category (e.g. sources) has selections, row must match one of them.
+    # If a category has NO selections, that category doesn't restrict rows.
+    if (length(sources_selected_in_input) > 0) {
+      pattern <- paste0("\\b(", paste(sources_selected_in_input, collapse = "|"), ")\\b")
+      if ("cite_source" %in% names(data_candidate_rows) && is.character(data_candidate_rows$cite_source)) {
+        data_candidate_rows <- data_candidate_rows %>%
+          dplyr::filter(stringr::str_detect(as.character(cite_source), pattern))
+      } else { data_candidate_rows <- data_candidate_rows %>% dplyr::slice(0) } # No relevant column, empty
     }
-    # Add back other columns from rv$latest_unique if needed by downstream functions
-    dplyr::left_join(out, dplyr::select(rv$latest_unique, -any_of(c("record_ids", "cite_label", "cite_source", "cite_string"))), by = "duplicate_id")
+    # Only proceed if rows remain
+    if(nrow(data_candidate_rows) == 0) return(rv$latest_unique %>% dplyr::slice(0))
     
+    
+    if (length(labels_selected_in_input) > 0) {
+      pattern <- paste0("\\b(", paste(labels_selected_in_input, collapse = "|"), ")\\b")
+      if ("cite_label" %in% names(data_candidate_rows) && is.character(data_candidate_rows$cite_label)) {
+        data_candidate_rows <- data_candidate_rows %>%
+          dplyr::filter(stringr::str_detect(as.character(cite_label), pattern))
+      } else { data_candidate_rows <- data_candidate_rows %>% dplyr::slice(0) }
+    }
+    if(nrow(data_candidate_rows) == 0) return(rv$latest_unique %>% dplyr::slice(0))
+    
+    
+    if (length(strings_selected_in_input) > 0) {
+      pattern <- paste0("\\b(", paste(strings_selected_in_input, collapse = "|"), ")\\b")
+      if ("cite_string" %in% names(data_candidate_rows) && is.character(data_candidate_rows$cite_string)) {
+        data_candidate_rows <- data_candidate_rows %>%
+          dplyr::filter(stringr::str_detect(as.character(cite_string), pattern))
+      } else { data_candidate_rows <- data_candidate_rows %>% dplyr::slice(0) }
+    }
+    if(nrow(data_candidate_rows) == 0) return(rv$latest_unique %>% dplyr::slice(0))
+    
+    
+    # Step 2: Mutate the columns to only contain selected items
+    data_processed_cols <- data_candidate_rows %>%
+      dplyr::mutate(
+        cite_source = if ("cite_source" %in% names(.)) {
+          sapply(as.character(cite_source), function(cs_val) {
+            if (is.na(cs_val) || cs_val == "") return("") 
+            items <- stringr::str_split(cs_val, ",\\s*")[[1]]
+            items <- items[!is.na(items) & items != ""]
+            
+            items_to_keep <- if (length(sources_selected_in_input) > 0) {
+              items[items %in% sources_selected_in_input]
+            } else { # If no specific sources were selected by user, keep all original (valid) items for this row
+              items 
+            }
+            paste(unique(items_to_keep), collapse = ", ") # Ensure unique items are pasted
+          }, USE.NAMES = FALSE)
+        } else { NA_character_ },
+        
+        cite_label = if ("cite_label" %in% names(.)) {
+          sapply(as.character(cite_label), function(cl_val) {
+            if (is.na(cl_val) || cl_val == "") return("")
+            items <- stringr::str_split(cl_val, ",\\s*")[[1]]
+            items <- items[!is.na(items) & items != ""]
+            items_to_keep <- if (length(labels_selected_in_input) > 0) {
+              items[items %in% labels_selected_in_input]
+            } else {
+              items
+            }
+            paste(unique(items_to_keep), collapse = ", ")
+          }, USE.NAMES = FALSE)
+        } else { NA_character_ },
+        
+        cite_string = if ("cite_string" %in% names(.)) {
+          sapply(as.character(cite_string), function(cstr_val) {
+            if (is.na(cstr_val) || cstr_val == "") return("")
+            items <- stringr::str_split(cstr_val, ",\\s*")[[1]]
+            items <- items[!is.na(items) & items != ""]
+            items_to_keep <- if (length(strings_selected_in_input) > 0) {
+              items[items %in% strings_selected_in_input]
+            } else {
+              items
+            }
+            paste(unique(items_to_keep), collapse = ", ")
+          }, USE.NAMES = FALSE)
+        } else { NA_character_ }
+      )
+    
+    # Step 3: Filter out rows where the column relevant to comp_type became empty
+    # This ensures that if comp_type is "sources", only rows with non-empty cite_source are passed.
+    data_final <- data_processed_cols
+    current_comp_type <- input$comp_type # Get the comparison type
+    
+    if (current_comp_type == "sources") {
+      if ("cite_source" %in% names(data_final)) {
+        data_final <- data_final %>% dplyr::filter(!is.na(cite_source) & cite_source != "")
+      } else { # If cite_source column doesn't exist, return empty
+        return(rv$latest_unique %>% dplyr::slice(0))
+      }
+    } else if (current_comp_type == "labels") {
+      if ("cite_label" %in% names(data_final)) {
+        data_final <- data_final %>% dplyr::filter(!is.na(cite_label) & cite_label != "")
+      } else {
+        return(rv$latest_unique %>% dplyr::slice(0))
+      }
+    } else if (current_comp_type == "strings") {
+      if ("cite_string" %in% names(data_final)) {
+        data_final <- data_final %>% dplyr::filter(!is.na(cite_string) & cite_string != "")
+      } else {
+        return(rv$latest_unique %>% dplyr::slice(0))
+      }
+    }
+    
+    return(data_final)
   })
   
   # REACTIVE for Phase Plot Data
@@ -1170,30 +1248,140 @@ server <- function(input, output, session) {
   #### Table tab ####
   
   # Event reactive for filtering the data used in the record table and summary table
+  # In your server function, replace the current unique_filtered_table eventReactive
+  
   unique_filtered_table <- shiny::eventReactive(
-    c(input$generateRecordTable, input$generateSummaryTable, 
+    c(input$generateRecordTable,
       input$sources_tables, input$strings_tables, input$labels_tables,
-      input$generateInitialRecordTable, input$generateDetailedRecordTable, 
+      input$generateInitialRecordTable, input$generateDetailedRecordTable,
       input$generatePrecisionTable),
     {
-      sources <- input$sources_tables 
-      sources <- ifelse(sources == "_blank_", "unknown", sources)
-      strings <- input$strings_tables
-      strings <- ifelse(strings == "_blank_", "unknown", strings)
-      labels <- input$labels_tables
-      labels <- ifelse(labels == "_blank_", "unknown", labels)
+      shiny::req(rv$latest_unique, is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
       
-      rv$latest_unique %>%
-        dplyr::group_by(duplicate_id) %>%
-        tidyr::separate_rows(c(record_ids, cite_label, cite_source, cite_string), sep=", ") %>%
-        dplyr::filter(length(sources) == 0 | cite_source %in% sources) %>%
-        dplyr::filter(length(strings) == 0 | cite_string %in% strings) %>%
-        dplyr::filter(length(labels) == 0 | cite_label %in% labels) %>%
-        dplyr::mutate(across(c(record_ids, cite_label, cite_source, cite_string), ~ trimws(paste(na.omit(.), collapse = ', ')))) %>%
-        unique() %>%
-        dplyr::ungroup()
-    }
-  )
+      data_in <- rv$latest_unique
+      
+      # Get current selections from table filters
+      sources_sel_tbl <- input$sources_tables
+      sources_sel_tbl <- sources_sel_tbl[!is.na(sources_sel_tbl) & sources_sel_tbl != ""] # Clean selections
+      
+      labels_sel_tbl <- input$labels_tables
+      labels_sel_tbl <- labels_sel_tbl[!is.na(labels_sel_tbl) & labels_sel_tbl != ""]
+      
+      strings_sel_tbl <- input$strings_tables
+      strings_sel_tbl <- strings_sel_tbl[!is.na(strings_sel_tbl) & strings_sel_tbl != ""]
+      
+      # Step 1: Filter rows based on selections.
+      # A row must match selections in each category that HAS selections.
+      data_candidate_rows <- data_in
+      
+      if (length(sources_sel_tbl) > 0) { # Only filter by source if sources are selected in the input
+        pattern <- paste0("\\b(", paste(sources_sel_tbl, collapse = "|"), ")\\b")
+        if ("cite_source" %in% names(data_candidate_rows) && is.character(data_candidate_rows$cite_source)) {
+          data_candidate_rows <- data_candidate_rows %>%
+            dplyr::filter(stringr::str_detect(as.character(cite_source), pattern))
+        } else { # If cite_source column is missing, no rows can match this criteria
+          data_candidate_rows <- data_candidate_rows %>% dplyr::slice(0) 
+        }
+      }
+      # If no rows remain after source filtering (and sources were selected), return empty
+      if(nrow(data_candidate_rows) == 0 && length(sources_sel_tbl) > 0) return(rv$latest_unique %>% dplyr::slice(0))
+      
+      
+      if (length(labels_sel_tbl) > 0) { # Only filter by label if labels are selected
+        pattern <- paste0("\\b(", paste(labels_sel_tbl, collapse = "|"), ")\\b")
+        if ("cite_label" %in% names(data_candidate_rows) && is.character(data_candidate_rows$cite_label)) {
+          data_candidate_rows <- data_candidate_rows %>%
+            dplyr::filter(stringr::str_detect(as.character(cite_label), pattern))
+        } else {
+          data_candidate_rows <- data_candidate_rows %>% dplyr::slice(0)
+        }
+      }
+      if(nrow(data_candidate_rows) == 0 && length(labels_sel_tbl) > 0) return(rv$latest_unique %>% dplyr::slice(0))
+      
+      
+      if (length(strings_sel_tbl) > 0) { # Only filter by string if strings are selected
+        pattern <- paste0("\\b(", paste(strings_sel_tbl, collapse = "|"), ")\\b")
+        if ("cite_string" %in% names(data_candidate_rows) && is.character(data_candidate_rows$cite_string)) {
+          data_candidate_rows <- data_candidate_rows %>%
+            dplyr::filter(stringr::str_detect(as.character(cite_string), pattern))
+        } else {
+          data_candidate_rows <- data_candidate_rows %>% dplyr::slice(0)
+        }
+      }
+      # If, after all row filtering, no candidates remain, return an empty frame
+      if(nrow(data_candidate_rows) == 0) return(rv$latest_unique %>% dplyr::slice(0))
+      
+      
+      # Step 2: For the remaining rows, mutate their cite_source, cite_label, cite_string
+      # to only contain the items that were actually selected in the input filters.
+      data_processed_cols <- data_candidate_rows %>%
+        dplyr::mutate(
+          cite_source = if ("cite_source" %in% names(.)) {
+            sapply(as.character(cite_source), function(cs_val) {
+              if (is.na(cs_val) || cs_val == "") return("") 
+              items <- stringr::str_split(cs_val, ",\\s*")[[1]]
+              items <- items[!is.na(items) & items != ""] # Clean items
+              
+              # If user selected specific sources for tables, filter by that selection
+              # Otherwise (if input$sources_tables was empty), keep all original items for this record
+              items_to_keep <- if (length(sources_sel_tbl) > 0) {
+                items[items %in% sources_sel_tbl]
+              } else {
+                items 
+              }
+              paste(unique(items_to_keep), collapse = ", ") # Ensure unique items are pasted
+            }, USE.NAMES = FALSE) # Prevent sapply from naming the vector
+          } else { NA_character_ }, # Column didn't exist
+          
+          cite_label = if ("cite_label" %in% names(.)) {
+            sapply(as.character(cite_label), function(cl_val) {
+              if (is.na(cl_val) || cl_val == "") return("")
+              items <- stringr::str_split(cl_val, ",\\s*")[[1]]
+              items <- items[!is.na(items) & items != ""]
+              items_to_keep <- if (length(labels_sel_tbl) > 0) {
+                items[items %in% labels_sel_tbl]
+              } else {
+                items
+              }
+              paste(unique(items_to_keep), collapse = ", ")
+            }, USE.NAMES = FALSE)
+          } else { NA_character_ },
+          
+          cite_string = if ("cite_string" %in% names(.)) {
+            sapply(as.character(cite_string), function(cstr_val) {
+              if (is.na(cstr_val) || cstr_val == "") return("")
+              items <- stringr::str_split(cstr_val, ",\\s*")[[1]]
+              items <- items[!is.na(items) & items != ""]
+              items_to_keep <- if (length(strings_sel_tbl) > 0) {
+                items[items %in% strings_sel_tbl]
+              } else {
+                items
+              }
+              paste(unique(items_to_keep), collapse = ", ")
+            }, USE.NAMES = FALSE)
+          } else { NA_character_ }
+        ) # End mutate
+      
+      # Step 3: Filter out rows that might have become "empty" in all key identifier fields
+      # (cite_source, cite_label, cite_string) after the transformation.
+      # This prevents passing rows that are no longer meaningful based on these common categorizations.
+      data_final <- data_processed_cols %>%
+        dplyr::filter(
+          !( (is.na(cite_source) | cite_source == "") &
+               (is.na(cite_label)  | cite_label  == "") &
+               (is.na(cite_string) | cite_string == "") )
+        )
+      
+      # If, after all processing, the dataframe is empty, return an empty version
+      # of the original structure to avoid downstream errors with missing columns.
+      if(nrow(data_final) == 0) {
+        return(rv$latest_unique %>% dplyr::slice(0))
+      }
+      
+      return(data_final)
+    } # End eventReactive logic
+  ) # End unique_filtered_table
+  
   detailed_table_data <- reactive({
     # Require base data to proceed
     shiny::req(is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
