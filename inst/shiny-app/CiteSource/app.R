@@ -273,20 +273,6 @@ ui <- shiny::navbarPage("CiteSource",
                             
                             shiny::mainPanel(
                               shiny::tabsetPanel(
-                                
-                                shiny::tabPanel(
-                                  "Initial Records Table",
-                                  shiny::div("View the initial record counts and deduplication results."),
-                                  shinyWidgets::actionBttn(
-                                    "generateInitialRecordTable", "Generate Initial Records Table",
-                                    style = "jelly",
-                                    icon = shiny::icon("table"),
-                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-                                  shiny::br(),
-                                  shiny::br(),
-                                  gt::gt_output("initialRecordTab")
-                                ),
-                                
                                 shiny::tabPanel(
                                   "Detailed Record Table",
                                   shiny::div("Summary of unique and non-unique records by source."),
@@ -1249,12 +1235,12 @@ server <- function(input, output, session) {
   #### Table tab ####
   
   # Event reactive for filtering the data used in the record table and summary table
-  # In your server function, replace the current unique_filtered_table eventReactive
-  
   unique_filtered_table <- shiny::eventReactive(
     c(input$generateRecordTable,
-      input$sources_tables, input$strings_tables, input$labels_tables,
-      input$generateInitialRecordTable, input$generateDetailedRecordTable,
+      input$sources_tables, 
+      input$strings_tables, 
+      input$labels_tables,
+      input$generateDetailedRecordTable,
       input$generatePrecisionTable),
     {
       shiny::req(rv$latest_unique, is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
@@ -1499,22 +1485,7 @@ server <- function(input, output, session) {
     
     return(detailed_counts_final)
   })
-  
-  # Rendering the initial record table
-  output$initialRecordTab <- gt::render_gt({
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-                             "Please import and deduplicate your citations first.",
-                             type = "error"
-      )
-      shiny::req(FALSE)
-    }
-    
-    unique_citations <- unique_filtered_table()
-    initial_records <- calculate_initial_records(unique_citations, "search") #incorrect percent testing 5/7 TR should be the same as detailed record table total records imported
-    create_initial_record_table(initial_records)
-  }) %>% shiny::bindEvent(input$generateInitialRecordTable)
-  
+ 
   # Rendering the detailed record table
   output$detailedRecordTab <- gt::render_gt({
     # Check if base data is loaded
@@ -1570,7 +1541,6 @@ server <- function(input, output, session) {
   
   #### Export tab ####
   
-  # # Downloadable bibtex ----
   # Downloadable bibtex ----
   output$downloadCsv <- shiny::downloadHandler(
     filename = function() {
