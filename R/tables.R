@@ -107,12 +107,11 @@ record_level_table <- function(citations, include = "sources", include_empty = T
       )
 
       # Data for DT: selected columns from citations, with an added details control column
-      data_for_dt <- citations %>%
+      citations %>%
         dplyr::select(-"duplicate_id", -"reference") %>% # Keeps "citation", "html_reference", and the renamed source indicator columns
-        cbind(" " = "&oplus;", .) # Adds a column named " " at the beginning for details control
+        cbind(" " = "&oplus;", .)%>%
 
       DT::datatable(
-        data_for_dt, # Use the prepared data
         escape = FALSE,
         extensions = "Buttons",
         options = list(
@@ -127,29 +126,26 @@ record_level_table <- function(citations, include = "sources", include_empty = T
               list("print", list(
                 extend = "csv", filename = "CiteSource_record_summary",
                 text = "Download csv",
-                # Adjust exportOptions columns based on the actual structure of data_for_dt and what you want to export
-                exportOptions = list(columns = c(1, 2, 4:(3 + (ncol(data_for_dt) - 3))))
+                # Adjust exportOptions columns based on the actual structure of citations data and what you want to export
+                exportOptions = list(columns = c(1, 2, 4:(3 + (ncol(citations) - 3))))
               ))
           ), container = sketch,
-        callback = DT::JS(paste0("
-          table.column(0).nodes().to$().css({cursor: 'pointer'}); // Assumes column 0 is the details-control
-          var format = function(d) {
-            // 'd' is the data array for the row. d[2] should be 'html_reference'
-            // (0-indexed: col 0 is ' ', col 1 is 'citation', col 2 is 'html_reference').
-            return '<div style=\"background-color:#eee; padding: .5em;\">' +
-                   d[2] + // This should be html_reference
-                   '</div>';
-          };
-          table.on('click', 'td.details-control', function() {
-            var td = $(this), row = table.row(td.closest('tr'));
-            if (row.child.isShown()) {
-              row.child.hide();
-              td.html('&oplus;');
-            } else {
-              row.child(format(row.data())).show();
-              td.html('&CircleMinus;'); // Unicode for circled minus
-            }
-          });"))
+        callback = DT::JS("
+              table.column(1).nodes().to$().css({cursor: 'pointer'});
+              var format = function(d) {
+                return '<div style=\"background-color:#eee; padding: .5em;\">' +
+                        d[3];
+              };
+              table.on('click', 'td.details-control', function() {
+                var td = $(this), row = table.row(td.closest('tr'));
+                if (row.child.isShown()) {
+                  row.child.hide();
+                  td.html('&oplus;');
+                } else {
+                  row.child(format(row.data())).show();
+                  td.html('&CircleMinus;');
+                }
+              });")
         )
     }
   } else {
