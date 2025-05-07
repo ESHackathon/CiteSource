@@ -18,7 +18,7 @@ columns2hide <- c("title", "author", "doi", "volume",
                   "pages", "number", "year", "abstract", "journal", "isbn")
 
 
-# Define UI for data upload app ----
+# ---- Define UI ----
 ui <- shiny::navbarPage("CiteSource",
                         id = "tabs",
                         header = shiny::tagList(
@@ -51,7 +51,7 @@ ui <- shiny::navbarPage("CiteSource",
                           input_bg = "#E0E0E0",  # Set the background color for input boxes
                           input_border_color = "#23395B"  # Set the border color for input boxes
                         ),
-                        # Home tab
+                        # Home tab ----
                         shiny::tabPanel(
                           "Home",
                           shiny::navlistPanel(
@@ -77,7 +77,7 @@ ui <- shiny::navbarPage("CiteSource",
                           shiny::fluidRow(
                             shiny::column(
                               12,
-                              # Sidebar layout with input and output definitions ----
+                              # Sidebar layout ----
                               shiny::sidebarLayout(
                                 shiny::sidebarPanel( # Input: Select a file ----
                                                      shiny::h5("Step 1: Upload your citation files"),
@@ -127,7 +127,6 @@ ui <- shiny::navbarPage("CiteSource",
                               shiny::textOutput("Manual_pretext"),
                               shiny::br(),
                               
-                              
                               # Button
                               shinyWidgets::actionBttn(
                                 inputId = "nomanualdedup",
@@ -146,7 +145,7 @@ ui <- shiny::navbarPage("CiteSource",
                               ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
                               
                               shinyWidgets::dropdown(
-                                
+
                                 tags$h3("Select columns to display"),
                                 
                                 shinyWidgets::pickerInput(
@@ -175,7 +174,7 @@ ui <- shiny::navbarPage("CiteSource",
                         shiny::tabPanel(
                           "Visualise",
                           
-                          # Sidebar layout with input and output definitions ----
+                          # Sidebar layout ----
                           shiny::sidebarLayout(
                             
                             # Sidebar panel for inputs ----
@@ -189,7 +188,8 @@ ui <- shiny::navbarPage("CiteSource",
                                 inline = TRUE,
                                 choices = c(
                                   "sources",
-                                  "labels", "strings"
+                                  "labels", 
+                                  "strings"
                                 ),
                                 status = "primary"
                               ),
@@ -331,7 +331,7 @@ ui <- shiny::navbarPage("CiteSource",
                                     
                                     # Performance Note
                                     shiny::tags$p(
-                                      style = "margin-bottom: 12px;", # Add space below this paragraph
+                                      style = "margin-bottom: 12px;",
                                       shiny::tags$strong(" Performance Note:"),
                                       " The record table may take a long time to generate if you include more than a few hundred references. Consider filtering your data first using the sidebar selectors before generating."
                                     ),
@@ -364,7 +364,7 @@ ui <- shiny::navbarPage("CiteSource",
                                       " Type into the search box located at the top-right of the table to dynamically filter records based on any information displayed."
                                     ),
                                     
-                                    # Instruction 5: Download (No bottom margin needed on the last item)
+                                    # Instruction 5: Download
                                     shiny::tags$p(
                                       shiny::tags$strong(" Download Data:"),
                                       " Click the 'Download CSV' button (located above the table, next to 'Print') to save the data currently shown in the table (including applied filters) as a CSV file."
@@ -415,13 +415,14 @@ server <- function(input, output, session) {
       # upload files one-by-one
       path_list <- input$file$datapath
       suggested_source <- stringr::str_replace_all(input$file$name, "\\.(ris|bib|txt)$", "")
+      suggested_label <- rep("search", length(input$file$datapath))
       empty_strings <- rep("", length(input$file$datapath))
       
       # Read the uploaded citations
       upload_df <- CiteSource::read_citations(
         files = path_list,
         cite_sources = suggested_source,
-        cite_labels = empty_strings,
+        cite_labels = suggested_label,
         cite_strings = empty_strings,
         only_key_fields = FALSE
         
@@ -437,7 +438,7 @@ server <- function(input, output, session) {
       df <- data.frame(
         "file" = input$file,
         "suggested_source" = suggested_source,
-        "label" = empty_strings,
+        "label" = suggested_label,
         "string" = empty_strings
       )
       
@@ -1466,17 +1467,17 @@ server <- function(input, output, session) {
     total_nonunique_records <- sum(detailed_counts_per_source$`Non-unique Records`, na.rm = TRUE)
     
     # Prepare for percentage calculation (avoid division by zero)
-    total_distinct_divisor <- ifelse(total_distinct_records == 0, 1, total_distinct_records)
+    total_distinct_divisor <- ifelse(total_distinct_records == 0, 1, total_distinct_records) 
     total_unique_divisor <- ifelse(total_unique_records == 0, 1, total_unique_records)
     
     # Calculate and format percentages
     detailed_counts_final <- detailed_counts_per_source %>%
       dplyr::mutate(
-        perc_contr = `Distinct Records` / total_distinct_divisor,
+        perc_contr = `Distinct Records` / total_distinct_divisor, #incorrect percent testing 5/7 TR
         perc_unique_contr = `Unique Records` / total_unique_divisor,
         perc_source_unique = ifelse(`Distinct Records` == 0, 0, `Unique Records` / `Distinct Records`) ) %>%
       dplyr::mutate(
-        `Source Contribution %` = scales::percent(perc_contr, accuracy = 0.1),
+        `Source Contribution %` = scales::percent(perc_contr, accuracy = 0.1), #incorrect percent testing 5/7 TR
         `Source Unique Contribution %` = scales::percent(perc_unique_contr, accuracy = 0.1),
         `Source Unique %` = scales::percent(perc_source_unique, accuracy = 0.1) ) %>%
       dplyr::select( # Select and order final columns
@@ -1510,7 +1511,7 @@ server <- function(input, output, session) {
     }
     
     unique_citations <- unique_filtered_table()
-    initial_records <- calculate_initial_records(unique_citations, "search")
+    initial_records <- calculate_initial_records(unique_citations, "search") #incorrect percent testing 5/7 TR should be the same as detailed record table total records imported
     create_initial_record_table(initial_records)
   }) %>% shiny::bindEvent(input$generateInitialRecordTable)
   
@@ -1533,7 +1534,7 @@ server <- function(input, output, session) {
     # Bind to the same button trigger
   }) %>% shiny::bindEvent(input$generateDetailedRecordTable)
   
-  # Rendering the precision and sensitivity table
+  # Rendering the precision and sensitivity table ----
   output$summaryPrecTab <- gt::render_gt({
     
     unique_citations <- unique_filtered_table()
@@ -1549,7 +1550,7 @@ server <- function(input, output, session) {
   }) %>% shiny::bindEvent(input$generatePrecisionTable)
   
   
-  # Rendering the record-level table
+  # Rendering the record-level table ----
   output$reviewTab <- DT::renderDataTable({
     
     if (nrow(rv$latest_unique) == 0) {
