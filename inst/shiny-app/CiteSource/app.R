@@ -24,17 +24,17 @@ ui <- shiny::navbarPage("CiteSource",
                         header = shiny::tagList(
                           shinybusy::add_busy_spinner(spin = "circle"),
                           shinyjs::useShinyjs(),
-                          #header text color
                           tags$head(
+                            tags$link(rel = "icon", type = "image/png", href = "www/favicon.png"),  # Add favicon
                             tags$style(HTML("
-      h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
-        margin-top: 0;
-        margin-bottom: .5rem;
-        font-weight: 500;
-        line-height: 1.2;
-        color: #23395B;
-      }
-    "))
+                              h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+                                margin-top: 0;
+                                margin-bottom: .5rem;
+                                font-weight: 500;
+                                line-height: 1.2;
+                                color: #23395B;
+                              }
+                            "))
                           )
                         ),
                         theme = bslib::bs_theme(
