@@ -95,8 +95,9 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
   unique_citations$source = unique_citations$cite_source
   unique_citations$label = unique_citations$cite_label
   
-  dedup_results <- ASySD::dedup_citations_add_manual(unique_citations, additional_pairs = additional_pairs
-                                                     )
+  dedup_results <- ASySD::dedup_citations_add_manual(unique_citations, 
+                                                     additional_pairs = additional_pairs, 
+                                                     extra_merge_fields = "cite_string")
 
   dedup_results$cite_source <- dedup_results$source
   dedup_results$cite_label <- dedup_results$label

@@ -1,6 +1,6 @@
 Package: CiteSource
 Title: Analyze the Utility of Information Sources and Retrieval Methodologies for Evidence Synthesis
-Version: 0.0.1
+Version: 0.1.1
 Date: 2023-06-22
 Authors@R: c(
     person("Trevor", "Riley", , "trevor.riley@noaa.gov", role = c("aut", "cre"),

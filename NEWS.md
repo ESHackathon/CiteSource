@@ -8,3 +8,10 @@
 
 - Integrated new dedup function into R shiny app
 
+# CiteSource 0.1.1
+
+- Added new functions which allow creation of tables and plots based on deduplicated (reimported) data. 
+
+- Updated shiny functionality, look and feel, and documentation
+
+- Added new vignettes 

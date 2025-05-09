@@ -22,7 +22,7 @@ CiteSource was created under [the General Public License (>=v3)](https://www.gnu
 
 **Shiny Web Application**
 
-Whether you know R or not, we want you to be able to use CiteSource! Check out our [CiteSource Shiny App!](https://litrev.shinyapps.io/CiteSource_latest/) 
+Whether you know R or not, we want you to be able to use CiteSource! Check out our [CiteSource Shiny App!](https://litrev.shinyapps.io/CiteSource/) 
 
 ## Features
 **Customizable Metadata Tags**
