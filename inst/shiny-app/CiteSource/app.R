@@ -411,7 +411,7 @@ server <- function(input, output, session) {
         cite_labels = suggested_label,
         cite_strings = empty_strings,
         only_key_fields = FALSE
-        
+
       )
       
       # Summarize the number of records by citation source
