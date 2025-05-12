@@ -2,20 +2,7 @@ library(DT)
 library(CiteSource)
 library(dplyr)
 
-app_environment <- Sys.getenv("APP_ENV")
-# Determine which Google Analytics file to include based on the environment
-ga_include_file <- NULL
-if (app_environment == "production") {
-  ga_include_file <- "google_analytics_main.html"
-} else if (app_environment == "development") {
-  ga_include_file <- "google_analytics_dev.html"
-}
-
 shiny::tags$head(
-  # Include the appropriate Google Analytics file if determined
-  if (!is.null(ga_include_file) && file.exists(ga_include_file)) {
-    includeHTML(ga_include_file)
-  },
   # style
   shiny::tags$style(shiny::HTML('
                      #sidebar {
@@ -396,12 +383,78 @@ ui <- shiny::navbarPage("CiteSource",
 
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
+  
+  # --- Reactive Values ---
+  # Used to store data that changes during the session
   rv <- shiny::reactiveValues()
   rv$df <- data.frame()
   rv$upload_df <- data.frame()#for original uploads
   rv$latest_unique <- data.frame()#for reimported data
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
+  
+  # --- Google Analytics Integration ---
+  # Flag to ensure GA script is inserted only once per session
+  ga_script_inserted <- reactiveVal(FALSE)
+  
+  # Use observeEvent on session$clientData which becomes available early
+  observeEvent(session$clientData, {
+    # Only proceed if the script hasn't been inserted yet for this session
+    if (!ga_script_inserted()) {
+      # Get the application's path from the URL (e.g., /CiteSource_latest/)
+      app_path <- session$clientData$url_pathname
+      ga_include_file <- NULL # Variable to hold the GA HTML filename
+      
+      # --- Determine GA HTML filename based on the application path ---
+      # Check if the path ends with '_latest' or '_latest/' (case-insensitive)
+      if (grepl("_latest/?$", app_path, ignore.case = TRUE)) {
+        # Development version
+        message("GA: Detected DEV environment based on URL path: ", app_path) # Logging
+        # *** SET the DEV Google Analytics HTML filename ***
+        ga_include_file <- "google_analytics_dev.html" # file is in same directory as app.R
+        
+      }
+      # Check if the path corresponds to the production app name (e.g., /CiteSource/ or /CiteSource)
+      # Adjust '/CiteSource/?$' if your production app name is different
+      else if (grepl("/CiteSource/?$", app_path, ignore.case = TRUE)) {
+        # Production version
+        message("GA: Detected PROD environment based on URL path: ", app_path) # Logging
+        # *** SET the PROD Google Analytics HTML filename ***
+        ga_include_file <- "google_analytics_main.html" # file is in same directory as app.R
+        
+      } else {
+        # Path didn't match known patterns
+        message("GA: Could not determine environment from URL path: ", app_path) # Logging
+      }
+      
+      # --- Insert the GA HTML file content if a filename was determined and file exists ---
+      if (!is.null(ga_include_file) && nzchar(ga_include_file)) {
+        # Check if the determined file actually exists in the app directory
+        if (file.exists(ga_include_file)) {
+          # Insert the content of the HTML file into the document's <head>
+          insertUI(
+            selector = "head",     # Target the <head> tag
+            where = "beforeEnd", # Add the script at the end of the head's content
+            # Use includeHTML to read and insert the file content
+            ui = includeHTML(ga_include_file),
+            immediate = TRUE      # Attempt to insert as soon as possible
+          )
+          # Set the flag to TRUE to prevent this code running again for this session
+          ga_script_inserted(TRUE)
+          message("GA: Inserted script from file: ", ga_include_file) # Logging
+        } else {
+          # Log an error if the file is missing
+          message("GA Error: HTML file not found: ", ga_include_file)
+          # Optionally set the flag anyway to prevent repeated checks for missing file
+          ga_script_inserted(TRUE)
+        }
+      } else {
+        # If no file was determined (e.g., path didn't match), set flag to prevent re-check
+        ga_script_inserted(TRUE)
+      }
+    }
+  }, ignoreNULL = TRUE, once = FALSE) # Trigger when clientData is available, but flag prevents re-run
+  # --- End Google Analytics Integration ---
   
   #### Upload files tab section ------
   # upload on click
