@@ -56,7 +56,7 @@ jobs:
             rsconnect::deployApp(
               appName = 'CiteSource_latest', 
               appDir = './inst/shiny-app/CiteSource',
-              envVars = c(APP_ENV = "development"),
+              envVars = c(APP_ENV = 'development'),
               forceUpdate = TRUE)"   
 
       - name: Deploy stable version from main
@@ -70,7 +70,7 @@ jobs:
             rsconnect::deployApp(
               appName = 'CiteSource', 
               appDir = './inst/shiny-app/CiteSource',
-              envVars = c(APP_ENV = "production"),
+              envVars = c(APP_ENV = 'production'),
               forceUpdate = TRUE)"   
 
       - name: Create pkgdown
