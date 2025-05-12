@@ -3,8 +3,9 @@ library(CiteSource)
 library(dplyr)
 
 # Set background color
-shiny::tags$head(shiny::tags$style(
-  shiny::HTML('
+shiny::tags$head(
+  includeHTML("google-analytics.html"),
+  shiny::tags$style(shiny::HTML('
                      #sidebar {
                         background-color: #ffffff;
                     }
