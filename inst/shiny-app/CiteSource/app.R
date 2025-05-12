@@ -2,9 +2,21 @@ library(DT)
 library(CiteSource)
 library(dplyr)
 
-# Set background color
+app_environment <- Sys.getenv("APP_ENV")
+# Determine which Google Analytics file to include based on the environment
+ga_include_file <- NULL
+if (app_environment == "production") {
+  ga_include_file <- "google_analytics_main.html"
+} else if (app_environment == "development") {
+  ga_include_file <- "google_analytics_dev.html"
+}
+
 shiny::tags$head(
-  includeHTML("google-analytics.html"),
+  # Include the appropriate Google Analytics file if determined
+  if (!is.null(ga_include_file) && file.exists(ga_include_file)) {
+    includeHTML(ga_include_file)
+  },
+  # style
   shiny::tags$style(shiny::HTML('
                      #sidebar {
                         background-color: #ffffff;
