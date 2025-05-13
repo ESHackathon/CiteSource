@@ -53,7 +53,10 @@ jobs:
           R -e "
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
-            rsconnect::deployApp(appName = 'CiteSource_latest', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
+            rsconnect::deployApp(
+              appName = 'CiteSource_latest',
+              appDir = './inst/shiny-app/CiteSource',
+              forceUpdate = TRUE)"   
 
       - name: Deploy stable version from main
         if: github.ref == 'refs/heads/main'
@@ -63,7 +66,10 @@ jobs:
           R -e "
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
-            rsconnect::deployApp(appName = 'CiteSource', appDir = './inst/shiny-app/CiteSource', forceUpdate = TRUE)"   
+            rsconnect::deployApp(
+              appName = 'CiteSource',
+              appDir = './inst/shiny-app/CiteSource',
+              forceUpdate = TRUE)"   
 
       - name: Create pkgdown
         env:

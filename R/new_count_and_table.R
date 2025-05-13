@@ -315,15 +315,19 @@ calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
   total_distinct_records <- dplyr::n_distinct(unique_citations$duplicate_id)
   
   # Split the cite_label column and count any occurrence of "screened" and "final"
+  # Updated for edge cases where a citation is duplicated within the screened set
   total_screened <- unique_citations %>%
     tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
     dplyr::filter(cite_label == "screened") %>%
-    nrow()
+    # Count the number of distinct duplicate_ids that remain
+    dplyr::n_distinct(duplicate_id)
   
+  # Updated for edge cases where a citation is duplicated within the screened set (should never happen)
   total_final <- unique_citations %>%
     tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
     dplyr::filter(cite_label == "final") %>%
-    nrow()
+    # Count the number of distinct duplicate_ids that remain
+    dplyr::n_distinct(duplicate_id)
   
   # Step 2: Proceed with the regular calculation for distinct records by source
   distinct_count <- unique_citations %>%

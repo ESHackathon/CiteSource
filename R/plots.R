@@ -260,7 +260,7 @@ cite_source <- cite_label <- type <- NULL
 #'
 plot_contributions <- function(data, facets = cite_source, bars = cite_label, color = type, 
                                center = FALSE, bar_order = "keep", facet_order = "keep", 
-                               color_order = "keep", totals_in_legend = TRUE) {
+                               color_order = "keep", totals_in_legend = FALSE) {
   
   bars <- rlang::enquo(bars)
   color <- rlang::enquo(color)
