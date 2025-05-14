@@ -8,7 +8,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
-## About the Pacakge
+## About the Package
 
 CiteSource was developed to provide researchers the ability to examine the utility and efficacy of literature resources and search methodologies. The idea behind CiteSource is simply allowing users to deduplicate citation records, while maintaining customizable metadata about the citation.
 
