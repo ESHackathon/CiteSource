@@ -1,4 +1,4 @@
-options(shiny.maxRequestSize = 100*1024^2) #set limit to 100MB
+options(shiny.maxRequestSize = 500*1024^2) #set limit to 100MB
 
 library(DT)
 library(CiteSource)
