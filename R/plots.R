@@ -101,21 +101,21 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
         ggplot2::theme(
           aspect.ratio = 1, legend.position = "none",
           strip.background = ggplot2::element_rect(
-            color = "black", fill = "darkgrey"
+            color = "black", fill = "#3A3A3A"
           )
-        ) + ggplot2::scale_fill_gradient(low = "white")
+        ) + ggplot2::scale_fill_gradient(low = "white",  high = "#23395B")
       # Removed legends here because they do not appear in correct order - maybe worth fixing in the future
       facets <- unique(data$facet)
 
       for (i in seq_along(facets)) {
         p <- p + ggnewscale::new_scale_fill() + ggplot2::geom_tile(ggplot2::aes(fill = .data$records), data = data %>% dplyr::filter(.data$facet == facets[i])) +
 
-          ggplot2::scale_fill_gradient(low = "white")
+          ggplot2::scale_fill_gradient(low = "white",  high = "#008080")
       }
     } else {
       p <- p +
         ggplot2::geom_tile() +
-        ggplot2::scale_fill_gradient(low = "white")
+        ggplot2::scale_fill_gradient(low = "white", high = "#008080")
     }
 
     p +
@@ -153,7 +153,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       dplyr::mutate(dplyr::across(dplyr::starts_with("DB"), ~ stringr::str_remove(.x, paste0(cells, "__")))) %>%
       ggplot2::ggplot(ggplot2::aes(.data$DB1, .data$DB2, fill = .data$shares)) +
       ggplot2::geom_tile(height = .9) +
-      ggplot2::scale_fill_gradient(low = "white", labels = scales::percent, limits = c(0, 1)) +
+      ggplot2::scale_fill_gradient(low = "white", high = "#008080", labels = scales::percent, limits = c(0, 1)) +
       ggplot2::geom_text(ggplot2::aes(label = fmt_pct(.data$shares), fill = NULL)) +
       ggplot2::labs(
         x = "", y = "", fill = "Overlap",
@@ -162,18 +162,12 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       ) +
       ggplot2::scale_x_discrete(limits = rev(sources_order), guide = ggplot2::guide_axis(angle = 45)) +
       ggplot2::scale_y_discrete(limits = sources_order) +
-      ggplot2::theme_light()
 
 
 
     if (length(unique(data$facet)) > 1) {
-      p <- p + ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1) +
-        ggplot2::theme(
-          aspect.ratio = 1,
-          strip.background = ggplot2::element_rect(
-            color = "black", fill = "darkgrey"
-          )
-        )
+      p <- p + ggplot2::facet_wrap(ggplot2::vars(.data$facet), ncol = 1)
+        
     }
     p
   }
@@ -219,11 +213,14 @@ plot_source_overlap_upset <- function(data, groups = "source", nsets = NULL, set
   }
 
   if (nsets > 5) message("Plotting a large number of groups. Consider reducing nset or sub-setting the data.")
-
+  
   data %>%
     data.frame() %>%
     dplyr::transmute(dplyr::across(tidyselect::vars_select_helpers$where(is.logical), as.numeric)) %>%
-    UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
+    UpSetR::upset(nsets = nsets, order.by = order.by, 
+                  sets.x.label = sets.x.label,
+                  text.scale = 1.8,
+                  mainbar.y.label = mainbar.y.label, ...) 
 }
 
 # Hack to suppress check warning re default values below
@@ -292,7 +289,8 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       ggplot2::geom_bar() +
       ggplot2::labs(y = "Citations")
 
-    if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
+    if (!rlang::quo_is_null(facets)) p <- p +  ggplot2::facet_wrap(ggplot2::vars(!!facets), nrow = 1, strip.position = "top")
+    
   } else {
     vals <- levels(data %>% dplyr::select(!!color) %>% dplyr::pull() %>% forcats::as_factor())
 
@@ -303,20 +301,37 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
       dplyr::summarise(n = dplyr::n())
 
     data_sum$labelpos <- ifelse(data_sum$type == vals[1],
-      pmax(.5 * data_sum$n, 1 + .05 * max(abs(data_sum$n))), pmin(-.5 * data_sum$n, -1 - .05 * max(abs(data_sum$n)))
+      pmax(.5 * data_sum$n, 1 + .08 * max(abs(data_sum$n))), pmin(-.5 * data_sum$n, -1 - .08 * max(abs(data_sum$n)))
     ) # add label positions for geom_text
 
+    base_size <- 12
+    base_theme <- ggplot2::theme_minimal(base_size = base_size) +
+      ggplot2::theme(
+        strip.text = ggplot2::element_text(size = 12),
+        strip.position = "top",
+        legend.position = "bottom",
+        legend.title = ggplot2::element_text(),
+        panel.spacing = ggplot2::unit(1, "lines"),
+        panel.border = ggplot2::element_rect(color = "#666666", fill = NA, linewidth = 0.5),
+        panel.background = ggplot2::element_blank())
+    
+    
     p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
-      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") +
-      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
-      ggplot2::labs(y = "Citations") +
+      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity", alpha=0.8) +
+      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity", alpha=0.8) +
+      ggplot2::labs(y = "Citations", x="") +
+      ggplot2::labs(fill = "Citation Type") +
+      ggplot2::scale_fill_manual(values = c("duplicated" = "lightgrey", "unique" = "#008080")) +
       ggplot2::scale_y_continuous(labels = abs) +
+      ggplot2::geom_hline(yintercept = 0, color = "white", linetype = "solid") +
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) +
       # make legend ordering the same as plot ordering
-      ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 3.5)
+      ggplot2::geom_text(data = data_sum, ggplot2::aes(label = paste0(.data$n), y = .data$labelpos), size = 4.5) + base_theme
 
-    if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
+    if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_wrap(ggplot2::vars(!!facets), nrow = 1, strip.position = "top")
   }
+  
+ 
 
   if (totals_in_legend == TRUE) {
     get_total <- function(type) {
@@ -326,9 +341,8 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
 
       type
     }
-
-    p <- p + ggplot2::scale_fill_discrete(labels = scales::trans_format("identity", get_total))
-  }
+    
+    p <- p + ggplot2::scale_fill_discrete(labels = scales::trans_format("identity", get_total))  }
 
   p
 }
