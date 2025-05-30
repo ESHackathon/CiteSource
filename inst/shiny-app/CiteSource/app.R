@@ -894,41 +894,74 @@ server <- function(input, output, session) {
     
   })
   output$manual_dedup_dt <- DT::renderDataTable({
-    
+      
     data <- manual_dedup_data()
+    data[is.na(data)] <- ""
+    data <- soles::format_doi(data)
     
-    format_cols <- c(
-      "title1", "author1", "doi1", "volume1",
-      "pages1", "number1", "year1", "abstract1", "journal1", "isbn1",
-      "title2", "author2", "doi2", "volume2",
-      "pages2", "number2", "year2", "abstract2", "journal2", "isbn2"
-    )
+    data <- data %>%
+      mutate(
+        doi1 = ifelse(
+          is.na(doi1) | doi1 == "",
+          doi1,
+          paste0("<a href='https://doi.org/", doi1, "' target='_blank'>", doi1, "</a>")
+        ),
+        doi2 = ifelse(
+          is.na(doi2) | doi2 == "",
+          doi2,
+          paste0("<a href='https://doi.org/", doi2, "' target='_blank'>", doi2, "</a>")
+          
+        )
+      )
     
-    format_cols <- intersect(format_cols, colnames(data))
-    shinyjs::useShinyjs()
     
-    datatable(data,
-              options = list(
-                pageLength = 100, 
-                info = FALSE,
-                lengthMenu = list(c(100, -1), c("100", "All")),
-                columnDefs =
-                  list(
-                    list(visible = FALSE, 
-                         targets = columns2hide),
-                    list(
-                      targets = "_all",
-                      render = JS(
-                        "function(data, type, row, meta) {",
-                        "return type === 'display' && data != null && data.length > 25 ?",
-                        "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
-                        "}"
+    fields <- c("title", "author", "doi", "volume", "pages", "number", "year", "abstract", "journal", "isbn")
+    
+    # Hide similarity score columns (fields without suffix)
+    columns2hide <- which(names(data) %in% fields) - 1
+    
+    dt <- datatable(data,
+                    selection = "multiple",
+                    rownames = FALSE,
+                    escape=FALSE,
+                    options = list(
+                      pageLength = 100,
+                      lengthMenu = list(c(100, -1), c("100", "All")),
+                      columnDefs = list(
+                        list(visible = FALSE, targets = columns2hide),
+                        list(
+                          targets = c(0:10,13:18),
+                          render = JS(
+                            "function(data, type, row, meta) {",
+                            "  if(type === 'display' && data != null && data.length > 45) {",
+                            "    return '<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>';",
+                            "  } else {",
+                            "    return data;",
+                            "  }",
+                            "}"
+                          )
+                        )
                       )
-                    )
-                  )
-              ))
+                    ))
+    
+    
+    brks <- c(0.999)
+    cls <- c('black', '#008080')
+    weights <- c('normal', 'bold')
+    
+    for(field in fields){
+      dt <- dt %>% formatStyle(
+        c(paste0(field, "1"), paste0(field, "2")),
+        field, 
+        color = styleInterval(brks, cls),
+        fontWeight = styleInterval(brks, weights)
+      )
+    }
+    
+    dt
   })
   
+    
   
   # ASySD manual dedup pre text 
   output$Manual_pretext <- shiny::renderText({
@@ -1176,7 +1209,10 @@ server <- function(input, output, session) {
     data_vis <- unique_filtered_visual()
     shiny::req(nrow(data_vis) > 0)
     source_comparison <- compare_sources(data_vis, comp_type = input$comp_type)
-    plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
+    plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE),
+                              main.bar.color = "#3A3A3A",
+                              sets.bar.color = "#3A3A3A",
+                              matrix.color = "#008080")
   })
   
   output$plotgraph2 <- shiny::renderPlot({
