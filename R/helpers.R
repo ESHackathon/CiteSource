@@ -24,3 +24,28 @@ ui_yeah <- function (x, yes = c("Yes", "Definitely", "For sure", "Yup",
   out <- utils::menu(qs)
   out != 0L && qs[[out]] %in% yes
 }
+
+
+format_doi <- function(df){
+
+    df$doi <- tolower(df$doi)
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("%28", 
+                                                                  "(", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("%29", 
+                                                                  ")", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("http://dx.doi.org/", 
+                                                                  "", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("https://doi.org/", 
+                                                                  "", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("https://dx.doi.org/", 
+                                                                  "", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("http://doi.org/", 
+                                                                  "", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("doi: ", 
+                                                                  "", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("doi:", 
+                                                                  "", x)))
+    df["doi"] <- as.data.frame(sapply(df["doi"], function(x) gsub("doi", 
+                                                                  "", x)))
+    return(df)
+  }
