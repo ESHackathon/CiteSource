@@ -897,7 +897,7 @@ server <- function(input, output, session) {
       
     data <- manual_dedup_data()
     data[is.na(data)] <- ""
-    data <- soles::format_doi(data)
+    data <- format_doi(data)
     
     data <- data %>%
       mutate(
