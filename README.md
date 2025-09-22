@@ -48,7 +48,7 @@ Install CiteSource in R with remotes::install_github("ESHackathon/CiteSource")
 
 **Vignettes**
 
-Vignettes covering various use cases can be found on the [CiteSource web page](https://www.eshackathon.org/CiteSource/). 
+Vignettes covering various use cases can be found on the [CiteSource web page](https://www.eshackathon.org/CiteSource/articles). 
 
 ## Feedback
 
