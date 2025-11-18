@@ -1,0 +1,233 @@
+# CiteSource
+
+![](https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png)
+
+## About the Pacakge
+
+CiteSource was developed to provide researchers the ability to examine
+the utility and efficacy of literature resources and search
+methodologies. The idea behind CiteSource is simply allowing users to
+deduplicate citation records, while maintaining customizable metadata
+about the citation.
+
+**Development**
+
+Development of this project began as part of the Evidence Synthesis
+Hackathon and as part of Evidence Synthesis & Meta-Analysis in R
+Conference - ESMARConf 2022. to learn more about this awesome conference
+and hackathon please visit @ <https://esmarconf.org/>
+
+**License**
+
+CiteSource was created under [the General Public License
+(\>=v3)](https://www.gnu.org/licenses/gpl-3.0.html).
+
+**Shiny Web Application**
+
+Whether you know R or not, we want you to be able to use CiteSource!
+Check out our [CiteSource Shiny
+App!](https://litrev.shinyapps.io/CiteSource/)
+
+## Features
+
+**Customizable Metadata Tags**
+
+Users can provide customizable metadata in three fields, cite_source,
+cite_string, and cite_label. Metadata can include anything from a
+resource name (e.g. Web of Science, LENS.org, PubMed), a method
+(database search, handsearching, citation snowballing), a variation used
+within a method (WoS string \#1, Wos string \#2, WoS string \#3), a
+research phase (search, Ti/Ab screening, Full-text Screening), or a
+unique group of citations (benchmarking articles, articles from a
+previous review, articles with a specific author affiliation).
+
+**Record Merging**
+
+The CiteSource deduplication process is better described as a record
+merging process due to the fact that the customizable metadata from
+duplicate records is maintained through the creation of a single,
+primary record. Beyond the merging of customizable metadata, the primary
+record is created by using the most complete metadata available between
+duplicate records (currently DOI and Abstract fields).The ASySD package,
+developed by Kaitlyn Hair, serves as the backbone of this process.
+
+**Table and Plot Visualizations**
+
+Once records are deduplicated, users are able to easily create plots and
+tables to answer specific questions or to simply explore the data in an
+effort to develop new hypotheses. Examples of analysis may include how
+many unique records a specific source contributed or how traditional
+methods of searching fare against a new AI discovery tool in finding
+relevant articles. Users may want to understand the overlap in records
+between two different search strings or evaluate the impact of including
+Google Scholar in a review. Before searching, a user may even develop a
+targeted search to better understand the topical coverage across
+databases that they intend to search, and once the search has been
+developed, how a particular source, string, or method performed in
+discovering benchmarking articles.
+
+**Exporting and Re-importing Data**
+
+Once records have been processed, users are able to export data in .csv,
+.ris, and .bib formats. Furthermore, users are able to reimport .csv and
+.ris files in order to recreate plots and tables.
+
+## Getting Started
+
+**Installation**
+
+Install CiteSource in R with
+remotes::install_github(“ESHackathon/CiteSource”)
+
+**Vignettes**
+
+Vignettes covering various use cases can be found on the [CiteSource web
+page](https://www.eshackathon.org/CiteSource/).
+
+## Feedback
+
+Be sure to check out [our discussion
+page](https://github.com/ESHackathon/CiteSource/discussions) to engage
+with us or to learn more about the various use cases for CiteSource. You
+can provide comments/suggestions or suggest a vignette for a specific
+use case.
+
+# Package index
+
+## All functions
+
+- [`CiteSource`](http://www.eshackathon.org/CiteSource/reference/CiteSource-package.md)
+  [`CiteSource-package`](http://www.eshackathon.org/CiteSource/reference/CiteSource-package.md)
+  : CiteSource: A package to compare sources of citation records
+
+- [`calculate_detailed_records()`](http://www.eshackathon.org/CiteSource/reference/calculate_detailed_records.md)
+  : Calculate Detailed Record Counts
+
+- [`calculate_initial_records()`](http://www.eshackathon.org/CiteSource/reference/calculate_initial_records.md)
+  : Calculate Initial Records Unique Citations
+
+- [`calculate_phase_count()`](http://www.eshackathon.org/CiteSource/reference/calculate_phase_count.md)
+  : Calculate phase counts, precision, and recall
+
+- [`calculate_phase_records()`](http://www.eshackathon.org/CiteSource/reference/calculate_phase_records.md)
+  : Calculate Phase Counts with Precision and Recall
+
+- [`calculate_record_counts()`](http://www.eshackathon.org/CiteSource/reference/calculate_record_counts.md)
+  : Calculate record counts function Calculate and combine counts of
+  distinct records, imported records, and unique records for each
+  database
+
+- [`citation_summary_table()`](http://www.eshackathon.org/CiteSource/reference/citation_summary_table.md)
+  : Contribution summary table
+
+- [`compare_sources()`](http://www.eshackathon.org/CiteSource/reference/compare_sources.md)
+  : Compare duplicate citations across sources, labels, and strings
+
+- [`count_unique()`](http://www.eshackathon.org/CiteSource/reference/count_unique.md)
+  : Count number of unique and non-unique citations from different
+  sources, labels, and strings
+
+- [`create_detailed_record_table()`](http://www.eshackathon.org/CiteSource/reference/create_detailed_record_table.md)
+  : Create a Detailed Record Table
+
+- [`create_initial_record_table()`](http://www.eshackathon.org/CiteSource/reference/create_initial_record_table.md)
+  : Initial Record Table
+
+- [`create_precision_sensitivity_table()`](http://www.eshackathon.org/CiteSource/reference/create_precision_sensitivity_table.md)
+  : Count and Precision/Sensitivity Table
+
+- [`dedup_citations()`](http://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
+  : Deduplicate citations - ASySD wrapper
+
+- [`dedup_citations_add_manual()`](http://www.eshackathon.org/CiteSource/reference/dedup_citations_add_manual.md)
+  : Remove pairs with manual dedup - ASySD wrapper
+
+- [`detect_parser()`](http://www.eshackathon.org/CiteSource/reference/detect_.md)
+  [`detect_delimiter()`](http://www.eshackathon.org/CiteSource/reference/detect_.md)
+  [`detect_lookup()`](http://www.eshackathon.org/CiteSource/reference/detect_.md)
+  [`detect_year()`](http://www.eshackathon.org/CiteSource/reference/detect_.md)
+  : Detect file formatting information
+
+- [`export_bib()`](http://www.eshackathon.org/CiteSource/reference/export_bib.md)
+  : Export deduplicated citations to .bib file
+
+- [`export_csv()`](http://www.eshackathon.org/CiteSource/reference/export_csv.md)
+  : Export deduplicated citations with source data as CSV file
+
+- [`export_ris()`](http://www.eshackathon.org/CiteSource/reference/export_ris.md)
+  : Export data frame to RIS file
+
+- [`merge_columns()`](http://www.eshackathon.org/CiteSource/reference/merge_columns.md)
+  : Bind two or more data frames with different columns
+
+- [`parse_pubmed()`](http://www.eshackathon.org/CiteSource/reference/parse_.md)
+  [`parse_ris()`](http://www.eshackathon.org/CiteSource/reference/parse_.md)
+  [`parse_bibtex()`](http://www.eshackathon.org/CiteSource/reference/parse_.md)
+  [`parse_csv()`](http://www.eshackathon.org/CiteSource/reference/parse_.md)
+  [`parse_tsv()`](http://www.eshackathon.org/CiteSource/reference/parse_.md)
+  : Parse bibliographic text in a variety of formats
+
+- [`plot_contributions()`](http://www.eshackathon.org/CiteSource/reference/plot_contributions.md)
+  : Create a bar chart that compares source contributions over stages
+
+- [`plot_source_overlap_heatmap()`](http://www.eshackathon.org/CiteSource/reference/plot_source_overlap_heatmap.md)
+  : Create a heatmap matrix showing the overlap between sources
+
+- [`plot_source_overlap_upset()`](http://www.eshackathon.org/CiteSource/reference/plot_source_overlap_upset.md)
+  : Create an UpSetR upset plot showing the overlap between sources
+
+- [`precision_sensitivity_table()`](http://www.eshackathon.org/CiteSource/reference/precision_sensitivity_table.md)
+  : precision_sensitivity_table
+
+- [`read_citations()`](http://www.eshackathon.org/CiteSource/reference/read_citations.md)
+  : Import citations from file
+
+- [`record_counts()`](http://www.eshackathon.org/CiteSource/reference/record_counts.md)
+  : Record counts function Calculate and combine counts of distinct
+  records and imported records for each database
+
+- [`record_counts_table()`](http://www.eshackathon.org/CiteSource/reference/record_counts_table.md)
+  : record_counts_table
+
+- [`record_level_table()`](http://www.eshackathon.org/CiteSource/reference/record_level_table.md)
+  : Record-level table
+
+- [`record_summary_table()`](http://www.eshackathon.org/CiteSource/reference/record_summary_table.md)
+  : search_summary_table
+
+- [`reimport_csv()`](http://www.eshackathon.org/CiteSource/reference/reimport_csv.md)
+  : Reimport a CSV-file exported from CiteSource
+
+- [`reimport_ris()`](http://www.eshackathon.org/CiteSource/reference/reimport_ris.md)
+  : Reimport a RIS-file exported from CiteSource
+
+- [`runShiny()`](http://www.eshackathon.org/CiteSource/reference/runShiny.md)
+  :
+
+  A wrapper function to run Shiny Apps from `CiteSource`.
+
+- [`synthesisr_read_refs()`](http://www.eshackathon.org/CiteSource/reference/synthesisr_read_refs.md)
+  [`read_ref()`](http://www.eshackathon.org/CiteSource/reference/synthesisr_read_refs.md)
+  : Import bibliographic search results
+
+- [`write_bib()`](http://www.eshackathon.org/CiteSource/reference/write_refs.md)
+  [`write_ris()`](http://www.eshackathon.org/CiteSource/reference/write_refs.md)
+  [`write_refs()`](http://www.eshackathon.org/CiteSource/reference/write_refs.md)
+  : Export data to a bibliographic format
+
+# Articles
+
+### Vignettes
+
+- [Source Analysis Across Screening
+  Phases](http://www.eshackathon.org/CiteSource/articles/citesource_working_example.md):
+- [Benchmark
+  Testing](http://www.eshackathon.org/CiteSource/articles/citesource_benchmark_testing.md):
+- [New Benchmark
+  Testing](http://www.eshackathon.org/CiteSource/articles/citesource_new_benchmark_testing.md):
+- [Assessing Usefulness of Databases for Evidence
+  Synthesis](http://www.eshackathon.org/CiteSource/articles/citesource_vignette_db-pre-screen_validation.md):
+- [Comparing Database Topic
+  Coverage](http://www.eshackathon.org/CiteSource/articles/citesource_vignette_db-topic-coverage.md):
+- [Analysis Across Screening
+  Phases](http://www.eshackathon.org/CiteSource/articles/citesource_analysis_across_screening_phases.md):

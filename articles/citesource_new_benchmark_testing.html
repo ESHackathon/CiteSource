@@ -69,9 +69,9 @@
       <h1>New Benchmark Testing</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-09-22</h4>
+            <h4 data-toc-skip class="date">2025-11-18</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_new_benchmark_testing.Rmd" class="external-link"><code>vignettes/citesource_new_benchmark_testing.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/dev/vignettes/citesource_new_benchmark_testing.Rmd" class="external-link"><code>vignettes/citesource_new_benchmark_testing.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_new_benchmark_testing.Rmd</code></div>
     </div>
 
@@ -699,12 +699,12 @@ file.</p>
 <td headers="stub_1_7 Distinct_Records" class="gt_row gt_right">1716</td>
 </tr>
 </tbody>
-<tfoot class="gt_footnotes">
-<tr>
+<tfoot>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="3">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Number of records imported from each source.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="3">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> Number of records after internal source deduplication.</td>
     </tr>
@@ -728,7 +728,7 @@ searches.</p>
 <code class="sourceCode R"><span><span class="co">#Generate a source comparison upset plot.</span></span>
 <span><span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Plotting a large number of groups. Consider reducing nset or sub-setting the data.</span></span></code></pre></div>
-<p><img src="citesource_new_benchmark_testing_files/figure-html/unnamed-chunk-6-1.png" alt="An upset plot visualizing the overlap of benchmarking articles found across five search strategies. The plot highlights that nine articles were identified by all five searches, while four benchmarking articles were missed entirely. Additional columns show the number of articles shared across different combinations of search strategies." width="576"></p>
+<p><img src="citesource_new_benchmark_testing_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="An upset plot visualizing the overlap of benchmarking articles found across five search strategies. The plot highlights that nine articles were identified by all five searches, while four benchmarking articles were missed entirely. Additional columns show the number of articles shared across different combinations of search strategies." width="576"></p>
 <p>Looking at the first column, we see that 9 benchmarking articles were
 found across every search. One may hypothesize that the 157 citations
 that follow in the second column may have a high number of relevant
@@ -843,7 +843,7 @@ following example.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

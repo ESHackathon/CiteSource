@@ -69,9 +69,9 @@
       <h1>Analysis Across Screening Phases</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-09-22</h4>
+            <h4 data-toc-skip class="date">2025-11-18</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_analysis_across_screening_phases.rmd" class="external-link"><code>vignettes/citesource_analysis_across_screening_phases.rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/dev/vignettes/citesource_analysis_across_screening_phases.rmd" class="external-link"><code>vignettes/citesource_analysis_across_screening_phases.rmd</code></a></small>
       <div class="d-none name"><code>citesource_analysis_across_screening_phases.rmd</code></div>
     </div>
 
@@ -196,7 +196,7 @@ raw_citations.</p>
 <span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span>
+<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   6%</span></span>
 <span><span class="co">#&gt; Import completed - with the following details:</span></span>
 <span><span class="co">#&gt;                 file       cite_source cite_string cite_label citations</span></span>
 <span><span class="co">#&gt; 1        wos_278.ris               WoS        &lt;NA&gt;     search       278</span></span>
@@ -760,12 +760,12 @@ duplicate citations within this source as both counts read 84.</p>
 <td headers="stub_1_7 Distinct_Records" class="gt_row gt_right">1051</td>
 </tr>
 </tbody>
-<tfoot class="gt_footnotes">
-<tr>
+<tfoot>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="3">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Number of records imported from each source.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="3">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> Number of records after internal source deduplication.</td>
     </tr>
@@ -809,12 +809,12 @@ from LENS</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_heatmap_count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span><span class="op">)</span></span>
 <span><span class="va">my_heatmap_count</span></span></code></pre></div>
-<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
+<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" width="960"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">my_heatmap_percent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_heatmap.html">plot_source_overlap_heatmap</a></span><span class="op">(</span><span class="va">source_comparison</span>, plot_type <span class="op">=</span> <span class="st">"percentages"</span><span class="op">)</span></span>
 <span><span class="va">my_heatmap_percent</span></span></code></pre></div>
-<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-2.png" width="960"></p>
+<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-6-2.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="upset-plot">Upset Plot<a class="anchor" aria-label="anchor" href="#upset-plot"></a>
@@ -838,7 +838,7 @@ plot to other use cases.</p>
 <code class="sourceCode R"><span><span class="va">plot_overlap_across_sources</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Plotting a large number of groups. Consider reducing nset or sub-setting the data.</span></span>
 <span><span class="va">plot_overlap_across_sources</span></span></code></pre></div>
-<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
+<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -869,7 +869,7 @@ unique citation in the end.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">plot_contributions_over_phases</span></span></code></pre></div>
-<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-8-1.png" width="960"></p>
+<p><img src="citesource_analysis_across_screening_phases_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1454,36 +1454,36 @@ the source unique percent of 5% is the lowest of any source.</p>
 <td headers="stub_1_7 Source Unique %" class="gt_row gt_right">NA</td>
 </tr>
 </tbody>
-<tfoot class="gt_footnotes">
-<tr>
+<tfoot>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Number of raw records imported from each database.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> Number of records after internal source deduplication.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span> Number of records not found in another source.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>4</sup></span> Number of records found in at least one other source.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>5</sup></span> Percent distinct records contributed to the total number of distinct records.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>6</sup></span> Percent of unique records contributed to the total unique records.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>7</sup></span> Percentage of records that were unique from each source.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="8">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>8</sup></span> Total citations discovered (after internal and cross-source deduplication).</td>
     </tr>
@@ -2070,40 +2070,40 @@ that made it into the final synthesis from all sources combined.</li>
 <td headers="stub_1_7 Recall" class="gt_row gt_right">NA</td>
 </tr>
 </tbody>
-<tfoot class="gt_footnotes">
-<tr>
+<tfoot>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Number of records after internal source deduplication.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> Number of citations included after title/abstract screening.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span> Number of citations included after full text screening.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>4</sup></span> Number of final included citations / Number of distinct records.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>5</sup></span> Number of final included citations / Total number of final included citations.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>6</sup></span> Total citations discovered (after internal and cross-source deduplication).</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>7</sup></span> Total citations included after Ti/Ab Screening.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>8</sup></span> Total citations included after full text screening.</td>
     </tr>
-<tr>
+<tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>9</sup></span> Overall Precision = Number of final included citations / Total distinct records.</td>
     </tr>
@@ -2192,7 +2192,7 @@ desktop</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

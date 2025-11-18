@@ -1,0 +1,91 @@
+# Import citations from file
+
+This function imports RIS and Bibtex files with citations and merges
+them into one long tibble with one record per line.
+
+## Usage
+
+``` r
+read_citations(
+  files = NULL,
+  cite_sources = NULL,
+  cite_strings = NULL,
+  cite_labels = NULL,
+  metadata = NULL,
+  verbose = TRUE,
+  tag_naming = "best_guess",
+  only_key_fields = TRUE
+)
+```
+
+## Arguments
+
+- files:
+
+  One or multiple RIS or Bibtex files with citations. Should be .bib or
+  .ris files
+
+- cite_sources:
+
+  The origin of the citation files (e.g. "Scopus", "WOS", "Medline") -
+  vector with one value per file, defaults to file names.
+
+- cite_strings:
+
+  Optional. The search string used (or another grouping to analyse) -
+  vector with one value per file
+
+- cite_labels:
+
+  Optional. An additional label per file, for instance the stage of
+  search - vector with one value per file
+
+- metadata:
+
+  A tibble with file names and metadata for each file. Can be specified
+  as an *alternative* to files, cite_sources, cite_strings and
+  cite_labels.
+
+- verbose:
+
+  Should number of reference and allocation of labels be reported?
+
+- tag_naming:
+
+  Either a length-1 character stating how should ris tags be replaced
+  (see details for a list of options), or an object inheriting from
+  class `data.frame` containing user-defined replacement tags.
+
+- only_key_fields:
+
+  Should only key fields (e.g., those used by CiteCourse) be imported?
+  If FALSE, all RIS data is retained. Can also be a character vector of
+  field names to retain (after they have been renamed by the import
+  function) in addition to the essential ones.
+
+## Value
+
+A tibble with one row per citation
+
+## Examples
+
+``` r
+if (interactive()) {
+  # Import only key fields from the RIS files
+  read_citations(c("res.ris", "res.bib"),
+    cite_sources = c("CINAHL", "MEDLINE"),
+    cite_strings = c("Search1", "Search2"),
+    cite_labels = c("raw", "screened"),
+    only_key_fields = TRUE
+  )
+
+  # or equivalently
+  metadata_tbl_key_fields <- tibble::tribble(
+   ~files,     ~cite_sources, ~cite_strings, ~cite_labels, ~only_key_fields,
+  "res.ris",  "CINAHL",      "Search1",     "raw",        TRUE,
+  "res.bib",  "MEDLINE",     "Search2",     "screened",   TRUE
+  )
+
+  read_citations(metadata = metadata_tbl_key_fields)
+}
+```
