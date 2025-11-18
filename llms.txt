@@ -2,7 +2,7 @@
 
 ![](https://user-images.githubusercontent.com/89118428/155393065-780381a0-ff77-45d3-b2ee-40332ef72064.png)
 
-## About the Pacakge
+## About the Package
 
 CiteSource was developed to provide researchers the ability to examine
 the utility and efficacy of literature resources and search
@@ -82,7 +82,7 @@ remotes::install_github(“ESHackathon/CiteSource”)
 **Vignettes**
 
 Vignettes covering various use cases can be found on the [CiteSource web
-page](https://www.eshackathon.org/CiteSource/).
+page](https://www.eshackathon.org/CiteSource/articles).
 
 ## Feedback
 
