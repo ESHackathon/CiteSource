@@ -1,3 +1,5 @@
+options(shiny.maxRequestSize=10000*1024^2, timeout = 40000000) 
+
 library(DT)
 library(CiteSource)
 library(dplyr)
@@ -12,7 +14,7 @@ shiny::tags$head(
                     body, label, input, button, select {
                       font-family: "Arial";
                     }')
-))
+  ))
 
 columns2hide <- c("title", "author", "doi", "volume",
                   "pages", "number", "year", "abstract", "journal", "isbn")
@@ -96,7 +98,8 @@ ui <- shiny::navbarPage("CiteSource",
                                 shiny::mainPanel(
                                   shiny::h5("Step 2: Double click on a column to edit sources, labels, and strings. Use *Ctrl+Enter* to save edits, one column at a time"),
                                   # Output: Data file ----
-                                  DT::dataTableOutput("tbl_out")
+                                  DT::dataTableOutput("tbl_out"),
+                                  shiny::uiOutput("post_upload_guide")
                                 )
                               )
                             )
@@ -122,7 +125,7 @@ ui <- shiny::navbarPage("CiteSource",
                             shiny::tabPanel(
                               "Manual deduplication",
                               br(),
-                              shiny::h5("Step 4: Review potential duplicates manually"),
+                              shiny::h5("Step 4 (optional): Manually select further duplicates"),
                               shiny::p("The following records were identified as potential duplicates. Potential duplicates are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
                               shiny::textOutput("Manual_pretext"),
                               shiny::br(),
@@ -145,7 +148,7 @@ ui <- shiny::navbarPage("CiteSource",
                               ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
                               
                               shinyWidgets::dropdown(
-
+                                
                                 tags$h3("Select columns to display"),
                                 
                                 shinyWidgets::pickerInput(
@@ -168,6 +171,15 @@ ui <- shiny::navbarPage("CiteSource",
                               tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
             background-color: #CBF7ED!important; color: black!important}")),
                               
+                            ),
+                            shiny::tabPanel(
+                              "How deduplication works",
+                              shiny::fluidRow(
+                                shiny::column(
+                                  12,
+                                  shiny::uiOutput("dedup_logic_guide")
+                                )
+                              )
                             )
                           )
                         ),
@@ -393,6 +405,43 @@ server <- function(input, output, session) {
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
   
+  # 1. The Container (Decides WHEN to show it)
+  output$post_upload_guide <- shiny::renderUI({
+    # Only show this if the upload dataframe exists and has rows
+    shiny::req(is.data.frame(rv$df) && nrow(rv$df) > 0)
+    
+    shiny::tagList(
+      shiny::br(),
+      shiny::hr(),
+      shiny::h5("Tagging Overview"),
+      # We refer to the table output created below
+      shiny::tableOutput("guide_table_content") 
+    )
+  })
+  
+  # 2. The Table Content (Generates the table itself)
+  output$guide_table_content <- shiny::renderTable({
+    # We don't need the req() here because the UI above handles the hiding
+    
+    data.frame(
+      "Column Name" = c("Source", "Label", "String"),
+      "Description" = c(
+        "'Source' is used to citations in files according to where the came from. This can include database names (e.g. Web of Science, Scopus) or a method used to find the citations (e.g. citation searching, numbered search string).",
+        
+        "'Label' is used to tag citations in files with information related to their associated screening phase. The label field requires one of three terms: ‘search’, ‘screened’, or ‘final’. All plots/tables require at least one file to be labeled as ‘search’, no other terms in the label field are permitted. <strong>NOTE: files that are tagged as 'screened' or 'final' should not have a 'source' tag.</strong>",
+        
+        "'String' is used to further differentiate sets of records. While the source/label fields alone can handle most use cases, the string field can be used to record other supplementary information a user may want to retain for analysis, or to further differentiate string variations (e.g. String1-narrow, String1-broad, String2-narrow, etc.)"
+      ),
+      check.names = FALSE
+    )
+  }, 
+  striped = TRUE, 
+  hover = TRUE, 
+  width = "100%", 
+  align = "l",
+  sanitize.text.function = function(x) x # Allows the <strong> tags to work
+  )
+  
   # --- Google Analytics Integration ---
   # Flag to ensure GA script is inserted only once per session
   ga_script_inserted <- reactiveVal(FALSE)
@@ -477,7 +526,7 @@ server <- function(input, output, session) {
         cite_labels = suggested_label,
         cite_strings = empty_strings,
         only_key_fields = FALSE
-
+        
       )
       
       # Summarize the number of records by citation source
@@ -938,6 +987,182 @@ server <- function(input, output, session) {
     
   })
   
+  
+  ## How Deduplication works tab
+  
+  # 1. The Container (With Padding added)
+  output$dedup_logic_guide <- shiny::renderUI({
+    
+    shiny::tagList(
+      shiny::br(),
+      # WRAPPER DIV: Adds 15px vertical and 30px horizontal padding
+      shiny::div(style = "padding: 15px 30px;", 
+                 
+                 shiny::h4("Deduplication Logic: ASySD Criteria"),
+                 shiny::p("ASySD identifies duplicates in two phases. First, it blocks records into potential groups. Second, it scores text similarity. Finally, 'close calls' are flagged for manual review."),
+                 
+                 shiny::hr(),
+                 
+                 # The table output
+                 shiny::tableOutput("dedup_guide_table_content") 
+      )
+    )
+    
+    # 1. The Container (UI with Accordions)
+    output$dedup_logic_guide <- shiny::renderUI({
+      
+      shiny::tagList(
+        shiny::br(),
+        # Wrapper div with padding
+        shiny::div(style = "padding: 0px 15px; max-width: 1050px;", 
+                   
+                   shiny::h4("Deduplication Criteria"),
+                   shiny::p("ASySD identifies duplicates in two automated phases, followed by a manual review safety net. Click a phase below to view the full logic."),
+                   
+                   shiny::hr(),
+                   
+                   # --- ACCORDION 1: BLOCKING ---
+                   shiny::tags$details(
+                     style = "border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 10px;",
+                     shiny::tags$summary(style = "cursor: pointer; font-weight: bold; font-size: 15px;", 
+                                         "Phase 1: Blocking (The Wide Net)"),
+                     shiny::br(),
+                     shiny::p(style = "font-style: italic; font-size: 13px;", 
+                              "Records are grouped into potential duplicate sets if they match EXACTLY on any of these combinations."),
+                     shiny::tableOutput("tbl_phase1")
+                   ),
+                   
+                   # --- ACCORDION 2: VALIDATION ---
+                   shiny::tags$details(
+                     style = "border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 10px;",
+                     shiny::tags$summary(style = "cursor: pointer; font-weight: bold; font-size: 15px;", 
+                                         "Phase 2: Validation (The Strict Check)"),
+                     shiny::br(),
+                     shiny::p(style = "font-style: italic; font-size: 13px;", 
+                              "Candidate pairs are text-scored (0-100%). A pair is confirmed as a duplicate ONLY if it meets one of these threshold sets."),
+                     shiny::tableOutput("tbl_phase2")
+                   ),
+                   
+                   # --- ACCORDION 3: MANUAL REVIEW ---
+                   shiny::tags$details(
+                     style = "border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 10px;",
+                     shiny::tags$summary(style = "cursor: pointer; font-weight: bold; font-size: 15px;", 
+                                         "Phase 3: Manual Review (The Safety Net)"),
+                     shiny::br(),
+                     shiny::p(style = "font-style: italic; font-size: 13px;", 
+                              "Pairs that fall into the 'Grey Area' or have conflicting metadata are flagged for human review."),
+                     shiny::tableOutput("tbl_phase3")
+                   )
+        ) # End div
+      ) # End tagList
+    }) # End renderUI
+    
+    
+    # 2. Table Content - Phase 1 (Blocking)
+    output$tbl_phase1 <- shiny::renderTable({
+      data.frame(
+        "Category" = c("Round 1 (Broad)", "Round 2 (Bibliographic)", "Round 3 (Numeric)", "Round 4 (Loose)"),
+        "Criteria" = c(
+          "<ul><li>Title & Pages</li><li>Title & Author</li><li>Title & Abstract</li><li>DOI (Exact)</li></ul>",
+          "<ul><li>Author & Year & Pages</li><li>Journal & Volume & Pages</li><li>ISBN & Volume & Pages</li><li>Title & ISBN</li></ul>",
+          "<ul><li>Year & Pages & Volume</li><li>Year & Number & Volume</li><li>Year & Pages & Number</li></ul>",
+          "<ul><li>Author & Year</li><li>Year & Title</li><li>Title & Volume</li><li>Title & Journal</li></ul>"
+        ),
+        check.names = FALSE
+      )
+    }, striped = TRUE, hover = TRUE, width = "100%", sanitize.text.function = function(x) x)
+  })
+  
+  
+  # 3. Table Content - Phase 2 (Validation - FULL DETAIL)
+  output$tbl_phase2 <- shiny::renderTable({
+    data.frame(
+      "Category" = c(
+        "Strict Bibliographic", 
+        "Abstract Heavy", 
+        "DOI Specific", 
+        "Complex Metadata", 
+        "Strict Journal + Abstract", 
+        "High Confidence Metadata", 
+        "High Numeric Confidence", 
+        "Title & Journal/ISBN"
+      ),
+      "Criteria" = c(
+        # Strict Bibliographic
+        "<ul>
+         <li><b>Pages</b>(>80%) + <b>Vol</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>50%) + <b>ISBN</b>(>99%)</li>
+         <li><b>Pages</b>(>80%) + <b>Vol</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>50%) + <b>Journal</b>(>60%)</li>
+         <li><b>Pages</b>(>80%) + <b>No.</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>50%) + <b>Journal</b>(>60%)</li>
+         <li><b>Vol</b>(>80%) + <b>No.</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>50%) + <b>Journal</b>(>60%)</li>
+       </ul>",
+        
+        # Abstract Heavy
+        "<ul>
+         <li><b>Vol</b>(>80%) + <b>No.</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>80%)</li>
+         <li><b>Vol</b>(>80%) + <b>Pages</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>80%)</li>
+         <li><b>Pages</b>(>80%) + <b>No.</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>90%) + <b>Author</b>(>80%)</li>
+       </ul>",
+        
+        # DOI Specific
+        "<ul><li><b>DOI</b>(>95%) + <b>Author</b>(>75%) + <b>Title</b>(>90%)</li></ul>",
+        
+        # Complex Metadata
+        "<ul>
+         <li><b>Title</b>(>80%) + <b>Abstract</b>(>90%) + <b>Vol</b>(>85%) + <b>Journal</b>(>65%) + <b>Author</b>(>90%)</li>
+         <li><b>Title</b>(>90%) + <b>Abstract</b>(>80%) + <b>Vol</b>(>85%) + <b>Journal</b>(>65%) + <b>Author</b>(>90%)</li>
+       </ul>",
+        
+        # Strict Journal & Abstract
+        "<ul>
+         <li><b>Pages</b>(>80%) + <b>Vol</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>80%) + <b>Author</b>(>90%) + <b>Journal</b>(>75%)</li>
+         <li><b>Pages</b>(>80%) + <b>No.</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>80%) + <b>Author</b>(>90%) + <b>Journal</b>(>75%)</li>
+         <li><b>Vol</b>(>80%) + <b>No.</b>(>80%) + <b>Title</b>(>90%) + <b>Abstract</b>(>80%) + <b>Author</b>(>90%) + <b>Journal</b>(>75%)</li>
+       </ul>",
+        
+        # High Confidence Metadata
+        "<ul>
+         <li><b>Title</b>(>90%) + <b>Author</b>(>90%) + <b>Abstract</b>(>90%) + <b>Journal</b>(>70%)</li>
+         <li><b>Title</b>(>90%) + <b>Author</b>(>90%) + <b>Abstract</b>(>90%) + <b>ISBN</b>(>99%)</li>
+       </ul>",
+        
+        # High Numeric Confidence
+        "<ul>
+         <li><b>Pages</b>(>90%) + <b>No.</b>(>90%) + <b>Title</b>(>90%) + <b>Author</b>(>80%) + <b>Journal</b>(>60%)</li>
+         <li><b>No.</b>(>90%) + <b>Vol</b>(>90%) + <b>Title</b>(>90%) + <b>Author</b>(>90%) + <b>ISBN</b>(>99%)</li>
+         <li><b>Pages</b>(>90%) + <b>Vol</b>(>90%) + <b>Title</b>(>90%) + <b>Author</b>(>80%) + <b>Journal</b>(>60%)</li>
+         <li><b>Pages</b>(>90%) + <b>No.</b>(>90%) + <b>Title</b>(>90%) + <b>Author</b>(>80%) + <b>ISBN</b>(>99%)</li>
+       </ul>",
+        
+        # Title & Journal/ISBN Specific
+        "<ul>
+         <li><b>Pages</b>(>80%) + <b>Vol</b>(>80%) + <b>Title</b>(>95%) + <b>Author</b>(>80%) + <b>Journal</b>(>90%)</li>
+         <li><b>No.</b>(>80%) + <b>Vol</b>(>80%) + <b>Title</b>(>95%) + <b>Author</b>(>80%) + <b>Journal</b>(>90%)</li>
+         <li><b>No.</b>(>80%) + <b>Pages</b>(>80%) + <b>Title</b>(>95%) + <b>Author</b>(>80%) + <b>Journal</b>(>90%)</li>
+         <li><b>Pages</b>(>80%) + <b>Vol</b>(>80%) + <b>Title</b>(>95%) + <b>Author</b>(>80%) + <b>ISBN</b>(>99%)</li>
+       </ul>"
+      ),
+      check.names = FALSE
+    )
+  }, striped = TRUE, hover = TRUE, width = "100%", sanitize.text.function = function(x) x)
+  
+  
+  # 4. Table Content - Phase 3 (Manual)
+  output$tbl_phase3 <- shiny::renderTable({
+    data.frame(
+      "Category" = c("The 'Grey Area'", "Conflicting DOI", "Year Mismatch"),
+      "Criteria" = c(
+        "<ul>
+        <li><b>Title</b>(>85%) + <b>Author</b>(>75%)</li>
+        <li><b>Title</b>(>80%) + <b>Abstract</b>(>80%)</li>
+        <li><b>Title</b>(>80%) + <b>ISBN</b>(>99%)</li>
+        <li><b>Title</b>(>80%) + <b>Journal</b>(>80%)</li>
+       </ul>",
+        "Pairs that match perfectly but have <b>different</b> DOIs.",
+        "Pairs that match perfectly but are published <b>>1 year apart</b>."
+      ),
+      check.names = FALSE
+    )
+  }, striped = TRUE, hover = TRUE, width = "100%", sanitize.text.function = function(x) x)
   
   #### Visualise tab ####
   
@@ -1563,7 +1788,7 @@ server <- function(input, output, session) {
     
     return(detailed_counts_final)
   })
- 
+  
   # Rendering the detailed record table
   output$detailedRecordTab <- gt::render_gt({
     # Check if base data is loaded
