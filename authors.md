@@ -27,7 +27,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/dev/DESCRIPTION)
 
 Riley T, Hair K, Wallrich L, Grainger M, Young S, Pritchard C, Haddaway
 N (2025). *CiteSource: Analyze the Utility of Information Sources and
