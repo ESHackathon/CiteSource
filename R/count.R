@@ -23,13 +23,10 @@ count_sources <- function(df, db_colname) {
 # Pull out the database column, split it into multiple elements if there are commas,
 # create a list of unique elements, unlist it to a vector, remove white spaces, and count occurrences
   db_counts <- df %>%
-    dplyr::pull(!!rlang::sym(db_colname)) %>%
-    strsplit(", ") %>%
-    lapply(unique) %>%
-    unlist() %>%
-    trimws() %>%
-    table() %>%
-    as.data.frame()
+    expand_single_metadata_column(db_colname) %>%
+    dplyr::count(!!rlang::sym(db_colname), name = "Freq") %>%
+    dplyr::rename(Source = !!rlang::sym(db_colname))
+  
   return(db_counts)
 }
 
