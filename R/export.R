@@ -33,11 +33,10 @@ export_csv <- function(unique_citations, filename = "citesource_exported_citatio
     separated <- purrr::map_dfc(separate, function(x) {
       unique_citations %>%
         dplyr::select(tidyselect::all_of(x), .data$duplicate_id, .data$record_ids) %>%
-        tidyr::separate_rows(1, sep = ", ", convert = TRUE) %>%
-        unique() %>%
+        expand_single_metadata_column(x) %>%
         tidyr::pivot_wider(
           id_cols = .data$duplicate_id, names_prefix = paste0(stringr::str_remove(x, "cite_"), "_"),
-          names_from = 1, values_from = c(.data$record_ids),
+          names_from = !!rlang::sym(x), values_from = c(.data$record_ids),
           values_fn = function(x) TRUE,
           values_fill = FALSE
         ) %>%
