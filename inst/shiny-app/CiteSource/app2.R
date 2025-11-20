@@ -2864,7 +2864,8 @@ server <- function(input, output, session) {
     # Separate cite_source column using helper function
     df_long_source <- df_filtered_wide %>%
       dplyr::select(duplicate_id, cite_source, cite_label, cite_string) %>% 
-      CiteSource:::expand_single_metadata_column("cite_source")
+      CiteSource:::expand_single_metadata_column("cite_source") %>%
+      dplyr::filter(cite_source != "unknown")  # Exclude "unknown" - records from screened/final phases aren't search sources
     
     # Apply source filter
     sources_filt_cleaned <- sources_filt[!is.na(sources_filt) & sources_filt != ""]
