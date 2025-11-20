@@ -1322,7 +1322,7 @@ server <- function(input, output, session) {
     
     # Separate rows for source and label using helper function
     df_long <- df %>%
-      expand_metadata_columns(columns = c("cite_source", "cite_label"))
+      CiteSource:::expand_metadata_columns(columns = c("cite_source", "cite_label"))
     
     # Apply filtering based on selected sources and labels for the plot
     df_filtered <- df_long %>%
@@ -1705,7 +1705,7 @@ server <- function(input, output, session) {
     # Separate cite_source column using helper function
     df_long_source <- df_filtered_wide %>%
       dplyr::select(duplicate_id, cite_source, cite_label, cite_string) %>% 
-      expand_single_metadata_column("cite_source")
+      CiteSource:::expand_single_metadata_column("cite_source")
     
     # Apply source filter
     sources_filt_cleaned <- sources_filt[!is.na(sources_filt) & sources_filt != ""]
