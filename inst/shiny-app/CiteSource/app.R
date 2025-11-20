@@ -1320,12 +1320,9 @@ server <- function(input, output, session) {
     df <- rv$latest_unique %>%
       dplyr::select(duplicate_id, cite_source, cite_label) # Add record_ids if needed
     
-    # Separate rows for source and label
+    # Separate rows for source and label using helper function
     df_long <- df %>%
-      tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
-      tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
-      dplyr::filter(!is.na(cite_source) & cite_source != "", # Ensure no blank/NA sources/labels after separation
-                    !is.na(cite_label) & cite_label != "")
+      expand_metadata_columns(columns = c("cite_source", "cite_label"))
     
     # Apply filtering based on selected sources and labels for the plot
     df_filtered <- df_long %>%
@@ -1705,12 +1702,10 @@ server <- function(input, output, session) {
     
     if (nrow(df_filtered_wide) == 0) { return(empty_result_df) }
     
-    # Separate cite_source column
+    # Separate cite_source column using helper function
     df_long_source <- df_filtered_wide %>%
       dplyr::select(duplicate_id, cite_source, cite_label, cite_string) %>% 
-      tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
-      dplyr::mutate(cite_source = trimws(cite_source)) %>%
-      dplyr::filter(!is.na(cite_source) & cite_source != "")
+      expand_single_metadata_column("cite_source")
     
     # Apply source filter
     sources_filt_cleaned <- sources_filt[!is.na(sources_filt) & sources_filt != ""]
