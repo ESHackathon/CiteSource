@@ -21,10 +21,8 @@ count_unique <- function(unique_data, include_references = FALSE) {
     dplyr::filter(!.data$cite_source == "") %>%
     # Select specific columns
     dplyr::select(.data$duplicate_id, .data$cite_source, .data$cite_label, .data$cite_string, tidyselect::any_of("record_ids")) %>%
-    # Separate rows by 'cite_source', 'cite_label', and 'cite_string'
-    tidyr::separate_rows(.data$cite_source, convert = TRUE, sep = ", ") %>%
-    tidyr::separate_rows(.data$cite_label, convert = TRUE, sep = ", ") %>%
-    tidyr::separate_rows(.data$cite_string, convert = TRUE, sep = ", ") %>%
+    # Expand metadata columns (replaces three separate_rows calls)
+    expand_metadata_columns(columns = c("cite_source", "cite_label", "cite_string")) %>%
     # Group by 'duplicate_id'
     dplyr::group_by(.data$duplicate_id) %>%
     # Add 'unique' and 'type' columns
