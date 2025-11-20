@@ -48,8 +48,7 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
   
   # Split and expand the cite_source column
   df_expanded <- unique_citations %>%
-    tidyr::separate_rows(cite_source, sep = ",") %>%
-    dplyr::mutate(cite_source = trimws(cite_source))
+    expand_single_metadata_column("cite_source")
   
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
@@ -167,8 +166,7 @@ calculate_detailed_records <- function(unique_citations, n_unique, labels_to_inc
   
   # Split and expand the cite_source column
   df_expanded <- unique_citations %>%
-    tidyr::separate_rows(cite_source, sep = ",") %>%
-    dplyr::mutate(cite_source = trimws(cite_source))
+    expand_single_metadata_column("cite_source")
   
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
@@ -317,21 +315,21 @@ calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
   # Split the cite_label column and count any occurrence of "screened" and "final"
   # Updated for edge cases where a citation is duplicated within the screened set
   total_screened <- unique_citations %>%
-    tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
+    expand_single_metadata_column("cite_label") %>%
     dplyr::filter(cite_label == "screened") %>%
     # Count the number of distinct duplicate_ids that remain
     dplyr::n_distinct(duplicate_id)
-  
+
   # Updated for edge cases where a citation is duplicated within the screened set (should never happen)
   total_final <- unique_citations %>%
-    tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
+    expand_single_metadata_column("cite_label") %>%
     dplyr::filter(cite_label == "final") %>%
     # Count the number of distinct duplicate_ids that remain
     dplyr::n_distinct(duplicate_id)
   
   # Step 2: Proceed with the regular calculation for distinct records by source
   distinct_count <- unique_citations %>%
-    tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") %>%
+    expand_single_metadata_column(db_colname) %>%
     dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
     dplyr::group_by(!!rlang::sym(db_colname)) %>%
     dplyr::summarise(Distinct_Records = dplyr::n_distinct(duplicate_id), .groups = "drop") %>%
@@ -340,8 +338,7 @@ calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
   # Calculate the number of "screened" and "final" records for each source after expanding
   source_phase <- unique_citations %>%
     dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) %>%
-    tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") %>%
-    tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
+    expand_metadata_columns(columns = c(db_colname, "cite_label")) %>%
     dplyr::distinct() %>%
     dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
     dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
