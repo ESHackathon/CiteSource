@@ -249,12 +249,8 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
     }
     source_phase_df <- source_phase_df %>%
       dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) %>%
-      tidyr::separate_rows(!!rlang::sym(db_colname), sep = ", ") %>%
-      tidyr::separate_rows(cite_label, sep = ", ") %>%
-      unique() %>%
-      dplyr::filter(!(!!db_colname == "unknown")) %>%
-      dplyr::mutate(!!rlang::sym(db_colname) := stringr::str_trim(!!rlang::sym(db_colname)),
-                    cite_label = stringr::str_trim(cite_label)) %>%
+      expand_metadata_columns(columns = c(db_colname, "cite_label")) %>%
+      dplyr::filter(!(!!rlang::sym(db_colname) == "unknown")) %>%
       dplyr::mutate(screened = ifelse(.data$cite_label == "screened", 1, 0),
                     final = ifelse(.data$cite_label == "final", 1, 0)) %>%
       dplyr::group_by(!!rlang::sym(db_colname)) %>%
