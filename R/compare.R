@@ -65,57 +65,48 @@ count_unique <- function(unique_data, include_references = FALSE) {
 
 compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
   
+  # Map comp_type to column names
+  column_map <- c(
+    "sources" = "cite_source",
+    "strings" = "cite_string", 
+    "labels" = "cite_label"
+  )
+  
+  columns_to_expand <- column_map[comp_type]
+  columns_to_expand <- columns_to_expand[!is.na(columns_to_expand)]
+  
+  if (length(columns_to_expand) == 0) {
+    stop('comp_type must be one or more of "sources", "strings" or "labels"')
+  }
+  
   out <- list(unique_data %>% dplyr::select("duplicate_id"))
-
-  if ("sources" %in% comp_type) {
-    source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")) %>%
-      dplyr::filter(!cite_source == "") %>%
-      tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
-      unique() %>%
+  
+  # Process each column type
+  for (i in seq_along(columns_to_expand)) {
+    comp_name <- names(columns_to_expand)[i]
+    col_name <- columns_to_expand[i]
+    prefix <- paste0(stringr::str_sub(comp_name, 1, -2), "__")  # "source__", "label__", etc.
+    
+    expanded <- unique_data %>%
+      dplyr::select(.data$duplicate_id, !!rlang::sym(col_name), tidyselect::any_of("record_ids")) %>%
+      dplyr::filter(!is.na(!!rlang::sym(col_name)), !!rlang::sym(col_name) != "") %>%
+      expand_single_metadata_column(col_name) %>%
       tidyr::pivot_wider(
-        id_cols = .data$duplicate_id, names_prefix = "source__", names_from = .data$cite_source, values_from = .data$cite_source,
+        id_cols = .data$duplicate_id,
+        names_prefix = prefix,
+        names_from = !!rlang::sym(col_name),
+        values_from = !!rlang::sym(col_name),
         values_fn = function(x) TRUE,
         values_fill = FALSE
       )
-
-    out <- c(out, list(source_comparison))
-  }
-
-  if ("strings" %in% comp_type) {
-    source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_string, tidyselect::any_of("record_ids")) %>%
-      dplyr::filter(!.data$cite_string == "") %>%
-      tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
-      unique() %>%
-      tidyr::pivot_wider(
-        id_cols = .data$duplicate_id, names_prefix = "string__", names_from = .data$cite_string, values_from = .data$cite_string,
-        values_fn = function(x) TRUE,
-        values_fill = FALSE
-      )
-
-    out <- c(out, list(source_comparison))
-  }
-
-  if ("labels" %in% comp_type) {
-    source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_label, tidyselect::any_of("record_ids")) %>%
-      dplyr::filter(!cite_label == "") %>%
-      tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
-      unique() %>%
-      tidyr::pivot_wider(
-        id_cols = .data$duplicate_id, names_prefix = "label__", names_from = .data$cite_label,
-        values_from = .data$cite_label,
-        values_fn = function(x) TRUE,
-        values_fill = FALSE
-      )
-    out <- c(out, list(source_comparison))
-
-
-    if (any(stringr::str_detect(names(source_comparison), "[Ss]earch"))) {
-      search_stage <- stringr::str_subset(names(source_comparison), "[Ss]earch")
+    
+    out <- c(out, list(expanded))
+    
+    # Special warning for labels (keep existing logic)
+    if (comp_name == "labels" && any(stringr::str_detect(names(expanded), "[Ss]earch"))) {
+      search_stage <- stringr::str_subset(names(expanded), "[Ss]earch")
       if (length(search_stage) == 1) {
-        not_in_search <- sum(!source_comparison[[search_stage]])
+        not_in_search <- sum(!expanded[[search_stage]])
         if (not_in_search > 0) {
           warning(
             "Beware: ", not_in_search, " records were not included in ", search_stage, " but in other labels.",
@@ -128,9 +119,6 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
     }
   }
 
-  if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
-
-  
   out <- purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
 
   # Deals with entries missing source or label
