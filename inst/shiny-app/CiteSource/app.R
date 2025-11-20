@@ -830,18 +830,29 @@ server <- function(input, output, session) {
     
     # Generate a summary message based on deduplication results
     n_citations <- nrow(rv$upload_df)
-    n_unique_records <- nrow(rv$n_unique)  # Changed variable name to avoid conflict
+    n_unique_records <- nrow(rv$latest_unique)  # Use latest_unique, not n_unique (which is expanded)
+    n_duplicates_removed <- n_citations - n_unique_records
     n_pairs_manual <- nrow(rv$pairs_to_check)
     
+    # Format numbers with commas for readability
+    n_citations_formatted <- format(n_citations, big.mark = ",", scientific = FALSE)
+    n_unique_records_formatted <- format(n_unique_records, big.mark = ",", scientific = FALSE)
+    n_duplicates_removed_formatted <- format(n_duplicates_removed, big.mark = ",", scientific = FALSE)
+    
     message <- if (n_pairs_manual > 0) {
-      paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
+      paste0(
+        "Total citations uploaded: ", n_citations_formatted, "\n",
+        "Unique citations after deduplication: ", n_unique_records_formatted, "\n",
+        "Duplicates removed: ", n_duplicates_removed_formatted, "\n\n",
+        n_pairs_manual, " potential duplicate pair(s) require manual review. ",
+        "Head to the manual deduplication tab to check them."
       )
     } else {
-      paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
+      paste0(
+        "Total citations uploaded: ", n_citations_formatted, "\n",
+        "Unique citations after deduplication: ", n_unique_records_formatted, "\n",
+        "Duplicates removed: ", n_duplicates_removed_formatted, "\n\n",
+        "No potential duplicates for manual review. You can proceed to the visualization tab."
       )
     }
     
