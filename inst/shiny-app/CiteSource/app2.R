@@ -61,51 +61,63 @@ ui <- shiny::navbarPage("CiteSource",
                               // Parse the ID: field_pref_[pair_idx]_[field]_[A or B]
                               var parts = buttonId.split('_');
                               
-                              // Only proceed if ID format is valid
                               if (parts.length >= 4) {
                                 var recordType = parts[parts.length - 1]; // 'A' or 'B'
+                                var field = parts[parts.length - 2];
+                                var idxParts = parts.slice(2, parts.length - 2);
+                                var pairIdx = idxParts.join('_');
                                 
-                                // Determine the partner's ID (Switch A to B or B to A)
                                 var partnerType = (recordType === 'A') ? 'B' : 'A';
                                 var baseId = parts.slice(0, parts.length - 1).join('_'); 
                                 var partnerId = baseId + '_' + partnerType;
                                 var partnerBtn = $('#' + partnerId);
                                 
-                                // 1. Update the CLICKED button (Visual: Selected)
-                                clickedBtn.addClass('selected');
-                                clickedBtn.css({
-                                  'background-color': 'white',
-                                  'color': '#2d8659',
-                                  'border': '2px solid #2d8659',
-                                  'font-weight': 'bold'
-                                });
-                                clickedBtn.html('<i class=\"fa fa-check\"></i> Selected');
-                          
-                                // 2. Update the PARTNER button (Visual: Deselected)
-                                partnerBtn.removeClass('selected');
-                                partnerBtn.css({
-                                  'background-color': 'white',
-                                  'color': '#333',
-                                  'border': '1px solid #ddd',
-                                  'font-weight': 'normal'
-                                });
-                                partnerBtn.html('<i class=\"fa fa-check\"></i> Use This');
+                                var isAlreadySelected = clickedBtn.hasClass('selected');
+                                var action = ''; // 'select' or 'clear'
                                 
-                                // 3. SEND DATA TO R SERVER (Crucial Step)
-                                // We extract the pair_idx and field to send clean data to R
-                                // ID format is: field_pref_[pair_idx]_[field]_[record]
-                                // Assuming pair_idx might have underscores, we take parts from index 2 up to length-2
+                                if (isAlreadySelected) {
+                                  // CASE 1: Deselect (Toggle off)
+                                  clickedBtn.removeClass('selected');
+                                  clickedBtn.css({
+                                    'background-color': 'white',
+                                    'color': '#333',
+                                    'border': '1px solid #ddd',
+                                    'font-weight': 'normal'
+                                  });
+                                  clickedBtn.html('<i class=\"fa fa-check\"></i> Use This');
+                                  action = 'clear';
+                                  
+                                } else {
+                                  // CASE 2: Select (and deselect partner)
+                                  
+                                  // Update clicked button
+                                  clickedBtn.addClass('selected');
+                                  clickedBtn.css({
+                                    'background-color': 'white',
+                                    'color': '#2d8659',
+                                    'border': '2px solid #2d8659',
+                                    'font-weight': 'bold'
+                                  });
+                                  clickedBtn.html('<i class=\"fa fa-check\"></i> Selected');
+                                  
+                                  // Reset partner button
+                                  partnerBtn.removeClass('selected');
+                                  partnerBtn.css({
+                                    'background-color': 'white',
+                                    'color': '#333',
+                                    'border': '1px solid #ddd',
+                                    'font-weight': 'normal'
+                                  });
+                                  partnerBtn.html('<i class=\"fa fa-check\"></i> Use This');
+                                  action = 'select';
+                                }
                                 
-                                var field = parts[parts.length - 2];
-                                // pair_idx is everything between 'field_pref' and the field name
-                                var idxParts = parts.slice(2, parts.length - 2);
-                                var pairIdx = idxParts.join('_');
-                                
+                                // Send data to R
                                 Shiny.setInputValue('field_preference_click', {
                                   pair_idx: pairIdx,
                                   field: field,
-                                  record: recordType,
-                                  nonce: Math.random() // Ensure every click registers
+                                  record: (action === 'select') ? recordType : 'clear',
+                                  nonce: Math.random()
                                 });
                               }
                             });
@@ -340,139 +352,126 @@ ui <- shiny::navbarPage("CiteSource",
                               shiny::textOutput("Manual_pretext"),
                               shiny::br(),
                               
-                              # Top toolbar: View mode and main actions
-                              shiny::wellPanel(
-                                style = "background-color: #f0f8ff; padding: 12px; margin-bottom: 15px; border: 1px solid #bce8f1;",
-                                shiny::fluidRow(
-                                  shiny::column(
-                                    3,
-                                    shinyWidgets::prettyRadioButtons(
-                                      inputId = "dedup_view_mode",
-                                      label = shiny::tags$strong("View Mode:"),
-                                      choices = c("Card View" = "card", "Table View" = "table"),
-                                      selected = "table",
-                                      inline = TRUE,
-                                      status = "primary"
+                              # 1. Action Buttons (Always Visible)
+                              shiny::div(
+                                style = "text-align: right; margin-bottom: 15px;",
+                                shinyWidgets::actionBttn(
+                                  inputId = "manualdedupsubmit",
+                                  label = "Remove Selected Duplicates",
+                                  style = "jelly",
+                                  icon = shiny::icon("trash"),
+                                  color = "primary",
+                                  size = "sm"
+                                ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B; margin-right: 10px;"),
+                                shinyWidgets::actionBttn(
+                                  inputId = "nomanualdedup",
+                                  label = "Go to Visualisations",
+                                  style = "jelly",
+                                  icon = shiny::icon("arrow-right"),
+                                  color = "primary",
+                                  size = "sm"
+                                ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173;")
+                              ),
+                              
+                              # 2. Collapsible Options Box
+                              bslib::accordion(
+                                open = "Options & Filters", # Default state: Open
+                                bslib::accordion_panel(
+                                  title = "Options & Filters",
+                                  icon = shiny::icon("sliders-h"),
+                                  
+                                  # View Mode Selection
+                                  shiny::fluidRow(
+                                    shiny::column(
+                                      12,
+                                      shinyWidgets::prettyRadioButtons(
+                                        inputId = "dedup_view_mode",
+                                        label = shiny::tags$strong("View Mode:"),
+                                        choices = c("Card View" = "card", "Table View" = "table"),
+                                        selected = "table",
+                                        inline = TRUE,
+                                        status = "primary"
+                                      )
                                     )
                                   ),
-                                  shiny::column(
-                                    9,
-                                    shiny::div(
-                                      style = "text-align: right; padding-top: 5px;",
-                                      shinyWidgets::actionBttn(
-                                        inputId = "manualdedupsubmit",
-                                        label = "Remove Selected Duplicates",
-                                        style = "jelly",
-                                        icon = shiny::icon("arrow"),
-                                        color = "primary",
-                                        size = "sm"
-                                      ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B; margin-right: 10px;"),
-                                      shinyWidgets::actionBttn(
-                                        inputId = "nomanualdedup",
-                                        label = "Go to Visualisations",
-                                        style = "jelly",
-                                        icon = shiny::icon("arrow-right"),
-                                        color = "primary",
-                                        size = "sm"
-                                      ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173;")
+                                  shiny::hr(),
+                                  # Card View Filters (Conditional)
+                                  shiny::conditionalPanel(
+                                    condition = "input.dedup_view_mode == 'card'",
+                                    shiny::tags$h6(shiny::icon("filter"), " Card Navigation"),
+                                    shiny::fluidRow(
+                                      shiny::column(
+                                        4,
+                                        shiny::sliderInput(
+                                          inputId = "similarity_filter",
+                                          label = "Min Similarity",
+                                          min = 0,
+                                          max = 100,
+                                          value = 0,
+                                          step = 5,
+                                          post = "%",
+                                          width = "100%"
+                                        )
+                                      ),
+                                      shiny::column(
+                                        4,
+                                        shiny::selectInput(
+                                          inputId = "similarity_sort",
+                                          label = "Sort by Similarity",
+                                          choices = list(
+                                            "Highest First" = "desc",
+                                            "Lowest First" = "asc"
+                                          ),
+                                          selected = "desc",
+                                          width = "100%"
+                                        )
+                                      ),
+                                      shiny::column(
+                                        4,
+                                        shiny::uiOutput("dedup_progress")
+                                      )
+                                    )
+                                  ),
+                                  # Table View Options (Conditional)
+                                  shiny::conditionalPanel(
+                                    condition = "input.dedup_view_mode == 'table'",
+                                    shiny::tags$h6(shiny::icon("columns"), " Table Columns"),
+                                    shinyWidgets::pickerInput(
+                                      inputId = "manual_dedup_cols",
+                                      label = "Choose columns",
+                                      choices = NULL,
+                                      selected = NULL,
+                                      multiple = TRUE,
+                                      options = list(
+                                        `live-search` = TRUE,
+                                        `actions-box` = TRUE,
+                                        style = "btn-primary"),
+                                      width = "100%"
                                     )
                                   )
                                 )
                               ),
                               
-                              # Card View UI
+                              shiny::br(),
+                              
+                              # 3. Main Content Area
+                              
+                              # Card View Output
                               shiny::conditionalPanel(
                                 condition = "input.dedup_view_mode == 'card'",
-                                shiny::fluidRow(
-                                  shiny::column(
-                                    12,
-                                    # Filters and navigation panel
-                                    shiny::wellPanel(
-                                      style = "background-color: #f8f9fa; padding: 12px; margin-bottom: 15px; border: 1px solid #dee2e6;",
-                                      shiny::tags$h6(
-                                        style = "margin-top: 0; margin-bottom: 12px; color: #23395B; font-weight: bold;",
-                                        shiny::icon("filter"), " Filters & Navigation"
-                                      ),
-                                      shiny::fluidRow(
-                                        shiny::column(
-                                          3,
-                                          shiny::sliderInput(
-                                            inputId = "similarity_filter",
-                                            label = "Min Similarity",
-                                            min = 0,
-                                            max = 100,
-                                            value = 0,
-                                            step = 5,
-                                            post = "%",
-                                            width = "100%"
-                                          )
-                                        ),
-                                        shiny::column(
-                                          2,
-                                          shiny::numericInput(
-                                            inputId = "current_pair_index",
-                                            label = "Go to Pair #",
-                                            value = 1,
-                                            min = 1,
-                                            max = 1,
-                                            step = 1,
-                                            width = "100%"
-                                          )
-                                        ),
-                                        shiny::column(
-                                          3,
-                                          shiny::selectInput(
-                                            inputId = "similarity_sort",
-                                            label = "Sort by Similarity",
-                                            choices = list(
-                                              "Highest First" = "desc",
-                                              "Lowest First" = "asc"
-                                            ),
-                                            selected = "desc",
-                                            width = "100%"
-                                          )
-                                        ),
-                                        shiny::column(
-                                          4,
-                                          shiny::uiOutput("dedup_progress")
-                                        )
-                                      )
-                                    ),
-                                    # Card view display
-                                    shiny::uiOutput("dedup_card_view")
-                                  )
-                                )
+                                shiny::uiOutput("dedup_card_view")
                               ),
                               
-                              # Table View UI (original)
+                              # Table View Output
                               shiny::conditionalPanel(
                                 condition = "input.dedup_view_mode == 'table'",
-                                shinyWidgets::dropdown(
-                                  tags$h3("Select columns to display"),
-                                  shinyWidgets::pickerInput(
-                                    inputId = "manual_dedup_cols",
-                                    label = "Choose columns",
-                                    choices = NULL,
-                                    selected = NULL,
-                                    multiple = TRUE,
-                                    options = list(
-                                      `live-search` = TRUE,
-                                      `actions-box` = TRUE,
-                                      style = "btn-primary")
-                                  ), 
-                                  icon = icon("filter"),
-                                  inline = TRUE,
-                                  status = "danger", 
-                                  width = "600px",
-                                  tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")
-                                ),
                                 DT::DTOutput("manual_dedup_dt"),
                                 tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
             background-color: #CBF7ED!important; color: black!important}"))
                               )
                             )
-                          )
-                        ),
+                              )
+                            ),
                         shiny::tabPanel(
                           "Visualise",
                           # Sidebar layout ----
@@ -1488,14 +1487,49 @@ server <- function(input, output, session) {
   }
   
   # Function to set preference for a field in a pair
+  # Function to set preference for a field in a pair
   set_field_preference <- function(pair_row_idx, field, preference) {
     key <- as.character(pair_row_idx)
     if (!key %in% names(rv$field_preferences)) {
       rv$field_preferences[[key]] <- list()
     }
-    rv$field_preferences[[key]][[field]] <- preference
+    
+    if (preference == "clear") {
+      # Remove the specific field preference
+      rv$field_preferences[[key]][[field]] <- NULL
+      # Clean up if list is empty
+      if (length(rv$field_preferences[[key]]) == 0) {
+        rv$field_preferences[[key]] <- NULL
+      }
+    } else {
+      rv$field_preferences[[key]][[field]] <- preference
+    }
   }
   
+  # --- Handle the custom JavaScript button click ---
+  shiny::observeEvent(input$field_preference_click, {
+    click_data <- input$field_preference_click
+    req(click_data)
+    
+    # 1. Update the preference (A, B, or clear)
+    set_field_preference(click_data$pair_idx, click_data$field, click_data$record)
+    
+    # 2. Auto-mark as duplicate logic
+    # If the user selected A or B (not clearing), automatically mark the pair as duplicate
+    if (click_data$record != "clear") {
+      
+      # We need to map the pair_idx (string from JS) back to the numeric original_row_index
+      # In the JS we passed the original_row_index as the pair_idx ID
+      row_idx <- as.numeric(click_data$pair_idx)
+      
+      if (!is.na(row_idx) && !row_idx %in% rv$selected_pairs_card) {
+        rv$selected_pairs_card <- unique(c(rv$selected_pairs_card, row_idx))
+        
+        # Optional: Show a subtle notification
+        show_toastr("Pair Marked", "Pair automatically marked as duplicate.", type = "info")
+      }
+    }
+  })  
   # Calculate similarity score for a pair
   calculate_similarity <- function(pair_row) {
     # Fields to compare (with weights)
@@ -2050,6 +2084,9 @@ server <- function(input, output, session) {
                 shiny::tags$span(style = "background-color: #d4edda; padding: 3px 10px; border-radius: 3px; margin-right: 5px;", "Green = Match"),
                 shiny::tags$span(style = "background-color: #fff3cd; padding: 3px 10px; border-radius: 3px; margin-right: 5px;", "Yellow = Different"),
                 shiny::tags$span(style = "background-color: #f8d7da; padding: 3px 10px; border-radius: 3px;", "Red = Missing")
+              ), shiny::tags$div(
+                style = "margin-top: 8px; font-size: 0.85em; color: #555; font-style: italic;",
+                shiny::icon("info-circle"), " Tip: Selecting a specific value ('Use This') automatically marks the pair as a duplicate."
               )
             ),
             shiny::column(
