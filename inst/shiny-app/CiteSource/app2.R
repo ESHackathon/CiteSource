@@ -52,6 +52,64 @@ ui <- shiny::navbarPage("CiteSource",
                                 'escapeHtml': false
                               };
                             ")),
+                            tags$script(HTML("
+                            // Handle field preference button selection
+                            $(document).on('click', '.btn-field-preference', function(e) {
+                              var clickedBtn = $(this);
+                              var buttonId = clickedBtn.attr('id');
+                              
+                              // Parse the ID: field_pref_[pair_idx]_[field]_[A or B]
+                              var parts = buttonId.split('_');
+                              
+                              // Only proceed if ID format is valid
+                              if (parts.length >= 4) {
+                                var recordType = parts[parts.length - 1]; // 'A' or 'B'
+                                
+                                // Determine the partner's ID (Switch A to B or B to A)
+                                var partnerType = (recordType === 'A') ? 'B' : 'A';
+                                var baseId = parts.slice(0, parts.length - 1).join('_'); 
+                                var partnerId = baseId + '_' + partnerType;
+                                var partnerBtn = $('#' + partnerId);
+                                
+                                // 1. Update the CLICKED button (Visual: Selected)
+                                clickedBtn.addClass('selected');
+                                clickedBtn.css({
+                                  'background-color': 'white',
+                                  'color': '#2d8659',
+                                  'border': '2px solid #2d8659',
+                                  'font-weight': 'bold'
+                                });
+                                clickedBtn.html('<i class=\"fa fa-check\"></i> Selected');
+                          
+                                // 2. Update the PARTNER button (Visual: Deselected)
+                                partnerBtn.removeClass('selected');
+                                partnerBtn.css({
+                                  'background-color': 'white',
+                                  'color': '#333',
+                                  'border': '1px solid #ddd',
+                                  'font-weight': 'normal'
+                                });
+                                partnerBtn.html('<i class=\"fa fa-check\"></i> Use This');
+                                
+                                // 3. SEND DATA TO R SERVER (Crucial Step)
+                                // We extract the pair_idx and field to send clean data to R
+                                // ID format is: field_pref_[pair_idx]_[field]_[record]
+                                // Assuming pair_idx might have underscores, we take parts from index 2 up to length-2
+                                
+                                var field = parts[parts.length - 2];
+                                // pair_idx is everything between 'field_pref' and the field name
+                                var idxParts = parts.slice(2, parts.length - 2);
+                                var pairIdx = idxParts.join('_');
+                                
+                                Shiny.setInputValue('field_preference_click', {
+                                  pair_idx: pairIdx,
+                                  field: field,
+                                  record: recordType,
+                                  nonce: Math.random() // Ensure every click registers
+                                });
+                              }
+                            });
+                          ")),
                             tags$style(HTML("
                               h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
                                 margin-top: 0;
@@ -146,6 +204,49 @@ ui <- shiny::navbarPage("CiteSource",
                               .dedup-similarity-low {
                                 background-color: #f8d7da;
                                 color: #721c24;
+                              }
+                              .btn-field-preference {
+                                padding: 4px 8px;
+                                font-size: 0.8em;
+                                border-radius: 3px;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                margin-left: 8px;
+                              }
+                              .btn-field-preference:hover {
+                                opacity: 0.9;
+                                transform: scale(1.05);
+                              }
+                              .btn-field-preference.selected {
+                                background-color: white !important;
+                                color: #2d8659 !important;
+                                border: 2px solid #2d8659 !important;
+                                font-weight: bold;
+                                box-shadow: 0 2px 6px rgba(45, 134, 89, 0.3);
+                              }
+                              .btn-field-preference.selected:hover {
+                                background-color: #f0f8f5 !important;
+                                box-shadow: 0 3px 8px rgba(45, 134, 89, 0.5);
+                              }
+                              .field-preferred {
+                                box-shadow: 0 0 8px rgba(130, 209, 115, 0.3);
+                              }
+                              .default-indicator {
+                                display: inline-block;
+                                margin-right: 4px;
+                                font-size: 0.75em;
+                                padding: 2px 6px;
+                                background-color: #e8f4f8;
+                                color: #0066cc;
+                                border-radius: 3px;
+                                border: 1px solid #0066cc;
+                                font-weight: 600;
+                              }
+                              .dedup-field-label {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 4px;
                               }
                             "))
                           )
@@ -1632,9 +1733,9 @@ server <- function(input, output, session) {
   
   ## Manual deduplication -----
   
-  # Action button: remove manually selected duplicates [merged two segments into one]
-  # remove manually selected duplicates 
-  observeEvent(input$manualdedupsubmit,{
+
+  # Action button: remove manually selected duplicates
+  shiny::observeEvent(input$manualdedupsubmit, {
     
     # Combine selections from both card view and table view
     selected_indices <- unique(c(
@@ -1647,19 +1748,41 @@ server <- function(input, output, session) {
       return()
     }
     
-    rv$pairs_removed <- rv$pairs_to_check[selected_indices, ]
+    # Move selected pairs to removed list
+    new_removed <- rv$pairs_to_check[selected_indices, ]
     rv$pairs_to_check <- rv$pairs_to_check[-selected_indices, ]
+    
+    # --- Initialize the column to prevent "Unknown column" warning ---
+    new_removed$field_preferences <- NA_character_
+    
+    # Attach field preferences to each removed pair
+    for (i in seq_len(nrow(new_removed))) {
+      # Use the ORIGINAL row index to look up preferences
+      # (If the dataframe was reordered, we need the stable ID)
+      pair_idx <- if("original_row_index" %in% names(new_removed)) new_removed$original_row_index[i] else selected_indices[i]
+      
+      # Fallback if original_row_index is missing (use the selected index directly)
+      # In the card view logic, we used original_row_index as the key
+      prefs <- get_pair_preferences(pair_idx)
+      
+      # Add preferences as a new column if any preferences are set
+      if (length(prefs) > 0) {
+        new_removed$field_preferences[i] <- jsonlite::toJSON(prefs, auto_unbox = TRUE)
+      }
+    }
+    
+    # Update global removed list
+    rv$pairs_removed <- dplyr::bind_rows(rv$pairs_removed, new_removed)
     
     # Clear card view selections
     rv$selected_pairs_card <- integer(0)
     
-    if(nrow(rv$pairs_removed) < 1){
-      show_toastr("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
-      return()
-    }
+    # Perform the manual deduplication in CiteSource
+    after <- CiteSource::dedup_citations_add_manual(rv$latest_unique,
+                                                    additional_pairs = new_removed)
     
-    after <- dedup_citations_add_manual(rv$latest_unique,
-                                        additional_pairs = rv$pairs_removed)
+    # --- Apply the field preferences to the merged data ---
+    after <- apply_field_preferences(after, new_removed, rv$latest_unique)
     
     # update latest unique df reactive value
     rv$latest_unique <- after
@@ -1667,10 +1790,11 @@ server <- function(input, output, session) {
     # Show success message
     show_toastr(
       "Manual deduplication complete",
-      paste("Removed", nrow(rv$pairs_removed), "duplicate pair(s). You can now proceed to visualizations and tables."),
+      paste("Removed", nrow(new_removed), "duplicate pair(s)."),
       type = "success"
     )
   })
+  
   observe({
     all_cols <- names(rv$pairs_to_check)
     base_cols <- unique(gsub("(1|2)$", "", all_cols)) # Remove "1" or "2" suffix
@@ -1698,6 +1822,27 @@ server <- function(input, output, session) {
   # Track selected pairs for card view
   rv$selected_pairs_card <- integer(0)
   rv$current_pair_index <- 1
+  
+  # Track field preferences for each pair (e.g., rv$field_preferences$"pair_123"$author = "A")
+  rv$field_preferences <- list()
+  
+  # Function to get or initialize preferences for a pair
+  get_pair_preferences <- function(pair_row_idx) {
+    key <- as.character(pair_row_idx)
+    if (!key %in% names(rv$field_preferences)) {
+      rv$field_preferences[[key]] <- list()
+    }
+    rv$field_preferences[[key]]
+  }
+  
+  # Function to set preference for a field in a pair
+  set_field_preference <- function(pair_row_idx, field, preference) {
+    key <- as.character(pair_row_idx)
+    if (!key %in% names(rv$field_preferences)) {
+      rv$field_preferences[[key]] <- list()
+    }
+    rv$field_preferences[[key]][[field]] <- preference
+  }
   
   # Calculate similarity score for a pair
   calculate_similarity <- function(pair_row) {
@@ -1926,7 +2071,8 @@ server <- function(input, output, session) {
     selected_cols <- input$manual_dedup_cols
     
     # Define the desired base order
-    core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string")
+    core_col_order <- c("author", "title", "year", "journal", "abstract",
+                                "doi", "pages", "source", "label")
     # Create the desired interleaved order of columns to select
     
     desired_table_order <- character(0)
@@ -2054,6 +2200,97 @@ server <- function(input, output, session) {
     )
   })
   
+  # Helper function to build field with preference selector
+  build_field_with_preference <- function(field, val1, val2, comparison, is_record_a, pair_row_idx) {
+    field_class <- paste0("dedup-field ", comparison$status)
+    field_value <- if (is_record_a) comparison$val1 else comparison$val2
+    
+    # Fields where user might want to override (when values differ)
+    selectable_fields <- c("author", "abstract", "title", "journal")
+    is_selectable <- field %in% selectable_fields && (comparison$status == "different" || comparison$status == "missing")
+    
+    # Get current preference
+    prefs <- get_pair_preferences(pair_row_idx)
+    current_pref <- prefs[[field]]
+    
+    # Determine if this field is preferred
+    is_preferred <- FALSE
+    if (!is.null(current_pref) && length(current_pref) > 0) {
+      is_preferred <- if (is_record_a) {
+        current_pref == "A"
+      } else {
+        current_pref == "B"
+      }
+      # Handle case where comparison returns NA or empty
+      if (is.na(is_preferred)) is_preferred <- FALSE
+    }
+    
+    # Determine default selection (which would be kept by ASySD)
+    # For selectable fields with "different" or "missing" status, show which is default
+    is_default <- FALSE
+    show_default_badge <- FALSE
+
+    if (is_selectable && (comparison$status == "different" || comparison$status == "missing")) {
+      val1_len <- nchar(as.character(comparison$val1))
+      val2_len <- nchar(as.character(comparison$val2))
+      if (comparison$status == "missing") {
+        # Show badge on the non-missing value
+        if (comparison$val1 != "N/A" && is_record_a) {
+          is_default <- TRUE
+        } else if (comparison$val2 != "N/A" && !is_record_a) {
+          is_default <- TRUE
+        } else {
+          is_default <- FALSE
+        }
+        show_default_badge <- is_default
+      } else {
+        # 'different' logic as before
+        if (val1_len > val2_len) {
+          is_default <- is_record_a
+        } else if (val2_len > val1_len) {
+          is_default <- !is_record_a
+        } else {
+          is_default <- is_record_a
+        }
+        show_default_badge <- TRUE
+      }
+    }
+    
+    record_label <- if (is_record_a) "Record A" else "Record B"
+    
+    shiny::tags$div(
+      class = paste0("dedup-field ", comparison$status, if (isTRUE(is_preferred)) " field-preferred" else ""),
+      style = if (isTRUE(is_preferred)) "background-color: #f0f8ff; border-left: 3px solid #008080;" else "",
+      shiny::tags$div(
+        class = "dedup-field-label",
+        shiny::tags$span(stringr::str_to_title(field), ":"),
+        if (is_selectable) {
+          shiny::tagList(
+            shiny::actionButton(
+              paste0("field_pref_", pair_row_idx, "_", field, "_", if (is_record_a) "A" else "B"),
+              label = shiny::tagList(shiny::icon("check"), if (isTRUE(is_preferred)) "Selected" else "Use This"),
+              class = paste0("btn-field-preference", if (isTRUE(is_preferred)) " selected" else ""),
+              style = if (isTRUE(is_preferred)) "background-color: white; color: #2d8659; border: 2px solid #2d8659; font-weight: bold;" else "background-color: white; color: #333; border: 1px solid #ddd;",
+              size = "sm"
+            ),
+            if (show_default_badge && isTRUE(is_default)) {
+              shiny::tags$span(
+                class = "default-indicator",
+                style = "margin-left: 6px;",
+                shiny::icon("star"),
+                "Default"
+              )
+            }
+          )
+        }
+      ),
+      shiny::tags$div(
+        class = "dedup-field-value",
+        field_value
+      )
+    )
+  }
+  
   # Helper function to compare field values
   compare_field <- function(val1, val2) {
     # Normalize values
@@ -2113,6 +2350,9 @@ server <- function(input, output, session) {
     # Fields to display - always show all fields to ensure alignment
     fields_to_show <- c("title", "author", "year", "journal", "doi", "pages", "volume", "abstract", "source", "label")
     
+    # Get pair row index for preference tracking
+    pair_row_idx <- if ("original_row_index" %in% names(pair)) pair$original_row_index else rv$current_pair_index
+    
     # Build record A card - always include all fields for alignment
     record_a_fields <- lapply(fields_to_show, function(field) {
       col1 <- paste0(field, "1")
@@ -2123,19 +2363,8 @@ server <- function(input, output, session) {
       val2 <- if (col2 %in% names(pair)) pair[[col2]] else ""
       
       comparison <- compare_field(val1, val2)
-      field_class <- paste0("dedup-field ", comparison$status)
       
-      shiny::tags$div(
-        class = field_class,
-        shiny::tags$div(
-          class = "dedup-field-label",
-          stringr::str_to_title(field), ":"
-        ),
-        shiny::tags$div(
-          class = "dedup-field-value",
-          comparison$val1
-        )
-      )
+      build_field_with_preference(field, val1, val2, comparison, TRUE, pair_row_idx)
     })
     
     # Build record B card - always include all fields for alignment
@@ -2148,23 +2377,11 @@ server <- function(input, output, session) {
       val2 <- if (col2 %in% names(pair)) pair[[col2]] else ""
       
       comparison <- compare_field(val1, val2)
-      field_class <- paste0("dedup-field ", comparison$status)
       
-      shiny::tags$div(
-        class = field_class,
-        shiny::tags$div(
-          class = "dedup-field-label",
-          stringr::str_to_title(field), ":"
-        ),
-        shiny::tags$div(
-          class = "dedup-field-value",
-          comparison$val2
-        )
-      )
+      build_field_with_preference(field, val1, val2, comparison, FALSE, pair_row_idx)
     })
     
     # Check if current pair is selected
-    pair_row_idx <- if ("original_row_index" %in% names(pair)) pair$original_row_index else NULL
     is_selected <- !is.null(pair_row_idx) && pair_row_idx %in% rv$selected_pairs_card
     
     shiny::fluidRow(
@@ -2279,6 +2496,22 @@ server <- function(input, output, session) {
     )
   })
   
+
+  # --- Handle the custom JavaScript button click ---
+  shiny::observeEvent(input$field_preference_click, {
+    click_data <- input$field_preference_click
+    
+    # Check if data exists
+    req(click_data)
+    
+    # Log for debugging (optional, prints to R console)
+     message("Click received: Pair ", click_data$pair_idx, 
+             " Field: ", click_data$field, 
+             " Record: ", click_data$record)
+    
+    # Save the preference to the reactive value
+    set_field_preference(click_data$pair_idx, click_data$field, click_data$record)
+  })  
   # Skip button handler
   shiny::observeEvent(input$dedup_skip, {
     filtered <- filtered_pairs()
@@ -2292,6 +2525,80 @@ server <- function(input, output, session) {
     }
   })
   
+  # Function to apply field preferences to merged records
+  apply_field_preferences <- function(merged_data, pairs_removed, original_unique) {
+    if (nrow(pairs_removed) == 0) return(merged_data)
+    
+    # --- Detect the correct ID column name ---
+    # CiteSource sometimes uses 'record_id' and sometimes 'duplicate_id'
+    id_col <- "record_id"
+    if (!"record_id" %in% names(merged_data)) {
+      if ("duplicate_id" %in% names(merged_data)) {
+        id_col <- "duplicate_id"
+      } else {
+        warning("apply_field_preferences: Could not find record_id or duplicate_id in merged data.")
+        return(merged_data)
+      }
+    }
+    
+    # Iterate through every removed pair to check for preferences
+    for (i in seq_len(nrow(pairs_removed))) {
+      pair <- pairs_removed[i, ]
+      
+      # 1. Decode the JSON preferences
+      prefs_json <- if ("field_preferences" %in% names(pair)) pair$field_preferences else "{}"
+      if (is.na(prefs_json) || prefs_json == "") prefs_json <- "{}"
+      
+      prefs <- tryCatch(
+        jsonlite::fromJSON(prefs_json),
+        error = function(e) list()
+      )
+      
+      # 2. If user made specific selections for this pair
+      if (length(prefs) > 0) {
+        
+        # Identify the ID of the record that SURVIVED in the final dataset
+        # handle tibble vs dataframe access safely
+        id1 <- if("record_id1" %in% names(pair)) pair[["record_id1"]] else pair[["record_id.x"]]
+        id2 <- if("record_id2" %in% names(pair)) pair[["record_id2"]] else pair[["record_id.y"]]
+        
+        # Check if we are dealing with NAs
+        if (is.null(id1)) id1 <- NA
+        if (is.null(id2)) id2 <- NA
+        
+        # Find the row index of the survivor in the merged dataset
+        # accessing the column dynamically using [[id_col]]
+        target_row <- which(merged_data[[id_col]] == id1)
+        if (length(target_row) == 0) {
+          target_row <- which(merged_data[[id_col]] == id2)
+        }
+        
+        # 3. Overwrite the data
+        if (length(target_row) > 0) {
+          for (field in names(prefs)) {
+            choice <- prefs[[field]] # "A" or "B"
+            
+            # Determine which column in the pair contained the chosen value
+            source_col <- paste0(field, if (choice == "A") "1" else "2")
+            
+            # If that column exists in the pair data
+            if (source_col %in% names(pair)) {
+              new_value <- pair[[source_col]]
+              
+              # Force this value into the final merged dataset
+              # Ensure we aren't writing NULL or weird types
+              if (field %in% names(merged_data)) {
+                if(is.null(new_value) || length(new_value) == 0) new_value <- NA
+                merged_data[target_row, field] <- new_value
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return(merged_data)
+  }
   
   #### Visualise tab ####
   
