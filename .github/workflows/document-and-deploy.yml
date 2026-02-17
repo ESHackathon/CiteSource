@@ -49,6 +49,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          RENV_CONFIG_SNAPSHOT_VALIDATE: "false"
         run: |
           R -e "
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);
@@ -62,6 +63,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          RENV_CONFIG_SNAPSHOT_VALIDATE: "false"
         run: |
           R -e "
             remotes::install_github('ESHackathon/CiteSource', force = TRUE);

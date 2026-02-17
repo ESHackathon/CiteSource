@@ -39,6 +39,7 @@ Imports:
     ggplot2,
     glue,
     gt,
+    progress,
     purrr,
     rlang,
     scales,
