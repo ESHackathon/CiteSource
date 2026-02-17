@@ -337,6 +337,41 @@ ui <- shiny::navbarPage("CiteSource",
                               shiny::h5("Step 3: Deduplicate"),
                               shiny::p("Click the button below to detect and remove duplicates automatically"),
                               
+                              # Toggle between default and custom thresholds
+                              shiny::div(
+                                style = "margin-bottom: 20px;",
+                                shinyWidgets::prettySwitch(
+                                  inputId = "use_custom_thresholds",
+                                  label = "Use Custom Thresholds",
+                                  value = FALSE,
+                                  status = "primary",
+                                  fill = TRUE
+                                ),
+                                shiny::tags$p(
+                                  style = "font-size: 0.9em; color: #666; margin-top: 5px;",
+                                  "Toggle to customize blocking rounds and validation criteria thresholds"
+                                )
+                              ),
+                              
+                              # Custom thresholds UI (conditional)
+                              shiny::conditionalPanel(
+                                condition = "input.use_custom_thresholds == true",
+                                bslib::accordion(
+                                  open = FALSE,
+                                  bslib::accordion_panel(
+                                    title = "Custom Blocking Rounds",
+                                    icon = shiny::icon("filter"),
+                                    shiny::uiOutput("custom_blocking_ui")
+                                  ),
+                                  bslib::accordion_panel(
+                                    title = "Custom Validation Criteria",
+                                    icon = shiny::icon("check-circle"),
+                                    shiny::uiOutput("custom_validation_ui")
+                                  )
+                                ),
+                                shiny::br()
+                              ),
+                              
                               # Action button: identify duplicates in uploaded dataset
                               shinyWidgets::actionBttn(
                                 "identify_dups", "Find duplicates",
@@ -344,6 +379,16 @@ ui <- shiny::navbarPage("CiteSource",
                                 color = "primary",
                                 icon = shiny::icon("search")
                               ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
+                              
+                              shiny::br(),
+                              shiny::br(),
+                              
+                              # Statistics table (appears after deduplication)
+                              shiny::conditionalPanel(
+                                condition = "output.show_dedup_stats",
+                                shiny::h5("Deduplication Statistics"),
+                                shiny::uiOutput("dedup_statistics_table")
+                              )
                             ),
                             shiny::tabPanel(
                               "Manual deduplication",
@@ -479,8 +524,8 @@ ui <- shiny::navbarPage("CiteSource",
                                 )
                               )
                             )
-                          )
-                        ),
+                              )
+                            ),
                         shiny::tabPanel(
                           "Visualise",
                           # Sidebar layout ----
@@ -783,6 +828,121 @@ server <- function(input, output, session) {
   rv$latest_unique <- data.frame()#for reimported data
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
+  rv$dedup_stats <- NULL # Statistics from deduplication
+  rv$custom_blocking_rounds <- NULL # Custom blocking rounds
+  rv$custom_validation_criteria <- list() # Custom validation criteria (will be initialized with defaults)
+  rv$defaults_loaded <- FALSE # Flag to prevent reloading defaults in a loop
+  rv$criteria_manually_edited <- FALSE # Flag to track if user has manually edited criteria (prevents auto-reload)
+  rv$sync_locked <- FALSE # Flag to temporarily disable sync after deletion to prevent reading stale inputs
+  rv$unlock_sync_at <- NULL # Timestamp when sync should be unlocked
+  
+  # Initialize custom validation criteria with defaults (convert from 0-1 to 0-100)
+  load_default_validation_criteria <- function() {
+    tryCatch({
+      message("load_default_validation_criteria: Calling get_default_validation_criteria()")
+      defaults <- CiteSource:::get_default_validation_criteria()
+      message("load_default_validation_criteria: Got ", length(defaults), " default criteria from function")
+      if (is.null(defaults) || length(defaults) == 0) {
+        message("load_default_validation_criteria: No defaults found, returning empty list")
+        return(list())
+      }
+      if (length(defaults) > 0) {
+        message("load_default_validation_criteria: First default name: ", defaults[[1]]$name)
+        message("load_default_validation_criteria: First default criteria fields: ", paste(names(defaults[[1]]$criteria), collapse=", "))
+        if ("title" %in% names(defaults[[1]]$criteria)) {
+          message("load_default_validation_criteria: First default title value: ", defaults[[1]]$criteria$title)
+        }
+      }
+      # Convert thresholds from decimals (0-1) to percentages (0-100)
+      criteria_list <- lapply(defaults, function(criterion) {
+        if (is.null(criterion) || is.null(criterion$criteria)) {
+          return(NULL)
+        }
+        # Convert all criteria values from 0-1 to 0-100
+        converted_criteria <- lapply(criterion$criteria, function(val) {
+          if (is.null(val) || is.na(val)) {
+            return(NA_real_)
+          }
+          num_val <- suppressWarnings(as.numeric(val))
+          if (is.na(num_val)) {
+            return(NA_real_)
+          }
+          round(num_val * 100, 0)
+        })
+        
+        # Build the criterion list with all fields (use NA_real_ for missing fields)
+        criterion_result <- list(
+          name = ifelse(is.null(criterion$name) || criterion$name == "", "", as.character(criterion$name))
+        )
+        # Add all fields, using NA_real_ if not present
+        for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+          if (field %in% names(converted_criteria)) {
+            field_val <- converted_criteria[[field]]
+            if (!is.null(field_val) && !is.na(field_val)) {
+              # Ensure it's numeric
+              num_val <- suppressWarnings(as.numeric(field_val))
+              criterion_result[[field]] <- if (is.na(num_val)) NA_real_ else num_val
+            } else {
+              criterion_result[[field]] <- NA_real_
+            }
+          } else {
+            criterion_result[[field]] <- NA_real_
+          }
+        }
+        # Ensure all values are explicitly numeric (defensive programming)
+        for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+          if (is.logical(criterion_result[[field]])) {
+            criterion_result[[field]] <- NA_real_
+          } else if (!is.numeric(criterion_result[[field]])) {
+            num_val <- suppressWarnings(as.numeric(criterion_result[[field]]))
+            criterion_result[[field]] <- if (is.na(num_val)) NA_real_ else num_val
+          }
+        }
+        criterion_result
+      })
+      # Remove NULL entries
+      criteria_list <- criteria_list[!sapply(criteria_list, is.null)]
+      message("load_default_validation_criteria: Converted to ", length(criteria_list), " criteria")
+      if (length(criteria_list) > 0) {
+        message("load_default_validation_criteria: First converted name: ", criteria_list[[1]]$name)
+        message("load_default_validation_criteria: First converted title type: ", class(criteria_list[[1]]$title), ", value: ", criteria_list[[1]]$title)
+      }
+      return(criteria_list)
+    }, error = function(e) {
+      # Fallback: return empty list if function not available
+      warning("Could not load default validation criteria: ", e$message)
+      message("load_default_validation_criteria: Error occurred: ", e$message)
+      return(list())
+    })
+  }
+  
+  # Initialize on app start
+  initial_criteria <- load_default_validation_criteria()
+  if (length(initial_criteria) > 0) {
+    # Defensive: ensure all values are numeric (convert any logical NAs to numeric NAs)
+    initial_criteria <- lapply(initial_criteria, function(crit) {
+      for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+        if (field %in% names(crit)) {
+          if (is.logical(crit[[field]]) && is.na(crit[[field]])) {
+            crit[[field]] <- NA_real_
+          } else if (!is.numeric(crit[[field]])) {
+            num_val <- suppressWarnings(as.numeric(crit[[field]]))
+            crit[[field]] <- if (is.na(num_val)) NA_real_ else num_val
+          }
+        }
+      }
+      crit
+    })
+    rv$custom_validation_criteria <- initial_criteria
+    message("Initialized custom_validation_criteria with ", length(initial_criteria), " default criteria")
+    if (length(initial_criteria) > 0) {
+      message("First criterion name: ", initial_criteria[[1]]$name)
+      message("First criterion title type: ", class(initial_criteria[[1]]$title), ", value: ", initial_criteria[[1]]$title)
+    }
+  } else {
+    message("Warning: Could not load default validation criteria on app start")
+    rv$custom_validation_criteria <- list()
+  }
   
   # Helper function to show toastr notifications
   show_toastr <- function(title, message, type = "info") {
@@ -1354,10 +1514,243 @@ server <- function(input, output, session) {
     # Assign unique IDs to avoid issues with manual deduplication
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
     
-    # Perform deduplication
-    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = TRUE)
+    # Check if using custom thresholds
+    use_custom <- isTRUE(input$use_custom_thresholds)
+    blocking_rounds <- NULL
+    validation_criteria <- NULL
+    
+    # Always use custom path to get statistics, but with defaults if not customizing
+    # This ensures statistics are always available as per requirements
+    if (use_custom) {
+      # Build custom validation criteria from reactive values
+      criteria_list <- rv$custom_validation_criteria
+      
+      if (is.null(criteria_list) || length(criteria_list) == 0) {
+        show_toastr(
+          "No Criteria Defined",
+          "Please define at least one validation criterion. Using default ASySD criteria instead.",
+          type = "warning"
+        )
+        validation_criteria <- NULL
+      } else {
+        # Convert criteria from UI format (percentages 0-100) to deduplication format (decimals 0-1)
+        # Debug: log what we're reading from reactive values
+        message("Building validation criteria from ", length(criteria_list), " criteria in reactive values")
+        if (length(criteria_list) > 0) {
+          # Show first few criteria to verify custom ones are included
+          for (i in 1:min(3, length(criteria_list))) {
+            crit <- criteria_list[[i]]
+            message("Criterion ", i, " from reactive values: name='", crit$name, 
+                    "', title=", crit$title, ", author=", crit$author,
+                    ", abstract=", crit$abstract, ", journal=", crit$journal)
+          }
+        }
+        
+        validation_criteria <- lapply(criteria_list, function(criterion) {
+          # Build criteria list, only including fields with valid values (> 0, not NA)
+          criteria_fields <- list()
+          
+          if (!is.null(criterion$title) && !is.na(criterion$title) && criterion$title > 0) {
+            criteria_fields$title <- criterion$title / 100
+          }
+          if (!is.null(criterion$author) && !is.na(criterion$author) && criterion$author > 0) {
+            criteria_fields$author <- criterion$author / 100
+          }
+          if (!is.null(criterion$abstract) && !is.na(criterion$abstract) && criterion$abstract > 0) {
+            criteria_fields$abstract <- criterion$abstract / 100
+          }
+          if (!is.null(criterion$journal) && !is.na(criterion$journal) && criterion$journal > 0) {
+            criteria_fields$journal <- criterion$journal / 100
+          }
+          if (!is.null(criterion$pages) && !is.na(criterion$pages) && criterion$pages > 0) {
+            criteria_fields$pages <- criterion$pages / 100
+          }
+          if (!is.null(criterion$volume) && !is.na(criterion$volume) && criterion$volume > 0) {
+            criteria_fields$volume <- criterion$volume / 100
+          }
+          if (!is.null(criterion$number) && !is.na(criterion$number) && criterion$number > 0) {
+            criteria_fields$number <- criterion$number / 100
+          }
+          if (!is.null(criterion$isbn) && !is.na(criterion$isbn) && criterion$isbn > 0) {
+            criteria_fields$isbn <- criterion$isbn / 100
+          }
+          if (!is.null(criterion$doi) && !is.na(criterion$doi) && criterion$doi > 0) {
+            criteria_fields$doi <- criterion$doi / 100
+          }
+          
+          # Only include criterion if it has at least one field
+          if (length(criteria_fields) > 0) {
+            criterion_result <- list(
+              name = ifelse(is.null(criterion$name) || criterion$name == "", "Unnamed Criterion", criterion$name),
+              criteria = criteria_fields
+            )
+            # Debug: log the converted criterion (always log first criterion)
+            if (length(validation_criteria) == 0 || criterion_result$name == criteria_list[[1]]$name) {
+              message("Converted criterion '", criterion_result$name, "': ", 
+                      paste(paste(names(criteria_fields), ">=", criteria_fields), collapse=", "))
+              message("  (Converted from percentages: ", 
+                      paste(paste(names(criteria_fields), "=", 
+                                  sapply(names(criteria_fields), function(f) {
+                                    val <- criterion[[f]]
+                                    ifelse(is.null(val) || is.na(val), "NA", paste0(val, "%"))
+                                  })), collapse=", "), ")")
+            }
+            criterion_result
+          } else {
+            NULL
+          }
+        })
+        
+        # Remove NULL entries (empty criteria)
+        validation_criteria <- validation_criteria[!sapply(validation_criteria, is.null)]
+        
+        # Debug: log final validation criteria structure
+        if (length(validation_criteria) > 0) {
+          message("Final validation criteria: ", length(validation_criteria), " criteria")
+          message("First criterion: name='", validation_criteria[[1]]$name, 
+                  "', fields: ", paste(names(validation_criteria[[1]]$criteria), collapse=", "))
+          if (length(validation_criteria[[1]]$criteria) > 0) {
+            first_field <- names(validation_criteria[[1]]$criteria)[1]
+            message("  First field '", first_field, "' threshold: ", validation_criteria[[1]]$criteria[[first_field]])
+          }
+        }
+        
+        if (length(validation_criteria) == 0) {
+          show_toastr(
+            "No Valid Criteria",
+            "All criteria are empty. Please set at least one field threshold above 0%. Using default ASySD criteria instead.",
+            type = "warning"
+          )
+          validation_criteria <- NULL
+        }
+      }
+      
+      # For now, use default blocking rounds (custom blocking rounds UI coming later)
+      blocking_rounds <- NULL  # NULL means use defaults
+    }
+    # If use_custom is FALSE, blocking_rounds and validation_criteria remain NULL
+    # which will cause dedup_citations to use defaults but still track statistics
+    
+    # Perform deduplication (always use custom path to get statistics)
+    # Try to call with new parameters, fall back if package hasn't been reloaded
+    dedup_results <- NULL
+    tryCatch({
+      dedup_results <- CiteSource::dedup_citations(
+        rv$upload_df, 
+        manual = TRUE, 
+        show_unknown_tags = TRUE,
+        use_custom = TRUE,  # Always TRUE to get statistics
+        blocking_rounds = blocking_rounds,  # NULL = use defaults
+        validation_criteria = validation_criteria  # NULL = use defaults
+      )
+    }, error = function(e) {
+      # If new parameters aren't recognized, package needs to be reloaded
+      # Fall back to standard ASySD call
+      if (grepl("unused argument", e$message, ignore.case = TRUE)) {
+        show_toastr(
+          "Package Reload Required",
+          "Please restart R and reload the CiteSource package for custom thresholds to work. Using default ASySD for now.",
+          type = "warning"
+        )
+        # Use standard ASySD call
+        dedup_results <<- CiteSource::dedup_citations(
+          rv$upload_df, 
+          manual = TRUE, 
+          show_unknown_tags = TRUE
+        )
+        # Set empty stats since we can't get them from default ASySD
+        rv$dedup_stats <<- list(
+          blocking_round_stats = data.frame(
+            round_number = integer(),
+            round_name = character(),
+            pair_count = integer(),
+            stringsAsFactors = FALSE
+          ),
+          validation_stats = data.frame(
+            criterion_name = character(),
+            pair_count = integer(),
+            stringsAsFactors = FALSE
+          )
+        )
+      } else {
+        # For other errors, show the error and use fallback
+        show_toastr(
+          "Deduplication Error",
+          paste("Error during deduplication:", e$message, "Falling back to default ASySD."),
+          type = "error"
+        )
+        tryCatch({
+          dedup_results <<- CiteSource::dedup_citations(
+            rv$upload_df, 
+            manual = TRUE, 
+            show_unknown_tags = TRUE
+          )
+          # Initialize empty stats structure for fallback
+          rv$dedup_stats <<- list(
+            blocking_round_stats = data.frame(
+              round_number = integer(),
+              round_name = character(),
+              pair_count = integer(),
+              stringsAsFactors = FALSE
+            ),
+            validation_stats = data.frame(
+              criterion_name = character(),
+              pair_count = integer(),
+              stringsAsFactors = FALSE
+            )
+          )
+          message("Fallback to default ASySD - statistics not available")
+        }, error = function(e2) {
+          stop("Failed to perform deduplication even with fallback: ", e2$message)
+        })
+      }
+    })
+    
+    # Check if dedup_results was successfully created
+    if (is.null(dedup_results)) {
+      stop("Deduplication failed and no fallback result available")
+    }
+    
+    # Ensure manual_dedup is a dataframe, even if empty
+    if (is.null(dedup_results$manual_dedup) || nrow(dedup_results$manual_dedup) == 0) {
+      # Create empty dataframe with expected structure
+      rv$pairs_to_check <- data.frame()
+    } else {
     rv$pairs_to_check <- dedup_results$manual_dedup
+    }
     rv$latest_unique <- dedup_results$unique
+    
+    # Store statistics (should always be available when use_custom=TRUE)
+    if (!is.null(dedup_results$stats)) {
+      rv$dedup_stats <- dedup_results$stats
+    } else {
+      # Fallback: try to get from attributes
+      stats_attr <- attr(dedup_results$unique, "dedup_stats")
+      if (!is.null(stats_attr)) {
+        rv$dedup_stats <- stats_attr
+      } else {
+        # Check if dedup_results itself has stats (for manual=TRUE case)
+        if (is.list(dedup_results) && "stats" %in% names(dedup_results)) {
+          rv$dedup_stats <- dedup_results$stats
+        } else {
+          # Last resort: empty stats structure
+          rv$dedup_stats <- list(
+            blocking_round_stats = data.frame(
+              round_number = integer(),
+              round_name = character(),
+              pair_count = integer(),
+              stringsAsFactors = FALSE
+            ),
+            validation_stats = data.frame(
+              criterion_name = character(),
+              pair_count = integer(),
+              stringsAsFactors = FALSE
+            )
+          )
+        }
+      }
+    }
+    
     rv$n_unique <- count_unique(rv$latest_unique)  # Generate the n_unique data
     
     # Generate a summary message based on deduplication results
@@ -1762,7 +2155,13 @@ server <- function(input, output, session) {
   # Output: manual dedup datatable
   manual_dedup_data <- reactive({
     
-    data <- rv$pairs_to_check[,1:36]
+    # Check if pairs_to_check exists and has data
+    if (is.null(rv$pairs_to_check) || nrow(rv$pairs_to_check) == 0) {
+      return(data.frame())
+    }
+    
+    # Get all columns, don't assume there are exactly 36
+    data <- rv$pairs_to_check
     selected_cols <- input$manual_dedup_cols
     
     # Define the desired base order
@@ -1792,8 +2191,8 @@ server <- function(input, output, session) {
     # Add the match_number_cols at the end (if they exist)
     
     match_number_cols_to_add <- intersect(paste0(match_cols), colnames(data))
-    if (length(match_number_cols_to_add) > 0) {
-      ordered_data <- cbind(ordered_data, data[, match_number_cols_to_add])
+    if (length(match_number_cols_to_add) > 0 && nrow(ordered_data) > 0) {
+      ordered_data <- cbind(ordered_data, data[, match_number_cols_to_add, drop = FALSE])
     }
     
     ordered_data
@@ -1802,6 +2201,15 @@ server <- function(input, output, session) {
   output$manual_dedup_dt <- DT::renderDataTable({
     
     data <- manual_dedup_data()
+    
+    # If data is empty, return empty table
+    if (is.null(data) || nrow(data) == 0) {
+      return(DT::datatable(
+        data.frame(Message = "No pairs require manual review."),
+        options = list(paging = FALSE, searching = FALSE, info = FALSE),
+        rownames = FALSE
+      ))
+    }
     
     format_cols <- c(
       "title1", "author1", "doi1", "volume1",
@@ -1844,6 +2252,911 @@ server <- function(input, output, session) {
     } else {
       paste(n_pairs, "pair(s) of citations require manual deduplication. Review the pairs below using either the card view (recommended) or table view.")
     }
+  })
+  
+  # Custom blocking rounds UI
+  output$custom_blocking_ui <- shiny::renderUI({
+    # Only show if custom thresholds are enabled
+    if (!isTRUE(input$use_custom_thresholds)) {
+      return(shiny::div())
+    }
+    
+    # Get default blocking rounds to display
+    # Try to get from the package, fall back to hardcoded if not available
+    default_rounds <- tryCatch({
+      CiteSource:::get_default_blocking_rounds()
+    }, error = function(e) {
+      # Fallback to hardcoded defaults
+      list(
+        "Round 1 (Broad)" = list(
+          c("title", "pages"),
+          c("title", "author"),
+          c("title", "abstract"),
+          c("doi")
+        ),
+        "Round 2 (Bibliographic)" = list(
+          c("author", "year", "pages"),
+          c("journal", "volume", "pages"),
+          c("isbn", "volume", "pages"),
+          c("title", "isbn")
+        ),
+        "Round 3 (Numeric)" = list(
+          c("year", "pages", "volume"),
+          c("year", "number", "volume"),
+          c("year", "pages", "number")
+        ),
+        "Round 4 (Loose)" = list(
+          c("author", "year"),
+          c("year", "title"),
+          c("title", "volume"),
+          c("title", "journal")
+        )
+      )
+    })
+    
+    shiny::div(
+      shiny::p(style = "margin-bottom: 15px; font-weight: 500;", 
+               "Blocking rounds identify potential duplicate pairs by matching on specific field combinations."),
+      shiny::p(style = "font-size: 0.9em; color: #666; margin-bottom: 20px;", 
+               "Currently using default ASySD blocking rounds. Custom blocking round editor coming soon."),
+      
+      # Display default blocking rounds for reference
+      shiny::h6("Default Blocking Rounds (Currently Active):"),
+      shiny::div(
+        style = "max-height: 400px; overflow-y: auto; margin-bottom: 15px;",
+        lapply(seq_along(default_rounds), function(i) {
+          round_name <- names(default_rounds)[i]
+          round_combos <- default_rounds[[i]]
+          
+          shiny::div(
+            style = "margin-bottom: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;",
+            shiny::tags$strong(round_name, ":"),
+            shiny::tags$ul(
+              style = "margin-top: 5px; margin-bottom: 0;",
+              lapply(round_combos, function(combo) {
+                shiny::tags$li(paste(combo, collapse = " & "))
+              })
+            )
+          )
+        })
+      ),
+      shiny::p(style = "font-size: 0.85em; color: #666; font-style: italic;",
+               "Note: Custom blocking rounds editor will allow you to add, remove, or modify these rounds in a future update.")
+    )
+  })
+  
+  # Observer to ensure defaults are loaded when custom thresholds are enabled
+  # This runs ONLY when the toggle changes, not when criteria are modified
+  # Only loads defaults ONCE when toggle is first enabled, never reloads after user edits
+  shiny::observeEvent(input$use_custom_thresholds, {
+    if (isTRUE(input$use_custom_thresholds)) {
+      # CRITICAL: Check flags FIRST before doing anything
+      # If user has manually edited, NEVER reload defaults
+      if (isTRUE(rv$criteria_manually_edited)) {
+        message("Observer: Criteria manually edited, skipping default load")
+        return()  # Exit early, don't reload
+      }
+      
+      # Only check/load defaults if we haven't already loaded them
+      if (!isTRUE(rv$defaults_loaded)) {
+        # Use isolate to prevent re-running when rv$custom_validation_criteria changes
+        criteria_list <- shiny::isolate(rv$custom_validation_criteria)
+        
+        # Check if we need to load defaults
+        needs_defaults <- FALSE
+        
+        if (is.null(criteria_list) || length(criteria_list) == 0) {
+          needs_defaults <- TRUE
+        } else if (length(criteria_list) > 0) {
+          # Check if criteria look like defaults
+          first_name <- criteria_list[[1]]$name
+          if (is.null(first_name) || first_name == "" || 
+              grepl("^Criterion \\d+$", first_name) || 
+              grepl("^New Criterion \\d+$", first_name)) {
+            needs_defaults <- TRUE
+          } else {
+            # Criteria look like defaults, mark as loaded
+            rv$defaults_loaded <- TRUE
+          }
+        }
+        
+        # Load defaults if needed
+        if (needs_defaults) {
+          criteria_list <- load_default_validation_criteria()
+          if (length(criteria_list) > 0) {
+            # Defensive: ensure all values are numeric
+            criteria_list <- lapply(criteria_list, function(crit) {
+              for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+                if (field %in% names(crit)) {
+                  if (is.logical(crit[[field]]) && is.na(crit[[field]])) {
+                    crit[[field]] <- NA_real_
+                  } else if (!is.numeric(crit[[field]])) {
+                    num_val <- suppressWarnings(as.numeric(crit[[field]]))
+                    crit[[field]] <- if (is.na(num_val)) NA_real_ else num_val
+                  }
+                }
+              }
+              crit
+            })
+            rv$custom_validation_criteria <- criteria_list
+            rv$defaults_loaded <- TRUE
+            message("Observer: Loaded ", length(criteria_list), " default criteria")
+          }
+        }
+      }
+    } else {
+      # When toggle is off, reset the flags so defaults can be loaded again when toggled back on
+      rv$defaults_loaded <- FALSE
+      rv$criteria_manually_edited <- FALSE
+    }
+  }, ignoreInit = TRUE)
+  
+  # Separate observer to handle logical NA conversion (runs when criteria change, but doesn't reload defaults)
+  # IMPORTANT: Only runs if criteria_manually_edited is FALSE (i.e., during initial load only)
+  shiny::observe({
+    # Only run if custom thresholds are enabled, defaults are loaded, AND user hasn't manually edited
+    # This prevents it from running after deletions/edits
+    if (isTRUE(input$use_custom_thresholds) && isTRUE(rv$defaults_loaded) && !isTRUE(rv$criteria_manually_edited)) {
+      criteria_list <- rv$custom_validation_criteria
+      if (length(criteria_list) > 0 && "title" %in% names(criteria_list[[1]])) {
+        if (is.logical(criteria_list[[1]]$title) && is.na(criteria_list[[1]]$title)) {
+          # Convert logical NAs to numeric NAs (but don't reload defaults)
+          criteria_list <- lapply(criteria_list, function(crit) {
+            for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+              if (field %in% names(crit)) {
+                if (is.logical(crit[[field]]) && is.na(crit[[field]])) {
+                  crit[[field]] <- NA_real_
+                } else if (!is.numeric(crit[[field]])) {
+                  num_val <- suppressWarnings(as.numeric(crit[[field]]))
+                  crit[[field]] <- if (is.na(num_val)) NA_real_ else num_val
+                }
+              }
+            }
+            crit
+          })
+          rv$custom_validation_criteria <- criteria_list
+        }
+      }
+    }
+  })
+  
+  # Custom validation criteria UI
+  output$custom_validation_ui <- shiny::renderUI({
+    # Only show if custom thresholds are enabled
+    if (!isTRUE(input$use_custom_thresholds)) {
+      return(shiny::div())
+    }
+    
+    # Get criteria from reactive values (don't modify them here!)
+    criteria_list <- rv$custom_validation_criteria
+    
+    # If still empty, show message
+    if (is.null(criteria_list) || length(criteria_list) == 0) {
+      return(shiny::div(
+        shiny::p("Loading default validation criteria...")
+      ))
+    }
+    
+    shiny::div(
+      shiny::p(style = "margin-bottom: 10px; font-weight: 500; font-size: 0.9em;", 
+               "Edit validation criteria below. Each criterion defines thresholds for different fields. A pair needs to match only ONE criterion to be considered a duplicate."),
+      shiny::p(style = "font-size: 0.85em; color: #666; margin-bottom: 10px;", 
+               "Tip: Leave a field blank or set to 0 to exclude it from that criterion."),
+      
+      # Action buttons at top
+      shiny::fluidRow(
+        shiny::column(6,
+          shinyWidgets::actionBttn(
+            inputId = "add_criterion",
+            label = "Add New Criterion",
+            style = "jelly",
+            color = "success",
+            size = "sm",
+            icon = shiny::icon("plus")
+          )
+        ),
+        shiny::column(6,
+          shinyWidgets::actionBttn(
+            inputId = "reset_criteria",
+            label = "Reset to Defaults",
+            style = "jelly",
+            color = "warning",
+            size = "sm",
+            icon = shiny::icon("undo")
+          )
+        )
+      ),
+      shiny::br(),
+      
+      # Header row for field labels
+      shiny::div(
+        style = "margin-bottom: 5px; padding: 5px; background-color: #e9ecef; border-radius: 3px; font-size: 0.85em; font-weight: 500;",
+        shiny::fluidRow(
+          shiny::column(2, shiny::tags$strong("Criterion Name")),
+          shiny::column(1, shiny::tags$strong("title")),
+          shiny::column(1, shiny::tags$strong("author")),
+          shiny::column(1, shiny::tags$strong("abstract")),
+          shiny::column(1, shiny::tags$strong("journal")),
+          shiny::column(1, shiny::tags$strong("pages")),
+          shiny::column(1, shiny::tags$strong("volume")),
+          shiny::column(1, shiny::tags$strong("number")),
+          shiny::column(1, shiny::tags$strong("isbn")),
+          shiny::column(1, shiny::tags$strong("doi")),
+          shiny::column(1, shiny::tags$strong(""))
+        )
+      ),
+      
+      # Scrollable list of criteria
+      shiny::div(
+        style = "max-height: 600px; overflow-y: auto;",
+        lapply(seq_along(criteria_list), function(i) {
+          criterion <- criteria_list[[i]]
+          criterion_id <- paste0("criterion_", i)
+          
+          # Helper function to get field value for numericInput
+          # numericInput can accept NA_real_ which will display as blank
+          get_field_val <- function(field_name) {
+            if (!field_name %in% names(criterion)) {
+              return(NA_real_)
+            }
+            val <- criterion[[field_name]]
+            if (is.null(val)) {
+              return(NA_real_)
+            }
+            if (length(val) == 0) {
+              return(NA_real_)
+            }
+            # Convert logical NA to numeric NA
+            if (is.logical(val) && is.na(val)) {
+              return(NA_real_)
+            }
+            if (is.na(val)) {
+              # If it's already NA, ensure it's numeric
+              return(NA_real_)
+            }
+            # Ensure it's numeric
+            num_val <- suppressWarnings(as.numeric(val))
+            if (is.na(num_val)) {
+              return(NA_real_)
+            }
+            return(num_val)
+          }
+          
+          shiny::div(
+            style = "margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+            # Compact single-row layout
+            shiny::fluidRow(
+              # Criterion name (wider)
+              shiny::column(2,
+                shiny::textInput(
+                  inputId = paste0(criterion_id, "_name"),
+                  label = NULL,
+                  value = ifelse(is.null(criterion$name) || criterion$name == "", "", criterion$name),
+                  placeholder = "Name",
+                  width = "100%"
+                )
+              ),
+              # All field inputs in one row (smaller width)
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_title"),
+                  label = "title",
+                  value = get_field_val("title"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_author"),
+                  label = "author",
+                  value = get_field_val("author"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_abstract"),
+                  label = "abstract",
+                  value = get_field_val("abstract"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_journal"),
+                  label = "journal",
+                  value = get_field_val("journal"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_pages"),
+                  label = "pages",
+                  value = get_field_val("pages"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_volume"),
+                  label = "volume",
+                  value = get_field_val("volume"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_number"),
+                  label = "number",
+                  value = get_field_val("number"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_isbn"),
+                  label = "isbn",
+                  value = get_field_val("isbn"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              shiny::column(1,
+                shiny::numericInput(
+                  inputId = paste0(criterion_id, "_doi"),
+                  label = "doi",
+                  value = get_field_val("doi"),
+                  min = 0,
+                  max = 100,
+                  step = 1,
+                  width = "100%"
+                )
+              ),
+              # Remove button
+              shiny::column(1,
+                shiny::div(
+                  style = "margin-top: 25px; text-align: center;",
+                  shinyWidgets::actionBttn(
+                    inputId = paste0("remove_criterion_", i),
+                    label = NULL,
+                    icon = shiny::icon("trash"),
+                    style = "jelly",
+                    color = "danger",
+                    size = "xs"
+                  )
+                )
+              )
+            )
+          )
+        })
+      )
+    )
+  })
+  
+  # Observer: Sync criterion input changes to reactive values
+  # Use debounce to avoid too frequent updates
+  # IMPORTANT: This reactive should depend on INPUT values, not rv$custom_validation_criteria
+  # We use isolate() to read rv$custom_validation_criteria to get the structure, but
+  # the reactive should trigger on input changes, not reactive value changes
+  sync_criteria_inputs <- shiny::reactive({
+    if (!isTRUE(input$use_custom_thresholds)) {
+      return(NULL)
+    }
+    
+    # Use isolate to get the structure without creating a reactive dependency
+    # This prevents the reactive from re-running when rv$custom_validation_criteria changes
+    criteria_list <- shiny::isolate(rv$custom_validation_criteria)
+    if (is.null(criteria_list) || length(criteria_list) == 0) {
+      return(NULL)
+    }
+    
+    # Check if inputs exist - if not, don't sync (prevents creating "Criterion 1" entries)
+    first_criterion_id <- paste0("criterion_1_name")
+    first_title_id <- paste0("criterion_1_title")
+    if (is.null(input[[first_criterion_id]])) {
+      # Inputs don't exist yet, return NULL to prevent sync
+      return(NULL)
+    }
+    
+    # Make this reactive depend on input values by accessing them
+    # This ensures the reactive re-runs when ANY input value changes
+    # Access all input values to create reactive dependencies (but don't use the values yet)
+    num_criteria <- length(criteria_list)
+    for (i in 1:min(num_criteria, 50)) {  # Check up to 50 criteria
+      criterion_id <- paste0("criterion_", i)
+      # Access all input fields to create reactive dependencies
+      # This makes the reactive depend on these inputs
+      tryCatch({
+        input[[paste0(criterion_id, "_name")]]
+        input[[paste0(criterion_id, "_title")]]
+        input[[paste0(criterion_id, "_author")]]
+        input[[paste0(criterion_id, "_abstract")]]
+        input[[paste0(criterion_id, "_journal")]]
+        input[[paste0(criterion_id, "_pages")]]
+        input[[paste0(criterion_id, "_volume")]]
+        input[[paste0(criterion_id, "_number")]]
+        input[[paste0(criterion_id, "_isbn")]]
+        input[[paste0(criterion_id, "_doi")]]
+      }, error = function(e) {
+        # Input doesn't exist for this criterion, skip
+      })
+    }
+    
+    # Debug: Log what we're reading from inputs (for first criterion)
+    title_val <- input[[first_title_id]]
+    if (!is.null(title_val)) {
+      message("Sync reactive triggered: Reading criterion_1_title from input: ", title_val)
+    }
+    
+    # Update each criterion from inputs
+    updated_criteria <- lapply(seq_along(criteria_list), function(i) {
+      criterion_id <- paste0("criterion_", i)
+      
+      # Get name - preserve existing name if input is empty or unchanged
+      name_input <- input[[paste0(criterion_id, "_name")]]
+      existing_name <- if (i <= length(criteria_list) && !is.null(criteria_list[[i]]$name)) {
+        criteria_list[[i]]$name
+      } else {
+        ""
+      }
+      
+      # Preserve existing name unless user explicitly changes it
+      if (is.null(name_input) || name_input == "") {
+        # Input is empty - preserve existing name, or use generic only if no name exists
+        name <- ifelse(existing_name == "", paste0("Criterion ", i), existing_name)
+      } else if (name_input == existing_name) {
+        # Input matches existing - preserve it
+        name <- existing_name
+      } else if (grepl("^Criterion \\d+$", name_input) && existing_name != "") {
+        # Input is generic but we have an existing name - preserve existing
+        name <- existing_name
+      } else {
+        # User has explicitly changed the name - use the new input
+        name <- name_input
+      }
+      
+      # Get field values
+      # Accessing input values here creates reactive dependencies
+      get_field_value <- function(field) {
+        input_id <- paste0(criterion_id, "_", field)
+        # Access the input - this creates a reactive dependency
+        val <- input[[input_id]]
+        # Debug: Log first criterion's first field to verify inputs are being read
+        if (i == 1 && field == "title" && !is.null(val)) {
+          message("Sync reactive: Reading input for criterion_1_", field, ": ", val)
+        }
+        if (is.null(val) || is.na(val) || val <= 0) {
+          return(NA_real_)
+        }
+        return(as.numeric(val))
+      }
+      
+      list(
+        name = name,
+        title = get_field_value("title"),
+        author = get_field_value("author"),
+        abstract = get_field_value("abstract"),
+        journal = get_field_value("journal"),
+        pages = get_field_value("pages"),
+        volume = get_field_value("volume"),
+        number = get_field_value("number"),
+        isbn = get_field_value("isbn"),
+        doi = get_field_value("doi")
+      )
+    })
+    
+    return(updated_criteria)
+  })
+  
+  # Debounce the sync to avoid too frequent updates
+  sync_criteria_debounced <- shiny::debounce(sync_criteria_inputs, millis = 500)
+  
+  # Create a reactive that tracks when inputs change
+  # This will trigger the observer when any input changes
+  input_change_tracker <- shiny::reactive({
+    if (!isTRUE(input$use_custom_thresholds)) {
+      return(NULL)
+    }
+    # Access a sample of inputs to create dependencies
+    # This reactive will fire when any of these inputs change
+    criteria_list <- shiny::isolate(rv$custom_validation_criteria)
+    if (is.null(criteria_list) || length(criteria_list) == 0) {
+      return(NULL)
+    }
+    # Access first criterion's inputs to create dependencies
+    tryCatch({
+      input[[paste0("criterion_1_title")]]
+      input[[paste0("criterion_1_author")]]
+      input[[paste0("criterion_1_abstract")]]
+    }, error = function(e) NULL)
+    return(Sys.time())  # Return timestamp to ensure reactive fires
+  })
+  
+  shiny::observe({
+    # Make observer depend on input changes
+    input_change_tracker()
+    
+    # Check if sync should be unlocked based on timestamp
+    if (!is.null(rv$unlock_sync_at) && Sys.time() >= rv$unlock_sync_at) {
+      rv$sync_locked <- FALSE
+      rv$unlock_sync_at <- NULL
+      message("Sync unlocked after deletion (2 second delay)")
+    }
+    
+    # CRITICAL: Don't sync if sync is locked (e.g., right after deletion)
+    # This prevents reading stale inputs during UI re-render
+    if (isTRUE(rv$sync_locked)) {
+      message("Sync observer: Sync is locked, skipping")
+      return()  # Exit early, don't sync
+    }
+    
+    # Sync criteria from inputs to reactive values
+    # Always preserve existing names unless user explicitly changes them
+    # Calling sync_criteria_debounced() here creates a reactive dependency
+    # The observer will re-run when the debounced reactive changes
+    updated <- sync_criteria_debounced()
+    
+    # Debug: Always log what we got from the debounced reactive
+    if (!is.null(updated) && length(updated) > 0) {
+      message("Sync observer: Got ", length(updated), " criteria from debounced reactive")
+      if (length(updated) > 0) {
+        message("Sync observer: First criterion title value: ", updated[[1]]$title)
+      }
+    } else {
+      message("Sync observer: debounced reactive returned NULL or empty")
+    }
+    
+    if (!is.null(updated) && !is.null(rv$custom_validation_criteria) && length(updated) > 0) {
+      # Only update if inputs exist and criteria count matches
+      if (length(updated) == length(rv$custom_validation_criteria)) {
+        message("Sync observer: Counts match (", length(updated), " criteria)")
+        # Preserve names: if updated name is empty or generic, keep existing name
+        for (i in seq_along(updated)) {
+          updated_name <- updated[[i]]$name
+          existing_name <- if (i <= length(rv$custom_validation_criteria) && 
+                               !is.null(rv$custom_validation_criteria[[i]]$name)) {
+            rv$custom_validation_criteria[[i]]$name
+          } else {
+            ""
+          }
+          
+          # If updated name is empty, generic ("Criterion X"), or unchanged, preserve existing
+          if (is.null(updated_name) || updated_name == "" || 
+              grepl("^Criterion \\d+$", updated_name) ||
+              (existing_name != "" && updated_name == existing_name)) {
+            if (existing_name != "") {
+              updated[[i]]$name <- existing_name
+            }
+          }
+        }
+        
+        # Debug: Log what we're syncing (for first criterion only, and only if values changed)
+        if (length(updated) > 0 && length(rv$custom_validation_criteria) > 0) {
+          first_updated <- updated[[1]]
+          first_existing <- rv$custom_validation_criteria[[1]]
+          
+          # Check if values actually changed
+          values_changed <- FALSE
+          for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+            updated_val <- first_updated[[field]]
+            existing_val <- first_existing[[field]]
+            if (!identical(updated_val, existing_val)) {
+              values_changed <- TRUE
+              break
+            }
+          }
+          
+          if (values_changed) {
+            message("Sync: Updating criterion '", first_updated$name, 
+                    "' - title: ", first_updated$title, 
+                    ", author: ", first_updated$author,
+                    " (was: title=", first_existing$title, ", author=", first_existing$author, ")")
+          }
+        }
+        
+        # Only update if something actually changed (excluding name preservation)
+        # Use a more lenient comparison that ignores list attributes
+        lists_identical <- tryCatch({
+          identical(updated, rv$custom_validation_criteria)
+        }, error = function(e) {
+          FALSE  # If comparison fails, assume they're different
+        })
+        
+        if (!lists_identical) {
+          message("Sync observer: Lists are different, updating reactive values")
+          message("Sync observer: Before update - first criterion title: ", rv$custom_validation_criteria[[1]]$title)
+          rv$custom_validation_criteria <- updated
+          message("Sync observer: After update - first criterion title: ", rv$custom_validation_criteria[[1]]$title)
+          if (!isTRUE(rv$criteria_manually_edited)) {
+            rv$criteria_manually_edited <- TRUE  # Mark as manually edited when user changes values
+          }
+        } else {
+          message("Sync observer: Lists are identical, skipping update")
+        }
+      } else {
+        # Debug: Log when counts don't match
+        if (!is.null(updated) && !is.null(rv$custom_validation_criteria)) {
+          message("Sync: Count mismatch - updated has ", length(updated), 
+                  " criteria, reactive has ", length(rv$custom_validation_criteria))
+        }
+      }
+    } else {
+      # Debug: Log when sync returns NULL
+      if (is.null(updated)) {
+        message("Sync: sync_criteria_debounced() returned NULL (inputs may not exist yet)")
+      }
+    }
+  })
+  
+  # Observer: Add new criterion
+  shiny::observeEvent(input$add_criterion, {
+    new_criterion <- list(
+      name = paste0("New Criterion ", length(rv$custom_validation_criteria) + 1),
+      title = NA_real_,
+      author = NA_real_,
+      abstract = NA_real_,
+      journal = NA_real_,
+      pages = NA_real_,
+      volume = NA_real_,
+      number = NA_real_,
+      isbn = NA_real_,
+      doi = NA_real_
+    )
+    rv$custom_validation_criteria <- c(rv$custom_validation_criteria, list(new_criterion))
+    rv$criteria_manually_edited <- TRUE  # Mark as manually edited to prevent auto-reload
+  })
+  
+  # Observer: Remove criterion (handle dynamically)
+  # Use a reactive value to track which criterion to remove
+  rv$criterion_to_remove <- NULL
+  
+  # Create observers for remove buttons (up to 50 criteria)
+  lapply(1:50, function(i) {
+    shiny::observeEvent(input[[paste0("remove_criterion_", i)]], {
+      if (!is.null(rv$custom_validation_criteria) && i <= length(rv$custom_validation_criteria)) {
+        criterion_name <- rv$custom_validation_criteria[[i]]$name
+        if (is.null(criterion_name) || criterion_name == "") {
+          criterion_name <- paste0("Criterion ", i)
+        }
+        shiny::showModal(shiny::modalDialog(
+          title = "Remove Criterion",
+          paste("Are you sure you want to remove '", criterion_name, "'?"),
+          footer = shiny::tagList(
+            shiny::modalButton("Cancel"),
+            shiny::actionButton("confirm_remove_criterion", "Remove", class = "btn-danger")
+          )
+        ))
+        rv$criterion_to_remove <- i
+      }
+    }, ignoreInit = TRUE, ignoreNULL = TRUE)
+  })
+  
+  # Confirm remove
+  shiny::observeEvent(input$confirm_remove_criterion, {
+    if (!is.null(rv$criterion_to_remove) && rv$criterion_to_remove <= length(rv$custom_validation_criteria)) {
+      # Store index before removing
+      index_to_remove <- rv$criterion_to_remove
+      
+      # CRITICAL: Set flags FIRST, before any reactive updates
+      # This prevents any observers from reloading defaults or syncing stale inputs
+      rv$criteria_manually_edited <- TRUE
+      rv$defaults_loaded <- TRUE  # Also ensure defaults_loaded is TRUE to prevent reload
+      rv$sync_locked <- TRUE  # Lock sync to prevent reading stale inputs during UI re-render
+      
+      # Now remove the criterion
+      rv$custom_validation_criteria <- rv$custom_validation_criteria[-index_to_remove]
+      rv$criterion_to_remove <- NULL
+      
+      message("Removed criterion at index ", index_to_remove, 
+              ". Criteria manually edited flag set to TRUE. Sync locked. Remaining criteria: ", 
+              length(rv$custom_validation_criteria))
+      
+      shiny::removeModal()
+      
+      # Schedule unlock after UI re-renders (2 seconds should be enough)
+      # Set a timestamp for when sync should be unlocked
+      rv$unlock_sync_at <- Sys.time() + 2  # Unlock in 2 seconds
+    }
+  })
+  
+  # Observer: Reset to defaults
+  shiny::observeEvent(input$reset_criteria, {
+    shiny::showModal(shiny::modalDialog(
+      title = "Reset to Defaults",
+      "This will replace all your custom criteria with the default ASySD criteria. Continue?",
+      footer = shiny::tagList(
+        shiny::modalButton("Cancel"),
+        shiny::actionButton("confirm_reset_criteria", "Reset", class = "btn-warning")
+      )
+    ))
+  })
+  
+  shiny::observeEvent(input$confirm_reset_criteria, {
+    defaults <- load_default_validation_criteria()
+    if (length(defaults) > 0) {
+      # Defensive: ensure all values are numeric (convert any logical NAs to numeric NAs)
+      defaults <- lapply(defaults, function(crit) {
+        for (field in c("title", "author", "abstract", "journal", "pages", "volume", "number", "isbn", "doi")) {
+          if (field %in% names(crit)) {
+            if (is.logical(crit[[field]]) && is.na(crit[[field]])) {
+              crit[[field]] <- NA_real_
+            } else if (!is.numeric(crit[[field]])) {
+              num_val <- suppressWarnings(as.numeric(crit[[field]]))
+              crit[[field]] <- if (is.na(num_val)) NA_real_ else num_val
+            }
+          }
+        }
+        crit
+      })
+      rv$custom_validation_criteria <- defaults
+      rv$defaults_loaded <- TRUE  # Mark as loaded after reset
+      rv$criteria_manually_edited <- FALSE  # Reset flag since we're back to defaults
+    } else {
+      show_toastr(
+        "Error Loading Defaults",
+        "Could not load default ASySD criteria. Please reload the CiteSource package.",
+        type = "error"
+      )
+    }
+    shiny::removeModal()
+  })
+  
+  # Note: Defaults loading is now handled by the main observer above
+  
+  # Show statistics flag - show if stats exist (even if empty)
+  output$show_dedup_stats <- shiny::reactive({
+    !is.null(rv$dedup_stats)
+  })
+  shiny::outputOptions(output, "show_dedup_stats", suspendWhenHidden = FALSE)
+  
+  
+  # Deduplication statistics table
+  output$dedup_statistics_table <- shiny::renderUI({
+    if (is.null(rv$dedup_stats)) {
+      return(shiny::div(
+        shiny::p(style = "color: #666; font-style: italic;", 
+                 "Statistics will appear here after deduplication completes.")
+      ))
+    }
+    
+    stats <- rv$dedup_stats
+    blocking_stats <- stats$blocking_round_stats
+    validation_stats <- stats$validation_stats
+    
+    # Check if stats are empty dataframes
+    blocking_empty <- is.null(blocking_stats) || (is.data.frame(blocking_stats) && nrow(blocking_stats) == 0)
+    validation_empty <- is.null(validation_stats) || (is.data.frame(validation_stats) && nrow(validation_stats) == 0)
+    
+    shiny::tagList(
+      # Blocking rounds statistics
+      shiny::h6("Blocking Rounds Statistics"),
+      DT::DTOutput("blocking_stats_table"),
+      if (blocking_empty) {
+        shiny::p(style = "color: #666; font-style: italic; margin-top: 10px;", 
+                 "No pairs were identified in any blocking round.")
+      },
+      
+      shiny::br(),
+      
+      # Validation criteria statistics
+      shiny::h6("Validation Criteria Statistics"),
+      DT::DTOutput("validation_stats_table"),
+      if (validation_empty) {
+        shiny::p(style = "color: #666; font-style: italic; margin-top: 10px;", 
+                 "No pairs were confirmed as duplicates by any validation criterion.")
+      }
+    )
+  })
+  
+  # Blocking statistics table
+  output$blocking_stats_table <- DT::renderDataTable({
+    if (is.null(rv$dedup_stats) || is.null(rv$dedup_stats$blocking_round_stats)) {
+      # Return empty table with proper structure
+      empty_df <- data.frame(
+        Round = character(),
+        `Pairs Identified` = integer(),
+        stringsAsFactors = FALSE
+      )
+      return(DT::datatable(empty_df, options = list(paging = FALSE, searching = FALSE, info = FALSE), rownames = FALSE))
+    }
+    
+    stats <- rv$dedup_stats$blocking_round_stats
+    
+    # If stats dataframe is empty, return empty table
+    if (nrow(stats) == 0) {
+      empty_df <- data.frame(
+        Round = character(),
+        `Pairs Identified` = integer(),
+        stringsAsFactors = FALSE
+      )
+      return(DT::datatable(empty_df, options = list(paging = FALSE, searching = FALSE, info = FALSE), rownames = FALSE))
+    }
+    
+    stats <- stats %>%
+      dplyr::arrange(round_number) %>%  # Ensure proper ordering first
+      dplyr::mutate(
+        Round = round_name,  # round_name already includes "Round X (Description)"
+        `Pairs Identified` = pair_count
+      ) %>%
+      dplyr::select(Round, `Pairs Identified`)
+    
+    DT::datatable(
+      stats,
+      options = list(
+        paging = FALSE,
+        searching = FALSE,
+        info = FALSE
+      ),
+      rownames = FALSE
+    )
+  })
+  
+  # Validation statistics table
+  output$validation_stats_table <- DT::renderDataTable({
+    if (is.null(rv$dedup_stats) || is.null(rv$dedup_stats$validation_stats)) {
+      # Return empty table with proper structure
+      empty_df <- data.frame(
+        `Validation Criterion` = character(),
+        `Pairs Confirmed as Duplicates` = integer(),
+        stringsAsFactors = FALSE
+      )
+      return(DT::datatable(empty_df, options = list(paging = FALSE, searching = FALSE, info = FALSE), rownames = FALSE))
+    }
+    
+    stats <- rv$dedup_stats$validation_stats
+    
+    # If stats dataframe is empty, return empty table
+    if (nrow(stats) == 0) {
+      empty_df <- data.frame(
+        `Validation Criterion` = character(),
+        `Pairs Confirmed as Duplicates` = integer(),
+        stringsAsFactors = FALSE
+      )
+      return(DT::datatable(empty_df, options = list(paging = FALSE, searching = FALSE, info = FALSE), rownames = FALSE))
+    }
+    
+    stats <- stats %>%
+      dplyr::arrange(dplyr::desc(pair_count)) %>%
+      dplyr::mutate(
+        `Validation Criterion` = criterion_name,
+        `Pairs Confirmed as Duplicates` = pair_count
+      ) %>%
+      dplyr::select(`Validation Criterion`, `Pairs Confirmed as Duplicates`)
+    
+    DT::datatable(
+      stats,
+      options = list(
+        paging = FALSE,
+        searching = FALSE,
+        info = FALSE,
+        order = list(list(1, 'desc'))
+      ),
+      rownames = FALSE
+    )
   })
   
   ## How Deduplication works tab

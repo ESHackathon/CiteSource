@@ -7,7 +7,10 @@
 #' @param raw_citations Citation dataframe with relevant columns
 #' @param manual logical. If TRUE, manually specify pairs of duplicates to merge. Default is FALSE.
 #' @param show_unknown_tags When a label, source, or other merged field is missing, do you want this to show as "unknown"?
-#' @return unique citations formatted for CiteSource
+#' @param use_custom logical. If TRUE, use custom blocking rounds and validation criteria. Default is FALSE.
+#' @param blocking_rounds List of custom blocking rounds. If NULL and use_custom=TRUE, uses defaults.
+#' @param validation_criteria List of custom validation criteria. If NULL and use_custom=TRUE, uses defaults.
+#' @return unique citations formatted for CiteSource (or list with unique, manual_dedup, and stats if manual=TRUE and use_custom=TRUE)
 #'
 #' @examples
 #' # Load example data from the package
@@ -24,7 +27,8 @@
 #'   show_unknown_tags = TRUE
 #'   )
 
-dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE){
+dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE, 
+                            use_custom=FALSE, blocking_rounds=NULL, validation_criteria=NULL){
   
   # rename or coalesce columns
   targets <- c("journal", "number", "pages", "isbn", "record_id")
@@ -44,7 +48,29 @@ dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE
   raw_citations$source <- raw_citations$cite_source
   raw_citations$label <- raw_citations$cite_label
   
-  dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", show_unknown_tags = show_unknown_tags)
+  # Use custom deduplication if requested
+  # Check if dedup_citations_custom function exists (in case package hasn't been reloaded)
+  if (use_custom && exists("dedup_citations_custom", mode = "function", envir = asNamespace("CiteSource"))) {
+    tryCatch({
+      dedup_results <- CiteSource:::dedup_citations_custom(
+        raw_citations, 
+        manual = manual,
+        show_unknown_tags = show_unknown_tags,
+        blocking_rounds = blocking_rounds,
+        validation_criteria = validation_criteria
+      )
+    }, error = function(e) {
+      warning("Custom deduplication failed, falling back to default ASySD: ", e$message)
+      use_custom <<- FALSE  # Use <<- to modify in parent scope
+      dedup_results <<- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", show_unknown_tags = show_unknown_tags)
+    })
+  } else {
+    if (use_custom) {
+      warning("Custom deduplication not available, using default ASySD. Please reload the CiteSource package.")
+      use_custom <- FALSE
+    }
+    dedup_results <- ASySD::dedup_citations(raw_citations, merge_citations = TRUE, extra_merge_fields = "cite_string", show_unknown_tags = show_unknown_tags)
+  }
   
   if(manual == FALSE){
     
@@ -55,6 +81,11 @@ dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE
   # Remove temporary columns
   unique_post_dedup <- unique_post_dedup %>%
     dplyr::select(-source, -label)
+  
+  # If custom was used, attach statistics
+  if (use_custom && !is.null(dedup_results$stats)) {
+    attr(unique_post_dedup, "dedup_stats") <- dedup_results$stats
+  }
   
   return(unique_post_dedup)
   
@@ -67,6 +98,26 @@ dedup_citations <- function(raw_citations, manual=FALSE, show_unknown_tags=FALSE
     # Remove temporary columns
     unique_post_dedup$unique <- unique_post_dedup$unique %>%
       dplyr::select(-source, -label)
+    
+    # If custom was used, preserve statistics in the return object
+    if (use_custom && !is.null(dedup_results$stats)) {
+      unique_post_dedup$stats <- dedup_results$stats
+    } else if (use_custom) {
+      # If stats should be there but aren't, create empty structure
+      unique_post_dedup$stats <- list(
+        blocking_round_stats = data.frame(
+          round_number = integer(),
+          round_name = character(),
+          pair_count = integer(),
+          stringsAsFactors = FALSE
+        ),
+        validation_stats = data.frame(
+          criterion_name = character(),
+          pair_count = integer(),
+          stringsAsFactors = FALSE
+        )
+      )
+    }
     
     return(unique_post_dedup)
   }
