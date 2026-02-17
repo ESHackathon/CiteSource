@@ -105,6 +105,7 @@ citations <- read_citations(metadata = metadata_tbl)
 #> Importing files ■■■■■■■                           19%
 #> Importing files ■■■■■■■                           21%
 #> Importing files ■■■■■■■■                          23%
+#> Importing files ■■■■■■■■■                         25%
 #> Import completed - with the following details:
 #>                file cite_source cite_string cite_label citations
 #> 1  Benchmarking.ris   Benchmark        <NA>  Benchmark        55
