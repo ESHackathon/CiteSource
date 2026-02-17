@@ -27,17 +27,17 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/Trevor-Patch/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/dev/DESCRIPTION)
 
 Riley T, Hair K, Wallrich L, Grainger M, Young S, Pritchard C, Haddaway
-N (2025). *CiteSource: Analyze the Utility of Information Sources and
+N (2026). *CiteSource: Analyze the Utility of Information Sources and
 Retrieval Methodologies for Evidence Synthesis*. R package version
 0.1.1, <https://www.eshackathon.org/CiteSource>.
 
     @Manual{,
       title = {CiteSource: Analyze the Utility of Information Sources and Retrieval Methodologies for Evidence Synthesis},
       author = {Trevor Riley and Kaitlyn Hair and Lukas Wallrich and Matthew Grainger and Sarah Young and Chris Pritchard and Neal Haddaway},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.1.1},
       url = {https://www.eshackathon.org/CiteSource},
     }
