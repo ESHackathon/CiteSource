@@ -1,5 +1,5 @@
 Package: CiteSource
-Title: Analyze the Utility of Information Sources and Retrieval Methodologies for Evidence Synthesis
+Title: An R package for data-driven search strategy development and enhanced evidence synthesis reporting
 Version: 0.1.1
 Date: 2023-06-22
 Authors@R: c(
@@ -60,9 +60,8 @@ Suggests:
     progressr,
     shinybusy,
     shinyWidgets,
-    testthat (>= 3.0.0)
-Additional_repositories:
-    https://github.com/camaradesuk/ASySD
+    testthat (>= 3.0.0),
+    plogr
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
@@ -72,4 +71,5 @@ RoxygenNote: 7.2.3
 Depends: 
     R (>= 3.5.0)
 Remotes:
-    camaradesuk/ASySD
+    camaradesuk/ASySD,
+    plogr=url::https://cran.r-project.org/src/contrib/Archive/plogr/plogr_0.2.0.tar.gz
