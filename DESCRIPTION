@@ -71,5 +71,3 @@ Depends:
     R (>= 3.5.0)
 Remotes:
     camaradesuk/ASySD,
-    krlmlr/plogr
-    
