@@ -60,7 +60,8 @@ Suggests:
     progressr,
     shinybusy,
     shinyWidgets,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    plogr
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
