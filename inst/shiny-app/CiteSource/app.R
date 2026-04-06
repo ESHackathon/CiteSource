@@ -385,11 +385,19 @@ ui <- shiny::navbarPage("CiteSource",
                                 shiny::h6("Note that you can only download the data after you have run the deduplication. Also, you are only able to re-upload CSV and RIS files to continue with CiteSource, so please use these formats if you want that option."),
                                 shiny::downloadButton("downloadCsv", "Download csv"),
                                 shiny::downloadButton("downloadRis", "Download RIS"),
-                                shiny::downloadButton("downloadBib", "Download BibTex")
+                                shiny::downloadButton("downloadBib", "Download BibTex"),
+                                shiny::hr(),
+                                shiny::wellPanel(
+                                  shiny::h5("Cite CiteSource"),
+                                  shiny::p("If you use these results in a publication, please cite the software:"),
+                                  shiny::tags$code("Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026). CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting. Research Synthesis Methods. https://doi.org/10.1017/rsm.2026.10084"),
+                                  shiny::br(),
+                                  shiny::a("View Publication", href = "https://doi.org/10.1017/rsm.2026.10084", target = "_blank")
                               )
                             )
                           )
                         )
+                      )
 )
 
 

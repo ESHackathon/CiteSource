@@ -9,6 +9,13 @@ CiteSource was developed as part of the [Evidence Synthesis Hackathon](https://w
 
 ---
 
+### How to Cite
+If you use CiteSource in your research, please cite the following publication:
+
+Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026). CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting. Research Synthesis Methods. https://doi.org/10.1017/rsm.2026.10084
+
+---
+
 ### Key Features:
 
 <details>
