@@ -22,6 +22,13 @@ and hackathon please visit @ <https://esmarconf.org/>
 CiteSource was created under [the General Public License
 (\>=v3)](https://www.gnu.org/licenses/gpl-3.0.html).
 
+**Citing CiteSource**
+
+Riley, T. N., Young, S., Paxton, A. B., Wallrich, L., Hair, K., &
+Grainger, M. J. (2026). CiteSource: An R Package for Data-Driven Search
+Strategy Development and Enhanced Evidence Synthesis Reporting. Research
+Synthesis Methods. (DOI/PUBLICATION FORTHCOMING)
+
 **Shiny Web Application**
 
 Whether you know R or not, we want you to be able to use CiteSource!

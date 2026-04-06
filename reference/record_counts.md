@@ -50,8 +50,8 @@ citations <- data.frame(
 result <- record_counts(unique_citations, citations, "db_source")
 result
 #>       Source Records Imported Distinct Records
-#> 1 Database 1                3                3
-#> 2 Database 2               10                5
-#> 3 Database 3                7                2
+#> 1 Database 1                9                4
+#> 2 Database 2                8                3
+#> 3 Database 3                3                3
 #> 4      Total               20               10
 ```
