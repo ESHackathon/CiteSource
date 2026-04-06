@@ -4139,6 +4139,17 @@
       "Maintainer": "Lionel Henry <lionel@posit.co>",
       "Repository": "CRAN"
     },
+    "plogr": {
+      "Package": "plogr",
+      "Version": "0.2.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "krlmlr",
+      "RemoteRepo": "plogr",
+      "RemoteRef": "main",
+      "RemoteSha": "53a4fd487bee827bfeefd44d1418c3a2d3ac0c2a"
+    },
     "plotly": {
       "Package": "plotly",
       "Version": "4.12.0",
