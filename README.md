@@ -6,6 +6,7 @@
 [![R-CMD-check](https://github.com/ESHackathon/CiteSource/workflows/R-CMD-Check/badge.svg)](https://github.com/ESHackathon/CiteSource/actions)
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen)](https://github.com/ESHackathon/CiteSource)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![DOI](https://img.shields.io/badge/DOI-10.1038/s41586--020--2649--2-blue)](https://doi.org/10.1017/rsm.2026.10084)
 <!-- badges: end -->
 
 ## About the Package
