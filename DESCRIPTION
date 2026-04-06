@@ -72,4 +72,4 @@ Depends:
     R (>= 3.5.0)
 Remotes:
     camaradesuk/ASySD,
-    krlmlr/plogr
+    url::https://cran.r-project.org/src/contrib/Archive/plogr/plogr_0.2.0.tar.gz
