@@ -27,7 +27,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/dev/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/main/DESCRIPTION)
 
 Riley T, Hair K, Wallrich L, Grainger M, Young S, Pritchard C, Haddaway
 N (2026). *CiteSource: An R package for data-driven search strategy
