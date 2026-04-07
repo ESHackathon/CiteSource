@@ -27,7 +27,7 @@ CiteSource was created under [the General Public License
 Riley, T. N., Young, S., Paxton, A. B., Wallrich, L., Hair, K., &
 Grainger, M. J. (2026). CiteSource: An R Package for Data-Driven Search
 Strategy Development and Enhanced Evidence Synthesis Reporting. Research
-Synthesis Methods. (DOI/PUBLICATION FORTHCOMING)
+Synthesis Methods. <https://doi.org/10.1017/rsm.2026.10084>
 
 **Shiny Web Application**
 
