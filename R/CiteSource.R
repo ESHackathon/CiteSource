@@ -8,16 +8,17 @@
 
 #' @importFrom rlang .data := as_name enquo inform is_installed quo_is_null sym
 #' @importFrom dplyr across all_of anti_join any_of arrange bind_cols bind_rows
-#'   case_when coalesce desc distinct everything filter first group_by if_else
-#'   last_col left_join matches mutate n n_distinct na_if pull relocate rename
-#'   rename_with right_join row_number rowwise select slice_head starts_with
-#'   summarise transmute ungroup
+#' @importFrom dplyr case_when coalesce desc distinct everything filter first
+#' @importFrom dplyr group_by if_else last_col left_join matches mutate n
+#' @importFrom dplyr n_distinct na_if pull relocate rename rename_with
+#' @importFrom dplyr right_join row_number rowwise select slice_head
+#' @importFrom dplyr starts_with summarise transmute ungroup
 #' @importFrom tidyr fill pivot_longer pivot_wider replace_na separate
-#'   separate_rows unite
+#' @importFrom tidyr separate_rows unite
 #' @importFrom gt cell_borders cell_text cells_body cells_column_labels
-#'   cells_column_spanners cols_align cols_label fmt_number fmt_percent gt md px
-#'   sub_missing tab_footnote tab_header tab_options tab_source_note
-#'   tab_spanner_delim tab_style
+#' @importFrom gt cells_column_spanners cols_align cols_label fmt_number
+#' @importFrom gt fmt_percent gt md px sub_missing tab_footnote tab_header
+#' @importFrom gt tab_options tab_source_note tab_spanner_delim tab_style
 #' @importFrom scales percent trans_format
 #' @importFrom tidyselect where
 NULL
