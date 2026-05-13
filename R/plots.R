@@ -13,6 +13,10 @@
 #' contained? If FALSE, order of data is retained.
 #' @param interactive Should returned plot be interactive and enable user to export
 #' records underlying each field?
+#' @param show_labels Whether to show text labels in cells. `"auto"` (default) shows
+#' labels when there are 10 or fewer sources; `TRUE` always shows them; `FALSE` hides them.
+#' @param log_scale Should the fill colour scale be log-transformed? Useful when counts
+#' vary greatly across cells. Ignored when `plot_type = "percentages"`.
 #' @return The requested plot as a either a `ggplot2` object (when interactive = FALSE), which can then be
 #' further formatted or saved using [ggplot2::ggsave()], or a `plotly` object when `interactive = TRUE`
 #' @export
