@@ -631,3 +631,238 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
   }
 }
 
+
+#' Initial Record Table
+#'
+#' This function generates a formatted table displaying the record counts
+#' for each citation source, including the number of records imported and
+#' the distinct records after deduplication.
+#'
+#' @param data A data frame containing the record counts for each citation source.
+#'   It must include columns `Source`, `Records_Imported`, and `Distinct_Records`.
+#'
+#' @return A `gt` table object summarizing the record counts for each citation source.
+#'
+#' @details
+#' The function checks if the input data frame is empty and returns an empty `gt` table
+#' if no data is present. Otherwise, it generates a formatted table with labeled columns
+#' and adds footnotes explaining the meaning of each column.
+#'
+#' @export
+#'
+#' @examples
+#' sample_data <- data.frame(
+#'   Source = c("Source1", "Source2", "Source3"),
+#'   Records_Imported = c(100, 150, 250),
+#'   Distinct_Records = c(90, 140, 230)
+#' )
+#' create_initial_record_table(sample_data)
+create_initial_record_table <- function(data) {
+  if (nrow(data) == 0) {
+    return(gt::gt(data.frame(Source = character(), `Records Imported` = integer(), `Distinct Records` = integer())))
+  }
+
+  data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts") |>
+    gt::cols_label(
+      Records_Imported = "Records Imported",
+      Distinct_Records = "Distinct Records"
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of records imported from each source.",
+      locations = gt::cells_column_labels(columns = c("Records_Imported"))
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of records after internal source deduplication.",
+      locations = gt::cells_column_labels(columns = c("Distinct_Records"))
+    )
+}
+
+
+#' Create a Detailed Record Table
+#'
+#' This function generates a formatted summary table using the `gt` package,
+#' which displays detailed counts for each citation source. The table includes
+#' columns for the number of records imported, distinct records, unique records,
+#' non-unique records, and various contribution percentages. Data from the
+#' function calculate_detailed_records is pre-formatted for this table.
+#'
+#' @param data A data frame containing the detailed counts for each citation source.
+#'   The data frame must include the following columns:
+#'   - `Source`: The name of the citation source.
+#'   - `Records Imported`: The total number of records imported from the source.
+#'   - `Distinct Records`: The number of distinct records after deduplication within the source.
+#'   - `Unique Records`: The number of records unique to that source.
+#'   - `Non-unique Records`: The number of records found in at least one other source.
+#'   - `Source Contribution %`: The percentage contribution of each source to the total distinct records.
+#'   - `Source Unique Contribution %`: The percentage contribution of each source to the total unique records.
+#'   - `Source Unique %`: The percentage of records from each source that were unique.
+#'
+#' @return A `gt` table object summarizing the detailed record counts for each citation source.
+#'
+#' @export
+#'
+#' @examples
+#' sample_data <- data.frame(
+#'   Source = c("Source1", "Source2", "Total"),
+#'   `Records Imported` = c(100, 150, 250),
+#'   `Distinct Records` = c(90, 140, 230),
+#'   `Unique Records` = c(50, 70, 120),
+#'   `Non-unique Records` = c(40, 70, 110),
+#'   `Source Contribution %` = c("39.1%", "60.9%", "100%"),
+#'   `Source Unique Contribution %` = c("41.7%", "58.3%", "100%"),
+#'   `Source Unique %` = c("55.6%", "50%", "52.2%"),
+#'   check.names = FALSE
+#' )
+#' create_detailed_record_table(sample_data)
+create_detailed_record_table <- function(data) {
+  required_columns <- c("Source", "Records Imported", "Distinct Records",
+                        "Unique Records", "Non-unique Records",
+                        "Source Contribution %", "Source Unique Contribution %",
+                        "Source Unique %")
+  missing_columns <- setdiff(required_columns, names(data))
+  if (length(missing_columns) > 0) {
+    stop("The following required columns are missing from the data: ",
+         paste(missing_columns, collapse = ", "))
+  }
+
+  data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Summary") |>
+    gt::cols_label(
+      `Records Imported` = "Records Imported",
+      `Distinct Records` = "Distinct Records",
+      `Unique Records` = "Unique Records",
+      `Non-unique Records` = "Non-unique Records",
+      `Source Contribution %` = "Source Contribution %",
+      `Source Unique Contribution %` = "Source Unique Contribution %",
+      `Source Unique %` = "Source Unique %"
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of raw records imported from each database.",
+      locations = gt::cells_column_labels(columns = "Records Imported")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of records after internal source deduplication.",
+      locations = gt::cells_column_labels(columns = "Distinct Records")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of records not found in another source.",
+      locations = gt::cells_column_labels(columns = "Unique Records")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of records found in at least one other source.",
+      locations = gt::cells_column_labels(columns = "Non-unique Records")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Percent distinct records contributed to the total number of distinct records.",
+      locations = gt::cells_column_labels(columns = "Source Contribution %")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Percent of unique records contributed to the total unique records.",
+      locations = gt::cells_column_labels(columns = "Source Unique Contribution %")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Percentage of records that were unique from each source.",
+      locations = gt::cells_column_labels(columns = "Source Unique %")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Total citations discovered (after internal and cross-source deduplication).",
+      locations = gt::cells_body(columns = "Distinct Records", rows = "Total")
+    )
+}
+
+
+#' Count and Precision/Sensitivity Table
+#'
+#' This function generates a formatted table that displays the precision
+#' and sensitivity (recall) metrics for each citation source, along with
+#' distinct records and phase-specific counts such as "screened" and "final".
+#'
+#' @param data A data frame containing phase-specific counts and calculated metrics
+#'   for each citation source. It must include columns such as `Source`,
+#'   `Distinct_Records`, `final`, `Precision`, `Recall`, and optionally `screened`.
+#'
+#' @return A `gt` table object summarizing the precision and sensitivity
+#'   metrics for each citation source, with relevant footnotes and labels.
+#'
+#' @details
+#' The function first checks whether all values in the `screened` column are zero.
+#' If so, the column is removed from the table. The table is then generated
+#' using the `gt` package, with labeled columns and footnotes explaining the metrics.
+#'
+#' @export
+#'
+#' @examples
+#' sample_data <- data.frame(
+#'   Source = c("Source1", "Source2", "Total"),
+#'   Distinct_Records = c(100, 150, 250),
+#'   final = c(80, 120, 200),
+#'   Precision = c(80.0, 80.0, 80.0),
+#'   Recall = c(40.0, 60.0, 100.0),
+#'   screened = c(90, 140, 230)
+#' )
+#' create_precision_sensitivity_table(sample_data)
+create_precision_sensitivity_table <- function(data) {
+  all_zero_screened <- all(data$screened == 0)
+
+  if (all_zero_screened) {
+    data <- data[ , !(names(data) %in% "screened")]
+  }
+
+  gt_table <- data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts & Precision/Sensitivity") |>
+    gt::cols_label(
+      `Distinct_Records` = "Distinct Records",
+      final = "Final Included",
+      Precision = "Precision",
+      Recall = "Sensitivity/Recall"
+    ) |>
+    gt::cols_align(align = "right", columns = c("final", "Precision", "Recall"))
+
+  if (!all_zero_screened) {
+    gt_table <- gt_table |>
+      gt::cols_label(screened = "Screened Included") |>
+      gt::cols_align(align = "right", columns = "screened") |>
+      gt::tab_footnote(
+        footnote = "Number of citations included after title/abstract screening.",
+        locations = gt::cells_column_labels(columns = "screened")
+      ) |>
+      gt::tab_footnote(
+        footnote = "Total citations included after Ti/Ab Screening.",
+        locations = gt::cells_body(columns = "screened", rows = "Total")
+      )
+  }
+
+  gt_table |>
+    gt::tab_footnote(
+      footnote = "Number of records after internal source deduplication.",
+      locations = gt::cells_column_labels(columns = "Distinct_Records")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of citations included after full text screening.",
+      locations = gt::cells_column_labels(columns = "final")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of final included citations / Number of distinct records.",
+      locations = gt::cells_column_labels(columns = "Precision")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Number of final included citations / Total number of final included citations.",
+      locations = gt::cells_column_labels(columns = "Recall")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Total citations discovered (after internal and cross-source deduplication).",
+      locations = gt::cells_body(columns = "Distinct_Records", rows = "Total")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Total citations included after full text screening.",
+      locations = gt::cells_body(columns = "final", rows = "Total")
+    ) |>
+    gt::tab_footnote(
+      footnote = "Overall Precision = Number of final included citations / Total distinct records.",
+      locations = gt::cells_body(columns = "Precision", rows = "Total")
+    )
+}

@@ -307,3 +307,362 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   
   return(combined_counts)
 }
+
+
+#' Calculate Initial Records Unique Citations
+#'
+#' This function processes a dataset of unique citations, expands the `cite_source` column,
+#' filters based on user-specified labels (if provided), and then calculates the number
+#' of records imported and distinct records for each citation source. It also adds a
+#' total row summarizing these counts.
+#'
+#' @param unique_citations A data frame containing the unique citations.
+#'   It must contain the columns `cite_source`, `cite_label`, and `duplicate_id`.
+#' @param labels_to_include An optional character vector of labels to filter the citations.
+#'   If provided, only citations matching these labels will be included in the counts.
+#'   Default is NULL, meaning no filtering will be applied.
+#'
+#' @return A data frame containing the counts of `Records Imported` and `Distinct Records`
+#'   for each citation source. The data frame also includes a "Total" row summing
+#'   the counts across all sources.
+#'
+#' @details
+#' The function first checks if the required columns are present in the input data frame.
+#' It then expands the `cite_source` column to handle multiple sources listed in a
+#' single row and filters the dataset based on the provided labels (if any).
+#' The function calculates the number of records imported (total rows) and the number
+#' of distinct records (unique `duplicate_id` values) for each citation source.
+#' Finally, a total row is added to summarize the counts across all sources.
+#'
+#' @export
+#'
+#' @examples
+#' # Example usage with a sample dataset
+#' unique_citations <- data.frame(
+#'   cite_source = c("Source1", "Source2", "Source3"),
+#'   cite_label = c("Label1", "Label2", "Label3"),
+#'   duplicate_id = c(1, 2, 3)
+#' )
+#' calculate_initial_records(unique_citations)
+calculate_initial_records <- function(unique_citations, labels_to_include = NULL) {
+
+  # Explicitly define variables as NULL to avoid binding warnings
+  duplicate_id <- NULL
+
+  # Check if necessary columns exist
+  required_columns <- c("cite_source", "cite_label", "duplicate_id")
+  if (!all(required_columns %in% colnames(unique_citations))) {
+    stop("The dataset does not contain the required columns.")
+  }
+
+  # Split and expand the cite_source column
+  df_expanded <- unique_citations |>
+    tidyr::separate_rows(cite_source, sep = ",\\s*") |>
+    dplyr::mutate(cite_source = trimws(cite_source))
+
+  # Filter by user-specified labels if provided
+  if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
+    pattern <- paste(labels_to_include, collapse = "|")
+    df_filtered <- df_expanded |>
+      dplyr::filter(grepl(pattern, cite_label, ignore.case = TRUE))
+  } else {
+    df_filtered <- df_expanded
+  }
+
+  # Check if df_filtered is empty
+  if (nrow(df_filtered) == 0) {
+    return(data.frame(Source = character(), Records_Imported = integer(), Distinct_Records = integer()))
+  }
+
+  records_imported <- df_filtered |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(Records_Imported = n(), .groups = 'drop')
+
+  # Count the unique duplicate_id values for each source to determine the "Distinct Records"
+  distinct_records <- df_filtered |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(Distinct_Records = dplyr::n_distinct(duplicate_id), .groups = 'drop')
+
+  # Merge the two dataframes to get the final result
+  initial_counts <- dplyr::left_join(records_imported, distinct_records, by = "cite_source")
+
+  # Calculate the total counts
+  total_records_imported <- sum(initial_counts$Records_Imported)
+  total_distinct_records <- sum(initial_counts$Distinct_Records)
+
+  # Add the total counts to the result dataframe
+  total_row <- data.frame(cite_source = "Total",
+                          Records_Imported = total_records_imported,
+                          Distinct_Records = total_distinct_records)
+  initial_counts <- dplyr::bind_rows(initial_counts, total_row)
+
+  # Rename columns for consistency with gt table
+  initial_counts <- initial_counts |>
+    dplyr::rename(Source = cite_source)
+
+  return(initial_counts)
+}
+
+
+#' Calculate Detailed Record Counts
+#'
+#' @description
+#' This function processes a dataset and expands the 'cite_source' column, filters on
+#' user-specified labels (if provided), and calculates detailed counts such as the records imported,
+#' distinct records, unique records, non-unique records, and several percentage contributions for
+#' each citation source/method it also adds a total row summarizing these counts.
+#'
+#' @param unique_citations A data frame containing unique citations.
+#'   The data frame must include the columns `cite_source`, `cite_label`, and `duplicate_id`.
+#' @param n_unique A data frame containing counts of unique records, typically filtered
+#'   by specific criteria (e.g., `cite_label == "search"`).
+#' @param labels_to_include An optional character vector of labels to filter the citations.
+#'   If provided, only citations matching these labels will be included in the counts.
+#'   if 'NULL' all labels are included. Default is 'NULL'.
+#'
+#' @return A data frame with detailed counts for each citation source, including:
+#'   - `Records Imported`: Total number of records imported.
+#'   - `Distinct Records`: Number of distinct records after deduplication.
+#'   - `Unique Records`: Number of unique records specific to a source.
+#'   - `Non-unique Records`: Number of records found in other sources.
+#'   - `Source Contribution %`: Percentage contribution of each source to the total distinct records.
+#'   - `Source Unique Contribution %`: Percentage contribution of each source to the total unique records.
+#'   - `Source Unique %`: Percentage of unique records within the distinct records for each source.
+#'
+#' @details
+#' The function first checks if the required columns are present in the input data frames.
+#' It then expands the `cite_source` column, filters the data based on the provided labels (if any),
+#' and calculates various counts and percentages for each citation source. The function also adds
+#' a total row summarizing these counts across all sources.
+#'
+#' @export
+#'
+#' @examples
+#' # Example usage with a sample dataset
+#' unique_citations <- data.frame(
+#'   cite_source = c("Source1, Source2", "Source2", "Source3"),
+#'   cite_label = c("Label1", "Label2", "Label1"),
+#'   duplicate_id = c(1, 2, 3)
+#' )
+#' n_unique <- data.frame(
+#'   cite_source = c("Source1", "Source2", "Source3"),
+#'   cite_label = c("search", "search", "search"),
+#'   unique = c(10, 20, 30)
+#' )
+#' calculate_detailed_records(unique_citations, n_unique, labels_to_include = "search")
+calculate_detailed_records <- function(unique_citations, n_unique, labels_to_include = NULL) {
+
+  # Explicitly define variables as NULL to avoid binding warnings
+  cite_source <- NULL
+  cite_label <- NULL
+  duplicate_id <- NULL
+  'Distinct Records' <- NULL
+  'Unique Records' <- NULL
+  Non_unique_Records <- NULL
+  'Source Contribution %' <- NULL
+  'Source Unique Contribution %' <- NULL
+  'Source Unique %' <- NULL
+
+  # Check if necessary columns exist in unique_citations
+  required_columns <- c("cite_source", "cite_label", "duplicate_id")
+  if (!all(required_columns %in% colnames(unique_citations))) {
+    stop("The dataset does not contain the required columns.")
+  }
+
+  # Split and expand the cite_source column
+  df_expanded <- unique_citations |>
+    tidyr::separate_rows(cite_source, sep = ",\\s*") |>
+    dplyr::mutate(cite_source = trimws(cite_source))
+
+  # Filter by user-specified labels if provided
+  if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
+    pattern <- paste(labels_to_include, collapse = "|")
+    df_filtered <- df_expanded |>
+      dplyr::filter(grepl(pattern, cite_label, ignore.case = TRUE))
+  } else {
+    df_filtered <- df_expanded
+  }
+
+  # Check if df_filtered is empty
+  if (nrow(df_filtered) == 0) {
+    return(data.frame(Source = character(),
+                      `Records Imported` = integer(),
+                      `Distinct Records` = integer(),
+                      `Unique Records` = integer(),
+                      `Non-unique Records` = integer()
+    ))
+  }
+
+  # Count the occurrences of each source to determine the "Records Imported"
+  records_imported <- df_filtered |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(`Records Imported` = n(), .groups = 'drop')
+
+  # Count the unique duplicate_id values for each source to determine the "Distinct Records"
+  distinct_records <- df_filtered |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(`Distinct Records` = dplyr::n_distinct(duplicate_id), .groups = 'drop')
+
+  # Filter n_unique data to only include records with 'search' as the citation label
+  n_unique_citations_count <- n_unique |>
+    dplyr::filter(cite_label == "search") |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(`Unique Records` = sum(unique), .groups = 'drop') |>
+    dplyr::filter(cite_source != "") |>
+    dplyr::arrange(cite_source)
+
+  # Merge the three counts (initial, distinct, unique) into a single dataframe
+  detailed_counts <- dplyr::left_join(records_imported, distinct_records, by = "cite_source") |>
+    dplyr::left_join(n_unique_citations_count, by = "cite_source")
+
+  detailed_counts <- detailed_counts |>
+    dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique Records`)
+
+  detailed_counts <- detailed_counts |>
+    dplyr::mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
+                  `Source Unique Contribution %` = `Unique Records` / sum(`Unique Records`, na.rm = TRUE),
+                  `Source Unique %` = `Unique Records` / `Distinct Records`)
+
+  detailed_counts <- detailed_counts |>
+    dplyr::mutate(
+      `Source Contribution %` = scales::percent(as.numeric(`Source Contribution %`), accuracy = 0.1),
+      `Source Unique Contribution %` = scales::percent(as.numeric(`Source Unique Contribution %`), accuracy = 0.1),
+      `Source Unique %` = scales::percent(as.numeric(`Source Unique %`), accuracy = 0.1)
+    )
+
+  total_records_imported <- sum(detailed_counts$`Records Imported`, na.rm = TRUE)
+  total_distinct_records <- nrow(unique_citations)
+  total_unique_records <- sum(detailed_counts$`Unique Records`, na.rm = TRUE)
+  total_nonunique_records <- sum(detailed_counts$`Non-unique Records`, na.rm = TRUE)
+
+  detailed_counts <- tibble::add_row(detailed_counts,
+                                     cite_source = "Total",
+                                     `Records Imported` = total_records_imported,
+                                     `Distinct Records` = total_distinct_records,
+                                     `Unique Records` = total_unique_records,
+                                     `Non-unique Records` = total_nonunique_records)
+
+  detailed_counts <- detailed_counts |>
+    dplyr::rename(Source = cite_source)
+
+  return(detailed_counts)
+}
+
+
+#' Calculate Phase Counts with Precision and Recall
+#'
+#' This function calculates the distinct record counts, as well as screened
+#' and final record counts, for each citation source across different phases
+#' (e.g., "screened", "final"). It also calculates precision and recall metrics
+#' for each source.
+#'
+#' @param unique_citations A data frame containing unique citations.
+#'   It must include the columns `cite_source`, `cite_label`, and `duplicate_id`.
+#' @param n_unique A data frame containing counts of unique records.
+#'   Typically filtered by specific criteria, such as `cite_label == "search"`.
+#' @param db_colname The name of the column representing the citation source
+#'   in the `unique_citations` data frame.
+#'
+#' @return A data frame with phase counts and calculated precision and recall
+#'   for each citation source, including:
+#'   - `Distinct Records`: The count of distinct records per source.
+#'   - `screened`: The count of records in the "screened" phase.
+#'   - `final`: The count of records in the "final" phase.
+#'   - `Precision`: The precision metric calculated as `final / Distinct Records`.
+#'   - `Recall`: The recall metric calculated as `final / Total final records`.
+#'
+#' @details
+#' The function starts by calculating the total distinct records, as well as
+#' the total "screened" and "final" records across all sources. It then
+#' calculates distinct counts for each source, followed by counts for "screened"
+#' and "final" records. Finally, it calculates precision and recall metrics and
+#' adds a total row summarizing these counts across all sources.
+#'
+#' @export
+#'
+#' @examples
+#' # Example usage with a sample dataset
+#' unique_citations <- data.frame(
+#'   cite_source = c("Source1", "Source2", "Source3"),
+#'   cite_label = c("screened","screened", "final"),
+#'   duplicate_id = c(1, 2, 3)
+#' )
+#' n_unique <- data.frame(
+#'   cite_source = c("Source1", "Source2", "Source3"),
+#'   unique = c(10, 20, 30)
+#' )
+#' calculate_phase_records(unique_citations, n_unique, "cite_source")
+calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
+
+  # Explicitly define variables as NULL to avoid binding warnings
+  duplicate_id <- NULL
+  Source <- NULL
+  screened <- NULL
+  final <- NULL
+  Distinct_Records <- NULL
+
+  # Step 1: Calculate and store the totals before expanding
+  total_distinct_records <- dplyr::n_distinct(unique_citations$duplicate_id)
+
+  total_screened <- unique_citations |>
+    tidyr::separate_rows(cite_label, sep = ",\\s*") |>
+    dplyr::filter(cite_label == "screened") |>
+    dplyr::summarise(n = dplyr::n_distinct(duplicate_id)) |>
+    dplyr::pull(n)
+
+  total_final <- unique_citations |>
+    tidyr::separate_rows(cite_label, sep = ",\\s*") |>
+    dplyr::filter(cite_label == "final") |>
+    dplyr::summarise(n = dplyr::n_distinct(duplicate_id)) |>
+    dplyr::pull(n)
+
+  # Step 2: Proceed with the regular calculation for distinct records by source
+  distinct_count <- unique_citations |>
+    tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") |>
+    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) |>
+    dplyr::group_by(!!rlang::sym(db_colname)) |>
+    dplyr::summarise(Distinct_Records = dplyr::n_distinct(duplicate_id), .groups = "drop") |>
+    dplyr::rename(Source = !!rlang::sym(db_colname))
+
+  source_phase <- unique_citations |>
+    dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) |>
+    tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") |>
+    tidyr::separate_rows(cite_label, sep = ",\\s*") |>
+    dplyr::distinct() |>
+    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) |>
+    dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
+                  final = ifelse(cite_label == "final", 1, 0)) |>
+    dplyr::group_by(!!rlang::sym(db_colname)) |>
+    dplyr::summarise(screened = sum(screened),
+                     final = sum(final),
+                     .groups = "drop") |>
+    dplyr::rename(Source = !!rlang::sym(db_colname))
+
+  combined_counts <- dplyr::left_join(distinct_count, source_phase, by = "Source")
+  combined_counts[is.na(combined_counts)] <- 0
+
+  # Step 3: Calculate Precision and Recall
+  combined_counts <- combined_counts |>
+    dplyr::mutate(
+      Precision = ifelse(Distinct_Records != 0, round((final / Distinct_Records) * 100, 2), 0)
+    ) |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      Recall = ifelse(total_final != 0, round((final / total_final) * 100, 2), 0)
+    ) |>
+    dplyr::ungroup()
+
+  # Step 4: Calculate the total row using the pre-expansion totals
+  totals <- tibble::tibble(
+    Source = "Total",
+    Distinct_Records = total_distinct_records,
+    screened = total_screened,
+    final = total_final,
+    Precision = ifelse(total_distinct_records != 0, round((total_final / total_distinct_records) * 100, 2), 0),
+    Recall = NA
+  )
+
+  phase_counts <- dplyr::bind_rows(combined_counts, totals)
+
+  return(phase_counts)
+}
