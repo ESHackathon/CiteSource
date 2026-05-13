@@ -2811,7 +2811,7 @@ server <- function(input, output, session) {
       `Unique Records` = sum(detailed_counts_final$`Unique Records`, na.rm = TRUE), 
       `Non-unique Records` = sum(detailed_counts_final$`Non-unique Records`, na.rm = TRUE),
       `Source Contribution %` = scales::percent(1.0, accuracy = 0.1), # Sum of these per-source % should now be 100%
-      `Source Unique Contribution %` = if(total_overall_unique_records > 0) scales::percent(1.0, accuracy = 0.1) else scales::percent(0.0, accuracy = 0.1), # Sum of these should be 100% if any uniques
+      `Source Unique Contribution %` = (if(total_overall_unique_records > 0) scales::percent(1.0, accuracy = 0.1) else scales::percent(0.0, accuracy = 0.1)), # Sum of these should be 100% if any uniques
       `Source Unique %` = scales::percent(sum(detailed_counts_final$`Unique Records`, na.rm = TRUE) / ifelse(overall_total_distinct_records == 0, 1, overall_total_distinct_records), accuracy = 0.1)
     )
     
