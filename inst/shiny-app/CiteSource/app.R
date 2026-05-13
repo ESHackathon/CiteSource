@@ -835,7 +835,6 @@ ui <- shiny::navbarPage("CiteSource",
                             )
                           )
                         )
-                      )
 )
 
 
