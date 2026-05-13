@@ -31,27 +31,28 @@ export_csv <- function(unique_citations, filename = "citesource_exported_citatio
     separate <- match.arg(separate, choices = c("cite_source", "cite_label", "cite_string"), several.ok = TRUE)
 
     separated <- purrr::map_dfc(separate, function(x) {
-      unique_citations %>%
-        dplyr::select(tidyselect::all_of(x), .data$duplicate_id, .data$record_ids) %>%
-        expand_single_metadata_column(x) %>%
+      unique_citations |>
+        dplyr::select(tidyselect::all_of(x), .data$duplicate_id, .data$record_ids) |>
+        tidyr::separate_rows(1, sep = ", ", convert = TRUE) |>
+        unique() |>
         tidyr::pivot_wider(
           id_cols = .data$duplicate_id, names_prefix = paste0(stringr::str_remove(x, "cite_"), "_"),
-          names_from = !!rlang::sym(x), values_from = c(.data$record_ids),
+          names_from = 1, values_from = c(.data$record_ids),
           values_fn = function(x) TRUE,
           values_fill = FALSE
-        ) %>%
+        ) |>
         dplyr::select(tidyselect::starts_with(paste0(stringr::str_remove(x, "cite_"))))
     })
     
     # Trim abstracts if required
     if (!is.null(trim_abstracts)) {
-      unique_citations <- unique_citations %>% 
+      unique_citations <- unique_citations |> 
         dplyr::mutate(abstract = stringr::str_sub(.data$abstract, 1, trim_abstracts))
     }
     
 
-    unique_citations <- unique_citations %>%
-      dplyr::select(-tidyselect::all_of(separate)) %>%
+    unique_citations <- unique_citations |>
+      dplyr::select(-tidyselect::all_of(separate)) |>
       dplyr::bind_cols(separated)
   }
   utils::write.csv(unique_citations, filename, row.names = FALSE)
@@ -98,8 +99,8 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
       "C2", "record_ids", TRUE,
       "TY", "type", TRUE
     ),
-    synthesisr_code_lookup %>% dplyr::filter(.data$ris_synthesisr)
-  ) %>% dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
+    synthesisr_code_lookup |> dplyr::filter(.data$ris_synthesisr)
+  ) |> dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
 
   # Currently, write_refs does not accept tibbles, thus converted
   write_refs(as.data.frame(citations), file = filename, tag_naming = synthesisr_codes)
@@ -128,21 +129,21 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 export_bib <- function(citations, filename = "citations.bib", include = c("sources", "labels", "strings")) {
   if (tolower(tools::file_ext(filename)) != "bib") warning("Function saves a BibTex file, so filename should (usually) end in .bib. For now, name is used as provided.")
 
-  include <- stringr::str_remove(include, "s$") %>% paste0("cite_", .)
+  include <- paste0("cite_", stringr::str_remove(include, "s$"))
 
-  notes <- citations %>% dplyr::select(tidyselect::all_of(include))
+  notes <- citations |> dplyr::select(tidyselect::all_of(include))
 
   for (i in seq_along(include)) {
     notes[include[i]] <- paste(include[i], notes[[include[i]]], sep = ": ")
   }
 
-  notes <- notes %>%
-    tidyr::unite("note", dplyr::everything(), sep = "; ") %>%
+  notes <- notes |>
+    tidyr::unite("note", dplyr::everything(), sep = "; ") |>
     dplyr::pull(.data$note)
 
   citations["note"] <- notes
 
-  citations <- citations %>%
+  citations <- citations |>
     dplyr::select(-dplyr::starts_with("cite_"), -tidyselect::any_of(c("duplicate_id", "record_ids", "record_id")))
 
   write_refs(as.data.frame(citations), format = "bib", file = filename)

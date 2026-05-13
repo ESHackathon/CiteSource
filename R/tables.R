@@ -48,30 +48,30 @@ record_level_table <- function(citations, include = "sources", include_empty = T
   }
   
   if (!include_empty == TRUE) {
-    citations <- citations %>% dplyr::filter(.data$duplicate_id %in% sources$duplicate_id)
+    citations <- citations |> dplyr::filter(.data$duplicate_id %in% sources$duplicate_id)
   }
   
   if (! "url" %in% colnames(citations)) {
     citations$url <- NA_character_
   }
   
-  citations <- citations %>%
+  citations <- citations |>
     dplyr::mutate(
       citation = generate_apa_citation(.data$author, .data$year),
       reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$journal, .data$volume, .data$issue, .data$doi, .data$url),
       html_reference = generate_apa_reference(.data$author, .data$year, .data$title, .data$journal, .data$volume, .data$issue, .data$doi, .data$url, return_html = TRUE)
-    ) %>%
+    ) |>
     # Arrange by first author to avoid issue with initials
-    dplyr::arrange(stringr::str_extract(.data$author, "^.*?,"), .data$citation) %>%
-    dplyr::select("duplicate_id", "citation", "reference", "html_reference") %>%
+    dplyr::arrange(stringr::str_extract(.data$author, "^.*?,"), .data$citation) |>
+    dplyr::select("duplicate_id", "citation", "reference", "html_reference") |>
     dplyr::left_join(sources, by = "duplicate_id")
   
   indicator_presence <- as.character(indicator_presence)
   indicator_absence <- as.character(indicator_absence)
   
-  to_display <- citations %>%
-    dplyr::select(-(1:4)) %>%
-    dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(.x, indicator_presence, indicator_absence))) %>%
+  to_display <- citations |>
+    dplyr::select(-(1:4)) |>
+    dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(.x, indicator_presence, indicator_absence))) |>
     dplyr::rename_with(~ paste0(.x, " ")) # Add space to keep column names unique
   
   citations <- dplyr::bind_cols(citations, to_display)
@@ -83,11 +83,11 @@ record_level_table <- function(citations, include = "sources", include_empty = T
     } else {
       headings <- purrr::map(include, function(type) {
         type <- stringr::str_sub(type, 1, -2)
-        values <- names(citations) %>%
-          stringr::str_subset(glue::glue("^{type}__")) %>%
+        values <- names(citations) |>
+          stringr::str_subset(glue::glue("^{type}__")) |>
           stringr::str_remove(glue::glue("^{type}__"))
-        list(type = type %>% stringr::str_to_title(), values = values)
-      }) %>% purrr::transpose()
+        list(type = type |> stringr::str_to_title(), values = values)
+      }) |> purrr::transpose()
       
       sketch <- htmltools::tags$table(
         class = "display",
@@ -106,9 +106,9 @@ record_level_table <- function(citations, include = "sources", include_empty = T
         )
       )
       
-      citations %>%
-        dplyr::select(-"duplicate_id", -"reference") %>%
-        cbind(" " = "&oplus;", .) %>%
+      citations |>
+        dplyr::select(-"duplicate_id", -"reference") |>
+        (\(df) cbind(" " = "&oplus;", df))() |>
         DT::datatable(
           escape = FALSE,
           extensions = "Buttons",
@@ -150,8 +150,8 @@ record_level_table <- function(citations, include = "sources", include_empty = T
         )
     }
   } else {
-    citations %>%
-      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") %>%
+    citations |>
+      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") |>
       dplyr::rename_with(stringr::str_trim)
   }
 }
@@ -186,7 +186,7 @@ record_level_table <- function(citations, include = "sources", include_empty = T
 citation_summary_table <- function(citations, comparison_type = "sources", search_label = "search", screening_label = "final", top_n = NULL) {
   if (!comparison_type %in% c("sources", "strings")) stop('comparison_type needs to be "sources" or "strings"')
 
-  labels <- unique(citations$cite_label) %>% paste(collapse = "  ")
+  labels <- unique(citations$cite_label) |> paste(collapse = "  ")
 
   if (!(stringr::str_detect(labels, search_label) && all(stringr::str_detect(labels, screening_label)))) stop("`search_label` and `screening_label` must refer to values of `cite_label` in `citations`")
 
@@ -194,117 +194,117 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
 
   # Merge multiple search labels
   for (i in seq_along(search_label)) {
-    citations <- citations %>%
+    citations <- citations |>
       dplyr::mutate(cite_label = stringr::str_replace_all(cite_label, paste0("(^|( ))(", search_label[i], ")(,|$)"), "\\1search\\4"))
   }
 
   citations_spread <- compare_sources(citations, c("labels", comparison_type))
 
-  citations_long <- citations_spread %>%
-    tidyr::pivot_longer(-.data$duplicate_id, values_to = "bool") %>%
-    dplyr::filter(.data$bool == TRUE) %>%
-    dplyr::select(-"bool") %>%
-    tidyr::separate(.data$name, c("type", "value")) %>%
+  citations_long <- citations_spread |>
+    tidyr::pivot_longer(-.data$duplicate_id, values_to = "bool") |>
+    dplyr::filter(.data$bool == TRUE) |>
+    dplyr::select(-"bool") |>
+    tidyr::separate(.data$name, c("type", "value")) |>
     dplyr::filter((.data$type == "label" & .data$value %in% c("search", screening_label)) |
       .data$type == comparison_type_singular)
 
 
-  types <- as.factor(paste0("_", unique(citations_long$type))) %>% levels()
+  types <- as.factor(paste0("_", unique(citations_long$type))) |> levels()
 
-  yield_dfs <- citations_long %>%
-    split(.$type) %>%
-    purrr::reduce(dplyr::left_join, by = "duplicate_id", suffix = types) %>%
-    dplyr::select(-dplyr::starts_with("type_")) %>%
+  yield_dfs <- citations_long |>
+    split(.$type) |>
+    purrr::reduce(dplyr::left_join, by = "duplicate_id", suffix = types) |>
+    dplyr::select(-dplyr::starts_with("type_")) |>
     split(.$value_label)
 
   yields <- purrr::map_dfr(yield_dfs, .id = "stage", function(df) {
-    indicators <- df %>%
+    indicators <- df |>
       tidyr::pivot_wider(
         names_from = .data[[glue::glue("value_{comparison_type_singular}")]],
         values_from = .data[[glue::glue("value_{comparison_type_singular}")]], values_fn = ~TRUE,
         values_fill = FALSE
-      ) %>%
+      ) |>
       dplyr::select(-dplyr::all_of(c("duplicate_id", "value_label")))
 
     clusters <- names(indicators)
 
     purrr::map_dfr(clusters, function(cluster) {
-      rs <- indicators %>%
-        dplyr::filter(.data[[cluster]] == TRUE) %>%
+      rs <- indicators |>
+        dplyr::filter(.data[[cluster]] == TRUE) |>
         rowSums()
       tibble::tibble(!!comparison_type := cluster, Records_total = length(rs), Records_unique = sum(rs == 1))
     })
   })
 
 
-  yield_dfs_dedup <- purrr::map_dfr(yield_dfs, .id = "stage", ~ .x %>%
-    dplyr::select("duplicate_id") %>%
-    unique()) %>%
-    dplyr::group_by(.data$stage) %>%
+  yield_dfs_dedup <- purrr::map_dfr(yield_dfs, .id = "stage", ~ .x |>
+    dplyr::select("duplicate_id") |>
+    unique()) |>
+    dplyr::group_by(.data$stage) |>
     dplyr::summarise(stage_total = dplyr::n())
 
-  yields <- yields %>%
-    dplyr::left_join(yield_dfs_dedup, by = "stage") %>%
-    dplyr::group_by(.data$stage) %>%
-    dplyr::mutate(Sensitivity = .data$Records_total / .data$stage_total) %>%
-    dplyr::ungroup() %>%
+  yields <- yields |>
+    dplyr::left_join(yield_dfs_dedup, by = "stage") |>
+    dplyr::group_by(.data$stage) |>
+    dplyr::mutate(Sensitivity = .data$Records_total / .data$stage_total) |>
+    dplyr::ungroup() |>
     dplyr::select(-"stage_total")
 
-  yields <- yield_dfs_dedup %>%
-    dplyr::rename(Records_total = .data$stage_total) %>%
-    dplyr::mutate(!!comparison_type := "Total", Sensitivity = NA) %>%
-    dplyr::left_join(yields %>%
-      dplyr::group_by(.data$stage) %>%
-      dplyr::summarise(Records_unique = sum(.data$Records_unique)), by = "stage") %>%
-    dplyr::bind_rows(yields, .)
+  total_row <- yield_dfs_dedup |>
+    dplyr::rename(Records_total = .data$stage_total) |>
+    dplyr::mutate(!!comparison_type := "Total", Sensitivity = NA) |>
+    dplyr::left_join(yields |>
+      dplyr::group_by(.data$stage) |>
+      dplyr::summarise(Records_unique = sum(.data$Records_unique)), by = "stage")
+  yields <- dplyr::bind_rows(yields, total_row)
 
-  search_results <- yields %>% dplyr::filter(.data$stage == search_label)
+  search_results <- yields |> dplyr::filter(.data$stage == search_label)
 
 
-  yields <- yields %>%
-    dplyr::filter(.data$stage != search_label) %>%
+  yields <- yields |>
+    dplyr::filter(.data$stage != search_label) |>
     dplyr::left_join(
-      search_results %>% dplyr::select(-"stage", total_search = .data$Records_total, -c("Records_unique":"Sensitivity")),
+      search_results |> dplyr::select(-"stage", total_search = .data$Records_total, -c("Records_unique":"Sensitivity")),
       by = comparison_type
-    ) %>%
-    dplyr::mutate(Precision = .data$Records_total / .data$total_search) %>%
-    dplyr::select(-"total_search") %>%
-    dplyr::bind_rows(search_results) %>%
-    dplyr::group_by(.data$stage) %>%
-    dplyr::arrange(-.data$Records_total) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(total_total = dplyr::if_else(.data[[comparison_type]] == "Total", .data$Records_total, NA_integer_)) %>%
-    tidyr::fill(.data$total_total) %>%
-    dplyr::mutate(Contribution_unique = .data$Records_unique / .data$total_total) %>%
-    dplyr::select(-"total_total") %>%
-    dplyr::group_by(.data$stage) %>%
-    dplyr::arrange(.data[[comparison_type]] == "Total") %>%
+    ) |>
+    dplyr::mutate(Precision = .data$Records_total / .data$total_search) |>
+    dplyr::select(-"total_search") |>
+    dplyr::bind_rows(search_results) |>
+    dplyr::group_by(.data$stage) |>
+    dplyr::arrange(-.data$Records_total) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(total_total = dplyr::if_else(.data[[comparison_type]] == "Total", .data$Records_total, NA_integer_)) |>
+    tidyr::fill(.data$total_total) |>
+    dplyr::mutate(Contribution_unique = .data$Records_unique / .data$total_total) |>
+    dplyr::select(-"total_total") |>
+    dplyr::group_by(.data$stage) |>
+    dplyr::arrange(.data[[comparison_type]] == "Total") |>
     dplyr::ungroup()
 
   if (!is.null(top_n)) {
     if (length(unique(search_results[[comparison_type]])) <= top_n) {
       top_n <- NULL
     } else {
-      to_display <- search_results %>%
-        dplyr::arrange(-.data$Records_total) %>%
-        dplyr::slice_head(n = top_n + 1) %>% # +1 to include Total row
+      to_display <- search_results |>
+        dplyr::arrange(-.data$Records_total) |>
+        dplyr::slice_head(n = top_n + 1) |> # +1 to include Total row
         dplyr::pull(!!rlang::sym(comparison_type))
 
-      yields <- yields %>%
+      yields <- yields |>
         dplyr::filter(.data[[comparison_type]] %in% to_display)
     }
   }
 
-  tab <- yields %>%
-    dplyr::relocate("Sensitivity", "Precision", .after = dplyr::last_col()) %>%
-    dplyr::rename_with(stringr::str_to_title) %>%
-    dplyr::group_by(.data$Stage) %>%
-    gt::gt() %>%
-    gt::fmt_percent(5:7) %>%
-    gt::sub_missing() %>%
-    gt::tab_spanner_delim("_") %>%
-    gt::fmt_number(3:4, decimals = 0) %>%
-    gt::tab_options(row_group.background.color = "grey") %>%
+  tab <- yields |>
+    dplyr::relocate("Sensitivity", "Precision", .after = dplyr::last_col()) |>
+    dplyr::rename_with(stringr::str_to_title) |>
+    dplyr::group_by(.data$Stage) |>
+    gt::gt() |>
+    gt::fmt_percent(5:7) |>
+    gt::sub_missing() |>
+    gt::tab_spanner_delim("_") |>
+    gt::fmt_number(3:4, decimals = 0) |>
+    gt::tab_options(row_group.background.color = "grey") |>
     gt::tab_style(
       locations = gt::cells_column_labels(columns = gt::everything()),
       style = list(
@@ -312,7 +312,7 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
         gt::cell_borders(sides = c("top"), weight = gt::px(2)),
         gt::cell_text(weight = "bold")
       )
-    ) %>%
+    ) |>
     gt::tab_style(
       locations = gt::cells_column_spanners(),
       style = list(
@@ -320,11 +320,11 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
         gt::cell_borders(sides = "bottom", weight = NULL),
         gt::cell_text(weight = "bold", style = "italic")
       )
-    ) %>%
+    ) |>
     gt::tab_footnote("After deduplication", gt::cells_body(
       columns = dplyr::all_of(stringr::str_to_title(comparison_type)),
       rows = !!rlang::sym(stringr::str_to_title(comparison_type)) == "Total"
-    )) %>%
+    )) |>
     gt::tab_source_note(gt::md(glue::glue(" \n **Included fields:**
     * **_Total_ records** are all records returned by that {comparison_type_singular}, while **_unique_ records** are found in only that {comparison_type_singular} (or, in the Total rows, in only one {comparison_type_singular}).
     * The **unique contribution** is the share of records only found in that {comparison_type_singular} (or, in the Total rows, in only one {comparison_type_singular}).\n
@@ -332,7 +332,7 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
     * **Precision** is the share of initial records in that {comparison_type_singular} that are retained for inclusion at that stage.")))
 
   if (!is.null(top_n)) {
-    tab <- tab %>% gt::tab_source_note(gt::md(glue::glue("NB: For clarity, **only the top-{top_n} {comparison_type} are displayed**. Totals and percentages, however, are based on *all* {comparison_type}.")))
+    tab <- tab |> gt::tab_source_note(gt::md(glue::glue("NB: For clarity, **only the top-{top_n} {comparison_type} are displayed**. Totals and percentages, however, are based on *all* {comparison_type}.")))
   }
   tab
 }
@@ -352,16 +352,16 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
 generate_apa_citation <- function(authors, year) {
   id <- seq_along(authors)
   # Extract last names and initials
-  processed_names <- tibble::tibble(id = id, authors = authors, year = year) %>%
+  processed_names <- tibble::tibble(id = id, authors = authors, year = year) |>
     dplyr::mutate(
-      last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
-      initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, "^.*?,") %>%
-        stringr::str_remove_all("\\.") %>%
-        stringr::str_trim() %>%
-        stringr::str_split(pattern = " ") %>%
-        purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
-        purrr::map(stringr::str_c, collapse = ". ") %>%
-        purrr::flatten_chr() %>%
+      last_names = authors |> stringr::str_split(pattern = " and ") |> purrr::map(~ stringr::str_remove(.x, ",.*$")),
+      initials = authors |> stringr::str_split(pattern = " and ") |> purrr::map(~ stringr::str_remove(.x, "^.*?,") |>
+        stringr::str_remove_all("\\.") |>
+        stringr::str_trim() |>
+        stringr::str_split(pattern = " ") |>
+        purrr::map(stringr::str_trunc, 1, ellipsis = "") |>
+        purrr::map(stringr::str_c, collapse = ". ") |>
+        purrr::flatten_chr() |>
         paste0("."))
     )
 
@@ -373,24 +373,24 @@ generate_apa_citation <- function(authors, year) {
   # Need this to ensure that last_names and initialed_names retain same length
 
 
-  last_name <- processed_names %>%
-    dplyr::pull(.data$last_names) %>%
+  last_name <- processed_names |>
+    dplyr::pull(.data$last_names) |>
     unlist()
 
   initialed_name <- purrr::map2(
     dplyr::pull(processed_names, .data$initials), 
     dplyr::pull(processed_names, .data$last_names),
     ~ paste(.x, .y)
-  ) %>% unlist()
+  ) |> unlist()
 
   authors <- tibble::tibble(last_name, initialed_name)
   duplicated_last_names <- last_name[duplicated(last_name)]
   # Identify which last names appear with different initials
-  to_disambiguate <- authors %>%
-    dplyr::filter(.data$last_name %in% duplicated_last_names) %>%
-    dplyr::group_by(.data$last_name) %>%
-    dplyr::summarise(disambiguate = dplyr::n_distinct(.data$initialed_name) > 1) %>%
-    dplyr::filter(.data$disambiguate == TRUE) %>%
+  to_disambiguate <- authors |>
+    dplyr::filter(.data$last_name %in% duplicated_last_names) |>
+    dplyr::group_by(.data$last_name) |>
+    dplyr::summarise(disambiguate = dplyr::n_distinct(.data$initialed_name) > 1) |>
+    dplyr::filter(.data$disambiguate == TRUE) |>
     dplyr::pull(.data$last_name)
   # Replace those last names with initials
 processed_names$last_names <- 
@@ -401,91 +401,94 @@ processed_names$last_names <-
   })
 
   # Create simple citations
-  citations <- processed_names %>%
-    dplyr::rowwise() %>%
+  citations <- processed_names |>
     dplyr::mutate(
-      N_authors = length(.data$last_names),
+      N_authors = purrr::map_int(.data$last_names, length),
       year = as.character(.data$year),
-      citation = dplyr::case_when(
-        .data$N_authors == 1 ~ glue::glue("{last_names[1]} ({year})"),
-        .data$N_authors == 2 ~ glue::glue("{last_names[1]} & {last_names[2]} ({year})"),
-        .data$N_authors > 2 ~ glue::glue("{last_names[1]} et al. ({year})")
-      )
-    ) %>%
-    dplyr::ungroup()
+      citation = purrr::map2_chr(.data$last_names, .data$year, function(ln, yr) {
+        n <- length(ln)
+        if (n == 1) paste0(ln[1], " (", yr, ")")
+        else if (n == 2) paste0(ln[1], " & ", ln[2], " (", yr, ")")
+        else paste0(ln[1], " et al. (", yr, ")")
+      })
+    )
 
   # Disambiguate
-  citations_unambiguous <- citations %>%
+  citations_unambiguous <- citations |>
     dplyr::filter(!(duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE))))
 
-  citations_ambiguous <- citations %>%
+  citations_ambiguous <- citations |>
     dplyr::filter((duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE))))
 
   if (nrow(citations_ambiguous) > 0) {
     citations_ambiguous <- purrr::map_dfr(unique(citations_ambiguous$citation), function(current_citation) {
-      group <- citations_ambiguous %>%
-        dplyr::filter(.data$citation == current_citation) %>%
-        dplyr::mutate(author_names = purrr::map(.data$last_names, stringr::str_c())) %>%
+      group <- citations_ambiguous |>
+        dplyr::filter(.data$citation == current_citation) |>
+        dplyr::mutate(author_names = purrr::map(.data$last_names, stringr::str_c())) |>
         dplyr::arrange(dplyr::desc(.data$author_names))
 
       # Case 1: multiple publications by same author(s) in same year - add letters
       if (dplyr::n_distinct(group$author_names) == 1) {
-        group <- group %>%
-          dplyr::mutate(year = paste0(year, letters[seq_len(dplyr::n())])) %>%
-          dplyr::rowwise() %>%
+        group <- group |>
+          dplyr::mutate(year = paste0(year, letters[seq_len(dplyr::n())])) |>
           dplyr::mutate(
-            N_authors = length(.data$last_names),
-            citation = dplyr::case_when(
-              .data$N_authors == 1 ~ glue::glue("{last_names[1]} ({year})"),
-              .data$N_authors == 2 ~ glue::glue("{last_names[1]} & {last_names[2]} ({year})"),
-              .data$N_authors > 2 ~ glue::glue("{last_names[1]} et al. ({year})")
-            )
-          ) %>%
-          dplyr::ungroup()
+            N_authors = purrr::map_int(.data$last_names, length),
+            citation = purrr::map2_chr(.data$last_names, .data$year, function(ln, yr) {
+              n <- length(ln)
+              if (n == 1) paste0(ln[1], " (", yr, ")")
+              else if (n == 2) paste0(ln[1], " & ", ln[2], " (", yr, ")")
+              else paste0(ln[1], " et al. (", yr, ")")
+            })
+          )
       } else {
         # Case 2: distinct authors
         # Find maximum number of common authors
-        common <- group$last_names %>%
-          utils::combn(2, simplify = FALSE) %>%
+        common <- group$last_names |>
+          utils::combn(2, simplify = FALSE) |>
           purrr::map_int(~{
             len <- min(length(.x[[1]]), length(.x[[2]]))
             comparison <- .x[[1]][1:len] == .x[[2]][1:len]
             ifelse(any(!comparison), which(!comparison)[1] - 1, len)
-          }) %>%
+          }) |>
           max()
         
-        group <- group %>%
-          dplyr::rowwise() %>%
-          dplyr::mutate(citation = dplyr::case_when(
-            (common < 5 | .data$N_authors < 5) & N_authors < common + 3 ~ glue::glue("{glue::glue_collapse(last_names, ', ', last = ' & ')} ({year})"),
-            (common < 5 | .data$N_authors < 5) ~ glue::glue("{glue::glue_collapse(last_names[1:(common+1)], ', ')} et al. ({year})"),
-            common >= 5 & .data$N_authors < common + 2 ~ glue::glue("{last_names[1]} ... {last_names[common]}  & {last_names[common+1]} ({year})"),
-            common >= 5 & .data$N_authors < common + 3 ~ glue::glue("{last_names[1]} ... {last_names[common+1]}  & {last_names[common+2]} ({year})"),
-            common >= 5 ~ glue::glue("{last_names[1]} ... {last_names[common+1]} et al. ({year})")
-          )) %>%
-          dplyr::ungroup()
+        group <- group |>
+          dplyr::mutate(citation = purrr::pmap_chr(
+            list(.data$last_names, .data$year, .data$N_authors),
+            function(ln, yr, n) {
+              if ((common < 5 || n < 5) && n < common + 3) {
+                paste0(glue::glue_collapse(ln, ", ", last = " & "), " (", yr, ")")
+              } else if (common < 5 || n < 5) {
+                paste0(glue::glue_collapse(ln[1:(common + 1)], ", "), " et al. (", yr, ")")
+              } else if (n < common + 2) {
+                paste0(ln[1], " ... ", ln[common], "  & ", ln[common + 1], " (", yr, ")")
+              } else if (n < common + 3) {
+                paste0(ln[1], " ... ", ln[common + 1], "  & ", ln[common + 2], " (", yr, ")")
+              } else {
+                paste0(ln[1], " ... ", ln[common + 1], " et al. (", yr, ")")
+              }
+            }
+          ))
       }
       group
     })
 
-    citations_still_ambiguous <- citations_ambiguous %>%
+    citations_still_ambiguous <- citations_ambiguous |>
       dplyr::filter((duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE))))
 
-    citations_unambiguous <- dplyr::bind_rows(citations_unambiguous, citations_ambiguous %>%
+    citations_unambiguous <- dplyr::bind_rows(citations_unambiguous, citations_ambiguous |>
       dplyr::filter(!(duplicated(.data$citation) | (duplicated(.data$citation, fromLast = TRUE)))))
 
     # If some of Case 2 were in fact Case 1s (e.g., more than 2 authors with same names), they need to be further disambiguated
-    citations_still_ambiguous <- citations_still_ambiguous %>%
-      dplyr::group_by(.data$citation) %>%
-      dplyr::mutate(letter = letters[seq_len(dplyr::n())]) %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(citation = stringr::str_replace(.data$citation, "([:digit:])\\)", glue::glue("\\1{letter})"))) %>%
-      dplyr::ungroup()
+    citations_still_ambiguous <- citations_still_ambiguous |>
+      dplyr::group_by(.data$citation) |>
+      dplyr::mutate(letter = letters[seq_len(dplyr::n())]) |>
+      dplyr::ungroup() |>
+      dplyr::mutate(citation = stringr::str_replace(.data$citation, "(\\d)\\)", paste0("\\1", .data$letter, ")")))
 
     citations_unambiguous <- dplyr::bind_rows(citations_unambiguous, citations_still_ambiguous)
   }
-  citations_unambiguous %>%
-    dplyr::left_join(tibble::tibble(id), ., by = "id") %>%
+  dplyr::left_join(tibble::tibble(id), citations_unambiguous, by = "id") |>
     dplyr::pull(.data$citation)
 }
 
@@ -537,24 +540,24 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
   weblink <- handle_missing(weblink, "weblink")
   
   # Extract last names and initials
-  citations <- tibble::tibble(id, authors, year, title, source, volume, issue, doi, weblink) %>%
-    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ as.character(.x) %>% dplyr::na_if(""))) %>%
+  citations <- tibble::tibble(id, authors, year, title, source, volume, issue, doi, weblink) |>
+    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ as.character(.x) |> dplyr::na_if(""))) |>
     dplyr::mutate(
-      last_names = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~ stringr::str_remove(.x, ",.*$")),
-      initials = authors %>% stringr::str_split(pattern = " and ") %>% purrr::map(~{
+      last_names = authors |> stringr::str_split(pattern = " and ") |> purrr::map(~ stringr::str_remove(.x, ",.*$")),
+      initials = authors |> stringr::str_split(pattern = " and ") |> purrr::map(~{
         out <- .x
         out[!stringr::str_detect(.x, ",")] <- ""
         
         .x <- .x[stringr::str_detect(.x, ",")]
         
 
-        out[!out == ""] <- stringr::str_remove(.x, "^.*?,") %>%
-                                                                                    stringr::str_remove_all("\\.") %>%
-                                                                                    stringr::str_trim() %>%
-                                                                                    stringr::str_split(pattern = " ") %>%
-                                                                                    purrr::map(stringr::str_trunc, 1, ellipsis = "") %>%
-                                                                                    purrr::map(stringr::str_c, collapse = ". ") %>%
-                                                                                    purrr::flatten_chr() %>%
+        out[!out == ""] <- stringr::str_remove(.x, "^.*?,") |>
+                                                                                    stringr::str_remove_all("\\.") |>
+                                                                                    stringr::str_trim() |>
+                                                                                    stringr::str_split(pattern = " ") |>
+                                                                                    purrr::map(stringr::str_trunc, 1, ellipsis = "") |>
+                                                                                    purrr::map(stringr::str_c, collapse = ". ") |>
+                                                                                    purrr::flatten_chr() |>
                                                                                     paste0(".")
         out
         })
@@ -562,16 +565,16 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
     )
   
   # Merge initials to names
-  citations$initialed_names <- citations %>%
-    dplyr::select("last_names", "initials") %>%
-    as.list() %>%
-    purrr::transpose() %>%
+  citations$initialed_names <- citations |>
+    dplyr::select("last_names", "initials") |>
+    as.list() |>
+    purrr::transpose() |>
     purrr::map(~ {
        purrr::map2_chr(.x$last_names, .x$initials, ~ if (.y == "" | is.na(.y)) .x else paste(.x, .y, sep = ", "))
     })
 
   if (format_journal_case) {
-    citations <- citations %>% dplyr::mutate(source = stringr::str_to_title(source))
+    citations <- citations |> dplyr::mutate(source = stringr::str_to_title(source))
   }
 
   # Helper function to deal with missing values
@@ -581,29 +584,50 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
 
   # Compose references
 
-  citations <- citations %>% dplyr::mutate(
-    doi = dplyr::if_else(stringr::str_detect(doi, "http"), doi, paste0("https://doi.org/", doi)),
+  citations <- citations |> dplyr::mutate(
+    doi = dplyr::case_when(
+      is.na(doi)                          ~ NA_character_,
+      stringr::str_detect(doi, "http")    ~ doi,
+      TRUE                                ~ paste0("https://doi.org/", doi)
+    ),
     link = dplyr::coalesce(doi, weblink)
   )
   
   if (return_html) {
-    citations %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(
-        reference = glue::glue("
-                               {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {nNA(title, '.')} {nNA(source, pre = '<i>', '</i>')}{nNA(volume, pre = '<i>, ', '</i>')}{nNA(issue, pre = '(', ')')}. {nNA(link, pre = '<a href=\"', '\" target=\"_blank\" rel=\"noopener noreferrer\">')}{nNA(link, '</a>')}
-                                     ")
-      ) %>%
-      dplyr::pull(.data$reference)
+    purrr::pmap_chr(
+      list(citations$initialed_names, citations$year, citations$title,
+           citations$source, citations$volume, citations$issue, citations$link),
+      function(initialed_names, year, title, source, volume, issue, link) {
+        paste0(
+          glue::glue_collapse(initialed_names, ", ", last = " & "),
+          " (", year, "). ",
+          nNA(title, "."), " ",
+          nNA(source, pre = "<i>", "</i>"),
+          nNA(volume, pre = "<i>, ", "</i>"),
+          nNA(issue, pre = "(", ")"),
+          ". ",
+          nNA(link, pre = '<a href="', '" target="_blank" rel="noopener noreferrer">'),
+          nNA(link, "</a>")
+        )
+      }
+    )
   } else {
-    citations %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(
-        reference = glue::glue("
-                              {glue::glue_collapse(initialed_names, ', ', last = ' & ')} ({year}). {nNA(title, '.')} {nNA(source)}{nNA(volume, pre = ', ')}{nNA(issue, pre = '(', ')')}. {nNA(link)}
-                                                     ")
-      ) %>%
-      dplyr::pull(.data$reference)
+    purrr::pmap_chr(
+      list(citations$initialed_names, citations$year, citations$title,
+           citations$source, citations$volume, citations$issue, citations$link),
+      function(initialed_names, year, title, source, volume, issue, link) {
+        paste0(
+          glue::glue_collapse(initialed_names, ", ", last = " & "),
+          " (", year, "). ",
+          nNA(title, "."), " ",
+          nNA(source),
+          nNA(volume, pre = ", "),
+          nNA(issue, pre = "(", ")"),
+          ". ",
+          nNA(link)
+        )
+      }
+    )
   }
 }
 
@@ -622,16 +646,17 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
 #' @importFrom gt gt tab_header cols_label tab_footnote cells_column_labels
 #' @export
 record_counts_table <- function(data) {
-  # Create the initial gt table
-  data %>%
-    gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Record Counts") %>%
+  .Deprecated("create_initial_record_table", package = "CiteSource",
+              msg = "`record_counts_table()` is deprecated. Use `create_initial_record_table()` instead.")
+  data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts") |>
     
     # Label the columns
     gt::cols_label(
       `Records Imported` = "Records Imported",
       `Distinct Records` = "Distinct Records"
-    ) %>%
+    ) |>
     
     # Add footnote for "Records Imported"
     gt::tab_footnote(
@@ -639,7 +664,7 @@ record_counts_table <- function(data) {
       locations = gt::cells_column_labels(
         columns = .data$`Records Imported`
       )
-    ) %>%
+    ) |>
     
     # Add footnote for "Distinct Records"
     gt::tab_footnote(
@@ -664,10 +689,11 @@ record_counts_table <- function(data) {
 #' @importFrom gt gt tab_header cols_label tab_footnote cells_column_labels
 #' @export
 record_summary_table <- function(data) {
-  # Create the initial gt table
-  data %>%
-    gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Record Counts") %>%
+  .Deprecated("create_detailed_record_table", package = "CiteSource",
+              msg = "`record_summary_table()` is deprecated. Use `create_detailed_record_table()` instead.")
+  data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts") |>
     
     # Label the columns
     gt::cols_label(
@@ -678,7 +704,7 @@ record_summary_table <- function(data) {
       `Source Contribution %` = "Records Contributed %",
       `Source Unique Contribution %` = "Unique Records Contributed %",
       `Source Unique %` = "Unique Records %"
-    ) %>%
+    ) |>
     
     # Add footnotes for the columns
     gt::tab_footnote(
@@ -686,43 +712,43 @@ record_summary_table <- function(data) {
       locations = gt::cells_column_labels(
         columns = .data$`Records Imported`
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication",
       locations = gt::cells_column_labels(
         columns = .data$`Distinct Records`
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of records not found in another source.",
       locations = gt::cells_column_labels(
         columns = .data$`Unique records`
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of records found in at least one other source.",
       locations = gt::cells_column_labels(
         columns = .data$`Non-unique Records`
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Percent distinct records contributed to the total number of distinct records.",
       locations = gt::cells_column_labels(
         columns = .data$`Source Contribution %`
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Percent of unique records contributed to the total unique records.",
       locations = gt::cells_column_labels(
         columns = .data$`Source Unique Contribution %`
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Percentage of records that were unique from each source.",
       locations = gt::cells_column_labels(
         columns = .data$`Source Unique %`
       )
-    )%>%
+    ) |>
   gt::tab_footnote(
     footnote = "Total citations discoverd (after internal and cross-source deduplication)",
     locations = gt::cells_body(
@@ -745,7 +771,8 @@ record_summary_table <- function(data) {
 #'
 #' @export
 precision_sensitivity_table <- function(data) {
-  # First, we check if all values in the "screened" column are 0
+  .Deprecated("create_precision_sensitivity_table", package = "CiteSource",
+              msg = "`precision_sensitivity_table()` is deprecated. Use `create_precision_sensitivity_table()` instead.")
   all_zero_screened <- all(data$screened == 0)
   
   # If all values are zero, we remove the "screened" column from the data
@@ -754,9 +781,9 @@ precision_sensitivity_table <- function(data) {
   }
 
   # Create the initial gt table
-  gt_table <- data %>%
-    gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
+  gt_table <- data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts & Precision/Sensitivity") |>
     
     # Label the columns
     gt::cols_label(
@@ -764,7 +791,7 @@ precision_sensitivity_table <- function(data) {
       final = "Final Included",
       Precision = "Precision",
       Recall = "Sensitivity/Recall"
-    ) %>%
+    ) |>
     
     # Align columns to the right
     gt::cols_align(
@@ -774,13 +801,13 @@ precision_sensitivity_table <- function(data) {
     
   # If the "screened" column isn't all zeros, add its specific labels, alignment, and footnotes
   if (!all_zero_screened) {
-    gt_table <- gt_table %>%
-      gt::cols_label(screened = "Screened Included") %>%
-      gt::cols_align(align = "right", columns = "screened") %>%
+    gt_table <- gt_table |>
+      gt::cols_label(screened = "Screened Included") |>
+      gt::cols_align(align = "right", columns = "screened") |>
       gt::tab_footnote(
         footnote = "Number of citations included after title/abstract screening",
         locations = gt::cells_column_labels(columns = "screened")
-      ) %>%
+      ) |>
       gt::tab_footnote(
         footnote = "Total citations included after Ti/Ab Screening",
         locations = gt::cells_body(columns = "screened", rows = "Total")
@@ -788,32 +815,32 @@ precision_sensitivity_table <- function(data) {
   }
 
   # Add remaining footnotes and return the gt_table
-  gt_table %>%
+  gt_table |>
     # Add footnotes for the columns
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication",
       locations = gt::cells_column_labels(columns = "Distinct Records")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of citations included after full text screening",
       locations = gt::cells_column_labels(columns = "final")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of final included citations / Number of distinct records",
       locations = gt::cells_column_labels(columns = "Precision")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of final included citations / Total number of final included citations",
       locations = gt::cells_column_labels(columns = "Recall")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Total citations discoverd (after internal and cross-source deduplication)",
       locations = gt::cells_body(columns = "Distinct Records", rows = "Total")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Total citations included after full text screening",
       locations = gt::cells_body(columns = "final", rows = "Total")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Overall Precision = Number of final included citations / Total distinct records",
       locations = gt::cells_body(columns = "Precision", rows = "Total")

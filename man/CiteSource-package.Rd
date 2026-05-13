@@ -9,7 +9,7 @@
 The CiteSource package supports evidence aggregation by helping with the
 processing of results of various searches in different sources. It allows to
 deduplicate results while retaining meta-data on where those results were
-found and then enables users to compare the contribution of different sources
+found and then enables users to compare the contribution of different sources.
 }
 \seealso{
 Useful links:
@@ -36,6 +36,8 @@ Other contributors:
 \itemize{
   \item Martin Westgate (Author of included synthesisr fragments) [copyright holder]
   \item Eliza Grames (Author of included synthesisr fragments) [copyright holder]
+  \item Kaitlyn Hair (Author of included ASySD deduplication code) [copyright holder]
+  \item CAMARADES Group (Authors of ASySD (github.com/camaradesuk/ASySD)) [copyright holder]
 }
 
 }

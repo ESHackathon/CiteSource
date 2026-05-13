@@ -23,8 +23,6 @@
 #' of distinct records (unique `duplicate_id` values) for each citation source.
 #' Finally, a total row is added to summarize the counts across all sources.
 #'
-#' @import dplyr
-#' @import tidyr
 #' @export
 #'
 #' @examples
@@ -47,31 +45,32 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
   }
   
   # Split and expand the cite_source column
-  df_expanded <- unique_citations %>%
-    expand_single_metadata_column("cite_source")
-  
+  df_expanded <- unique_citations |>
+    tidyr::separate_rows(cite_source, sep = ",\\s*") |>
+    dplyr::mutate(cite_source = trimws(cite_source))
+
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
     pattern <- paste(labels_to_include, collapse = "|")
-    df_filtered <- df_expanded %>%
+    df_filtered <- df_expanded |>
       dplyr::filter(grepl(pattern, cite_label, ignore.case = TRUE))
   } else {
     df_filtered <- df_expanded
   }
-  
+
   # Check if df_filtered is empty
   if (nrow(df_filtered) == 0) {
     return(data.frame(Source = character(), Records_Imported = integer(), Distinct_Records = integer()))
   }
-  
-  records_imported <- df_filtered %>%
-    dplyr::group_by(cite_source) %>%
+
+  records_imported <- df_filtered |>
+    dplyr::group_by(cite_source) |>
     dplyr::summarise(Records_Imported = n(), .groups = 'drop')
-  
+
   # Count the unique duplicate_id values for each source to determine the "Distinct Records"
-  distinct_records <- df_filtered %>%
-    dplyr::group_by(cite_source) %>%
-    dplyr::summarise(Distinct_Records = n_distinct(duplicate_id), .groups = 'drop')
+  distinct_records <- df_filtered |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(Distinct_Records = dplyr::n_distinct(duplicate_id), .groups = 'drop')
   
   # Merge the two dataframes to get the final result
   initial_counts <- dplyr::left_join(records_imported, distinct_records, by = "cite_source")
@@ -87,7 +86,7 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
   initial_counts <- dplyr::bind_rows(initial_counts, total_row)
   
   # Rename columns for consistency with gt table
-  initial_counts <- initial_counts %>%
+  initial_counts <- initial_counts |>
     dplyr::rename(Source = cite_source)
   
   # Return the final result
@@ -127,9 +126,6 @@ calculate_initial_records <- function(unique_citations, labels_to_include = NULL
 #' and calculates various counts and percentages for each citation source. The function also adds 
 #' a total row summarizing these counts across all sources.
 #'
-#' @import dplyr
-#' @import tidyr
-#' @import scales
 #' @export
 #'
 #' @examples
@@ -165,65 +161,65 @@ calculate_detailed_records <- function(unique_citations, n_unique, labels_to_inc
   }
   
   # Split and expand the cite_source column
-  df_expanded <- unique_citations %>%
-    expand_single_metadata_column("cite_source")
-  
+  df_expanded <- unique_citations |>
+    tidyr::separate_rows(cite_source, sep = ",\\s*") |>
+    dplyr::mutate(cite_source = trimws(cite_source))
+
   # Filter by user-specified labels if provided
   if (!is.null(labels_to_include) && length(labels_to_include) > 0) {
     pattern <- paste(labels_to_include, collapse = "|")
-    df_filtered <- df_expanded %>%
+    df_filtered <- df_expanded |>
       dplyr::filter(grepl(pattern, cite_label, ignore.case = TRUE))
   } else {
     df_filtered <- df_expanded
   }
-  
+
   # Check if df_filtered is empty
   if (nrow(df_filtered) == 0) {
-    return(data.frame(Source = character(), 
-                      `Records Imported` = integer(), 
-                      `Distinct Records` = integer(), 
-                      `Unique Records` = integer(), 
+    return(data.frame(Source = character(),
+                      `Records Imported` = integer(),
+                      `Distinct Records` = integer(),
+                      `Unique Records` = integer(),
                       `Non-unique Records` = integer()
-    )
-    )
+    ))
   }
-  
+
   # Count the occurrences of each source to determine the "Records Imported"
-  records_imported <- df_filtered %>%
-    dplyr::group_by(cite_source) %>%
+  records_imported <- df_filtered |>
+    dplyr::group_by(cite_source) |>
     dplyr::summarise(`Records Imported` = n(), .groups = 'drop')
-  
+
   # Count the unique duplicate_id values for each source to determine the "Distinct Records"
-  distinct_records <- df_filtered %>%
-    dplyr::group_by(cite_source) %>%
+  distinct_records <- df_filtered |>
+    dplyr::group_by(cite_source) |>
     dplyr::summarise(`Distinct Records` = dplyr::n_distinct(duplicate_id), .groups = 'drop')
   
   # Filter n_unique data to only include records with 'search' as the citation label
-  n_unique_citations_count <- n_unique %>%
-    dplyr::filter(cite_label == "search") %>%
-    dplyr::group_by(cite_source) %>%
-    dplyr::summarise(`Unique Records` = sum(unique), .groups = 'drop') %>%
-    dplyr::filter(cite_source != "") %>%
+  n_unique_citations_count <- n_unique |>
+    dplyr::filter(cite_label == "search") |>
+    dplyr::group_by(cite_source) |>
+    dplyr::summarise(`Unique Records` = sum(unique), .groups = 'drop') |>
+    dplyr::filter(cite_source != "") |>
     dplyr::arrange(cite_source)
   
   # Merge the three counts (initial, distinct, unique) into a single dataframe
-  detailed_counts <- dplyr::left_join(records_imported, distinct_records, by = "cite_source") %>%
+  detailed_counts <- dplyr::left_join(records_imported, distinct_records, by = "cite_source") |>
     dplyr::left_join(n_unique_citations_count, by = "cite_source")
   
   # Calculate the number of non-unique records by subtracting the number of unique records from the distinct records
-  detailed_counts <- detailed_counts %>%
+  detailed_counts <- detailed_counts |>
     dplyr::mutate(`Non-unique Records` = `Distinct Records` - `Unique Records`)
   
   # Calculate and add three percentages: the contribution of each source to the total,
   # the contribution of unique records of each source to the total unique records,
   # and the proportion of unique records in each source's distinct records
-  detailed_counts <- detailed_counts %>%
+  detailed_counts <- detailed_counts |>
     dplyr::mutate(`Source Contribution %` = `Distinct Records` / sum(`Distinct Records`, na.rm = TRUE),
                   `Source Unique Contribution %` = `Unique Records` / sum(`Unique Records`, na.rm = TRUE),
                   `Source Unique %` = `Unique Records` / `Distinct Records`)
   
   # Convert percentage columns to numeric first and then to percentage format
-  detailed_counts <- detailed_counts %>%
+  detailed_counts <- detailed_counts |>
     dplyr::mutate(
       `Source Contribution %` = scales::percent(as.numeric(`Source Contribution %`), accuracy = 0.1),
       `Source Unique Contribution %` = scales::percent(as.numeric(`Source Unique Contribution %`), accuracy = 0.1),
@@ -245,7 +241,7 @@ calculate_detailed_records <- function(unique_citations, n_unique, labels_to_inc
                                      `Non-unique Records` = total_nonunique_records)
   
   # Rename columns for consistency
-  detailed_counts <- detailed_counts %>%
+  detailed_counts <- detailed_counts |>
     dplyr::rename(Source = cite_source)
   
   # Return the final counts dataframe
@@ -282,9 +278,6 @@ calculate_detailed_records <- function(unique_citations, n_unique, labels_to_inc
 #' and "final" records. Finally, it calculates precision and recall metrics and 
 #' adds a total row summarizing these counts across all sources.
 #'
-#' @import dplyr
-#' @import tidyr
-#' @import rlang
 #' @export
 #'
 #' @examples
@@ -313,40 +306,39 @@ calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
   total_distinct_records <- dplyr::n_distinct(unique_citations$duplicate_id)
   
   # Split the cite_label column and count any occurrence of "screened" and "final"
-  # Updated for edge cases where a citation is duplicated within the screened set
-  total_screened <- unique_citations %>%
-    expand_single_metadata_column("cite_label") %>%
-    dplyr::filter(cite_label == "screened") %>%
-    # Count the number of distinct duplicate_ids that remain
-    dplyr::n_distinct(duplicate_id)
+  total_screened <- unique_citations |>
+    tidyr::separate_rows(cite_label, sep = ",\\s*") |>
+    dplyr::filter(cite_label == "screened") |>
+    dplyr::summarise(n = dplyr::n_distinct(duplicate_id)) |>
+    dplyr::pull(n)
 
-  # Updated for edge cases where a citation is duplicated within the screened set (should never happen)
-  total_final <- unique_citations %>%
-    expand_single_metadata_column("cite_label") %>%
-    dplyr::filter(cite_label == "final") %>%
-    # Count the number of distinct duplicate_ids that remain
-    dplyr::n_distinct(duplicate_id)
+  total_final <- unique_citations |>
+    tidyr::separate_rows(cite_label, sep = ",\\s*") |>
+    dplyr::filter(cite_label == "final") |>
+    dplyr::summarise(n = dplyr::n_distinct(duplicate_id)) |>
+    dplyr::pull(n)
   
   # Step 2: Proceed with the regular calculation for distinct records by source
-  distinct_count <- unique_citations %>%
-    expand_single_metadata_column(db_colname) %>%
-    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
-    dplyr::group_by(!!rlang::sym(db_colname)) %>%
-    dplyr::summarise(Distinct_Records = dplyr::n_distinct(duplicate_id), .groups = "drop") %>%
+  distinct_count <- unique_citations |>
+    tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") |>
+    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) |>
+    dplyr::group_by(!!rlang::sym(db_colname)) |>
+    dplyr::summarise(Distinct_Records = dplyr::n_distinct(duplicate_id), .groups = "drop") |>
     dplyr::rename(Source = !!rlang::sym(db_colname))
   
   # Calculate the number of "screened" and "final" records for each source after expanding
-  source_phase <- unique_citations %>%
-    dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) %>%
-    expand_metadata_columns(columns = c(db_colname, "cite_label")) %>%
-    dplyr::distinct() %>%
-    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) %>%
+  source_phase <- unique_citations |>
+    dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) |>
+    tidyr::separate_rows(!!rlang::sym(db_colname), sep = ",\\s*") |>
+    tidyr::separate_rows(cite_label, sep = ",\\s*") |>
+    dplyr::distinct() |>
+    dplyr::filter(!(!!rlang::sym(db_colname) == "unknown" | !!rlang::sym(db_colname) == "")) |>
     dplyr::mutate(screened = ifelse(cite_label == "screened", 1, 0),
-                  final = ifelse(cite_label == "final", 1, 0)) %>%
-    dplyr::group_by(!!rlang::sym(db_colname)) %>%
+                  final = ifelse(cite_label == "final", 1, 0)) |>
+    dplyr::group_by(!!rlang::sym(db_colname)) |>
     dplyr::summarise(screened = sum(screened),
                      final = sum(final),
-                     .groups = "drop") %>%
+                     .groups = "drop") |>
     dplyr::rename(Source = !!rlang::sym(db_colname))
   
   # Combine the distinct counts with the source_phase
@@ -354,14 +346,14 @@ calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
   combined_counts[is.na(combined_counts)] <- 0
   
   # Step 3: Calculate Precision and Recall
-  combined_counts <- combined_counts %>%
+  combined_counts <- combined_counts |>
     dplyr::mutate(
       Precision = ifelse(Distinct_Records != 0, round((final / Distinct_Records) * 100, 2), 0)
-    ) %>%
-    dplyr::rowwise() %>%
+    ) |>
+    dplyr::rowwise() |>
     dplyr::mutate(
       Recall = ifelse(total_final != 0, round((final / total_final) * 100, 2), 0)
-    ) %>%
+    ) |>
     dplyr::ungroup()
   
   # Step 4: Calculate the total row using the pre-expansion totals
@@ -396,7 +388,6 @@ calculate_phase_records <- function(unique_citations, n_unique, db_colname) {
 #' if no data is present. Otherwise, it generates a formatted table with labeled columns
 #' and adds footnotes explaining the meaning of each column.
 #'
-#' @import gt
 #' @export
 #'
 #' @examples
@@ -414,15 +405,15 @@ create_initial_record_table <- function(data) {
   }
   
   # Create the initial gt table
-  data %>%
-    gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Record Counts") %>%
+  data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts") |>
     
     # Label the columns
     gt::cols_label(
       Records_Imported = "Records Imported",
       Distinct_Records = "Distinct Records"
-    ) %>%
+    ) |>
     
     # Add footnote for "Records Imported"
     gt::tab_footnote(
@@ -430,7 +421,7 @@ create_initial_record_table <- function(data) {
       locations = gt::cells_column_labels(
         columns = c("Records_Imported")
       )
-    ) %>%
+    ) |>
     
     # Add footnote for "Distinct Records"
     gt::tab_footnote(
@@ -471,7 +462,6 @@ create_initial_record_table <- function(data) {
 #' The generated table includes a header and footnotes that provide additional context 
 #' for each column, explaining the meaning of the data presented.
 #'
-#' @import gt
 #' @export
 #'
 #' @examples
@@ -505,11 +495,11 @@ create_detailed_record_table <- function(data) {
   }
   
   # Create the gt table using the provided data
-  data %>%
-    gt::gt(rowname_col = "Source") %>%
+  data |>
+    gt::gt(rowname_col = "Source") |>
     
     # Add a title to the table
-    gt::tab_header(title = "Record Summary") %>%
+    gt::tab_header(title = "Record Summary") |>
     
     # Label the columns as per their data role
     gt::cols_label(
@@ -520,7 +510,7 @@ create_detailed_record_table <- function(data) {
       `Source Contribution %` = "Source Contribution %",
       `Source Unique Contribution %` = "Source Unique Contribution %",
       `Source Unique %` = "Source Unique %" 
-    ) %>%
+    ) |>
     
     # Add explanatory footnotes for the columns
     gt::tab_footnote(
@@ -528,43 +518,43 @@ create_detailed_record_table <- function(data) {
       locations = gt::cells_column_labels(
         columns = "Records Imported"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication.",
       locations = gt::cells_column_labels(
         columns = "Distinct Records"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of records not found in another source.",
       locations = gt::cells_column_labels(
         columns = "Unique Records"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of records found in at least one other source.",
       locations = gt::cells_column_labels(
         columns = "Non-unique Records"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Percent distinct records contributed to the total number of distinct records.",
       locations = gt::cells_column_labels(
         columns = "Source Contribution %"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Percent of unique records contributed to the total unique records.",
       locations = gt::cells_column_labels(
         columns = "Source Unique Contribution %"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Percentage of records that were unique from each source.",
       locations = gt::cells_column_labels(
         columns = "Source Unique %"
       )
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Total citations discovered (after internal and cross-source deduplication).",
       locations = gt::cells_body(
@@ -593,7 +583,6 @@ create_detailed_record_table <- function(data) {
 #' If so, the column is removed from the table. The table is then generated 
 #' using the `gt` package, with labeled columns and footnotes explaining the metrics.
 #'
-#' @import gt
 #' @export
 #'
 #' @examples
@@ -618,9 +607,9 @@ create_precision_sensitivity_table <- function(data) {
   }
   
   # Create the initial gt table
-  gt_table <- data %>%
-    gt::gt(rowname_col = "Source") %>%
-    gt::tab_header(title = "Record Counts & Precision/Sensitivity") %>%
+  gt_table <- data |>
+    gt::gt(rowname_col = "Source") |>
+    gt::tab_header(title = "Record Counts & Precision/Sensitivity") |>
     
     # Label the columns
     gt::cols_label(
@@ -628,7 +617,7 @@ create_precision_sensitivity_table <- function(data) {
       final = "Final Included",
       Precision = "Precision",
       Recall = "Sensitivity/Recall"
-    ) %>%
+    ) |>
     
     # Align columns to the right
     gt::cols_align(
@@ -638,13 +627,13 @@ create_precision_sensitivity_table <- function(data) {
   
   # If the "screened" column isn't all zeros, add its specific labels, alignment, and footnotes
   if (!all_zero_screened) {
-    gt_table <- gt_table %>%
-      gt::cols_label(screened = "Screened Included") %>%
-      gt::cols_align(align = "right", columns = "screened") %>%
+    gt_table <- gt_table |>
+      gt::cols_label(screened = "Screened Included") |>
+      gt::cols_align(align = "right", columns = "screened") |>
       gt::tab_footnote(
         footnote = "Number of citations included after title/abstract screening.",
         locations = gt::cells_column_labels(columns = "screened")
-      ) %>%
+      ) |>
       gt::tab_footnote(
         footnote = "Total citations included after Ti/Ab Screening.",
         locations = gt::cells_body(columns = "screened", rows = "Total")
@@ -652,32 +641,32 @@ create_precision_sensitivity_table <- function(data) {
   }
   
   # Add remaining footnotes and return the gt_table
-  gt_table %>%
+  gt_table |>
     # Add footnotes for the columns
     gt::tab_footnote(
       footnote = "Number of records after internal source deduplication.",
       locations = gt::cells_column_labels(columns = "Distinct_Records")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of citations included after full text screening.",
       locations = gt::cells_column_labels(columns = "final")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of final included citations / Number of distinct records.",
       locations = gt::cells_column_labels(columns = "Precision")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Number of final included citations / Total number of final included citations.",
       locations = gt::cells_column_labels(columns = "Recall")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Total citations discovered (after internal and cross-source deduplication).",
       locations = gt::cells_body(columns = "Distinct_Records", rows = "Total")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Total citations included after full text screening.",
       locations = gt::cells_body(columns = "final", rows = "Total")
-    ) %>%
+    ) |>
     gt::tab_footnote(
       footnote = "Overall Precision = Number of final included citations / Total distinct records.",
       locations = gt::cells_body(columns = "Precision", rows = "Total")

@@ -22,11 +22,14 @@
 count_sources <- function(df, db_colname) {
 # Pull out the database column, split it into multiple elements if there are commas,
 # create a list of unique elements, unlist it to a vector, remove white spaces, and count occurrences
-  db_counts <- df %>%
-    expand_single_metadata_column(db_colname) %>%
-    dplyr::count(!!rlang::sym(db_colname), name = "Freq") %>%
-    dplyr::rename(Source = !!rlang::sym(db_colname))
-  
+  db_counts <- df |>
+    dplyr::pull(!!rlang::sym(db_colname)) |>
+    strsplit(", ") |>
+    lapply(unique) |>
+    unlist() |>
+    trimws() |>
+    table() |>
+    as.data.frame()
   return(db_counts)
 }
 
@@ -62,6 +65,8 @@ count_sources <- function(df, db_colname) {
 #' result
 
 record_counts <- function(unique_citations, citations, db_colname) {
+  .Deprecated("calculate_initial_records", package = "CiteSource",
+              msg = "`record_counts()` is deprecated. Use `calculate_initial_records()` instead.")
   # Count distinct record sources
   distinct_count <- count_sources(unique_citations, db_colname)
   colnames(distinct_count) <- c("Source", "Distinct Records")
@@ -129,7 +134,8 @@ record_counts <- function(unique_citations, citations, db_colname) {
 #' print(result)
 
 calculate_record_counts <- function(unique_citations, citations, n_unique, db_colname) {
-  
+  .Deprecated("calculate_detailed_records", package = "CiteSource",
+              msg = "`calculate_record_counts()` is deprecated. Use `calculate_detailed_records()` instead.")
   # Calculate the count of distinct records for each database source and convert the count to numeric.
   distinct_count <- count_sources(unique_citations, db_colname)
   colnames(distinct_count) <- c("Source", "Distinct Records")
@@ -142,38 +148,38 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
   
   # Filter n_unique data to only include records with 'search' as the citation label.
   # Then count the unique records in each source, convert these counts to numeric, and rename the column.
-  n_unique_citations_count <- n_unique %>%
-    dplyr::filter(.data$cite_label == "search") %>%
-    dplyr::group_by(.data$cite_source) %>%
-    dplyr::summarise("Unique records" = sum(.data$unique)) %>%
-    dplyr::filter(.data$cite_source != "") %>%
-    dplyr::arrange(.data$cite_source) %>%
+  n_unique_citations_count <- n_unique |>
+    dplyr::filter(.data$cite_label == "search") |>
+    dplyr::group_by(.data$cite_source) |>
+    dplyr::summarise("Unique records" = sum(.data$unique)) |>
+    dplyr::filter(.data$cite_source != "") |>
+    dplyr::arrange(.data$cite_source) |>
     dplyr::rename(Source = .data$cite_source)
   n_unique_citations_count$`Unique records` <- as.numeric(n_unique_citations_count$`Unique records`)
   
   # Merge the three counts (initial, distinct, unique) into a single dataframe.
-  citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source") %>%
+  citation_counts <- dplyr::left_join(initial_citations_count, distinct_count, by = "Source") |>
     dplyr::left_join(n_unique_citations_count, by = "Source")
   
   # Calculate the number of non-unique records by subtracting the number of unique records from the total records.
-  citation_counts <- citation_counts %>%
+  citation_counts <- citation_counts |>
     dplyr::mutate("Non-unique Records" = .data$`Distinct Records` - .data$`Unique records`)
   citation_counts$`Non-unique Records` <- as.numeric(citation_counts$`Non-unique Records`)
   
   # Calculate and add three percentages: the contribution of each source to the total,
   # the contribution of unique records of each source to the total unique records,
   # and the proportion of unique records in each source's distinct records.
-  citation_counts <- citation_counts %>%
+  citation_counts <- citation_counts |>
     dplyr::mutate("Source Contribution %" = .data$`Distinct Records` / sum(.data$`Distinct Records`, na.rm = TRUE),
                   "Source Unique Contribution %" = .data$`Unique records` / sum(.data$`Unique records`, na.rm = TRUE),
                   "Source Unique %" = .data$`Unique records` / .data$`Distinct Records`)
   
-  citation_counts <- citation_counts %>%
+  citation_counts <- citation_counts |>
     dplyr::mutate(
       `Source Contribution %` = as.numeric(.data$`Source Contribution %`),
       `Source Unique Contribution %` = as.numeric(.data$`Source Unique Contribution %`),
       `Source Unique %` = as.numeric(.data$`Source Unique %`)
-    ) %>%
+    ) |>
     dplyr::mutate(
       `Source Contribution %` = scales::percent(.data$`Source Contribution %`, accuracy = 0.1),
       `Source Unique Contribution %` = scales::percent(.data$`Source Unique Contribution %`, accuracy = 0.1),
@@ -236,6 +242,8 @@ calculate_record_counts <- function(unique_citations, citations, n_unique, db_co
 
 
 calculate_phase_count <- function(unique_citations, citations, db_colname) {
+  .Deprecated("calculate_phase_records", package = "CiteSource",
+              msg = "`calculate_phase_count()` is deprecated. Use `calculate_phase_records()` instead.")
   count_source_phase <- function(source_phase_df, db_colname) {
     # Convert cite_label to lower case
     source_phase_df$cite_label <- tolower(source_phase_df$cite_label)
@@ -247,16 +255,20 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
     if(!("final" %in% labels)) {
       warning("The data does not contain 'final' label.")
     }
-    source_phase_df <- source_phase_df %>%
-      dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) %>%
-      expand_metadata_columns(columns = c(db_colname, "cite_label")) %>%
-      dplyr::filter(!(!!rlang::sym(db_colname) == "unknown")) %>%
+    source_phase_df <- source_phase_df |>
+      dplyr::select(!!rlang::sym(db_colname), cite_label, duplicate_id) |>
+      tidyr::separate_rows(!!rlang::sym(db_colname), sep = ", ") |>
+      tidyr::separate_rows(cite_label, sep = ", ") |>
+      unique() |>
+      dplyr::filter(!(!!db_colname == "unknown")) |>
+      dplyr::mutate(!!rlang::sym(db_colname) := stringr::str_trim(!!rlang::sym(db_colname)),
+                    cite_label = stringr::str_trim(cite_label)) |>
       dplyr::mutate(screened = ifelse(.data$cite_label == "screened", 1, 0),
-                    final = ifelse(.data$cite_label == "final", 1, 0)) %>%
-      dplyr::group_by(!!rlang::sym(db_colname)) %>%
+                    final = ifelse(.data$cite_label == "final", 1, 0)) |>
+      dplyr::group_by(!!rlang::sym(db_colname)) |>
       dplyr::summarise(screened = sum(.data$screened),
                        final = sum(.data$final),
-                       .groups = "drop") %>%
+                       .groups = "drop") |>
       dplyr::rename(Source = !!rlang::sym(db_colname))
     
     return(source_phase_df)
@@ -272,8 +284,8 @@ calculate_phase_count <- function(unique_citations, citations, db_colname) {
   combined_counts <- dplyr::left_join(distinct_count, source_phase, by = "Source")
   combined_counts[is.na(combined_counts)] <- 0
   
-  combined_counts <- combined_counts %>%
-    dplyr::mutate(Precision = ifelse(.data$`Distinct Records` != 0, round((.data$final / .data$`Distinct Records`) * 100, 2), 0)) %>%
+  combined_counts <- combined_counts |>
+    dplyr::mutate(Precision = ifelse(.data$`Distinct Records` != 0, round((.data$final / .data$`Distinct Records`) * 100, 2), 0)) |>
     dplyr::filter(!Source == "unknown")
   
   # Calculate total_final before the loop
