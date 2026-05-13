@@ -10,7 +10,9 @@ plot_source_overlap_heatmap(
   facets = NULL,
   plot_type = c("counts", "percentages"),
   sort_sources = TRUE,
-  interactive = FALSE
+  interactive = FALSE,
+  show_labels = "auto",
+  log_scale = FALSE
 )
 }
 \arguments{
