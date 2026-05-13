@@ -35,7 +35,6 @@ explaining the metrics.
 ## Examples
 
 ``` r
-# Example usage with a sample dataset
 sample_data <- data.frame(
   Source = c("Source1", "Source2", "Total"),
   Distinct_Records = c(100, 150, 250),
@@ -52,70 +51,3 @@ create_precision_sensitivity_table(sample_data)
 
 Record Counts & Precision/Sensitivity
 ```
-
-Distinct Records¹
-
-Final Included²
-
-Precision³
-
-Sensitivity/Recall⁴
-
-Screened Included⁵
-
-Source1
-
-100
-
-80
-
-80
-
-40
-
-90
-
-Source2
-
-150
-
-120
-
-80
-
-60
-
-140
-
-Total
-
-⁶ 250
-
-⁷ 200
-
-⁸ 80
-
-100
-
-⁹ 230
-
-¹ Number of records after internal source deduplication.
-
-² Number of citations included after full text screening.
-
-³ Number of final included citations / Number of distinct records.
-
-⁴ Number of final included citations / Total number of final included
-citations.
-
-⁵ Number of citations included after title/abstract screening.
-
-⁶ Total citations discovered (after internal and cross-source
-deduplication).
-
-⁷ Total citations included after full text screening.
-
-⁸ Overall Precision = Number of final included citations / Total
-distinct records.
-
-⁹ Total citations included after Ti/Ab Screening.

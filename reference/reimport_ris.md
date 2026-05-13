@@ -6,7 +6,7 @@ repeating that step, and also allows users to make any manual
 corrections to tagging or deduplication. The function can also be used
 to replace the import step (for instance if tags are to be added to
 individual citations rather than entire files) - in this case, just call
-[`dedup_citations()`](http://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
+[`dedup_citations()`](https://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
 after the import.
 
 ## Usage
@@ -72,7 +72,7 @@ reimport_ris(
 ## Details
 
 Note that this functions defaults' are based on those in
-[`export_ris()`](http://www.eshackathon.org/CiteSource/reference/export_ris.md)
+[`export_ris()`](https://www.eshackathon.org/CiteSource/reference/export_ris.md)
 so that these functions can easily be combined.
 
 ## Examples

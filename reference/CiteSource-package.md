@@ -4,7 +4,7 @@ The CiteSource package supports evidence aggregation by helping with the
 processing of results of various searches in different sources. It
 allows to deduplicate results while retaining meta-data on where those
 results were found and then enables users to compare the contribution of
-different sources
+different sources.
 
 ## See also
 
@@ -20,6 +20,9 @@ Useful links:
 ([ORCID](https://orcid.org/0000-0002-6834-9802))
 
 Authors:
+
+- Trevor Riley <trevor.riley@noaa.gov>
+  ([ORCID](https://orcid.org/0000-0002-6834-9802))
 
 - Kaitlyn Hair <kaitlyn.hair@ed.ac.uk>
   ([ORCID](https://orcid.org/0000-0003-0180-7343))
@@ -46,3 +49,9 @@ Other contributors:
 
 - Eliza Grames (Author of included synthesisr fragments) \[copyright
   holder\]
+
+- Kaitlyn Hair (Author of included ASySD deduplication code) \[copyright
+  holder\]
+
+- CAMARADES Group (Authors of ASySD (github.com/camaradesuk/ASySD))
+  \[copyright holder\]

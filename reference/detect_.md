@@ -5,7 +5,7 @@ meaning that detecting consistent attributes of those files is necessary
 if they are to be parsed accurately. These functions attempt to identify
 some of those key file attributes. Specifically, `detect_parser`
 determines which
-[`parse_`](http://www.eshackathon.org/CiteSource/reference/parse_.md)
+[`parse_`](https://www.eshackathon.org/CiteSource/reference/parse_.md)
 function to use; `detect_delimiter` and `detect_lookup` identify
 different attributes of RIS files; and `detect_year` attempts to fill
 gaps in publication years from other information stored in a

@@ -3,7 +3,7 @@
 Text in standard formats - such as imported via
 [`readLines`](https://rdrr.io/r/base/readLines.html) - can be parsed
 using a variety of standard formats. Use
-[`detect_parser`](http://www.eshackathon.org/CiteSource/reference/detect_.md)
+[`detect_parser`](https://www.eshackathon.org/CiteSource/reference/detect_.md)
 to determine which is the most appropriate parser for your situation.
 
 ## Usage
@@ -29,7 +29,7 @@ parse_tsv(x)
 - tag_naming:
 
   What format are ris tags in? Defaults to "best_guess" See
-  [`synthesisr_read_refs`](http://www.eshackathon.org/CiteSource/reference/synthesisr_read_refs.md)
+  [`synthesisr_read_refs`](https://www.eshackathon.org/CiteSource/reference/synthesisr_read_refs.md)
   for a list of accepted arguments.
 
 ## Value

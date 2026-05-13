@@ -21,7 +21,7 @@ citation_summary_table(
 - citations:
 
   A deduplicated tibble as returned by
-  [`dedup_citations()`](http://www.eshackathon.org/CiteSource/reference/dedup_citations.md).
+  [`dedup_citations()`](https://www.eshackathon.org/CiteSource/reference/dedup_citations.md).
 
 - comparison_type:
 

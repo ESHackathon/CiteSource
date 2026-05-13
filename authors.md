@@ -24,20 +24,26 @@
 - **Eliza Grames**. Copyright holder.  
   Author of included synthesisr fragments
 
+- **Kaitlyn Hair**. Copyright holder.  
+  Author of included ASySD deduplication code
+
+- **CAMARADES Group**. Copyright holder.  
+  Authors of ASySD (github.com/camaradesuk/ASySD)
+
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ESHackathon/CiteSource/blob/Trevor-Patch/DESCRIPTION)
 
 Riley T, Hair K, Wallrich L, Grainger M, Young S, Pritchard C, Haddaway
 N (2026). *CiteSource: An R package for data-driven search strategy
 development and enhanced evidence synthesis reporting*. R package
-version 0.1.1, <https://www.eshackathon.org/CiteSource>.
+version 0.2.0, <https://www.eshackathon.org/CiteSource>.
 
     @Manual{,
       title = {CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting},
       author = {Trevor Riley and Kaitlyn Hair and Lukas Wallrich and Matthew Grainger and Sarah Young and Chris Pritchard and Neal Haddaway},
       year = {2026},
-      note = {R package version 0.1.1},
+      note = {R package version 0.2.0},
       url = {https://www.eshackathon.org/CiteSource},
     }

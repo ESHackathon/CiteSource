@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,12 +18,11 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_working_example.html">Source Analysis Across Screening Phases</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_benchmark_testing.html">Benchmark Testing</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">New Benchmark Testing</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">Benchmark Testing</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-pre-screen_validation.html">Assessing Usefulness of Databases for Evidence Synthesis</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-topic-coverage.html">Comparing Database Topic Coverage</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Source Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_search_string_comparison.html">Comparing Search Strings</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -38,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Count number of unique and non-unique citations from different sources, labels, and strings</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/R/compare.R" class="external-link"><code>R/compare.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/Trevor-Patch/R/compare.R" class="external-link"><code>R/compare.R</code></a></small>
       <div class="d-none name"><code>count_unique.Rd</code></div>
     </div>
 
@@ -76,9 +75,6 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Deduplicate citations</span></span></span>
 <span class="r-in"><span><span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">examplecitations</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Registered S3 method overwritten by 'synthesisr':</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   method                     from      </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   as.data.frame.bibliography CiteSource</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> formatting data...</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Search contains missing values for the record_id column. A record_id will be created using row numbers</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> identifying potential duplicates...</span>
@@ -92,7 +88,7 @@
 <span class="r-in"><span><span class="fu">count_unique</span><span class="op">(</span><span class="va">dedup_results</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 166 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    duplicate_id cite_source cite_label cite_string record_ids       unique type </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1001         DIM         search     <span style="color: #BB0000;">NA</span>          1001             TRUE   uniq…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 1002         WoS         search     <span style="color: #BB0000;">NA</span>          1002, 1081       FALSE  dupl…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 1002         DIM         search     <span style="color: #BB0000;">NA</span>          1002, 1081       FALSE  dupl…</span>

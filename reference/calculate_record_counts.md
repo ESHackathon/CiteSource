@@ -57,6 +57,7 @@ n_unique <- data.frame(
 )
 
 result <- calculate_record_counts(unique_citations, citations, n_unique, "db_source")
+#> Warning: `calculate_record_counts()` is deprecated. Use `calculate_detailed_records()` instead.
 print(result)
 #>      Source Records Imported Distinct Records Unique records Non-unique Records
 #> 1 Database1                3                2              1                  1

@@ -33,7 +33,6 @@ meaning of each column.
 ## Examples
 
 ``` r
-# Example usage with a sample dataset
 sample_data <- data.frame(
   Source = c("Source1", "Source2", "Source3"),
   Records_Imported = c(100, 150, 250),
@@ -47,29 +46,3 @@ create_initial_record_table(sample_data)
 
 Record Counts
 ```
-
-Records Imported¹
-
-Distinct Records²
-
-Source1
-
-100
-
-90
-
-Source2
-
-150
-
-140
-
-Source3
-
-250
-
-230
-
-¹ Number of records imported from each source.
-
-² Number of records after internal source deduplication.

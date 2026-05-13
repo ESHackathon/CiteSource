@@ -21,7 +21,7 @@ export_csv(
 - unique_citations:
 
   Dataframe with unique citations, resulting from
-  [`dedup_citations()`](http://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
+  [`dedup_citations()`](https://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
 
 - filename:
 

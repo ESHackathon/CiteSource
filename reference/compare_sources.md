@@ -42,6 +42,6 @@ if (interactive()) {
 
   # Deduplicate citations and compare sources
   dedup_results <- dedup_citations(examplecitations)
-  compare_sources(unique_citations, comp_type = "sources")
+  compare_sources(dedup_results, comp_type = "sources")
 }
 ```

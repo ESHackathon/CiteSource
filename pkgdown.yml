@@ -1,14 +1,13 @@
-pandoc: 3.1.11
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   citesource_analysis_across_screening_phases: citesource_analysis_across_screening_phases.html
-  citesource_benchmark_testing: citesource_benchmark_testing.html
   citesource_new_benchmark_testing: citesource_new_benchmark_testing.html
+  citesource_search_string_comparison: citesource_search_string_comparison.html
   citesource_vignette_db-pre-screen_validation: citesource_vignette_db-pre-screen_validation.html
   citesource_vignette_db-topic-coverage: citesource_vignette_db-topic-coverage.html
-  citesource_working_example: citesource_working_example.html
-last_built: 2026-04-07T16:13Z
+last_built: 2026-05-13T20:24Z
 urls:
-  reference: http://www.eshackathon.org/CiteSource/reference
-  article: http://www.eshackathon.org/CiteSource/articles
+  reference: https://www.eshackathon.org/CiteSource/reference
+  article: https://www.eshackathon.org/CiteSource/articles
