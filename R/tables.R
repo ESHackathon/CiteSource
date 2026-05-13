@@ -212,10 +212,10 @@ citation_summary_table <- function(citations, comparison_type = "sources", searc
   types <- as.factor(paste0("_", unique(citations_long$type))) |> levels()
 
   yield_dfs <- citations_long |>
-    split(.$type) |>
+    (\(x) split(x, x$type))() |>
     purrr::reduce(dplyr::left_join, by = "duplicate_id", suffix = types) |>
     dplyr::select(-dplyr::starts_with("type_")) |>
-    split(.$value_label)
+    (\(x) split(x, x$value_label))()
 
   yields <- purrr::map_dfr(yield_dfs, .id = "stage", function(df) {
     indicators <- df |>

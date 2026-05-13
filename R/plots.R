@@ -61,7 +61,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       tidyr::pivot_longer(tidyselect::matches(paste0(facets, "__")), names_to = "facet") |>
       dplyr::mutate(facet = stringr::str_remove(.data$facet, paste0(facets, "__"))) |>
       dplyr::filter(.data$value == TRUE) |>
-      split(.$facet)
+      (\(x) split(x, x$facet))()
   } else {
     data$facet <- "1"
     data <- list(data)
