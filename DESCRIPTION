@@ -1,7 +1,7 @@
 Package: CiteSource
 Title: An R package for data-driven search strategy development and enhanced evidence synthesis reporting
-Version: 0.1.1
-Date: 2023-06-22
+Version: 0.2.0
+Date: 2026-05-11
 Authors@R: c(
     person("Trevor", "Riley", , "trevor.riley@noaa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6834-9802")),
@@ -18,20 +18,21 @@ Authors@R: c(
     person("Neal", "Haddaway", , "nealhaddaway@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0003-3902-2234")),
     person("Martin", "Westgate", role = "cph", comment = "Author of included synthesisr fragments"),
-    person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments")      
+    person("Eliza", "Grames", role = "cph", comment = "Author of included synthesisr fragments"),
+    person("Kaitlyn", "Hair", role = "cph", comment = "Author of included ASySD deduplication code"),
+    person("CAMARADES Group", role = "cph", comment = "Authors of ASySD (github.com/camaradesuk/ASySD)")
   )
-Description: This package was developed in order to provide researchers the ability to 
-             examine the utility and efficacy of literature resources and search 
+Description: This package was developed in order to provide researchers the ability to
+             examine the utility and efficacy of literature resources and search
              methodologies. The package provides users with the ability to deduplicate
-             references while maintaining customizable metadata. The resulting data 
-             can be analyzed using predeveloped plots and tables, including a summary 
-             table. Users are also able to export and reimport data in .ris, and csv. 
+             references while maintaining customizable metadata. The resulting data
+             can be analyzed using predeveloped plots and tables, including a summary
+             table. Users are also able to export and reimport data in .ris, and csv.
              files. The package includes a shiny application for interactive use.
 License: GPL (>= 3)
 URL: https://www.eshackathon.org/CiteSource
 BugReports: https://github.com/ESHackathon/CiteSource/issues
-Imports: 
-    ASySD (>= 0.3.0),
+Imports:
     dplyr,
     DT,
     forcats,
@@ -39,37 +40,38 @@ Imports:
     ggplot2,
     glue,
     gt,
-    progress,
+    igraph,
+    parallelly,
     purrr,
+    RecordLinkage,
     rlang,
     scales,
     stringr,
     tibble,
     tidyr,
     tidyselect,
-    UpSetR
-Suggests: 
+    UpSetR,
+    utf8
+Suggests:
+    bslib,
     htmltools,
+    jsonlite,
     knitr,
     networkD3,
     plotly,
+    progressr,
     rmarkdown,
     shiny,
     shinyalert,
-    shinyjs,
-    progressr,
     shinybusy,
+    shinyjs,
     shinyWidgets,
-    testthat (>= 3.0.0),
-    plogr
-VignetteBuilder: 
+    testthat (>= 3.0.0)
+VignetteBuilder:
     knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-Depends: 
-    R (>= 3.5.0)
-Remotes:
-    camaradesuk/ASySD,
-    plogr=url::https://cran.r-project.org/src/contrib/Archive/plogr/plogr_0.2.0.tar.gz
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.1.0)

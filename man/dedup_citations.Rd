@@ -2,36 +2,37 @@
 % Please edit documentation in R/dedup.R
 \name{dedup_citations}
 \alias{dedup_citations}
-\title{Deduplicate citations - ASySD wrapper}
+\title{Deduplicate citations}
 \usage{
 dedup_citations(raw_citations, manual = FALSE, show_unknown_tags = FALSE)
 }
 \arguments{
 \item{raw_citations}{Citation dataframe with relevant columns}
 
-\item{manual}{logical. If TRUE, manually specify pairs of duplicates to merge. Default is FALSE.}
+\item{manual}{logical. If TRUE, return the full result list including
+potential pairs for manual review. Default is FALSE.}
 
-\item{show_unknown_tags}{When a label, source, or other merged field is missing, do you want this to show as "unknown"?}
+\item{show_unknown_tags}{When a label, source, or other merged field is
+missing, show it as "unknown"? Default FALSE.}
 }
 \value{
-unique citations formatted for CiteSource
+When \code{manual = FALSE}: a dataframe of unique citations. When
+\code{manual = TRUE}: a list with \verb{$unique} (unique citations) and
+\verb{$manual_dedup} (potential pairs for review).
 }
 \description{
-This function deduplicates citation data. Note that duplicates are assumed to published
-in the same journal, so pre-prints and similar results will not be identified here.
+Deduplicates citation data. Duplicates are assumed to be published in the
+same journal, so pre-prints vs. their published versions will not be merged.
 }
 \examples{
 # Load example data from the package
-examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations_path <- system.file("extdata", "examplecitations.rds",
+                                      package = "CiteSource")
 examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate citations without manually specifying pairs and without showing unknown tags
+# Deduplicate citations
 dedup_results <- dedup_citations(examplecitations)
 
-# Deduplicate citations with manual specification of pairs and showing unknown tags
-dedup_results_manual_unknown <- dedup_citations(
-  examplecitations, 
-  manual = TRUE, 
-  show_unknown_tags = TRUE
-  )
+# Return potential pairs for manual review
+dedup_results_manual <- dedup_citations(examplecitations, manual = TRUE)
 }

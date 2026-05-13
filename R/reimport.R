@@ -69,7 +69,7 @@ reimport_ris <- function(filename = "citations.ris",
                          tag_naming = "ris_synthesisr", verbose = TRUE) {
 
   if (!tag_naming %in% names(synthesisr_code_lookup)) {
-    stop("tag_naming must be one of ", names(synthesisr_code_lookup) %>% stringr::str_subset("^ris_") %>%
+    stop("tag_naming must be one of ", names(synthesisr_code_lookup) |> stringr::str_subset("^ris_") |>
       glue::glue_collapse(sep = ", ", last = " or "))
   }
 
@@ -93,9 +93,9 @@ reimport_ris <- function(filename = "citations.ris",
 
   synthesisr_codes <- dplyr::bind_rows(
     custom_codes,
-    synthesisr_code_lookup %>% dplyr::filter(.data[[tag_naming]])
-  ) %>%
-    dplyr::filter(!is.na(.data$code)) %>%
+    synthesisr_code_lookup |> dplyr::filter(.data[[tag_naming]])
+  ) |>
+    dplyr::filter(!is.na(.data$code)) |>
     dplyr::distinct(.data$code, .keep_all = TRUE) # Remove fields from synthesisr specification used for CiteSource metadata
 
   citations <- read_ref(filename, tag_naming = synthesisr_codes)

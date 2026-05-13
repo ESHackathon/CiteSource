@@ -10,7 +10,9 @@ plot_source_overlap_heatmap(
   facets = NULL,
   plot_type = c("counts", "percentages"),
   sort_sources = TRUE,
-  interactive = FALSE
+  interactive = FALSE,
+  show_labels = "auto",
+  log_scale = FALSE
 )
 }
 \arguments{
@@ -29,6 +31,12 @@ contained? If FALSE, order of data is retained.}
 
 \item{interactive}{Should returned plot be interactive and enable user to export
 records underlying each field?}
+
+\item{show_labels}{Whether to show text labels in cells. \code{"auto"} (default) shows
+labels when there are 10 or fewer sources; \code{TRUE} always shows them; \code{FALSE} hides them.}
+
+\item{log_scale}{Should the fill colour scale be log-transformed? Useful when counts
+vary greatly across cells. Ignored when \code{plot_type = "percentages"}.}
 }
 \value{
 The requested plot as a either a \code{ggplot2} object (when interactive = FALSE), which can then be

@@ -20,7 +20,8 @@ authors:
     given-names: "Matthew J."
     orcid: "https://orcid.org/0000-0001-8426-6495"
 title: "CiteSource: An R Package for Data-Driven Search Strategy Development and Enhanced Evidence Synthesis Reporting"
-version: 0.1.1
+version: 0.2.0
+date-released: 2026-05-13
 doi: TBD 
 url: "https://github.com/ESHackathon/CiteSource"
 preferred-citation:

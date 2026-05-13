@@ -2,107 +2,144 @@
 
 <img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
 
-> CiteSource has a number of applications. This guide walks users through the step-wise process of uploading, deduplicating and analyzing data > within the shiny application. For step by step instructions for running CiteSource in R, [check out our vignettes](https://www.eshackathon.org/CiteSource/articles/)
+This guide walks through each step of the CiteSource workflow in the Shiny app. The progress bar at the top of the app shows where you are and lets you jump between steps once they're available.
+
+For R package documentation and vignettes, visit the [CiteSource website](https://www.eshackathon.org/CiteSource/articles/).
+
 ---
 
-### Using CiteSource: Step-by-Step
+<a id="step-1"></a>
+
+### Step 1 — Upload Citation Files
+
+Navigate to the **File upload** tab. Click **Browse** to select one or more citation files (`.ris`, `.bib`, or `.txt`).
+
+After uploading, a metadata form appears with one row per file. Set three fields for each:
+
+| Field | What it does | Examples |
+|-------|-------------|---------|
+| **Source** | Tags where the citations came from | `Web of Science`, `Scopus`, `Citation Searching` |
+| **Label** | Tags the screening stage | `search`, `screened`, `final` |
+| **String** | Optional — tags string or method variations | `String_1`, `String_2_proximity` |
+
+CiteSource auto-suggests a source name from the filename — edit it to something meaningful. Label defaults to `search`, which is correct for most initial uploads. The String field can be left blank if you aren't tracking string variations.
+
+You can upload files in multiple batches. Each new upload adds rows to the form without clearing prior entries. Review the new rows and update their metadata before moving on.
 
 <details>
-  <summary><strong>Step 1: File Upload, Labeling, & Re-importing</strong></summary>
+<summary><strong>Re-importing previously processed CiteSource data</strong></summary>
 
-> **Standard Upload:**
->
-> * Navigate to the 'File upload' tab.
-> * Use the 'Set Label for Uploaded File(s)' dropdown to select the appropriate stage for the file(s) you are about to upload (e.g., `search`, `screened`, or `final`). This label helps organize records, especially for phase analysis and some summary tables.
-> * Click the file input area ('Browse...') to select one or more citation files from your computer. Supported formats are `.ris`, `.bib`, and `.txt`.
-> * The label you selected will be applied to all citation records within the file(s) uploaded in that specific action.
->
-> **Re-importing Previously Processed Data:**
->
-> * If you have previously exported data from CiteSource as a `.ris` or `.csv` file (these exported files contain special `cite_` columns), you can re-upload this file directly.
-> * On the 'File upload' tab, use the 'OR: Re-upload an .ris or .csv exported from CiteSource' file input.
-> * This bypasses the initial upload processing and deduplication steps (Steps 3 & 4), allowing you to proceed directly to the 'Visualise' and 'Tables' tabs with your previously processed data.
->
-> * **NOTE**: Raw citation exports from some platforms (e.g.OVID) may be incompatible due to abnormal .ris field use or structuring. If you are having issues, please be sure to try importing them using citation software (e.g. Zotero, EndNote) and exporting them before uploading to CiteSource.*
+> If you have a `.ris` or `.csv` previously exported from CiteSource, use the **"Re-upload an .ris or .csv exported from CiteSource"** input below the main upload area. These files contain embedded `cite_source`, `cite_label`, and `cite_string` columns. Re-importing skips deduplication entirely and takes you directly to Visualise and Tables with your prior results.
 
 </details>
 
 <details>
-  <summary><strong>Step 2: Review Uploads & Edit</strong></summary>
+<summary><strong>Compatibility note</strong></summary>
 
-> * After uploading citations, a summary table appears in the main panel showing each file, its detected record count, and the assigned source name, label, and string.
-> * To correct the auto-assigned source name, or to change the label or string for *all* records from a specific file after upload, you can double-click the corresponding cell in the table and type the new value.
+> Some platforms (notably OVID) produce `.ris` files with non-standard field structures. If an upload produces unexpected results, try importing the file into citation software (Zotero, EndNote) first and re-exporting before uploading to CiteSource.
+
+</details>
+
+---
+
+<a id="step-2"></a>
+
+### Step 2 — Automated Deduplication
+
+Navigate to the **Deduplicate** tab and click **Find duplicates**.
+
+CiteSource compares metadata fields (DOI, title, authors, journal, year, volume, pages) to identify duplicates both *within* each source file (internal deduplication → *distinct* records) and *across* all uploaded files (external deduplication → *unique* records). When duplicates are merged, all `cite_source`, `cite_label`, and `cite_string` tags from every copy are preserved on the single merged record.
+
+Once complete, a summary card shows:
+
+- Total records uploaded, duplicates removed, and unique citations remaining
+- A per-source record count breakdown
+- Whether any pairs were flagged for manual review
+
+---
+
+<a id="step-3"></a>
+
+### Step 3 — Manual Deduplication (If Needed)
+
+If the summary card flags pairs for review, switch to the **Manual deduplication** sub-tab.
+
+The default **Card View** shows each potential pair side-by-side with color-coded field comparisons: green fields match, amber fields differ, red fields are missing from one record. A similarity badge shows the overall match score. Check the box on pairs that are true duplicates, then click **Remove Selected Duplicates**. When you're done — or if no review is needed — click **Go to Visualisations**.
+
+<details>
+<summary><strong>Switching to Table View</strong></summary>
+
+> Open the **Options & Filters** accordion to switch to Table View, which lists all pairs in a sortable table. Useful for quickly scanning a large number of flagged pairs. Click rows to select duplicates, then click **Remove additional duplicates**.
 
 </details>
 
 <details>
-  <summary><strong>Step 3: Automated Deduplication</strong></summary>
+<summary><strong>Card navigation options</strong></summary>
 
-> * Navigate to the 'Deduplicate' tab and ensure you are on the 'Automated deduplication' sub-tab.
-> * Click the 'Find duplicates' button.
-> * CiteSource will process all the records you've uploaded. It compares metadata fields (like DOI, title, authors, journal, year, volume, pages) to identify potential duplicates both *within* the same source file (internal deduplication) and *across* different source files (external deduplication).
-> * A pop-up message will summarize the results, indicating the number of unique records found and if any potential duplicates require manual review.
+> The Options & Filters accordion also lets you filter cards by minimum similarity score and sort by highest or lowest similarity first. Use this to prioritize high-confidence pairs or to focus on borderline cases.
 
 </details>
+
+---
+
+<a id="step-4"></a>
+
+### Step 4 — Visualise Overlap
+
+Navigate to the **Visualise** tab. Use the sidebar to configure:
+
+- **Comparison type** — compare by `sources`, `labels`, or `strings`
+- **Filters** — limit which sources, labels, or strings appear in the plots
+
+These filter selections sync automatically with the Tables tab, so you don't need to set them twice.
+
+Three plots are available:
+
+**Heatmap** — a matrix of pairwise overlap between all groups. Darker cells indicate higher overlap; hover for exact counts. Best for spotting pairs of sources with high redundancy.
+
+**Upset Plot** — visualizes intersections across all groups simultaneously. Vertical bars show record counts for each intersection pattern; horizontal bars show totals per group. More informative than a Venn diagram when comparing more than three groups.
+
+**Phase Analysis Plot** — most useful when comparing by labels (`search` → `screened` → `final`). Shows how many records at each stage were newly unique versus carried forward from a prior stage. Visualizes yield and deduplication effectiveness across your review workflow.
+
+Each plot has a **Download** button to save it as a PNG.
+
+---
+
+<a id="step-5"></a>
+
+### Step 5 — Summary Tables
+
+Navigate to the **Tables** tab. Use the sidebar filters to select the subset of data to analyze, then click **Generate** for the table you need:
+
+**Initial Records Table** — high-level counts for the earliest phase. Shows total uploaded records and how many were internal duplicates within each source file — the difference between raw download counts and distinct records.
+
+**Record Summary Table** — breaks down unique versus overlapping contributions by source or method. Shows which sources contributed the most records found nowhere else.
+
+**Precision/Sensitivity Table** — requires records labeled `final`. For each source, calculates *precision* (proportion of its records that were ultimately included) and *sensitivity* (proportion of all included records that it found). Useful for evaluating and reporting search strategy performance.
+
+**Record Level Table** — the full deduplicated citation list with per-record provenance metadata. Click ⊕ to expand a row for the full APA reference.
 
 <details>
-  <summary><strong>Step 4: Manual Deduplication (If Needed)</strong></summary>
+<summary><strong>Working with the Record Level Table</strong></summary>
 
-> * If the summary message from Step 3 indicates potential duplicates need review, or if you want to manually inspect potential matches, go to the 'Manual deduplication' sub-tab.
-> * Pairs of records identified as potential duplicates are displayed. Each row represents a pair, showing selected metadata side-by-side (e.g., Title 1 vs. Title 2).
-> * Use the 'Choose columns' filter dropdown (filter icon) above the table to select which metadata fields (e.g., author, year, abstract) you want to see for comparison.
-> * Carefully review each pair. If you determine a pair represents the *same* underlying citation, click on that row to select it.
-> * After selecting all rows that are true duplicates, click the 'Remove additional duplicates' button (this button only appears after you select at least one row). This merges the selected pairs, keeping only one unique record with combined metadata.
-> * If you finish reviewing or decide no manual merging is needed, click 'Go to visualisations'.
+> - **Sort** — click any column header; hold Shift and click a second header to sort by multiple columns
+> - **Filter** — type in the search box (top right) to filter across all displayed columns dynamically
+> - **Download** — the CSV button above the table saves the currently filtered view
 
 </details>
 
-<details>
-  <summary><strong>Step 5: Visualise Overlap</strong></summary>
+---
 
-> * Navigate to the 'Visualise' tab.
-> * Use the sidebar controls to tailor the analysis:
->     * **Choose comparison type:** Select whether you want to compare overlap based on 'sources' (original files/databases), 'labels' (e.g., search vs screened), or 'strings' (if used).
->     * **Filter data:** Select specific sources, labels, or strings to include in the visualizations.
-> * Explore the generated plots:
->     * **Heatmap:** This matrix shows pairwise overlap. Each cell represents the number of citations shared between two groups (the groups depend on your chosen comparison type). Darker cells indicate higher overlap. Hover over cells to see exact counts. It helps quickly identify pairs with significant commonality.
->     * **Upset Plot:** This plot visualizes intersections among multiple groups simultaneously. The large bottom bar chart shows the number of citations unique to specific combinations of groups (e.g., found only in Source A, or found in both Source A and B but not C). The smaller top bar chart shows the total number of unique citations in each individual group. It's excellent for understanding complex overlap patterns involving more than two groups.
->     * **Phase Analysis Plot:** This plot is most useful when comparing by 'labels' representing stages (e.g., `search`, `screened`, `final`). It shows the total number of records at each stage, broken down into those that are unique (first identified at that stage) versus those that were already found in a previous stage (duplicates relative to earlier stages). It helps visualize the yield and deduplication effectiveness across a review workflow.
-> * Use the 'Download' buttons above each plot to save them as image files.
+<a id="step-6"></a>
 
-</details>
+### Step 6 — Export Results
 
-<details>
-  <summary><strong>Step 6: Summary Tables & Record Review</strong></summary>
+Navigate to the **Export** tab. Three sections are available:
 
-> * Navigate to the 'Tables' tab.
-> * Use the sidebar filters (Sources, Labels, Strings) to select the subset of data you want summarized.
-> * Generate specific summary tables by clicking the corresponding 'Generate...' button:
->     * **Initial Records Table:** Provides a high-level count based on the earliest phase (typically records labeled `search`). Shows the total uploaded records for that phase. This table distinguishes between the number of uploaded records andduplicates found *within* the each source file. 
->     * **Detailed Record Table:** Breaks down the citation counts by individual source/method (within your selected filters). For each set of records, it shows how many citations were unique to that set and how many were also found in other sets. This helps identify which sources/methods contributed the most unique records and which have a high level of overlap.
->     * **Precision/Sensitivity Table:** Calculates performance metrics, requiring data labeled as `final` to be present and selected. It compares each source, method, or search string against this 'final' set. 'Precision' tells you what proportion of records retrieved by a source were actually relevant ('final' records). 'Sensitivity' (or Recall) tells you what proportion of all relevant ('final') records were found by that specific source. Useful for evaluating search strategy performance.
->     * **Review individual records:** Click 'Generate the table' on the "Review individual records" sub-tab to view the detailed, deduplicated citation list. This table may take a while to load if you have a large number of records. 
->
-> **Using the Interactive Record Table:**
->
->     * **Expand/Collapse Row:** Click the `⊕` symbol in a row to view the full APA reference. Click `⊖` to hide it again.
->     * **Sort by Single Column:** Click any column header (like 'Citation' or a source name) to sort the table by that column's values. Click the header again to reverse the sort order.
->     * **Sort by Multiple Columns:** Click the primary column header you want to sort by. Then, hold down the **Shift** key on your keyboard and click a second column header. You can repeat this for more sorting levels.
->     * **Filter/Search:** Type into the search box located at the top-right of the table to dynamically filter records based on any information displayed.
->     * **Download Data:** Click the 'Download CSV' button (located above the table, next to 'Print') to save the data currently shown in the table (including applied filters) as a CSV file.
+**Citations** — download the full deduplicated dataset as `.csv`, `.ris`, or `.bib`. Provenance metadata (`cite_source`, `cite_label`, `cite_string`) is embedded in standard bibliographic fields (`.ris` uses C1, C2, C7, C8, DB). Only `.csv` and `.ris` can be re-imported into CiteSource later.
 
-</details>
+**Plots** — download any of the three visualizations as PNG files. Content reflects your current filter selections on the Visualise tab.
 
-<details>
-  <summary><strong>Step 7: Export Results</strong></summary>
-
-> * Navigate to the 'Export' tab.
-> * This tab becomes active after you have run the deduplication process (Step 3).
-> * Click the button corresponding to your desired file format: 'Download csv', 'Download RIS', or 'Download BibTex'.
-> * The custom metadata is embedded directly into fields within the export files (e.g., using C1, C2, C7, C8, DB fields in `.ris` format)
-> * This will save the final dataset of unique citations (after both automated and any manual deduplication). 
-> * **Note:** Only `.csv` and `.ris` files can be re-imported later.
-
-</details>
+**Tables** — download the Detailed Record Table as CSV. Content reflects your current filter selections on the Tables tab.
 
 ---

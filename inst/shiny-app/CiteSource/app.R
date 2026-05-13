@@ -4,30 +4,99 @@ library(DT)
 library(CiteSource)
 library(dplyr)
 
-shiny::tags$head(
-  # style
-  shiny::tags$style(shiny::HTML('
-                     #sidebar {
-                        background-color: #ffffff;
-                    }
-
-                    body, label, input, button, select {
-                      font-family: "Arial";
-                    }')
-  ))
+# Source local plots.R so the app picks up changes without a full package rebuild
+local({
+  f <- normalizePath("../../../R/plots.R", mustWork = FALSE)
+  if (file.exists(f)) source(f, local = FALSE)
+})
 
 columns2hide <- c("title", "author", "doi", "volume",
                   "pages", "number", "year", "abstract", "journal", "isbn")
+
+# Google Analytics: set CITESOURCE_ENV=production or CITESOURCE_ENV=dev at deployment
+.ga_file <- local({
+  switch(Sys.getenv("CITESOURCE_ENV", "local"),
+    production = "google_analytics_main.html",
+    dev        = "google_analytics_dev.html",
+    NULL
+  )
+})
+
+# Vectorized helper: split a multi-value column and keep only items in keep_set
+.filter_multivalue_col <- function(vals, keep_set) {
+  items_list <- strsplit(as.character(vals), ",\\s*")
+  vapply(items_list, function(items) {
+    items <- items[!is.na(items) & items != ""]
+    if (length(keep_set) > 0) items <- items[items %in% keep_set]
+    paste(unique(items), collapse = ", ")
+  }, character(1))
+}
 
 
 # ---- Define UI ----
 ui <- shiny::navbarPage("CiteSource",
                         id = "tabs",
+                        fluid = TRUE,
                         header = shiny::tagList(
                           shinybusy::add_busy_spinner(spin = "circle"),
                           shinyjs::useShinyjs(),
                           tags$head(
-                            tags$link(rel = "icon", type = "image/png", href = "www/favicon.png"),  # Add favicon
+                            tags$link(rel = "icon", type = "image/png", href = "www/favicon.png"),
+                            # Toastr CSS and JS
+                            tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"),
+                            tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"),
+                            tags$script(HTML("
+                              toastr.options = {
+                                'closeButton': true,
+                                'progressBar': true,
+                                'positionClass': 'toast-top-right',
+                                'timeOut': '5000',
+                                'extendedTimeOut': '2000',
+                                'showMethod': 'fadeIn',
+                                'hideMethod': 'fadeOut',
+                                'escapeHtml': false
+                              };
+                            ")),
+                            # Field preference button JS handler
+                            tags$script(HTML("
+                            $(document).on('click', '.btn-field-preference', function(e) {
+                              var clickedBtn = $(this);
+                              var buttonId = clickedBtn.attr('id');
+                              var parts = buttonId.split('_');
+                              if (parts.length >= 4) {
+                                var recordType = parts[parts.length - 1];
+                                var field = parts[parts.length - 2];
+                                var idxParts = parts.slice(2, parts.length - 2);
+                                var pairIdx = idxParts.join('_');
+                                var partnerType = (recordType === 'A') ? 'B' : 'A';
+                                var baseId = parts.slice(0, parts.length - 1).join('_');
+                                var partnerId = baseId + '_' + partnerType;
+                                var partnerBtn = $('#' + partnerId);
+                                var isAlreadySelected = clickedBtn.hasClass('selected');
+                                var action = '';
+                                if (isAlreadySelected) {
+                                  clickedBtn.removeClass('selected');
+                                  clickedBtn.css({'background-color':'white','color':'#333','border':'1px solid #ddd','font-weight':'normal'});
+                                  clickedBtn.html('<i class=\"fa fa-check\"></i> Use This');
+                                  action = 'clear';
+                                } else {
+                                  clickedBtn.addClass('selected');
+                                  clickedBtn.css({'background-color':'white','color':'#2d8659','border':'2px solid #2d8659','font-weight':'bold'});
+                                  clickedBtn.html('<i class=\"fa fa-check\"></i> Selected');
+                                  partnerBtn.removeClass('selected');
+                                  partnerBtn.css({'background-color':'white','color':'#333','border':'1px solid #ddd','font-weight':'normal'});
+                                  partnerBtn.html('<i class=\"fa fa-check\"></i> Use This');
+                                  action = 'select';
+                                }
+                                Shiny.setInputValue('field_preference_click', {
+                                  pair_idx: pairIdx,
+                                  field: field,
+                                  record: (action === 'select') ? recordType : 'clear',
+                                  nonce: Math.random()
+                                });
+                              }
+                            });
+                            ")),
                             tags$style(HTML("
                               h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
                                 margin-top: 0;
@@ -36,42 +105,242 @@ ui <- shiny::navbarPage("CiteSource",
                                 line-height: 1.2;
                                 color: #23395B;
                               }
-                            "))
+                              .dedup-card { border: 2px solid #dee2e6; border-radius: 8px; padding: 8px; margin-bottom: 10px; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.9em; }
+                              .dedup-card.record-a { border-left: 4px solid #008080; }
+                              .dedup-card.record-b { border-left: 4px solid #23395B; }
+                              .dedup-field { margin-bottom: 6px; padding: 4px 6px; border-radius: 4px; min-height: 32px; }
+                              .dedup-field.match { background-color: #d4edda; border-left: 3px solid #82D173; }
+                              .dedup-field.different { background-color: #fff3cd; border-left: 3px solid #ffc107; }
+                              .dedup-field.missing { background-color: #f8d7da; border-left: 3px solid #dc3545; }
+                              .dedup-field-label { font-weight: bold; color: #23395B; margin-bottom: 2px; font-size: 0.85em; display: flex; justify-content: space-between; align-items: center; }
+                              .dedup-field-value { min-height: 20px; word-wrap: break-word; overflow-wrap: break-word; }
+                              .dedup-similarity-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; }
+                              .dedup-similarity-high { background-color: #d4edda; color: #155724; }
+                              .dedup-similarity-medium { background-color: #fff3cd; color: #856404; }
+                              .dedup-similarity-low { background-color: #f8d7da; color: #721c24; }
+                              .btn-field-preference { padding: 4px 8px; font-size: 0.8em; border-radius: 3px; cursor: pointer; transition: all 0.2s ease; margin-left: 8px; }
+                              .btn-field-preference.selected { background-color: white !important; color: #2d8659 !important; border: 2px solid #2d8659 !important; font-weight: bold; }
+                              .default-indicator { display: inline-block; margin-right: 4px; font-size: 0.75em; padding: 2px 6px; background-color: #e8f4f8; color: #0066cc; border-radius: 3px; border: 1px solid #0066cc; font-weight: 600; }
+                              .field-preferred { box-shadow: 0 0 8px rgba(130, 209, 115, 0.3); }
+                              /* Workflow stepper */
+                              .workflow-stepper {
+                                display: flex; align-items: center;
+                                padding: 10px 24px; background: #ffffff;
+                                border-bottom: 1px solid #dee2e6; margin: 0;
+                              }
+                              .ws-step {
+                                display: flex; flex-direction: column; align-items: center;
+                                cursor: pointer; min-width: 64px;
+                              }
+                              .ws-step:hover .ws-circle { filter: brightness(0.88); }
+                              .ws-circle {
+                                width: 28px; height: 28px; border-radius: 50%;
+                                display: flex; align-items: center; justify-content: center;
+                                font-weight: 700; font-size: 0.82em;
+                                transition: filter 0.15s;
+                              }
+                              .ws-label {
+                                font-size: 0.72em; margin-top: 4px;
+                                font-weight: 500; white-space: nowrap;
+                              }
+                              .ws-step.ws-completed .ws-circle { background-color: #23395B; color: #ffffff; }
+                              .ws-step.ws-completed .ws-label  { color: #23395B; }
+                              .ws-step.ws-active .ws-circle    {
+                                background-color: #008080; color: #ffffff;
+                                box-shadow: 0 0 0 3px rgba(0,128,128,0.2);
+                              }
+                              .ws-step.ws-active .ws-label     { color: #008080; font-weight: 700; }
+                              .ws-step.ws-pending .ws-circle   { background-color: #e9ecef; color: #adb5bd; cursor: default; }
+                              .ws-step.ws-pending .ws-label    { color: #adb5bd; }
+                              .ws-step.ws-pending:hover .ws-circle { filter: none; }
+                              .ws-line {
+                                flex: 1; height: 2px; min-width: 24px; margin-bottom: 22px;
+                              }
+                              .ws-line.ws-done    { background-color: #23395B; }
+                              .ws-line.ws-pending { background-color: #e9ecef; }
+
+                              /* ── Global typography ─────────────────────────────── */
+                              body, .form-control, .selectize-input, label, button, select {
+                                font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+                                             'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                              }
+
+                              /* ── Navbar ────────────────────────────────────────── */
+                              .navbar { box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
+                              .navbar-brand { font-weight: 700; letter-spacing: 0.2px; }
+
+                              /* ── Sidebar / .well ───────────────────────────────── */
+                              #sidebar, #sidebar_tables { background-color: #ffffff; }
+                              .well {
+                                background-color: #ffffff !important;
+                                border: 1px solid #dde3ed !important;
+                                border-radius: 10px !important;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+                              }
+
+                              /* ── bslib cards ───────────────────────────────────── */
+                              .card {
+                                border-radius: 10px !important;
+                                border: 1px solid #dde3ed !important;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.06) !important;
+                              }
+                              .card-header {
+                                font-weight: 600;
+                                font-size: 0.92em;
+                                letter-spacing: 0.15px;
+                                border-bottom: 1px solid #dde3ed !important;
+                              }
+
+                              /* ── Form controls ─────────────────────────────────── */
+                              .form-control {
+                                border-radius: 6px;
+                                transition: border-color 0.15s, box-shadow 0.15s;
+                              }
+                              .form-control:focus {
+                                box-shadow: 0 0 0 0.2rem rgba(0,128,128,0.18);
+                              }
+                              .selectize-input { border-radius: 6px !important; }
+
+                              /* ── Buttons ───────────────────────────────────────── */
+                              .btn { border-radius: 6px; font-weight: 500; }
+                              a.shiny-download-link.btn { font-size: 0.88em; }
+
+                              /* ── Home tab pills ────────────────────────────────── */
+                              .nav-pills .nav-link { border-radius: 20px; font-weight: 500; }
+
+                              /* ── Tab content ───────────────────────────────────── */
+                              .tab-pane { padding-top: 4px; }
+
+                              /* ── DataTables ────────────────────────────────────── */
+                              .dataTables_wrapper { font-size: 0.92em; }
+
+                              /* ── Links ─────────────────────────────────────────── */
+                              a { color: #008080; }
+                              a:hover { color: #006666; }
+
+                              /* ── Accordion ─────────────────────────────────────── */
+                              .accordion-button:not(.collapsed) {
+                                color: #008080;
+                                background-color: #f0fafa;
+                              }
+                              .accordion-button:focus {
+                                box-shadow: 0 0 0 0.2rem rgba(0,128,128,0.18);
+                              }
+
+                              /* Home tab docs: full-width reading area (avoid narrow 900px column) */
+                              html { scroll-behavior: smooth; }
+                              #shiny-tab-home .home-tab-wrap {
+                                width: 100%;
+                                max-width: 100%;
+                                box-sizing: border-box;
+                                padding: 0.5rem 0 1.25rem;
+                              }
+                              #shiny-tab-home .home-doc-pane {
+                                width: 100%;
+                                max-width: 100%;
+                                margin: 0 auto;
+                                box-sizing: border-box;
+                                padding: 0.75rem clamp(0.25rem, 2vw, 2rem) 1.25rem;
+                                line-height: 1.65;
+                                font-size: 1.02rem;
+                              }
+                              #shiny-tab-home .home-doc-pane img {
+                                max-width: min(280px, 100%);
+                                height: auto;
+                              }
+                              #shiny-tab-home .guide-toc {
+                                font-size: 0.9rem;
+                              }
+                              #shiny-tab-home .guide-toc a {
+                                color: #3d4f63;
+                                text-decoration: none;
+                                display: block;
+                                padding: 0.28rem 0;
+                                border-radius: 4px;
+                              }
+                              #shiny-tab-home .guide-toc a:hover {
+                                color: #008080;
+                                background-color: rgba(0, 128, 128, 0.06);
+                                padding-left: 6px;
+                              }
+                            ")),
+                            if (!is.null(.ga_file) && file.exists(.ga_file)) includeHTML(.ga_file)
+                          ),
+                          # Workflow progress stepper (hidden on Home tab)
+                          shiny::conditionalPanel(
+                            condition = "input.tabs !== 'Home'",
+                            shiny::uiOutput("workflow_stepper")
                           )
                         ),
                         theme = bslib::bs_theme(
-                          bg = "rgb(251, 251, 251)",
-                          primary = "#008080",
-                          secondary = "#CBF7ED",
-                          success = "#23395B",
-                          info = "#82D173",
-                          warning = "#FFC07F",
-                          danger = "#008080",
-                          font_scale = NULL,
-                          bootswatch = "cerulean",
-                          fg = "#000",
-                          input_bg = "#E0E0E0",  # Set the background color for input boxes
-                          input_border_color = "#23395B"  # Set the border color for input boxes
+                          bg           = "rgb(248, 249, 251)",
+                          primary      = "#008080",
+                          secondary    = "#CBF7ED",
+                          success      = "#23395B",
+                          info         = "#82D173",
+                          warning      = "#FFC07F",
+                          danger       = "#008080",
+                          font_scale   = NULL,
+                          bootswatch   = "cerulean",
+                          fg           = "#1a1a2e",
+                          input_bg     = "#ffffff",
+                          input_border_color = "#ced4da",
+                          base_font    = bslib::font_google("Inter", wght = "300..700")
                         ),
                         # Home tab ----
                         shiny::tabPanel(
                           "Home",
-                          shiny::navlistPanel(
-                            shiny::tabPanel(
-                              title = "About",
-                              htmltools::includeMarkdown("www/about.md")
-                            ),
-                            shiny::tabPanel(
-                              title = "Use Cases",
-                              htmltools::includeMarkdown("www/use-cases.md")
-                            ),
-                            # User Guide
-                            shiny::tabPanel(
-                              title = "User Guide",
-                              # Load the external Markdown file
-                              htmltools::includeMarkdown("www/user_guide.md")
-                            ),
-                            widths = c(2, 10)
+                          shiny::div(
+                            class = "home-tab-wrap",
+                            shiny::tabsetPanel(
+                              type = "pills",
+                              shiny::tabPanel(
+                                title = "About",
+                                shiny::div(
+                                  class = "home-doc-pane",
+                                  htmltools::includeMarkdown("www/about.md")
+                                )
+                              ),
+                              shiny::tabPanel(
+                                title = "Use Cases",
+                                shiny::div(
+                                  class = "home-doc-pane",
+                                  htmltools::includeMarkdown("www/use-cases.md")
+                                )
+                              ),
+                              shiny::tabPanel(
+                                title = "User Guide",
+                                shiny::fluidRow(
+                                  shiny::column(
+                                    width = 3,
+                                    shiny::div(
+                                      class = "guide-toc d-none d-md-block",
+                                      style = "position: sticky; top: 1rem; align-self: flex-start;",
+                                      shiny::tags$p(
+                                        shiny::tags$strong("Jump to a step"),
+                                        class = "small text-muted mb-2"
+                                      ),
+                                      shiny::tags$ul(
+                                        class = "list-unstyled mb-0 ps-0",
+                                        shiny::tags$li(shiny::tags$a("Step 1 — Upload files", href = "#step-1")),
+                                        shiny::tags$li(shiny::tags$a("Step 2 — Auto deduplication", href = "#step-2")),
+                                        shiny::tags$li(shiny::tags$a("Step 3 — Manual deduplication", href = "#step-3")),
+                                        shiny::tags$li(shiny::tags$a("Step 4 — Visualise overlap", href = "#step-4")),
+                                        shiny::tags$li(shiny::tags$a("Step 5 — Summary tables", href = "#step-5")),
+                                        shiny::tags$li(shiny::tags$a("Step 6 — Export results", href = "#step-6"))
+                                      )
+                                    )
+                                  ),
+                                  shiny::column(
+                                    width = 9,
+                                    shiny::div(
+                                      class = "home-doc-pane",
+                                      htmltools::includeMarkdown("www/user_guide.md")
+                                    )
+                                  )
+                                )
+                              )
+                            )
                           )
                         ),
                         shiny::tabPanel(
@@ -96,9 +365,7 @@ ui <- shiny::navbarPage("CiteSource",
                                 ),
                                 # Main panel for displaying outputs ----
                                 shiny::mainPanel(
-                                  shiny::h5("Step 2: Double click on a column to edit sources, labels, and strings. Use *Ctrl+Enter* to save edits, one column at a time"),
-                                  # Output: Data file ----
-                                  DT::dataTableOutput("tbl_out"),
+                                  shiny::uiOutput("metadata_form"),
                                   shiny::uiOutput("post_upload_guide")
                                 )
                               )
@@ -121,56 +388,111 @@ ui <- shiny::navbarPage("CiteSource",
                                 color = "primary",
                                 icon = shiny::icon("search")
                               ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080; margin-right: 20px"),
+                              shiny::br(),
+                              shiny::uiOutput("dedup_summary_card")
                             ),
                             shiny::tabPanel(
                               "Manual deduplication",
                               br(),
-                              shiny::h5("Step 4 (optional): Manually select further duplicates"),
-                              shiny::p("The following records were identified as potential duplicates. Potential duplicates are combined into a single row with metadata fields for each record represented (ex. Title 1 & Title 2). Click any row to indicate that the records in that row ARE duplicates. Once all duplicates are identified you can click the button 'Remove additional duplicates' and then proceed to the visualizations."),
+                              shiny::h5("Step 4: Review potential duplicates manually"),
                               shiny::textOutput("Manual_pretext"),
                               shiny::br(),
-                              
-                              # Button
-                              shinyWidgets::actionBttn(
-                                inputId = "nomanualdedup",
-                                label = "Go to visualisations",
-                                style = "jelly",
-                                icon = shiny::icon("arrow-right"),
-                                color = "primary"
-                              ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173"),
-                              br(),
-                              shinyWidgets::actionBttn(
-                                inputId = "manualdedupsubmit",
-                                label = "Remove additional duplicates",
-                                style = "jelly",
-                                icon = shiny::icon("reply"),
-                                color = "primary" # Hide the button initially
-                              ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-                              
-                              shinyWidgets::dropdown(
-                                
-                                tags$h3("Select columns to display"),
-                                
-                                shinyWidgets::pickerInput(
-                                  inputId = "manual_dedup_cols",
-                                  label = "Choose columns",
-                                  choices = NULL,
-                                  selected = NULL,
-                                  multiple = TRUE,
-                                  options = list(
-                                    `live-search` = TRUE,
-                                    `actions-box` = TRUE,
-                                    style = "btn-primary")
-                                ), 
-                                icon = icon("filter"),
-                                inline =TRUE,
-                                status = "danger", width = "600px",
-                                tooltip = shinyWidgets::tooltipOptions(title = "Select columns to display")),
-                              
-                              DT::DTOutput("manual_dedup_dt"),
-                              tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
-            background-color: #CBF7ED!important; color: black!important}")),
-                              
+
+                              # Action buttons (always visible)
+                              shiny::div(
+                                style = "text-align: right; margin-bottom: 15px;",
+                                shinyWidgets::actionBttn(
+                                  inputId = "manualdedupsubmit",
+                                  label = "Remove Selected Duplicates",
+                                  style = "jelly",
+                                  icon = shiny::icon("trash"),
+                                  color = "primary",
+                                  size = "sm"
+                                ) %>% htmltools::tagAppendAttributes(style = "background-color: #23395B; margin-right: 10px;"),
+                                shinyWidgets::actionBttn(
+                                  inputId = "nomanualdedup",
+                                  label = "Go to Visualisations",
+                                  style = "jelly",
+                                  icon = shiny::icon("arrow-right"),
+                                  color = "primary",
+                                  size = "sm"
+                                ) %>% htmltools::tagAppendAttributes(style = "background-color: #82D173;")
+                              ),
+
+                              # Options & Filters accordion
+                              bslib::accordion(
+                                open = FALSE,
+                                bslib::accordion_panel(
+                                  title = "Options & Filters",
+                                  icon = shiny::icon("sliders-h"),
+                                  shiny::fluidRow(
+                                    shiny::column(
+                                      12,
+                                      shinyWidgets::prettyRadioButtons(
+                                        inputId = "dedup_view_mode",
+                                        label = shiny::tags$strong("View Mode:"),
+                                        choices = c("Card View" = "card", "Table View" = "table"),
+                                        selected = "card",
+                                        inline = TRUE,
+                                        status = "primary"
+                                      )
+                                    )
+                                  ),
+                                  shiny::hr(),
+                                  # Card View filters (conditional)
+                                  shiny::conditionalPanel(
+                                    condition = "input.dedup_view_mode == 'card'",
+                                    shiny::tags$h6(shiny::icon("filter"), " Card Navigation"),
+                                    shiny::fluidRow(
+                                      shiny::column(
+                                        4,
+                                        shiny::sliderInput(
+                                          inputId = "similarity_filter",
+                                          label = "Min Similarity",
+                                          min = 0, max = 100, value = 0, step = 5, post = "%", width = "100%"
+                                        )
+                                      ),
+                                      shiny::column(
+                                        4,
+                                        shiny::selectInput(
+                                          inputId = "similarity_sort",
+                                          label = "Sort by Similarity",
+                                          choices = list("Highest First" = "desc", "Lowest First" = "asc"),
+                                          selected = "desc", width = "100%"
+                                        )
+                                      ),
+                                      shiny::column(4, shiny::uiOutput("dedup_progress"))
+                                    )
+                                  ),
+                                  # Table View options (conditional)
+                                  shiny::conditionalPanel(
+                                    condition = "input.dedup_view_mode == 'table'",
+                                    shiny::tags$h6(shiny::icon("columns"), " Table Columns"),
+                                    shinyWidgets::pickerInput(
+                                      inputId = "manual_dedup_cols",
+                                      label = "Choose columns",
+                                      choices = NULL, selected = NULL, multiple = TRUE,
+                                      options = list(`live-search` = TRUE, `actions-box` = TRUE, style = "btn-primary"),
+                                      width = "100%"
+                                    )
+                                  )
+                                )
+                              ),
+                              shiny::br(),
+
+                              # Card View output
+                              shiny::conditionalPanel(
+                                condition = "input.dedup_view_mode == 'card'",
+                                shiny::uiOutput("dedup_card_view")
+                              ),
+
+                              # Table View output
+                              shiny::conditionalPanel(
+                                condition = "input.dedup_view_mode == 'table'",
+                                DT::DTOutput("manual_dedup_dt"),
+                                tags$style(HTML(".table.dataTable tbody td.active, .table.dataTable tbody tr.active td {
+            background-color: #CBF7ED!important; color: black!important}"))
+                              )
                             ),
                             shiny::tabPanel(
                               "How deduplication works",
@@ -191,7 +513,7 @@ ui <- shiny::navbarPage("CiteSource",
                             
                             # Sidebar panel for inputs ----
                             shiny::sidebarPanel(
-                              width = 3,
+                              width = 2,
                               id = "sidebar",
                               shiny::h5("Step 5: Visualise overlap"),
                               shinyWidgets::prettyRadioButtons(
@@ -225,40 +547,103 @@ ui <- shiny::navbarPage("CiteSource",
                                 list(),
                                 multiple = TRUE,
                                 selectize = TRUE
+                              ),
+                              shiny::tags$small(
+                                style = "color: #6c757d; display: block; margin-top: 6px;",
+                                shiny::tags$i(class = "fa fa-link", style = "margin-right: 4px;"),
+                                "Filters sync with the Tables tab"
                               )
                             ),
-                            
+
                             # Main panel for displaying outputs ----
                             shiny::mainPanel(
-                              shiny::tabsetPanel(
-                                shiny::tabPanel(
-                                  "Plot overlap as a heatmap matrix",
-                                  shiny::downloadButton("downloadHeatPlot"),
-                                  plotly::plotlyOutput("plotgraph1")
+                              shiny::uiOutput("visualise_empty_state"),
+                              shiny::tags$div(
+                                id = "visualise_tabs_wrapper",
+                                # Per-tab controls: shown conditionally based on active tab
+                                shiny::conditionalPanel(
+                                  "input.vis_tabs === 'Plot overlap as a heatmap matrix'",
+                                  shiny::div(
+                                    style = "padding: 6px 0 10px 0;",
+                                    shiny::checkboxInput(
+                                      "heatmap_log_scale",
+                                      shiny::tagList(
+                                        "Log scale colors ",
+                                        shiny::tags$i(
+                                          class = "fa fa-question-circle",
+                                          title = "Applies a log transform to the color gradient so small overlaps remain visible when one source has far more records than others.",
+                                          style = "color:#6c757d; cursor:help;"
+                                        )
+                                      ),
+                                      value = FALSE
+                                    )
+                                  )
                                 ),
-                                shiny::tabPanel(
-                                  "Plot overlap as an upset plot",
-                                  shiny::downloadButton("downloadUpsetPlot"),
-                                  shiny::plotOutput("plotgraph2")
-                                ),
-                                shiny::tabPanel(
-                                  "Phase Analysis",  # New Tab for Phase Analysis
-                                  shiny::downloadButton("downloadPhasePlot"),
-                                  shiny::plotOutput("phasePlot")
+                                shiny::tabsetPanel(
+                                  id = "vis_tabs",
+                                  shiny::tabPanel(
+                                    "Plot overlap as a heatmap matrix",
+                                    shiny::br(),
+                                    shiny::downloadButton("downloadHeatPlot"),
+                                    bslib::card(
+                                      bslib::card_body(shiny::uiOutput("heatmapUI"))
+                                    )
+                                  ),
+                                  shiny::tabPanel(
+                                    "Plot overlap as an upset plot",
+                                    shiny::br(),
+                                    shiny::fluidRow(
+                                      shiny::column(3,
+                                        shiny::sliderInput("upset_nsets", "Max sources shown",
+                                                           min = 2, max = 20, value = 10, step = 1),
+                                        shiny::tags$small(
+                                          style = "color:#6c757d; display:block; margin-top:-8px; margin-bottom:8px;",
+                                          "Display only — to change which sources are analyzed, use the filter on the left."
+                                        )
+                                      ),
+                                      shiny::column(3,
+                                        shiny::sliderInput("upset_nintersects", "Max intersections shown",
+                                                           min = 5, max = 100, value = 40, step = 5)
+                                      ),
+                                      shiny::column(2,
+                                        shiny::div(style = "margin-top:24px;",
+                                          shiny::actionButton("apply_upset", "Apply",
+                                            icon = shiny::icon("rotate-right"),
+                                            class = "btn-primary btn-sm")
+                                        )
+                                      ),
+                                      shiny::column(4,
+                                        shiny::div(style = "margin-top:24px; text-align:right;",
+                                          shiny::downloadButton("downloadUpsetPlot")
+                                        )
+                                      )
+                                    ),
+                                    bslib::card(
+                                      bslib::card_body(shiny::plotOutput("plotgraph2"))
+                                    )
+                                  ),
+                                  shiny::tabPanel(
+                                    "Phase Analysis",
+                                    shiny::br(),
+                                    shiny::downloadButton("downloadPhasePlot"),
+                                    bslib::card(
+                                      bslib::card_body(shiny::plotOutput("phasePlot"))
+                                    )
+                                  )
                                 )
                               )
                             )
                           )
                         ),
-                        
+
                         shiny::tabPanel(
                           "Tables",
-                          
+
                           shiny::sidebarLayout(
-                            
+
                             shiny::sidebarPanel(
-                              id = "sidebar",
-                              width = 3,
+                              id = "sidebar_tables",
+                              width = 2,
                               shiny::h5("Step 6: Summary tables"),
                               selectInput(
                                 inputId = "sources_tables",
@@ -280,39 +665,35 @@ ui <- shiny::navbarPage("CiteSource",
                                 list(),
                                 multiple = TRUE,
                                 selectize = TRUE
+                              ),
+                              shiny::tags$small(
+                                style = "color: #6c757d; display: block; margin-top: 6px;",
+                                shiny::tags$i(class = "fa fa-link", style = "margin-right: 4px;"),
+                                "Filters sync with the Visualise tab"
                               )
                             ),
-                            
+
                             shiny::mainPanel(
-                              shiny::tabsetPanel(
-                                shiny::tabPanel(
-                                  "Detailed Record Table",
-                                  shiny::div("Summary of unique and non-unique records by source."),
-                                  shinyWidgets::actionBttn(
-                                    "generateDetailedRecordTable", "Generate Detailed Record Table",
-                                    style = "jelly",
-                                    icon = shiny::icon("table"),
-                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-                                  shiny::br(),
-                                  shiny::br(),
-                                  gt::gt_output("detailedRecordTab")
-                                ),
-                                
-                                shiny::tabPanel(
-                                  "Precision/Sensitivity Table",
-                                  shiny::div("Precision and Sensitivity of records across screening phases."),
-                                  shinyWidgets::actionBttn(
-                                    "generatePrecisionTable", "Generate Precision/Sensitivity Table",
-                                    style = "jelly",
-                                    icon = shiny::icon("table"),
-                                    color = "primary") %>% htmltools::tagAppendAttributes(style = "background-color: #23395B"),
-                                  shiny::br(),
-                                  shiny::br(),
-                                  gt::gt_output("summaryPrecTab")
-                                ),
-                                
-                                shiny::tabPanel(
-                                  "Review individual records",
+                              shiny::uiOutput("tables_empty_state"),
+                              shiny::tags$div(
+                                id = "tables_tabs_wrapper",
+                                shiny::tabsetPanel(
+                                  shiny::tabPanel(
+                                    "Detailed Record Table",
+                                    shiny::div("Summary of unique and non-unique records by source."),
+                                    shiny::br(),
+                                    gt::gt_output("detailedRecordTab")
+                                  ),
+
+                                  shiny::tabPanel(
+                                    "Precision/Sensitivity Table",
+                                    shiny::div("Precision and Sensitivity of records across screening phases. Only available when data includes a 'final' screening label."),
+                                    shiny::br(),
+                                    gt::gt_output("summaryPrecTab")
+                                  ),
+
+                                  shiny::tabPanel(
+                                    "Review individual records",
                                   shiny::br(),
                                   shinyWidgets::actionBttn(
                                     "generateRecordTable", "Generate the table",
@@ -369,30 +750,87 @@ ui <- shiny::navbarPage("CiteSource",
                                     )
                                   ),
                                   DT::dataTableOutput("reviewTab")
+                                  )
                                 )
                               )
                             )
                           )
                         ),
-                        
+
                         shiny::tabPanel(
                           "Export",
-                          shiny::fluidRow(
-                            shiny::column(
-                              12,
-                              shiny::mainPanel(
-                                shiny::h5("Step 7: Export citations"),
-                                shiny::h6("Note that you can only download the data after you have run the deduplication. Also, you are only able to re-upload CSV and RIS files to continue with CiteSource, so please use these formats if you want that option."),
-                                shiny::downloadButton("downloadCsv", "Download csv"),
-                                shiny::downloadButton("downloadRis", "Download RIS"),
-                                shiny::downloadButton("downloadBib", "Download BibTex"),
-                                shiny::hr(),
-                                shiny::wellPanel(
-                                  shiny::h5("Cite CiteSource"),
-                                  shiny::p("If you use these results in a publication, please cite the software:"),
-                                  shiny::tags$code("Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026). CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting. Research Synthesis Methods. https://doi.org/10.1017/rsm.2026.10084"),
+                          shiny::div(
+                            style = "padding: 20px;",
+                            shiny::uiOutput("export_empty_state"),
+                            shiny::tags$div(
+                              id = "export_content_wrapper",
+                              shiny::h5("Step 7: Export your results"),
+                              shiny::br(),
+                              shiny::fluidRow(
+                                shiny::column(
+                                  8,
+                                  bslib::card(
+                                    bslib::card_header(
+                                      shiny::tags$i(class="fa fa-file-alt", style="margin-right:7px;"),
+                                      "Citations"
+                                    ),
+                                    bslib::card_body(
+                                      shiny::p("Download the deduplicated citation set.",
+                                        style="color:#6c757d;font-size:0.88em;margin-bottom:10px;"),
+                                      shiny::div(
+                                        style="font-size:0.82em;color:#856404;background:#fff8e1;padding:8px 12px;border-radius:4px;margin-bottom:14px;",
+                                        shiny::tags$i(class="fa fa-info-circle", style="margin-right:5px;"),
+                                        "Only .ris and .csv can be re-imported into CiteSource."
+                                      ),
+                                      shiny::downloadButton("downloadCsv", "CSV",
+                                        style="margin-right:6px;margin-bottom:4px;"),
+                                      shiny::downloadButton("downloadRis", "RIS",
+                                        style="margin-right:6px;margin-bottom:4px;"),
+                                      shiny::downloadButton("downloadBib", "BibTeX",
+                                        style="margin-bottom:4px;")
+                                    )
+                                  ),
                                   shiny::br(),
-                                  shiny::a("View Publication", href = "https://doi.org/10.1017/rsm.2026.10084", target = "_blank")
+                                  bslib::card(
+                                    bslib::card_header(
+                                      shiny::tags$i(class="fa fa-chart-bar", style="margin-right:7px;"),
+                                      "Plots"
+                                    ),
+                                    bslib::card_body(
+                                      shiny::p("Download visualisations as PNG. Content reflects current filter selections on the Visualise tab.",
+                                        style="color:#6c757d;font-size:0.88em;margin-bottom:12px;"),
+                                      shiny::downloadButton("export_heatplot",  "Overlap Heatmap",
+                                        style="margin-right:6px;margin-bottom:4px;"),
+                                      shiny::downloadButton("export_upsetplot", "Upset Plot",
+                                        style="margin-right:6px;margin-bottom:4px;"),
+                                      shiny::downloadButton("export_phaseplot", "Phase Analysis",
+                                        style="margin-bottom:4px;")
+                                    )
+                                  ),
+                                  shiny::br(),
+                                  bslib::card(
+                                    bslib::card_header(
+                                      shiny::tags$i(class="fa fa-table", style="margin-right:7px;"),
+                                      "Tables"
+                                    ),
+                                    bslib::card_body(
+                                      shiny::p("Download the detailed record table as CSV (reflects current filter selections on the Tables tab).",
+                                        style="color:#6c757d;font-size:0.88em;margin-bottom:12px;"),
+                                      shiny::downloadButton("exportDetailedTable", "Detailed Record Table",
+                                        style="margin-bottom:4px;")
+                                    )
+                                  ),
+                                  shiny::br(),
+                                  shiny::wellPanel(
+                                    style="background:#f8f9fa;border:1px solid #dee2e6;",
+                                    shiny::h5("Cite CiteSource", style="margin-top:0;"),
+                                    shiny::p("If you use these results in a publication, please cite the software:"),
+                                    shiny::tags$code("Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026). CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting. Research Synthesis Methods. https://doi.org/10.1017/rsm.2026.10084"),
+                                    shiny::br(), shiny::br(),
+                                    shiny::a("View Publication",
+                                      href="https://doi.org/10.1017/rsm.2026.10084", target="_blank")
+                                  )
+                                )
                               )
                             )
                           )
@@ -403,7 +841,26 @@ ui <- shiny::navbarPage("CiteSource",
 
 # Define server logic to read selected file ----
 server <- function(input, output, session) {
-  
+
+  # --- Toastr notification helper ---
+  show_toastr <- function(title, message, type = "info") {
+    toastr_type <- switch(type, success = "success", error = "error", warning = "warning", "info")
+    timeout_ms  <- if (type == "error") 10000 else 5000
+    ext_timeout <- if (type == "error") 4000  else 2000
+    escape_js <- function(x) {
+      x <- as.character(x)
+      x <- gsub("\n", "<br>", x, fixed = TRUE)
+      x <- gsub("\\\\", "\\\\\\\\", x)
+      x <- gsub("'",  "\\'",  x, fixed = TRUE)
+      x <- gsub('"', '\\"', x, fixed = TRUE)
+      x
+    }
+    js <- paste0("toastr.", toastr_type, "('", escape_js(message), "','", escape_js(title),
+                 "',{'timeOut':", timeout_ms, ",'extendedTimeOut':", ext_timeout,
+                 ",'closeButton':true,'progressBar':true,'escapeHtml':false});")
+    shinyjs::runjs(js)
+  }
+
   # --- Reactive Values ---
   # Used to store data that changes during the session
   rv <- shiny::reactiveValues()
@@ -412,7 +869,72 @@ server <- function(input, output, session) {
   rv$latest_unique <- data.frame()#for reimported data
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
-  
+  rv$file_meta           <- list()  # Per-file metadata (source/label/string); keyed by file.datapath
+  # Card view state
+  rv$selected_pairs_card <- integer(0)
+  rv$current_pair_index  <- 1L
+  rv$field_preferences   <- list()
+
+  # ---- Workflow stepper ----
+  output$workflow_stepper <- shiny::renderUI({
+    shiny::req(input$tabs)
+
+    has_data  <- (is.data.frame(rv$upload_df)    && nrow(rv$upload_df)    > 0) ||
+                 (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    has_dedup <-  is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+
+    steps <- list(
+      list(n = 1L, label = "Upload",      tab = "File upload",  done = has_data),
+      list(n = 2L, label = "Deduplicate", tab = "Deduplicate",  done = has_dedup),
+      list(n = 3L, label = "Visualise",   tab = "Visualise",    done = FALSE),
+      list(n = 4L, label = "Tables",      tab = "Tables",       done = FALSE),
+      list(n = 5L, label = "Export",      tab = "Export",       done = FALSE)
+    )
+
+    tab_to_idx <- c("File upload" = 1L, "Deduplicate" = 2L,
+                    "Visualise"   = 3L, "Tables"       = 4L, "Export" = 5L)
+    cur_idx <- tab_to_idx[input$tabs]
+    cur_idx <- if (is.na(cur_idx)) 0L else as.integer(cur_idx)
+
+    items <- vector("list", length(steps) * 2L - 1L)
+    for (i in seq_along(steps)) {
+      s      <- steps[[i]]
+      status <- if (i == cur_idx) "ws-active"
+                else if (s$done || i < cur_idx) "ws-completed"
+                else "ws-pending"
+
+      circle_inner <- if (status == "ws-completed")
+        shiny::tags$i(class = "fa fa-check", `aria-hidden` = "true")
+      else
+        as.character(s$n)
+
+      # Pending steps are not clickable
+      onclick_attr <- if (status != "ws-pending")
+        sprintf("Shiny.setInputValue('stepper_nav','%s',{priority:'event'})", s$tab)
+      else
+        NULL
+
+      items[[i * 2L - 1L]] <- shiny::tags$div(
+        class   = paste("ws-step", status),
+        onclick = onclick_attr,
+        shiny::tags$div(class = "ws-circle", circle_inner),
+        shiny::tags$div(class = "ws-label",  s$label)
+      )
+
+      if (i < length(steps)) {
+        lc <- if (s$done || i < cur_idx) "ws-done" else "ws-pending"
+        items[[i * 2L]] <- shiny::tags$div(class = paste("ws-line", lc))
+      }
+    }
+
+    shiny::tags$div(class = "workflow-stepper", items)
+  })
+
+  shiny::observeEvent(input$stepper_nav, {
+    shiny::updateNavbarPage(session, "tabs", selected = input$stepper_nav)
+  }, ignoreInit = TRUE)
+  # ---- End workflow stepper ----
+
   # 1. The Container (Decides WHEN to show it)
   output$post_upload_guide <- shiny::renderUI({
     # Only show this if the upload dataframe exists and has rows
@@ -452,67 +974,6 @@ server <- function(input, output, session) {
   
   # --- Google Analytics Integration ---
   # Flag to ensure GA script is inserted only once per session
-  ga_script_inserted <- reactiveVal(FALSE)
-  
-  # Use observeEvent on session$clientData which becomes available early
-  observeEvent(session$clientData, {
-    # Only proceed if the script hasn't been inserted yet for this session
-    if (!ga_script_inserted()) {
-      # Get the application's path from the URL (e.g., /CiteSource_latest/)
-      app_path <- session$clientData$url_pathname
-      ga_include_file <- NULL # Variable to hold the GA HTML filename
-      
-      # --- Determine GA HTML filename based on the application path ---
-      # Check if the path ends with '_latest' or '_latest/' (case-insensitive)
-      if (grepl("_latest/?$", app_path, ignore.case = TRUE)) {
-        # Development version
-        message("GA: Detected DEV environment based on URL path: ", app_path) # Logging
-        # *** SET the DEV Google Analytics HTML filename ***
-        ga_include_file <- "google_analytics_dev.html" # file is in same directory as app.R
-        
-      }
-      # Check if the path corresponds to the production app name (e.g., /CiteSource/ or /CiteSource)
-      # Adjust '/CiteSource/?$' if your production app name is different
-      else if (grepl("/CiteSource/?$", app_path, ignore.case = TRUE)) {
-        # Production version
-        message("GA: Detected PROD environment based on URL path: ", app_path) # Logging
-        # *** SET the PROD Google Analytics HTML filename ***
-        ga_include_file <- "google_analytics_main.html" # file is in same directory as app.R
-        
-      } else {
-        # Path didn't match known patterns
-        message("GA: Could not determine environment from URL path: ", app_path) # Logging
-      }
-      
-      # --- Insert the GA HTML file content if a filename was determined and file exists ---
-      if (!is.null(ga_include_file) && nzchar(ga_include_file)) {
-        # Check if the determined file actually exists in the app directory
-        if (file.exists(ga_include_file)) {
-          # Insert the content of the HTML file into the document's <head>
-          insertUI(
-            selector = "head",     # Target the <head> tag
-            where = "beforeEnd", # Add the script at the end of the head's content
-            # Use includeHTML to read and insert the file content
-            ui = includeHTML(ga_include_file),
-            immediate = TRUE      # Attempt to insert as soon as possible
-          )
-          # Set the flag to TRUE to prevent this code running again for this session
-          ga_script_inserted(TRUE)
-          message("GA: Inserted script from file: ", ga_include_file) # Logging
-        } else {
-          # Log an error if the file is missing
-          message("GA Error: HTML file not found: ", ga_include_file)
-          # Optionally set the flag anyway to prevent repeated checks for missing file
-          ga_script_inserted(TRUE)
-        }
-      } else {
-        # If no file was determined (e.g., path didn't match), set flag to prevent re-check
-        ga_script_inserted(TRUE)
-      }
-    }
-  }, ignoreNULL = TRUE, once = FALSE) # Trigger when clientData is available, but flag prevents re-run
-  # --- End Google Analytics Integration ---
-  
   #### Upload files tab section ------
   # upload on click
   shiny::observeEvent(input$file, {
@@ -567,29 +1028,150 @@ server <- function(input, output, session) {
       # Append the results to the reactive values
       rv$df <- dplyr::bind_rows(rv$df, df)
       rv$upload_df <- dplyr::bind_rows(rv$upload_df, upload_df)
+
+      # Seed file_meta for each new file (only if not already present)
+      for (fi in seq_along(input$file$datapath)) {
+        dp <- input$file$datapath[fi]
+        if (is.null(rv$file_meta[[dp]])) {
+          rv$file_meta[[dp]] <- list(
+            source = suggested_source[fi],
+            label  = "search",
+            string = ""
+          )
+        }
+      }
     }
   })
   
   
-  ## display summary input table - summary of files added
-  output$tbl_out <- DT::renderDataTable({
-    if (is.null(input$file_reimport)) {
-      DT::datatable(
-        rv$df,
-        options = list(
-          paging = FALSE,
-          searching = FALSE,
-          columnDefs = list(list(visible = FALSE, targets = c(0))) 
+  ## Per-file metadata assignment form
+  output$metadata_form <- shiny::renderUI({
+    df_snap <- rv$df
+
+    if (!is.data.frame(df_snap) || nrow(df_snap) == 0) {
+      return(shiny::div(
+        style = paste(
+          "margin-top: 20px; padding: 30px 20px; background: #f8f9fa;",
+          "border: 2px dashed #dee2e6; border-radius: 8px;",
+          "text-align: center; color: #6c757d;"
         ),
-        editable = list(
-          target = 'column',
-          disable = list(columns = c(1, 2)) 
+        shiny::tags$i(class = "fa fa-upload",
+                      style = "font-size: 2em; margin-bottom: 10px; display: block;"),
+        shiny::p("Upload citation files on the left to get started.",
+                 style = "margin-bottom: 0;")
+      ))
+    }
+
+    # Read file_meta via isolate so edits don't re-trigger this renderUI
+    fm <- shiny::isolate(rv$file_meta)
+
+    header <- shiny::fluidRow(
+      style = paste(
+        "font-weight: 600; padding: 4px 8px; border-bottom: 2px solid #dee2e6;",
+        "margin-bottom: 6px; color: #23395B; font-size: 0.85em;"
+      ),
+      shiny::column(3, "File"),
+      shiny::column(1, shiny::div(style = "text-align:center;", "Records")),
+      shiny::column(3, "Source"),
+      shiny::column(2, "Label"),
+      shiny::column(3, "String")
+    )
+
+    rows <- lapply(seq_len(nrow(df_snap)), function(i) {
+      dp      <- df_snap$file.datapath[i]
+      meta    <- fm[[dp]]
+      cur_src <- if (!is.null(meta$source)) meta$source else df_snap$source[i]
+      cur_lbl <- if (!is.null(meta$label))  meta$label  else "search"
+      cur_str <- if (!is.null(meta$string)) meta$string else ""
+
+      shiny::fluidRow(
+        style = "border-bottom: 1px solid #f0f0f0; padding: 4px 0;",
+        shiny::column(3,
+          shiny::div(
+            style = "font-size: 0.82em; word-break: break-all; padding-top: 8px; color: #23395B;",
+            shiny::tags$i(class = "fa fa-file-alt",
+                          style = "color: #aaa; margin-right: 4px;"),
+            df_snap$file.name[i]
+          )
         ),
-        rownames = FALSE
+        shiny::column(1,
+          shiny::div(
+            style = "text-align: center; padding-top: 8px; font-weight: 600; color: #23395B;",
+            as.character(df_snap$records[i])
+          )
+        ),
+        shiny::column(3,
+          shiny::textInput(
+            inputId     = paste0("file_source_", i),
+            label       = NULL,
+            value       = cur_src,
+            placeholder = "e.g. Web of Science",
+            width       = "100%"
+          )
+        ),
+        shiny::column(2,
+          shiny::selectInput(
+            inputId  = paste0("file_label_", i),
+            label    = NULL,
+            choices  = c("search", "screened", "final"),
+            selected = cur_lbl,
+            width    = "100%"
+          )
+        ),
+        shiny::column(3,
+          shiny::textInput(
+            inputId     = paste0("file_string_", i),
+            label       = NULL,
+            value       = cur_str,
+            placeholder = "e.g. string1",
+            width       = "100%"
+          )
+        )
       )
-    }
+    })
+
+    shiny::tagList(
+      shiny::h5("Step 2: Assign metadata for each uploaded file"),
+      shiny::div(
+        style = paste(
+          "background: white; border: 1px solid #dee2e6;",
+          "border-radius: 6px; padding: 10px 12px;"
+        ),
+        header,
+        do.call(shiny::tagList, rows),
+        shiny::div(
+          style = "margin-top: 10px; font-size: 0.82em; color: #6c757d;",
+          shiny::tags$i(class = "fa fa-info-circle"),
+          " Label at least one file as ",
+          shiny::strong("'search'"),
+          " to proceed with deduplication.",
+          shiny::tags$br(),
+          shiny::tags$i(class = "fa fa-info-circle"),
+          " Files labeled ",
+          shiny::strong("'screened'"),
+          " or ",
+          shiny::strong("'final'"),
+          " should have their Source field left blank."
+        )
+      ),
+      shiny::div(
+        style = "margin-top: 14px;",
+        shinyWidgets::actionBttn(
+          inputId = "go_to_dedup",
+          label   = "Continue to deduplication",
+          style   = "jelly",
+          icon    = shiny::icon("arrow-right"),
+          color   = "primary",
+          size    = "sm"
+        ) %>% htmltools::tagAppendAttributes(style = "background-color: #008080;")
+      )
+    )
   })
   
+  shiny::observeEvent(input$go_to_dedup, {
+    shiny::updateNavbarPage(session, "tabs", selected = "Deduplicate")
+  })
+
   shiny::observeEvent(input$file_reimport, {
     file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
     
@@ -603,10 +1185,9 @@ server <- function(input, output, session) {
     
     rv$n_unique <- count_unique(rv$latest_unique)
     
-    shinyalert::shinyalert("Re-import successful",
-                           paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
-                           type = "success"
-    )
+    show_toastr("Re-import successful",
+                paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
+                type = "success")
     
   })
   
@@ -685,127 +1266,77 @@ server <- function(input, output, session) {
       shiny::updateSelectInput(session, inputId = "strings_tables", choices = character(0), selected = character(0))
     }
   }) # End update filters observe
-  
-  # Robust Observer for Cell Edits in tbl_out
-  shiny::observeEvent(input$tbl_out_cell_edit, {
-    # This observer handles edits made to the summary table (rv$df)
-    # and propagates relevant changes (source, label, string)
-    # to the corresponding records in the detailed table (rv$upload_df).
-    
-    info <- input$tbl_out_cell_edit
-    
-    # Ensure rv$df and rv$upload_df are valid data frames before proceeding
-    if (!is.data.frame(rv$df) || nrow(rv$df) == 0) {
-      # Silently return if summary data isn't ready (e.g., during initial load)
-      return()
-    }
-    if (!is.data.frame(rv$upload_df)) {
-      # Log warning if detailed data structure is missing, but allow proceeding
-      # if only rv$df needs update (though propagation will fail later)
-      warning("rv$upload_df is not a valid data frame. Edits cannot be propagated.")
-      # Depending on desired behavior, could 'return()' here too.
-    }
-    
-    # Get column names from the summary data frame
-    df_col_names <- names(rv$df)
-    
-    # Determine the number of edits reported in this event
-    n_edits <- length(info$row)
-    
-    # Process each reported edit individually
-    for (i in 1:n_edits) {
-      # Extract information for the current (i-th) edit
-      target_row_df <- as.integer(info$row[i]) # 1-based row index for rv$df
-      target_col_dt <- as.integer(info$col[i]) # 0-based column index from DT
-      target_col_df <- target_col_dt + 1       # Convert to 1-based R index for rv$df
-      val <- if (is.list(info$value)) info$value[[i]] else info$value[i] # Handle list/vector values
-      
-      # Convert blank input ("") to logical NA
-      if (length(val) == 1 && !is.na(val) && val == "") {
-        val <- NA
+
+  # ---- Filter sync: keep Visualise ↔ Tables in lock-step ----
+  # setequal() guard prevents ping-pong; ignoreInit stops firing at load time.
+  shiny::observeEvent(input$sources_visual, {
+    if (!setequal(input$sources_visual, input$sources_tables))
+      shiny::updateSelectInput(session, "sources_tables", selected = input$sources_visual)
+  }, ignoreInit = TRUE)
+  shiny::observeEvent(input$sources_tables, {
+    if (!setequal(input$sources_tables, input$sources_visual))
+      shiny::updateSelectInput(session, "sources_visual", selected = input$sources_tables)
+  }, ignoreInit = TRUE)
+
+  shiny::observeEvent(input$labels_visual, {
+    if (!setequal(input$labels_visual, input$labels_tables))
+      shiny::updateSelectInput(session, "labels_tables", selected = input$labels_visual)
+  }, ignoreInit = TRUE)
+  shiny::observeEvent(input$labels_tables, {
+    if (!setequal(input$labels_tables, input$labels_visual))
+      shiny::updateSelectInput(session, "labels_visual", selected = input$labels_tables)
+  }, ignoreInit = TRUE)
+
+  shiny::observeEvent(input$strings_visual, {
+    if (!setequal(input$strings_visual, input$strings_tables))
+      shiny::updateSelectInput(session, "strings_tables", selected = input$strings_visual)
+  }, ignoreInit = TRUE)
+  shiny::observeEvent(input$strings_tables, {
+    if (!setequal(input$strings_tables, input$strings_visual))
+      shiny::updateSelectInput(session, "strings_visual", selected = input$strings_tables)
+  }, ignoreInit = TRUE)
+  # ---- End filter sync ----
+
+  # Propagate file metadata form inputs to rv$upload_df.
+  # rv$df is NOT isolated here so the observer re-runs whenever files are added
+  # (registering the new inputs as reactive dependencies on the next pass).
+  # rv$upload_df writes stay isolated to avoid a feedback loop.
+  shiny::observe({
+    n_files <- if (is.data.frame(rv$df)) nrow(rv$df) else 0L
+    if (n_files == 0L) return()
+
+    for (i in seq_len(n_files)) {
+      src_val <- input[[paste0("file_source_", i)]]
+      lbl_val <- input[[paste0("file_label_",  i)]]
+      str_val <- input[[paste0("file_string_", i)]]
+
+      # Inputs don't exist yet if renderUI hasn't rendered them
+      if (is.null(src_val) || is.null(lbl_val) || is.null(str_val)) next
+
+      # Auto-clear source when label is switched to screened or final
+      if (lbl_val %in% c("screened", "final") && src_val != "") {
+        shiny::updateTextInput(session, paste0("file_source_", i), value = "")
+        src_val <- ""
       }
-      
-      # --- Validate indices against rv$df ---
-      if (target_row_df <= 0 || target_row_df > nrow(rv$df) ||
-          target_col_df <= 0 || target_col_df > ncol(rv$df)) {
-        warning(paste("Invalid row/column index received from DT edit. Row:",
-                      target_row_df, "Col:", target_col_df, ". Skipping this edit."))
-        next # Skip to the next edit
-      }
-      
-      # --- 1. Update rv$df (the summary table data) ---
-      # Use tryCatch to handle potential errors during assignment (e.g., type mismatch)
-      tryCatch({
-        rv$df[target_row_df, target_col_df] <- val
-      }, error = function(e) {
-        warning(paste("Error updating rv$df[", target_row_df, ",", target_col_df, "]:", e$message))
-        # Continue to the next edit even if this one failed
-        next
+
+      dp <- rv$df$file.datapath[i]
+
+      # Persist to file_meta so the form can restore values on re-render
+      rv$file_meta[[dp]] <- list(source = src_val, label = lbl_val, string = str_val)
+
+      # Propagate to upload_df (isolated to avoid making upload_df a dep of this observer)
+      shiny::isolate({
+        if (is.data.frame(rv$upload_df) && nrow(rv$upload_df) > 0 &&
+            "file.datapath" %in% names(rv$upload_df)) {
+          idx <- which(rv$upload_df$file.datapath == dp)
+          if (length(idx) > 0) {
+            rv$upload_df$cite_source[idx] <- src_val
+            rv$upload_df$cite_label[idx]  <- lbl_val
+            rv$upload_df$cite_string[idx] <- str_val
+          }
+        }
       })
-      
-      # --- 2. Propagate change to rv$upload_df (if applicable) ---
-      
-      # Get the file.datapath associated with the edited row in rv$df
-      # This assumes column 1 of rv$df is 'file.datapath'
-      if (df_col_names[1] != "file.datapath") {
-        warning("Column 1 of rv$df is not 'file.datapath'. Cannot link edits to rv$upload_df.")
-        next # Skip propagation for this edit
-      }
-      edited_datapath <- rv$df[[target_row_df, 1]]
-      
-      # Check if the datapath is valid for lookup
-      if (is.na(edited_datapath) || edited_datapath == "") {
-        # Don't warn every time, might be expected if datapath is missing
-        next # Cannot link without a valid datapath
-      }
-      
-      # Check if rv$upload_df is ready for update
-      if (nrow(rv$upload_df) == 0 || !"file.datapath" %in% names(rv$upload_df)) {
-        # Silently skip if detailed data isn't ready or lacks the key column
-        next
-      }
-      
-      # Find rows in rv$upload_df matching the datapath
-      target_rows_upload_idx <- which(rv$upload_df$file.datapath == edited_datapath)
-      
-      if (length(target_rows_upload_idx) == 0) {
-        # No matching rows found in detailed data, nothing to propagate
-        next
-      }
-      
-      # Determine the target column name in rv$upload_df based on the edited column in rv$df
-      col_name_df <- df_col_names[target_col_df] # Name of edited column in summary table
-      col_name_upload <- NULL # Target column name in detailed table
-      
-      # Define the mapping for propagation
-      if (col_name_df == "source") {
-        col_name_upload <- "cite_source"
-      } else if (col_name_df == "label") {
-        col_name_upload <- "cite_label"
-      } else if (col_name_df == "string") {
-        col_name_upload <- "cite_string"
-      } else {
-        # If the edited column (e.g., 'records') shouldn't be propagated, skip
-        next
-      }
-      
-      # Check if the target column exists in rv$upload_df
-      if (!col_name_upload %in% names(rv$upload_df)) {
-        warning(paste("Target column '", col_name_upload, "' not found in rv$upload_df. Cannot propagate edit."))
-        next
-      }
-      
-      # Perform the update on all matching rows in the detailed data frame
-      tryCatch({
-        rv$upload_df[target_rows_upload_idx, col_name_upload] <- val
-      }, error = function(e) {
-        warning(paste("Error updating rv$upload_df rows for datapath", edited_datapath,
-                      "Column:", col_name_upload, ":", e$message))
-        # Continue to the next edit even if propagation failed
-      })
-      
-    } # End FOR loop iterating through edits reported by DT
-    
+    }
   })
   
   # Deduplication tab -----------------
@@ -814,68 +1345,257 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$identify_dups, {
     if (nrow(rv$upload_df) == 0) {
       if (nrow(rv$latest_unique) > 0) {
-        shinyalert::shinyalert("Deduplications already complete",
-                               "You have reimported a dataset that has already been deduplicated. In that case, further deduplication is not possible here, but would need to take place outside the app.",
-                               type = "error"
-        )
+        show_toastr("Deduplication already complete",
+                    "You have reimported a dataset that has already been deduplicated. Further deduplication is not possible here.",
+                    type = "error")
       } else {
-        shinyalert::shinyalert("Data needed",
-                               "Please import your citations first.",
-                               type = "error"
-        )
+        show_toastr("Data needed", "Please import your citations first.", type = "error")
       }
       return()  # Early return to stop further execution
     }
-    
+
+    # Sync file metadata inputs into upload_df right before dedup runs.
+    # This is a guaranteed flush regardless of whether the reactive observer
+    # above has already propagated the latest changes.
+    if (is.data.frame(rv$df) && nrow(rv$df) > 0 && "file.datapath" %in% names(rv$upload_df)) {
+      for (.i in seq_len(nrow(rv$df))) {
+        .src <- input[[paste0("file_source_", .i)]]
+        .lbl <- input[[paste0("file_label_",  .i)]]
+        .str <- input[[paste0("file_string_", .i)]]
+        if (is.null(.src) || is.null(.lbl) || is.null(.str)) next
+        if (.lbl %in% c("screened", "final")) .src <- ""
+        .dp  <- rv$df$file.datapath[.i]
+        .idx <- which(rv$upload_df$file.datapath == .dp)
+        if (length(.idx) > 0) {
+          rv$upload_df$cite_source[.idx] <- .src
+          rv$upload_df$cite_label[.idx]  <- .lbl
+          rv$upload_df$cite_string[.idx] <- .str
+        }
+      }
+    }
+
     # Assign unique IDs to avoid issues with manual deduplication
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
     
     # Perform deduplication
-    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = TRUE)
+    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
     rv$pairs_to_check <- dedup_results$manual_dedup
     rv$latest_unique <- dedup_results$unique
     rv$n_unique <- count_unique(rv$latest_unique)  # Generate the n_unique data
     
     # Generate a summary message based on deduplication results
-    n_citations <- nrow(rv$upload_df)
-    n_unique_records <- nrow(rv$n_unique)  # Changed variable name to avoid conflict
+    n_citations    <- nrow(rv$upload_df)
+    n_unique_records <- nrow(rv$latest_unique)
+    n_duplicates_removed <- n_citations - n_unique_records
     n_pairs_manual <- nrow(rv$pairs_to_check)
-    
+
+    fmt <- function(x) format(x, big.mark = ",", scientific = FALSE)
     message <- if (n_pairs_manual > 0) {
-      paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. Head to the manual deduplication tab to check", n_pairs_manual, "potential duplicates."
+      paste0("Total citations uploaded: ", fmt(n_citations), "\n",
+             "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
+             "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
+             n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
+    } else {
+      paste0("Total citations uploaded: ", fmt(n_citations), "\n",
+             "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
+             "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
+             "No potential duplicates for manual review. You can proceed to the visualization tab.")
+    }
+
+    show_toastr("Auto-deduplication complete", message, type = "success")
+  })
+
+  # ---- Post-dedup summary card ----
+  output$dedup_summary_card <- shiny::renderUI({
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    shiny::req(is.data.frame(rv$upload_df)     && nrow(rv$upload_df)     > 0)
+
+    n_total  <- nrow(rv$upload_df)
+    n_unique <- nrow(rv$latest_unique)
+    n_dupes  <- n_total - n_unique
+    n_manual <- if (is.data.frame(rv$pairs_to_check)) nrow(rv$pairs_to_check) else 0L
+    fmt      <- function(x) format(x, big.mark = ",", scientific = FALSE)
+
+    # Per-source record counts (from pre-dedup data)
+    src_counts <- rv$upload_df %>%
+      dplyr::group_by(cite_source) %>%
+      dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+      dplyr::arrange(dplyr::desc(n))
+    max_n <- max(src_counts$n, 1L)
+
+    src_bars <- lapply(seq_len(nrow(src_counts)), function(i) {
+      src <- src_counts$cite_source[i]
+      cnt <- src_counts$n[i]
+      pct <- round(cnt / max_n * 100)
+      label <- if (nchar(src) > 28) paste0(substr(src, 1, 26), "…") else src
+      shiny::tags$div(
+        style = "margin-bottom: 8px;",
+        shiny::tags$div(
+          style = "display:flex; justify-content:space-between; margin-bottom:2px;",
+          shiny::tags$span(label,
+            style = "font-size:0.82em; color:#23395B; font-weight:500;"),
+          shiny::tags$span(fmt(cnt),
+            style = "font-size:0.82em; color:#6c757d;")
+        ),
+        shiny::tags$div(
+          style = "background:#e9ecef; border-radius:4px; height:8px;",
+          shiny::tags$div(
+            style = paste0("width:", pct, "%; height:8px;",
+                           "background:#008080; border-radius:4px;")
+          )
+        )
+      )
+    })
+
+    bottom_note <- if (n_manual > 0) {
+      shiny::div(
+        style = paste("margin-top:14px; padding:10px 14px;",
+                      "background:#fff8e1; border-left:3px solid #ffc107;",
+                      "border-radius:4px; font-size:0.85em; color:#856404;"),
+        shiny::tags$i(class = "fa fa-exclamation-triangle",
+                      style = "margin-right:6px;"),
+        sprintf("%s potential duplicate pair%s flagged — review on the Manual deduplication tab.",
+                fmt(n_manual), if (n_manual == 1L) "" else "s")
       )
     } else {
-      paste(
-        "From a total of", n_citations, "citations added, there are", n_unique_records, 
-        "unique citations. There are no potential duplicates for manual review. You can proceed to the visualization tab."
+      shiny::div(
+        style = paste("margin-top:14px; padding:10px 14px;",
+                      "background:#d4edda; border-left:3px solid #82D173;",
+                      "border-radius:4px; font-size:0.85em; color:#155724;"),
+        shiny::tags$i(class = "fa fa-check-circle", style = "margin-right:6px;"),
+        "No pairs flagged for manual review — you can proceed to Visualise."
       )
     }
-    
-    shinyalert::shinyalert("Auto-deduplication complete", message, type = "success")
+
+    shiny::div(
+      style = "margin-top:20px;",
+      shiny::h5("Deduplication Summary"),
+      # Metric tiles
+      shiny::fluidRow(
+        shiny::column(4,
+          shiny::div(
+            style = paste("background:#f8f9fa; border:1px solid #dee2e6;",
+                          "border-radius:8px; padding:14px; text-align:center;"),
+            shiny::div(style = "font-size:1.8em; font-weight:700; color:#495057;",
+                       fmt(n_total)),
+            shiny::div(style = "font-size:0.78em; color:#6c757d; margin-top:3px;",
+                       "Total uploaded")
+          )
+        ),
+        shiny::column(4,
+          shiny::div(
+            style = paste("background:#e8f5f5; border:1px solid #b2dfdb;",
+                          "border-radius:8px; padding:14px; text-align:center;"),
+            shiny::div(style = "font-size:1.8em; font-weight:700; color:#008080;",
+                       fmt(n_dupes)),
+            shiny::div(style = "font-size:0.78em; color:#6c757d; margin-top:3px;",
+                       "Duplicates removed")
+          )
+        ),
+        shiny::column(4,
+          shiny::div(
+            style = paste("background:#eef1f6; border:1px solid #c5cfe0;",
+                          "border-radius:8px; padding:14px; text-align:center;"),
+            shiny::div(style = "font-size:1.8em; font-weight:700; color:#23395B;",
+                       fmt(n_unique)),
+            shiny::div(style = "font-size:0.78em; color:#6c757d; margin-top:3px;",
+                       "Unique citations")
+          )
+        )
+      ),
+      shiny::br(),
+      # Per-source bars
+      shiny::div(
+        style = paste("background:white; border:1px solid #dee2e6;",
+                      "border-radius:8px; padding:14px;"),
+        shiny::tags$p(
+          style = "font-size:0.85em; font-weight:600; color:#23395B; margin-bottom:10px;",
+          shiny::tags$i(class = "fa fa-database", style = "margin-right:6px;"),
+          "Records per source"
+        ),
+        do.call(shiny::tagList, src_bars)
+      ),
+      bottom_note
+    )
   })
-  
+  # ---- End post-dedup summary card ----
+
   ## Manual deduplication -----
   
-  # Action button: remove manually selected duplicates [merged two segments into one]
-  # remove manually selected duplicates 
-  observeEvent(input$manualdedupsubmit,{
-    
-    rv$pairs_removed <- rv$pairs_to_check[input$manual_dedup_dt_rows_selected,]
-    rv$pairs_to_check <- rv$pairs_to_check[-input$manual_dedup_dt_rows_selected,]
-    
-    if(nrow(rv$pairs_removed) < 1){
-      shinyalert("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
+  # --- Card view helpers ---
+
+  get_pair_preferences <- function(pair_row_idx) {
+    key <- as.character(pair_row_idx)
+    if (!key %in% names(rv$field_preferences)) rv$field_preferences[[key]] <- list()
+    rv$field_preferences[[key]]
+  }
+
+  set_field_preference <- function(pair_row_idx, field, preference) {
+    key <- as.character(pair_row_idx)
+    if (!key %in% names(rv$field_preferences)) rv$field_preferences[[key]] <- list()
+    if (preference == "clear") {
+      rv$field_preferences[[key]][[field]] <- NULL
+      if (length(rv$field_preferences[[key]]) == 0) rv$field_preferences[[key]] <- NULL
+    } else {
+      rv$field_preferences[[key]][[field]] <- preference
+    }
+  }
+
+  apply_field_preferences <- function(merged_data, pairs_removed, original_unique) {
+    if (nrow(pairs_removed) == 0) return(merged_data)
+    id_col <- if ("record_id" %in% names(merged_data)) "record_id" else
+              if ("duplicate_id" %in% names(merged_data)) "duplicate_id" else {
+                warning("apply_field_preferences: no id column found"); return(merged_data)
+              }
+    for (i in seq_len(nrow(pairs_removed))) {
+      pair <- pairs_removed[i, ]
+      prefs_json <- if ("field_preferences" %in% names(pair)) pair$field_preferences else "{}"
+      if (is.na(prefs_json) || prefs_json == "") prefs_json <- "{}"
+      prefs <- tryCatch(jsonlite::fromJSON(prefs_json), error = function(e) list())
+      if (length(prefs) > 0) {
+        id1 <- if ("record_id1" %in% names(pair)) pair[["record_id1"]] else pair[["record_id.x"]]
+        id2 <- if ("record_id2" %in% names(pair)) pair[["record_id2"]] else pair[["record_id.y"]]
+        if (is.null(id1)) id1 <- NA; if (is.null(id2)) id2 <- NA
+        target_row <- which(merged_data[[id_col]] == id1)
+        if (length(target_row) == 0) target_row <- which(merged_data[[id_col]] == id2)
+        if (length(target_row) > 0) {
+          for (field in names(prefs)) {
+            source_col <- paste0(field, if (prefs[[field]] == "A") "1" else "2")
+            if (source_col %in% names(pair) && field %in% names(merged_data)) {
+              new_val <- pair[[source_col]]
+              if (is.null(new_val) || length(new_val) == 0) new_val <- NA
+              merged_data[target_row, field] <- new_val
+            }
+          }
+        }
+      }
+    }
+    merged_data
+  }
+
+  # --- manualdedupsubmit: handles both card and table selections ---
+  observeEvent(input$manualdedupsubmit, {
+    selected_indices <- unique(c(input$manual_dedup_dt_rows_selected, rv$selected_pairs_card))
+    if (length(selected_indices) == 0) {
+      show_toastr("Oops!", "You haven't selected any duplicate pairs to remove.", type = "error")
       return()
     }
-    
-    after <- dedup_citations_add_manual(rv$latest_unique,
-                                        additional_pairs = rv$pairs_removed)
-    
-    # update latest unique df reactive value
+    new_removed <- rv$pairs_to_check[selected_indices, ]
+    rv$pairs_to_check <- rv$pairs_to_check[-selected_indices, ]
+    new_removed$field_preferences <- NA_character_
+    for (i in seq_len(nrow(new_removed))) {
+      pair_idx <- if ("original_row_index" %in% names(new_removed)) new_removed$original_row_index[i] else selected_indices[i]
+      prefs <- get_pair_preferences(pair_idx)
+      if (length(prefs) > 0)
+        new_removed$field_preferences[i] <- jsonlite::toJSON(prefs, auto_unbox = TRUE)
+    }
+    rv$pairs_removed    <- dplyr::bind_rows(rv$pairs_removed, new_removed)
+    rv$selected_pairs_card <- integer(0)
+    after <- CiteSource::dedup_citations_add_manual(rv$latest_unique, additional_pairs = new_removed)
+    after <- apply_field_preferences(after, new_removed, rv$latest_unique)
     rv$latest_unique <- after
-    
+    show_toastr("Manual deduplication complete",
+                paste("Removed", nrow(new_removed), "duplicate pair(s)."), type = "success")
   })
   observe({
     all_cols <- names(rv$pairs_to_check)
@@ -901,20 +1621,273 @@ server <- function(input, output, session) {
     )
   })
   
-  # if rows selected in manual dedup, make buttom appear
+  # Show/hide Remove button based on any selection (table or card view)
   observe({
-    selected_rows <- input$manual_dedup_dt_rows_selected
-    if (length(selected_rows) > 0) {
-      shinyjs::show("manualdedupsubmit")  # Show the button when rows are selected
+    if (length(input$manual_dedup_dt_rows_selected) > 0 || length(rv$selected_pairs_card) > 0) {
+      shinyjs::show("manualdedupsubmit")
     } else {
-      shinyjs::hide("manualdedupsubmit")  # Hide the button when no rows are selected
+      shinyjs::hide("manualdedupsubmit")
     }
+  })
+
+  # --- Card view similarity helpers ---
+  calculate_similarity <- function(pair_row) {
+    fields <- list(
+      list(name="title", weight=0.30), list(name="author", weight=0.20),
+      list(name="doi",   weight=0.20), list(name="year",   weight=0.10),
+      list(name="journal", weight=0.10), list(name="abstract", weight=0.05),
+      list(name="pages", weight=0.025), list(name="volume", weight=0.025)
+    )
+    total_score <- 0; total_weight <- 0
+    for (f in fields) {
+      col1 <- paste0(f$name, "1"); col2 <- paste0(f$name, "2")
+      if (!col1 %in% names(pair_row) || !col2 %in% names(pair_row)) next
+      v1 <- as.character(pair_row[[col1]]); v2 <- as.character(pair_row[[col2]])
+      if (is.na(v1) || v1 == "NA") v1 <- ""
+      if (is.na(v2) || v2 == "NA") v2 <- ""
+      if (v1 == "" && v2 == "") next
+      score <- if (v1 == "" || v2 == "") { 0.2
+      } else if (tolower(trimws(v1)) == tolower(trimws(v2))) { 1.0
+      } else if (grepl(tolower(v1), tolower(v2), fixed=TRUE) || grepl(tolower(v2), tolower(v1), fixed=TRUE)) { 0.8
+      } else {
+        ch1 <- strsplit(tolower(v1), "")[[1]]; ch2 <- strsplit(tolower(v2), "")[[1]]
+        tot <- length(union(ch1, ch2))
+        if (tot > 0) length(intersect(ch1, ch2)) / tot else 0
+      }
+      total_score  <- total_score  + score * f$weight
+      total_weight <- total_weight + f$weight
+    }
+    if (total_weight > 0) round((total_score / total_weight) * 100) else 0L
+  }
+
+  compare_field <- function(v1, v2) {
+    if (is.na(v1) || v1 %in% c("","NA")) v1 <- ""
+    if (is.na(v2) || v2 %in% c("","NA")) v2 <- ""
+    if (v1 == "" && v2 == "") return(list(status="missing", val1="N/A", val2="N/A"))
+    if (v1 == "") return(list(status="missing", val1="N/A", val2=v2))
+    if (v2 == "") return(list(status="missing", val1=v1,    val2="N/A"))
+    if (tolower(trimws(v1)) == tolower(trimws(v2))) list(status="match", val1=v1, val2=v2)
+    else list(status="different", val1=v1, val2=v2)
+  }
+
+  build_field_with_preference <- function(field, val1, val2, comparison, is_record_a, pair_row_idx) {
+    selectable <- c("author","abstract","title","journal")
+    is_sel     <- field %in% selectable && comparison$status %in% c("different","missing")
+    prefs      <- get_pair_preferences(pair_row_idx)
+    cur_pref   <- prefs[[field]]
+    is_preferred <- !is.null(cur_pref) && length(cur_pref) > 0 &&
+                    isTRUE(if (is_record_a) cur_pref == "A" else cur_pref == "B")
+
+    # Determine which side is the ASySD default (longer non-missing value)
+    show_badge <- is_sel && comparison$status %in% c("different","missing")
+    is_default <- FALSE
+    if (show_badge) {
+      if (comparison$status == "missing") {
+        is_default <- if (is_record_a) comparison$val1 != "N/A" else comparison$val2 != "N/A"
+      } else {
+        l1 <- nchar(as.character(comparison$val1)); l2 <- nchar(as.character(comparison$val2))
+        is_default <- if (l1 > l2) is_record_a else if (l2 > l1) !is_record_a else is_record_a
+      }
+    }
+
+    field_val <- if (is_record_a) comparison$val1 else comparison$val2
+    btn_id    <- paste0("field_pref_", pair_row_idx, "_", field, "_", if (is_record_a) "A" else "B")
+    btn_style <- if (is_preferred)
+      "background-color:white;color:#2d8659;border:2px solid #2d8659;font-weight:bold;"
+      else "background-color:white;color:#333;border:1px solid #ddd;"
+
+    shiny::tags$div(
+      class = paste0("dedup-field ", comparison$status, if (is_preferred) " field-preferred" else ""),
+      style = if (is_preferred) "background-color:#f0f8ff;border-left:3px solid #008080;" else "",
+      shiny::tags$div(
+        class = "dedup-field-label",
+        shiny::tags$span(stringr::str_to_title(field), ":"),
+        if (is_sel) shiny::tagList(
+          shiny::actionButton(btn_id,
+            label = shiny::tagList(shiny::icon("check"), if (is_preferred) "Selected" else "Use This"),
+            class = paste0("btn-field-preference", if (is_preferred) " selected" else ""),
+            style = btn_style, size = "sm"),
+          if (show_badge && is_default)
+            shiny::tags$span(class="default-indicator", style="margin-left:6px;",
+                             shiny::icon("star"), "Default")
+        )
+      ),
+      shiny::tags$div(class = "dedup-field-value", field_val)
+    )
+  }
+
+  # Filtered & sorted pairs for card view
+  filtered_pairs <- shiny::reactive({
+    if (nrow(rv$pairs_to_check) == 0) return(data.frame())
+    pairs <- rv$pairs_to_check
+    min_sim   <- if (is.null(input$similarity_filter)) 0 else input$similarity_filter
+    sort_ord  <- if (is.null(input$similarity_sort))   "desc" else input$similarity_sort
+    scores <- sapply(seq_len(nrow(pairs)), function(i) calculate_similarity(pairs[i,]))
+    pairs$original_row_index <- seq_len(nrow(pairs))
+    pairs$similarity_score   <- scores
+    pairs <- pairs[scores >= min_sim, ]
+    if (nrow(pairs) > 0)
+      pairs <- pairs[order(if (sort_ord == "desc") -pairs$similarity_score else pairs$similarity_score), ]
+    pairs
+  })
+
+  # Navigation observers
+  shiny::observeEvent(input$dedup_prev_pair, {
+    if (rv$current_pair_index > 1) rv$current_pair_index <- rv$current_pair_index - 1L
+  })
+  shiny::observeEvent(input$dedup_next_pair, {
+    fp <- filtered_pairs()
+    if (nrow(fp) > 0 && rv$current_pair_index < nrow(fp))
+      rv$current_pair_index <- rv$current_pair_index + 1L
+  })
+  shiny::observeEvent(input$dedup_mark_duplicate, {
+    fp <- filtered_pairs()
+    if (nrow(fp) > 0 && rv$current_pair_index >= 1 && rv$current_pair_index <= nrow(fp)) {
+      pair_row <- fp[rv$current_pair_index, ]
+      row_idx  <- if ("original_row_index" %in% names(pair_row)) pair_row$original_row_index else rv$current_pair_index
+      rv$selected_pairs_card <- unique(c(rv$selected_pairs_card, row_idx))
+      if (rv$current_pair_index < nrow(fp)) rv$current_pair_index <- rv$current_pair_index + 1L
+    }
+  })
+  shiny::observeEvent(input$dedup_mark_not_duplicate, {
+    fp <- filtered_pairs()
+    if (nrow(fp) > 0 && rv$current_pair_index < nrow(fp))
+      rv$current_pair_index <- rv$current_pair_index + 1L
+  })
+  shiny::observeEvent(input$dedup_skip, {
+    fp <- filtered_pairs()
+    if (nrow(fp) > 0 && rv$current_pair_index < nrow(fp))
+      rv$current_pair_index <- rv$current_pair_index + 1L
+  })
+
+  # Field preference button handler
+  shiny::observeEvent(input$field_preference_click, {
+    click_data <- input$field_preference_click
+    shiny::req(click_data)
+    set_field_preference(click_data$pair_idx, click_data$field, click_data$record)
+    if (click_data$record != "clear") {
+      row_idx <- suppressWarnings(as.numeric(click_data$pair_idx))
+      if (!is.na(row_idx) && !row_idx %in% rv$selected_pairs_card) {
+        rv$selected_pairs_card <- unique(c(rv$selected_pairs_card, row_idx))
+        show_toastr("Pair Marked", "Pair automatically marked as duplicate.", type = "info")
+      }
+    }
+  })
+
+  # Card view progress indicator
+  output$dedup_progress <- shiny::renderUI({
+    fp <- filtered_pairs()
+    if (nrow(fp) == 0) return(shiny::div())
+    cur   <- rv$current_pair_index
+    total <- nrow(fp)
+    pct   <- round((cur / total) * 100)
+    shiny::div(
+      style = "padding-top:5px;",
+      shiny::tags$p(style="margin:0 0 5px;font-size:.95em;font-weight:bold;color:#23395B;",
+                    paste("Pair", cur, "of", total)),
+      shiny::tags$p(style="margin:0 0 8px;font-size:.85em;color:#666;",
+                    paste(length(rv$selected_pairs_card), "selected")),
+      shiny::tags$div(
+        style="width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-bottom:8px;",
+        shiny::tags$div(style=paste0("width:",pct,"%;height:100%;background:#008080;border-radius:3px;"))
+      ),
+      shiny::div(style="text-align:center;",
+        shinyWidgets::actionBttn("dedup_prev_pair", label="", icon=shiny::icon("chevron-left"),
+          style="jelly", color="primary", size="xs") %>% htmltools::tagAppendAttributes(style="margin-right:5px;"),
+        shinyWidgets::actionBttn("dedup_next_pair", label="", icon=shiny::icon("chevron-right"),
+          style="jelly", color="primary", size="xs")
+      )
+    )
+  })
+
+  # Card view main render
+  output$dedup_card_view <- shiny::renderUI({
+    fp <- filtered_pairs()
+    if (nrow(fp) == 0) {
+      return(shiny::wellPanel(style="text-align:center;padding:40px;",
+        shiny::tags$p(style="font-size:1.2em;color:#666;",
+          "No pairs match the current filter. Try lowering the minimum similarity score.")))
+    }
+    if (rv$current_pair_index < 1 || rv$current_pair_index > nrow(fp)) return(shiny::div())
+
+    pair         <- fp[rv$current_pair_index, ]
+    similarity   <- pair$similarity_score
+    sim_class    <- if (similarity >= 80) "dedup-similarity-high" else
+                    if (similarity >= 50) "dedup-similarity-medium" else "dedup-similarity-low"
+    fields_show  <- c("title","author","year","journal","doi","pages","volume","abstract","source","label")
+    pair_row_idx <- if ("original_row_index" %in% names(pair)) pair$original_row_index else rv$current_pair_index
+    is_selected  <- isTRUE(pair_row_idx %in% rv$selected_pairs_card)
+
+    make_card_fields <- function(is_a) {
+      lapply(fields_show, function(field) {
+        col1 <- paste0(field,"1"); col2 <- paste0(field,"2")
+        v1 <- if (col1 %in% names(pair)) pair[[col1]] else ""
+        v2 <- if (col2 %in% names(pair)) pair[[col2]] else ""
+        cmp <- compare_field(v1, v2)
+        build_field_with_preference(field, v1, v2, cmp, is_a, pair_row_idx)
+      })
+    }
+
+    shiny::fluidRow(shiny::column(12,
+      # Toolbar
+      shiny::wellPanel(
+        style="background:#f8f9fa;padding:12px;margin-bottom:15px;border:1px solid #dee2e6;",
+        shiny::fluidRow(
+          shiny::column(6,
+            shiny::tags$p(style="margin:0;font-size:.9em;",
+              shiny::tags$span(style="background:#d4edda;padding:3px 10px;border-radius:3px;margin-right:5px;","Green = Match"),
+              shiny::tags$span(style="background:#fff3cd;padding:3px 10px;border-radius:3px;margin-right:5px;","Yellow = Different"),
+              shiny::tags$span(style="background:#f8d7da;padding:3px 10px;border-radius:3px;","Red = Missing")
+            ),
+            shiny::tags$div(style="margin-top:8px;font-size:.85em;color:#555;font-style:italic;",
+              shiny::icon("info-circle"),
+              " Tip: clicking 'Use This' on a field automatically marks the pair as a duplicate.")
+          ),
+          shiny::column(6, shiny::div(style="text-align:right;",
+            shiny::tags$strong(style="margin-right:10px;color:#23395B;font-size:.9em;","Quick Actions:"),
+            shinyWidgets::actionBttn("dedup_mark_duplicate", "Duplicate",
+              icon=shiny::icon("check"), style="jelly", color="success", size="sm") %>%
+              htmltools::tagAppendAttributes(style="background:#82D173;margin-right:6px;"),
+            shinyWidgets::actionBttn("dedup_mark_not_duplicate", "Not Duplicate",
+              icon=shiny::icon("times"), style="jelly", color="danger", size="sm") %>%
+              htmltools::tagAppendAttributes(style="background:#dc3545;margin-right:6px;"),
+            shinyWidgets::actionBttn("dedup_skip", "Skip",
+              icon=shiny::icon("forward"), style="jelly", color="warning", size="sm")
+          ))
+        )
+      ),
+      # Similarity badge
+      shiny::div(class=paste("dedup-similarity-badge", sim_class),
+                 paste("Similarity:", similarity, "%")),
+      shiny::br(),
+      # Side-by-side cards
+      shiny::fluidRow(
+        shiny::column(6,
+          shiny::div(class="dedup-card record-a",
+            shiny::tags$h6(style="margin-top:0;margin-bottom:8px;color:#008080;",
+              shiny::icon("file-alt"), " Record A",
+              if (is_selected) shiny::tags$span(style="float:right;color:#82D173;",
+                shiny::icon("check-circle"), " Selected")),
+            make_card_fields(TRUE)
+          )
+        ),
+        shiny::column(6,
+          shiny::div(class="dedup-card record-b",
+            shiny::tags$h6(style="margin-top:0;margin-bottom:8px;color:#23395B;",
+              shiny::icon("file-alt"), " Record B",
+              if (is_selected) shiny::tags$span(style="float:right;color:#82D173;",
+                shiny::icon("check-circle"), " Selected")),
+            make_card_fields(FALSE)
+          )
+        )
+      )
+    ))
   })
   
   # Output: manual dedup datatable
   manual_dedup_data <- reactive({
     
-    data <- rv$pairs_to_check[,1:36]
+    data <- rv$pairs_to_check
     selected_cols <- input$manual_dedup_cols
     
     # Define the desired base order
@@ -963,16 +1936,19 @@ server <- function(input, output, session) {
     
     format_cols <- intersect(format_cols, colnames(data))
     shinyjs::useShinyjs()
-    
+
+    # DT targets require 0-based integer indices, not column names
+    hide_targets <- which(names(data) %in% columns2hide) - 1L
+
     datatable(data,
               options = list(
-                pageLength = 100, 
+                pageLength = 100,
                 info = FALSE,
                 lengthMenu = list(c(100, -1), c("100", "All")),
                 columnDefs =
                   list(
-                    list(visible = FALSE, 
-                         targets = columns2hide),
+                    list(visible = FALSE,
+                         targets = hide_targets),
                     list(
                       targets = "_all",
                       render = JS(
@@ -987,12 +1963,11 @@ server <- function(input, output, session) {
   })
   
   
-  # ASySD manual dedup pre text 
+  # Manual dedup pre-text
   output$Manual_pretext <- shiny::renderText({
-    
-    paste(nrow(rv$pairs_to_check), "pairs of citations require manual deduplication. Review the pairs in the table
-        below.")
-    
+    n <- nrow(rv$pairs_to_check)
+    if (n == 0) "No pairs require manual deduplication."
+    else paste(n, "pair(s) flagged for manual review. Use Card View (recommended) or Table View.")
   })
   
   
@@ -1172,8 +2147,100 @@ server <- function(input, output, session) {
     )
   }, striped = TRUE, hover = TRUE, width = "100%", sanitize.text.function = function(x) x)
   
+  # ---- Empty state helpers ----
+
+  # Renders a centered card explaining what's missing and how to fix it.
+  # btn_tab must match a navbarPage tab name (used by the stepper_nav observer).
+  .empty_state <- function(icon_name, heading, detail,
+                           btn_label = NULL, btn_tab = NULL) {
+    btn <- if (!is.null(btn_label) && !is.null(btn_tab)) {
+      shiny::tags$button(
+        class   = "btn btn-primary",
+        style   = "margin-top: 16px;",
+        onclick = sprintf(
+          "Shiny.setInputValue('stepper_nav','%s',{priority:'event'})", btn_tab
+        ),
+        shiny::tags$i(class = "fa fa-arrow-right",
+                      style = "margin-right: 6px;"),
+        btn_label
+      )
+    } else NULL
+
+    shiny::div(
+      style = "padding: 56px 24px; text-align: center; color: #6c757d;",
+      shiny::tags$i(
+        class = paste0("fa fa-", icon_name),
+        style = "font-size: 3em; color: #008080; margin-bottom: 16px; display: block;"
+      ),
+      shiny::h4(heading, style = "color: #23395B; margin-bottom: 8px;"),
+      shiny::p(detail,
+               style = "max-width: 380px; margin: 0 auto; font-size: 0.9em;"),
+      btn
+    )
+  }
+
+  output$visualise_empty_state <- shiny::renderUI({
+    has_dedup <- is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+    if (has_dedup) return(NULL)
+    has_data  <- (is.data.frame(rv$upload_df)    && nrow(rv$upload_df)    > 0) ||
+                 (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    if (!has_data)
+      .empty_state("upload", "No citations uploaded yet",
+                   "Upload your citation files first, then run deduplication to generate visualisations.",
+                   "Go to Upload", "File upload")
+    else
+      .empty_state("copy", "Deduplication not yet run",
+                   "Run automated deduplication to generate overlap visualisations.",
+                   "Go to Deduplicate", "Deduplicate")
+  })
+
+  output$tables_empty_state <- shiny::renderUI({
+    has_dedup <- is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+    if (has_dedup) return(NULL)
+    has_data  <- (is.data.frame(rv$upload_df)    && nrow(rv$upload_df)    > 0) ||
+                 (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    if (!has_data)
+      .empty_state("upload", "No citations uploaded yet",
+                   "Upload your citation files first, then run deduplication to generate summary tables.",
+                   "Go to Upload", "File upload")
+    else
+      .empty_state("copy", "Deduplication not yet run",
+                   "Run automated deduplication to generate summary tables.",
+                   "Go to Deduplicate", "Deduplicate")
+  })
+
+  output$export_empty_state <- shiny::renderUI({
+    has_dedup <- is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+    if (has_dedup) return(NULL)
+    has_data  <- (is.data.frame(rv$upload_df)    && nrow(rv$upload_df)    > 0) ||
+                 (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    if (!has_data)
+      .empty_state("upload", "No citations uploaded yet",
+                   "Upload your citation files first, then run deduplication before exporting.",
+                   "Go to Upload", "File upload")
+    else
+      .empty_state("copy", "Deduplication not yet run",
+                   "Run automated deduplication to make exports available.",
+                   "Go to Deduplicate", "Deduplicate")
+  })
+
+  # Show/hide the plot, table, and export panels based on whether dedup data exists
+  shiny::observe({
+    has_dedup <- is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+    if (has_dedup) {
+      shinyjs::show("visualise_tabs_wrapper")
+      shinyjs::show("tables_tabs_wrapper")
+      shinyjs::show("export_content_wrapper")
+    } else {
+      shinyjs::hide("visualise_tabs_wrapper")
+      shinyjs::hide("tables_tabs_wrapper")
+      shinyjs::hide("export_content_wrapper")
+    }
+  })
+  # ---- End empty state helpers ----
+
   #### Visualise tab ####
-  
+
   # Reactive expression to filter the data for visualization (used for Heatmap and Upset)
   unique_filtered_visual <- shiny::reactive({
     shiny::req(rv$latest_unique, is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
@@ -1231,46 +2298,13 @@ server <- function(input, output, session) {
     data_processed_cols <- data_candidate_rows %>%
       dplyr::mutate(
         cite_source = if ("cite_source" %in% names(.)) {
-          sapply(as.character(cite_source), function(cs_val) {
-            if (is.na(cs_val) || cs_val == "") return("") 
-            items <- stringr::str_split(cs_val, ",\\s*")[[1]]
-            items <- items[!is.na(items) & items != ""]
-            
-            items_to_keep <- if (length(sources_selected_in_input) > 0) {
-              items[items %in% sources_selected_in_input]
-            } else { # If no specific sources were selected by user, keep all original (valid) items for this row
-              items 
-            }
-            paste(unique(items_to_keep), collapse = ", ") # Ensure unique items are pasted
-          }, USE.NAMES = FALSE)
+          .filter_multivalue_col(cite_source, sources_selected_in_input)
         } else { NA_character_ },
-        
         cite_label = if ("cite_label" %in% names(.)) {
-          sapply(as.character(cite_label), function(cl_val) {
-            if (is.na(cl_val) || cl_val == "") return("")
-            items <- stringr::str_split(cl_val, ",\\s*")[[1]]
-            items <- items[!is.na(items) & items != ""]
-            items_to_keep <- if (length(labels_selected_in_input) > 0) {
-              items[items %in% labels_selected_in_input]
-            } else {
-              items
-            }
-            paste(unique(items_to_keep), collapse = ", ")
-          }, USE.NAMES = FALSE)
+          .filter_multivalue_col(cite_label, labels_selected_in_input)
         } else { NA_character_ },
-        
         cite_string = if ("cite_string" %in% names(.)) {
-          sapply(as.character(cite_string), function(cstr_val) {
-            if (is.na(cstr_val) || cstr_val == "") return("")
-            items <- stringr::str_split(cstr_val, ",\\s*")[[1]]
-            items <- items[!is.na(items) & items != ""]
-            items_to_keep <- if (length(strings_selected_in_input) > 0) {
-              items[items %in% strings_selected_in_input]
-            } else {
-              items
-            }
-            paste(unique(items_to_keep), collapse = ", ")
-          }, USE.NAMES = FALSE)
+          .filter_multivalue_col(cite_string, strings_selected_in_input)
         } else { NA_character_ }
       )
     
@@ -1306,25 +2340,25 @@ server <- function(input, output, session) {
   unique_separated_phase <- shiny::reactive({
     # Require rv$latest_unique to have data
     shiny::req(nrow(rv$latest_unique) > 0)
-    
-    # Get filter inputs
+
+    # Get filter inputs (sources and labels from the Visualise sidebar)
     sources_filt <- input$sources_visual
     sources_filt <- ifelse(sources_filt == "_blank_", "unknown", sources_filt)
     labels_filt <- input$labels_visual
     labels_filt <- ifelse(labels_filt == "_blank_", "unknown", labels_filt)
-    
+
     # Start with the base unique data, select columns needed
     df <- rv$latest_unique %>%
-      dplyr::select(duplicate_id, cite_source, cite_label) # Add record_ids if needed
-    
+      dplyr::select(duplicate_id, cite_source, cite_label)
+
     # Separate rows for source and label
     df_long <- df %>%
       tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
       tidyr::separate_rows(cite_label, sep = ",\\s*") %>%
-      dplyr::filter(!is.na(cite_source) & cite_source != "", # Ensure no blank/NA sources/labels after separation
+      dplyr::filter(!is.na(cite_source) & cite_source != "",
                     !is.na(cite_label) & cite_label != "")
-    
-    # Apply filtering based on selected sources and labels for the plot
+
+    # Apply source and label filters
     df_filtered <- df_long %>%
       dplyr::filter(length(sources_filt) == 0 | cite_source %in% sources_filt) %>%
       dplyr::filter(length(labels_filt) == 0 | cite_label %in% labels_filt)
@@ -1360,23 +2394,37 @@ server <- function(input, output, session) {
   })# End Phase Plot Reactive
   
   
-  # Heatmap plot (uses unique_filtered_visual)
-  plotHeat <- shiny::reactive({
-    # Add check if data is available
+  # Shared reactive: compute compare_sources once for both heatmap and upset
+  source_comparison_data <- shiny::reactive({
     data_vis <- unique_filtered_visual()
     shiny::req(nrow(data_vis) > 0)
-    source_comparison <- compare_sources(data_vis, comp_type = input$comp_type)
-    plot_source_overlap_heatmap(source_comparison, cells = stringr::str_sub(input$comp_type, end = -2))
+    compare_sources(data_vis, comp_type = input$comp_type)
   })
-  
+
+  # Heatmap plot (uses shared source_comparison_data)
+  plotHeat <- shiny::reactive({
+    source_comparison <- source_comparison_data()
+    shiny::req(!is.null(source_comparison))
+    plot_source_overlap_heatmap(
+      source_comparison,
+      cells     = stringr::str_sub(input$comp_type, end = -2),
+      log_scale = isTRUE(input$heatmap_log_scale)
+    )
+  })
+
+  # Dynamic height: allocate ~55px per source, min 450px
+  output$heatmapUI <- shiny::renderUI({
+    shiny::req(nrow(unique_filtered_visual()) > 0, cancelOutput = TRUE)
+    data <- source_comparison_data()
+    shiny::req(!is.null(data), cancelOutput = TRUE)
+    n <- data |>
+      dplyr::select(tidyselect::matches(paste0(stringr::str_sub(input$comp_type, end = -2), "__"))) |>
+      ncol()
+    plotly::plotlyOutput("plotgraph1", height = paste0(max(450, n * 55), "px"))
+  })
+
   output$plotgraph1 <- plotly::renderPlotly({
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-                             "Please import and deduplicate your citations first.",
-                             type = "error"
-      )
-      shiny::req(FALSE)
-    }
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
     # Add check specific to filtered data for this plot
     shiny::req(nrow(unique_filtered_visual()) > 0, cancelOutput = TRUE)
     print(plotHeat())
@@ -1403,23 +2451,32 @@ server <- function(input, output, session) {
     }
   )
   
-  # Upset plot (uses unique_filtered_visual)
-  plotUpset <- shiny::reactive({
-    # Add check if data is available
-    data_vis <- unique_filtered_visual()
-    shiny::req(nrow(data_vis) > 0)
-    source_comparison <- compare_sources(data_vis, comp_type = input$comp_type)
-    plot_source_overlap_upset(source_comparison, groups = stringr::str_sub(input$comp_type, end = -2), decreasing = c(TRUE, TRUE))
+  # Keep both nsets sliders' max in sync with the actual number of groups in the data
+  shiny::observe({
+    data <- source_comparison_data()
+    shiny::req(!is.null(data))
+    n_groups <- data |>
+      dplyr::select(tidyselect::matches(paste0(stringr::str_sub(input$comp_type, end = -2), "__"))) |>
+      ncol()
+    shiny::updateSliderInput(session, "upset_nsets",
+      max = n_groups, value = min(input$upset_nsets, n_groups))
   })
+
+  # Upset plot — only re-renders on Apply or when the underlying data changes
+  plotUpset <- shiny::reactive({
+    source_comparison <- source_comparison_data()
+    shiny::req(!is.null(source_comparison))
+    plot_source_overlap_upset(
+      source_comparison,
+      groups      = stringr::str_sub(input$comp_type, end = -2),
+      decreasing  = c(TRUE, TRUE),
+      nsets       = input$upset_nsets,
+      nintersects = input$upset_nintersects
+    )
+  }) |> shiny::bindEvent(input$apply_upset, source_comparison_data(), ignoreNULL = FALSE)
   
   output$plotgraph2 <- shiny::renderPlot({
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-                             "Please import and deduplicate your citations first.",
-                             type = "error"
-      )
-      shiny::req(FALSE)
-    }
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
     # Add check specific to filtered data for this plot
     shiny::req(nrow(unique_filtered_visual()) > 0, cancelOutput = TRUE)
     print(plotUpset())
@@ -1466,14 +2523,18 @@ server <- function(input, output, session) {
   
   # Phase plot output
   output$phasePlot <- shiny::renderPlot({
-    # Initial check if any data has been processed
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-                             "Please import and deduplicate your citations first.",
-                             type = "error")
-      shiny::req(FALSE, cancelOutput = TRUE)
-    }
-    
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    shiny::validate(
+      shiny::need(
+        any(stringr::str_detect(tolower(rv$latest_unique$cite_label), "screened|final")),
+        paste0(
+          "No screened or final labels found.\n\n",
+          "To show phase analysis: in the Import tab, set files to 'screened' or ",
+          "'final' labels, then re-run deduplication."
+        )
+      )
+    )
+
     # Use the reactive data specifically prepared for this plot
     plot_data <- unique_separated_phase()
     
@@ -1533,15 +2594,8 @@ server <- function(input, output, session) {
   
   #### Table tab ####
   
-  # Event reactive for filtering the data used in the record table and summary table
-  unique_filtered_table <- shiny::eventReactive(
-    c(input$generateRecordTable,
-      input$sources_tables, 
-      input$strings_tables, 
-      input$labels_tables,
-      input$generateDetailedRecordTable,
-      input$generatePrecisionTable),
-    {
+  # Reactive for filtering the data used in the record table and summary table
+  unique_filtered_table <- shiny::reactive({
       shiny::req(rv$latest_unique, is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
       
       data_in <- rv$latest_unique
@@ -1603,50 +2657,15 @@ server <- function(input, output, session) {
       data_processed_cols <- data_candidate_rows %>%
         dplyr::mutate(
           cite_source = if ("cite_source" %in% names(.)) {
-            sapply(as.character(cite_source), function(cs_val) {
-              if (is.na(cs_val) || cs_val == "") return("") 
-              items <- stringr::str_split(cs_val, ",\\s*")[[1]]
-              items <- items[!is.na(items) & items != ""] # Clean items
-              
-              # If user selected specific sources for tables, filter by that selection
-              # Otherwise (if input$sources_tables was empty), keep all original items for this record
-              items_to_keep <- if (length(sources_sel_tbl) > 0) {
-                items[items %in% sources_sel_tbl]
-              } else {
-                items 
-              }
-              paste(unique(items_to_keep), collapse = ", ") # Ensure unique items are pasted
-            }, USE.NAMES = FALSE) # Prevent sapply from naming the vector
-          } else { NA_character_ }, # Column didn't exist
-          
-          cite_label = if ("cite_label" %in% names(.)) {
-            sapply(as.character(cite_label), function(cl_val) {
-              if (is.na(cl_val) || cl_val == "") return("")
-              items <- stringr::str_split(cl_val, ",\\s*")[[1]]
-              items <- items[!is.na(items) & items != ""]
-              items_to_keep <- if (length(labels_sel_tbl) > 0) {
-                items[items %in% labels_sel_tbl]
-              } else {
-                items
-              }
-              paste(unique(items_to_keep), collapse = ", ")
-            }, USE.NAMES = FALSE)
+            .filter_multivalue_col(cite_source, sources_sel_tbl)
           } else { NA_character_ },
-          
+          cite_label = if ("cite_label" %in% names(.)) {
+            .filter_multivalue_col(cite_label, labels_sel_tbl)
+          } else { NA_character_ },
           cite_string = if ("cite_string" %in% names(.)) {
-            sapply(as.character(cite_string), function(cstr_val) {
-              if (is.na(cstr_val) || cstr_val == "") return("")
-              items <- stringr::str_split(cstr_val, ",\\s*")[[1]]
-              items <- items[!is.na(items) & items != ""]
-              items_to_keep <- if (length(strings_sel_tbl) > 0) {
-                items[items %in% strings_sel_tbl]
-              } else {
-                items
-              }
-              paste(unique(items_to_keep), collapse = ", ")
-            }, USE.NAMES = FALSE)
+            .filter_multivalue_col(cite_string, strings_sel_tbl)
           } else { NA_character_ }
-        ) # End mutate
+        )
       
       # Step 3: Filter out rows that might have become "empty" in all key identifier fields
       # (cite_source, cite_label, cite_string) after the transformation.
@@ -1665,8 +2684,7 @@ server <- function(input, output, session) {
       }
       
       return(data_final)
-    } # End eventReactive logic
-  ) # End unique_filtered_table
+  }) # End unique_filtered_table
   
   detailed_table_data <- reactive({
     # Require base data to proceed
@@ -1687,12 +2705,18 @@ server <- function(input, output, session) {
     strings_filt_cleaned <- strings_filt[!is.na(strings_filt) & strings_filt != ""]
     strings_pattern <- if (length(strings_filt_cleaned) > 0) paste0("\\b(", paste(strings_filt_cleaned, collapse = "|"), ")\\b") else NULL
     
-    # Apply initial filters for labels and strings only
-    df_filtered_wide <- rv$latest_unique %>%
-      dplyr::filter(
-        (is.null(labels_pattern) | stringr::str_detect(as.character(cite_label), labels_pattern)),
-        (is.null(strings_pattern) | stringr::str_detect(as.character(cite_string), strings_pattern))
-      )
+    # Apply initial filters for labels and strings only.
+    # Filters are applied conditionally to avoid passing NULL to str_detect
+    # (R's | does not short-circuit, so is.null(p) | str_detect(..., p) errors when p is NULL).
+    df_filtered_wide <- rv$latest_unique
+    if (!is.null(labels_pattern)) {
+      df_filtered_wide <- df_filtered_wide %>%
+        dplyr::filter(stringr::str_detect(as.character(cite_label), labels_pattern))
+    }
+    if (!is.null(strings_pattern)) {
+      df_filtered_wide <- df_filtered_wide %>%
+        dplyr::filter(stringr::str_detect(as.character(cite_string), strings_pattern))
+    }
     
     empty_result_df <- tibble::tibble( # Define structure for empty returns
       Source = character(), `Records Imported` = integer(), `Distinct Records` = integer(),
@@ -1702,12 +2726,12 @@ server <- function(input, output, session) {
     
     if (nrow(df_filtered_wide) == 0) { return(empty_result_df) }
     
-    # Separate cite_source column
+    # Separate cite_source column; exclude "unknown" (records from screened/final phases)
     df_long_source <- df_filtered_wide %>%
-      dplyr::select(duplicate_id, cite_source, cite_label, cite_string) %>% 
+      dplyr::select(duplicate_id, cite_source, cite_label, cite_string) %>%
       tidyr::separate_rows(cite_source, sep = ",\\s*") %>%
       dplyr::mutate(cite_source = trimws(cite_source)) %>%
-      dplyr::filter(!is.na(cite_source) & cite_source != "")
+      dplyr::filter(!is.na(cite_source) & cite_source != "" & cite_source != "unknown")
     
     # Apply source filter
     sources_filt_cleaned <- sources_filt[!is.na(sources_filt) & sources_filt != ""]
@@ -1799,53 +2823,41 @@ server <- function(input, output, session) {
   
   # Rendering the detailed record table
   output$detailedRecordTab <- gt::render_gt({
-    # Check if base data is loaded
-    if (!is.data.frame(rv$latest_unique) || nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed", "Please import and deduplicate your citations first.", type = "error")
-      shiny::req(FALSE) # Stop execution
-    }
-    # Get the data from the new reactive
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
     table_data <- detailed_table_data()
-    # Check if the reactive returned any data (e.g., after filtering)
     shiny::validate(
       shiny::need(is.data.frame(table_data) && nrow(table_data) > 0,
                   "No records match the current filter selections for the Detailed Record Table.")
     )
-    # Pass the prepared data frame to the formatting function
     create_detailed_record_table(table_data)
-    # Bind to the same button trigger
-  }) %>% shiny::bindEvent(input$generateDetailedRecordTable)
+  })
   
   # Rendering the precision and sensitivity table ----
   output$summaryPrecTab <- gt::render_gt({
-    
+    shiny::validate(
+      shiny::need(
+        is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0 &&
+          any(stringr::str_detect(tolower(rv$latest_unique$cite_label), "final")),
+        paste0(
+          "No records labeled 'final' found.\n\n",
+          "To use this table: in the Import tab, set at least one file's label ",
+          "to 'final', then re-run deduplication."
+        )
+      )
+    )
     unique_citations <- unique_filtered_table()
-    
-    # The table is only for phase comparison, include "final" in labels for comparison
-    if (!any(stringr::str_detect(tolower(unique_citations$cite_label), "final"))) {
-      shiny::req(FALSE)
-    }
-    
-    unique_citations <- unique_filtered_table()
-    phase_counts <- calculate_phase_records(unique_citations, n_unique, "cite_source")
+    phase_counts <- calculate_phase_records(unique_citations, rv$n_unique, "cite_source")
     create_precision_sensitivity_table(phase_counts)
-  }) %>% shiny::bindEvent(input$generatePrecisionTable)
+  })
   
   
   # Rendering the record-level table ----
   output$reviewTab <- DT::renderDataTable({
     
-    if (nrow(rv$latest_unique) == 0) {
-      shinyalert::shinyalert("Data needed",
-                             "Please import and deduplicate your citations first.",
-                             type = "error"
-      )
-      shiny::req(FALSE)
-    }
-    
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
     citations <- unique_filtered_table()
     citations$source <- citations$cite_source
-    record_level_table(citations = citations, return = "DT")
+    record_level_table(citations = citations, include = c("sources", "labels"), return = "DT")
   }) %>% shiny::bindEvent(input$generateRecordTable)
   
   
@@ -1881,6 +2893,76 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       export_ris(rv$latest_unique, file)
+    }
+  )
+
+  # Export hub — plot downloads (mirror the Visualise tab download handlers)
+  output$export_heatplot <- shiny::downloadHandler(
+    filename = function() {
+      paste("heatmap-overlap-", Sys.Date(), ".png", sep = "")
+    },
+    content = function(file) {
+      shiny::req(nrow(unique_filtered_visual()) > 0)
+      heat_plot_obj <- plotHeat()
+      if (!is.null(heat_plot_obj)) {
+        ggplot2::ggsave(filename = file, plot = heat_plot_obj,
+                        device = "png", width = 10, height = 8, dpi = 300)
+      } else {
+        stop("Failed to generate heatmap plot for download.")
+      }
+    }
+  )
+
+  output$export_upsetplot <- shiny::downloadHandler(
+    filename = function() {
+      paste("upset-overlap-", Sys.Date(), ".png", sep = "")
+    },
+    content = function(file) {
+      shiny::req(nrow(unique_filtered_visual()) > 0)
+      upset_plot_obj <- plotUpset()
+      if (!is.null(upset_plot_obj)) {
+        grDevices::png(file, width = 1200, height = 800, res = 100)
+        print(upset_plot_obj)
+        grDevices::dev.off()
+      } else {
+        stop("Failed to generate upset plot for download.")
+      }
+    }
+  )
+
+  output$export_phaseplot <- shiny::downloadHandler(
+    filename = function() {
+      paste("phase-analysis-", Sys.Date(), ".png", sep = "")
+    },
+    content = function(file) {
+      plot_data <- unique_separated_phase()
+      if (nrow(plot_data) == 0) stop("No data available to plot based on current filters.")
+      phase_plot_obj <- CiteSource::plot_contributions(
+        data            = plot_data,
+        center          = TRUE,
+        bar_order       = c("search", "screened", "final"),
+        color_order     = c("unique", "duplicated"),
+        totals_in_legend = FALSE
+      )
+      if (!is.null(phase_plot_obj)) {
+        grDevices::png(file, width = 1000, height = 700, res = 100)
+        print(phase_plot_obj)
+        grDevices::dev.off()
+      } else {
+        stop("Failed to generate phase analysis plot for download.")
+      }
+    }
+  )
+
+  # Export hub — detailed table download (mirrors Tables tab filter state)
+  output$exportDetailedTable <- shiny::downloadHandler(
+    filename = function() {
+      paste("detailed-records-", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      tbl <- detailed_table_data()
+      shiny::req(!is.null(tbl) && nrow(tbl) > 0)
+      write.csv(tbl, file, row.names = FALSE)
     }
   )
 }

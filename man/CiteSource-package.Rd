@@ -9,7 +9,7 @@
 The CiteSource package supports evidence aggregation by helping with the
 processing of results of various searches in different sources. It allows to
 deduplicate results while retaining meta-data on where those results were
-found and then enables users to compare the contribution of different sources
+found and then enables users to compare the contribution of different sources.
 }
 \seealso{
 Useful links:
@@ -24,6 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Trevor Riley \email{trevor.riley@noaa.gov} (\href{https://orcid.org/0000-0002-6834-9802}{ORCID})
   \item Kaitlyn Hair \email{kaitlyn.hair@ed.ac.uk} (\href{https://orcid.org/0000-0003-0180-7343}{ORCID})
   \item Lukas Wallrich \email{lukas.wallrich@gmail.com} (\href{https://orcid.org/0000-0003-2121-5177}{ORCID})
   \item Matthew Grainger \email{matthewjamesgrainger@gmail.com} (\href{https://orcid.org/0000-0001-8426-6495}{ORCID})
@@ -36,6 +37,8 @@ Other contributors:
 \itemize{
   \item Martin Westgate (Author of included synthesisr fragments) [copyright holder]
   \item Eliza Grames (Author of included synthesisr fragments) [copyright holder]
+  \item Kaitlyn Hair (Author of included ASySD deduplication code) [copyright holder]
+  \item CAMARADES Group (Authors of ASySD (github.com/camaradesuk/ASySD)) [copyright holder]
 }
 
 }

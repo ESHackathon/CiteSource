@@ -1,107 +1,76 @@
-## CiteSource Use Cases: Overview
+## CiteSource Use Cases
 
 <img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
 
-CiteSource provides a suite of tools to support data-driven decision-making throughout the evidence synthesis process. Its applications generally fall into two main categories: **Optimizing Search Strategies** (typically during protocol development and iterative searching) and **Analyzing Search Impact** (often after screening is complete, for reporting and methodological insights). Additional applications extend to training and resource management.
+CiteSource supports two broad phases of evidence synthesis work: **optimizing search strategies** during development, and **analyzing search impact** after screening. It also has useful applications in training and library management.
 
 ---
 
 ### I. Optimizing Search Strategies
 
-CiteSource enables researchers to move beyond reliance on experience or potentially outdated guidance by providing empirical data specific to their project *during* the search development phase.
+These use cases apply during the search development phase — before you've committed to a final strategy. The common thread is using empirical data from your own search results rather than relying on general guidance or experience alone.
+
+#### Source & Method Selection
+
+Which databases are actually worth searching for your topic? CiteSource answers this empirically. Upload pilot searches from candidate databases, tag each with `cite_source`, and run deduplication. The overlap plots show which sources retrieve largely the same records (redundant) versus which contribute meaningfully unique citations. This turns source selection from a judgment call into a data-driven decision.
+
+**Key tools:** Heatmap, Upset Plot, Record Summary Table
+
+#### Search String Development
+
+Testing variations in search strings — different terms, proximity operators, Boolean logic, field codes — is inherently iterative. CiteSource compresses that cycle. Tag results from each variation using `cite_source` and `cite_string`, deduplicate, and visualize what each version adds or removes. You can assess the impact of a single modification in minutes rather than days.
+
+**Key tools:** Upset Plot, Record Level Table
+
+#### Validation Against a Reference Set
+
+Upload a known-relevant set of articles alongside your search results, tagging the reference set with a distinct `cite_source` name (e.g., `"benchmark"` or `"reference_set"`) and the `search` label — the same label used for your database results. After deduplication, the overlap between your results and the reference set tells you quantitatively how well your strategy is performing — and which strings or sources are missing key articles.
+
+**Key tools:** Upset Plot, Record Level Table
 
 <details>
-  <summary><strong>Information Source/Method Selection & Optimization</strong></summary>
+<summary><strong>A note on benchmark sets</strong></summary>
 
-> Choosing the most effective and efficient set of databases, platforms, or indexes (e.g., Web of Science, Scopus, ASFA, Dimensions, OATD) can be challenging, especially for interdisciplinary topics where overlap and unique contributions are unknown. CiteSource addresses this by allowing users to empirically compare potential sources *before* committing significant time. After uploading initial search results and tagging them using the `cite_source` field (e.g., `Web of Science`, `Scopus`), deduplication the overlapping and unique records across sources and methods. This analysis enables informed, data-driven decisions about which sources and methods provide the best return on investment and helps optimize the selection, potentially reducing redundancy. Key CiteSource features used include:
-> * Tagging records with `cite_source` metadata.
-> * Robust internal and external deduplication (using `ASySD`).
-> * Visualization of overlap using interactive **Heatmaps** and **Upset Plots**.
-> * Quick analysis of individual citations using the interactive **Record Level Table**
+> Benchmark sets should be used carefully. If your benchmark was assembled from the same databases you're searching, sensitivity estimates will be optimistic. They work best when the benchmark comes from an independent source — a previously published review, expert consultation, or citation chaining — rather than from the search you're evaluating.
 
 </details>
 
-<details>
-  <summary><strong>Search String Development & Optimization</strong></summary>
+#### Efficient Iterative Testing
 
-> Developing effective search strings is an iterative process involving testing terms, syntax variations, Boolean logic, proximity operators, field codes, etc. Comparing the impact of these subtle changes across potentially multiple databases is time-consuming. CiteSource assists by streamlining the analysis of string effectiveness. Users can upload results from different string variations, tag them using `cite_source` and `cite_string` (e.g., `String_1`, `String_2_proximity`), and visualize the impact on retrieval after deduplication. This allows for rapid assessment of how changes affect results, speeding up refinement for an optimal balance of sensitivity and precision and helping identify errors in logic or syntax. CiteSource facilitates this via:
-> * Tagging result sets with `cite_source` and `cite_string` metadata.
-> * Deduplication to compare results accurately.
-> * Visualization of unique/overlapping records retrieved by different strings using **Upset Plots**.
-> * Quick examination of individual citations using the interactive **Record Level Table**.
-
-</details>
-
-<details>
-  <summary><strong>Benchmark Testing</strong></summary>
-
-> Ensuring a search strategy retrieves known, key relevant articles (benchmark or reference articles) is crucial for assessing sensitivity. CiteSource facilitates this by comparing search results against a predefined benchmark set. After uploading search results and the benchmark set (tagging each appropriately using `cite_source`, `cite_string`, and `cite_label`), deduplication allows for direct comparison. This provides a quantitative assessment of how well different strings or sources capture the benchmark articles, highlighting potential weaknesses or indexing gaps. While benchmark sets should be used cautiously due to potential bias, this process aids refinement and is useful for updates or developing standardized protocols. Key functionalities include:
-> * Tagging benchmark sets and search results distinctly using `cite_source` and `cite_label`.
-> * Deduplication to identify matches between search results and the benchmark set.
-> * Using **Upset Plots** to visualize captured vs. missed benchmark articles across different strings/sources.
-> * Investigating specific missed articles using the interactive **Record Level Table**.
-
-</details>
-
-<details>
-  <summary><strong>Efficient Iterative Testing (Overarching Benefit)</strong></summary>
-
-> The entire process of testing variations in sources, strings, and methods is inherently iterative. CiteSource significantly compresses this cycle by providing rapid analysis and visualization (**Heatmaps**, **Upset Plots**, **Summary Tables**) immediately after deduplication. This drastic reduction in the time needed to evaluate the impact of each iteration saves researcher time and allows for more thorough testing and validation, leading to a more optimized and well-documented strategy.
-
-</details>
+The value of CiteSource compounds across multiple iterations. Because each round of analysis takes minutes rather than hours, you can test more variations, validate more thoroughly, and document every decision with quantitative support. This is especially valuable when developing a protocol for a multi-year systematic review or when building a reusable search template.
 
 ---
 
-### II. Analyzing Search Impact (Post-Screening / Reporting)
+### II. Analyzing Search Impact (Post-Screening)
 
-After screening is complete, CiteSource analyzes the *actual* contribution of different search components to the final set of included studies and enhances reporting.
+These use cases apply after screening is complete, when you want to understand and report on what your search actually achieved.
 
-<details>
-  <summary><strong>Analyzing Information Source & Search Method Contribution</strong></summary>
+#### Source & Method Contribution Analysis
 
-> Understanding which sources or methods were most effective in identifying the studies ultimately included in the synthesis is crucial for methodological reflection and reporting. CiteSource enables this analysis by tracking records through screening phases. By tagging records with `cite_source`/`cite_string` and progressively updating the `cite_label` (`search` -> `screened` -> `final`), users can quantify the "true impact" or ROI of each component. This identifies high-yield sources/methods versus those contributing mostly irrelevant records, providing valuable data for reporting and future strategy refinement. Analysis tools include:
-> * Tracking records using `cite_source`, `cite_string`, and `cite_label` tags.
-> * Visualizing the flow through screening stages with the **Bar Chart (Phase Analysis Plot)**.
-> * Quantifying performance using the **Precision/Sensitivity Table** (calculating precision and recall against the `final` set).
-> * Examining contributions at each stage using the **Record Summary Table**.
+Which databases or methods found the studies that actually mattered? By tagging records with `cite_source`/`cite_string` and progressively updating `cite_label` as records move through screening (`search` → `screened` → `final`), CiteSource quantifies the contribution of each search component. This distinguishes high-yield sources from those that retrieved large volumes of irrelevant records — valuable for reporting, justifying methodology, and informing future searches on similar topics.
 
-</details>
+**Key tools:** Phase Analysis Plot, Precision/Sensitivity Table, Record Summary Table
 
-<details>
-  <summary><strong>Enhanced Reporting & Transparency</strong></summary>
+#### Enhanced Reporting & Transparency
 
-> Reporting guidelines like PRISMA require transparent and detailed documentation of the search process. CiteSource directly supports this by generating clear outputs and ensuring provenance is maintained. The plots and tables offer visual and quantitative summaries of the search process, outcomes, and source/method contributions. Furthermore, exporting the final dataset embeds the custom metadata tags (`cite_source`, `cite_label`, `cite_string`) into standard bibliographic fields (e.g., C1, C2, C7, C8, DB in `.ris` format), providing a clear, reproducible audit trail. This enhances transparency and allows reviewers/readers to scrutinize the methodology effectively. Key outputs for reporting include:
-> * Ready-to-use **plots** (**Heatmaps**, **Upset Plots**, **Bar Charts**).
-> * Summary **tables** (**Initial Record**, **Record Summary**, **Precision/Sensitivity**, **Record Level**).
-> * Exported datasets (`.csv`, `.ris`, `.bib`) with embedded provenance metadata.
+CiteSource directly supports PRISMA-aligned reporting. Its plots and tables are ready to drop into publications or protocols. Exported files embed `cite_source`, `cite_label`, and `cite_string` directly into standard bibliographic fields (`.ris` uses C1, C2, C7, C8, DB), creating a reproducible audit trail that reviewers and readers can verify.
 
-</details>
+**Key tools:** All plots and tables; Export tab (Citations, Plots, Tables sections)
 
 ---
 
 ### III. Broader Applications
 
-Beyond individual reviews, CiteSource has wider utility:
+#### Training & Education
 
-<details>
-  <summary><strong>Training & Education</strong></summary>
+CiteSource is an effective classroom tool for MLIS programs and evidence synthesis courses. Its visualizations make abstract concepts — database overlap, string sensitivity, benchmark recall — tangible and interactive. Instructors can demonstrate best practices live, and students can experiment with their own searches to develop practical skills.
 
-> CiteSource serves as an effective training tool for evidence synthesis methods. Its interactive visualizations provide a hands-on way for students and early-career researchers to understand abstract concepts like database overlap, string variation impacts, and benchmark testing. Instructors can use it to demonstrate best practices in real-time, building practical skills and competence in systematic searching.
+#### Library Collection Development
 
-</details>
+Librarians can use CiteSource to generate empirical, topic-specific data on database coverage and overlap, informing subscription decisions and recommendations. Comparing results from an existing subscription against a candidate new resource gives a concrete estimate of added value that goes beyond publisher-supplied marketing.
 
-<details>
-  <summary><strong>Library Collection Development</strong></summary>
+#### Methodological Research
 
-> Librarians can leverage CiteSource to support collection development decisions. By analyzing search results from institutional researchers or targeted test searches, they can gain empirical data on database coverage and overlap for specific research topics. This helps justify subscription costs, compare existing resources with potential new ones, and make effective recommendations based on demonstrated value and uniqueness.
-
-</details>
-
-<details>
-  <summary><strong>Methodological Research</strong></summary>
-
-> CiteSource facilitates methodological research on searching itself. When researchers use the tool and report their quantitative findings on source/method performance (e.g., precision/sensitivity, unique contributions), they contribute valuable empirical data to the wider evidence synthesis community. Aggregating such findings across studies can inform the development and refinement of evidence-based search guidelines and best practices, potentially supporting "Studies Within A Review" (SWAR) focused on search methodology.
-
-</details>
+When CiteSource users publish their quantitative findings on source and method performance, they contribute empirical data to the wider evidence synthesis community. Aggregating such findings across studies can inform evidence-based search guidelines — a form of "Studies Within A Review" (SWAR) focused on search methodology.
 
 ---
