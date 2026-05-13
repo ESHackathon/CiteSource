@@ -78,7 +78,7 @@ jobs:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
+            devtools::install(dependencies = FALSE, upgrade = 'never');
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
 
       - name: Deploy to GitHub pages 🚀
