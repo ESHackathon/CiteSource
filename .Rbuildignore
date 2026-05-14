@@ -8,8 +8,13 @@
 ^_pkgdown.yml$
 ^cran-comments\.md$
 ^\.httr-oauth$
-^docs$
-^CITESOURCE2_ANALYSIS\.md$
 ^CITATION\.cff$
 ^REQUIREMENTS.*$
-^ASySD info$
+^vignettes/working_example_data$
+^vignettes/benchmark_data$
+^vignettes/vignette_exports$
+^vignettes/new_stage_data$
+^vignettes/new_benchmark_data$
+^vignettes/topic_data$
+^vignettes/valid_data$
+^tests/shinytest$

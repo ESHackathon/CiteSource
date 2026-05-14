@@ -22,9 +22,9 @@ Authors@R: c(
     person("Kaitlyn", "Hair", role = "cph", comment = "Author of included ASySD deduplication code"),
     person("CAMARADES Group", role = "cph", comment = "Authors of ASySD (github.com/camaradesuk/ASySD)")
   )
-Description: CiteSource provides tools for data-driven search strategy development
-             and evidence synthesis reporting. Researchers can deduplicate references
-             while maintaining customizable metadata, analyze results using pre-built
+Description: Tools for data-driven search strategy development and evidence
+             synthesis reporting. Researchers can deduplicate references while
+             maintaining customizable metadata, analyze results using pre-built
              plots and tables, and import or export data in .ris and .csv formats.
              An interactive Shiny application is included for exploratory use.
 License: GPL (>= 3)

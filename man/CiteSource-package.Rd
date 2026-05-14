@@ -24,7 +24,6 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Trevor Riley \email{trevor.riley@noaa.gov} (\href{https://orcid.org/0000-0002-6834-9802}{ORCID})
   \item Kaitlyn Hair \email{kaitlyn.hair@ed.ac.uk} (\href{https://orcid.org/0000-0003-0180-7343}{ORCID})
   \item Lukas Wallrich \email{lukas.wallrich@gmail.com} (\href{https://orcid.org/0000-0003-2121-5177}{ORCID})
   \item Matthew Grainger \email{matthewjamesgrainger@gmail.com} (\href{https://orcid.org/0000-0001-8426-6495}{ORCID})

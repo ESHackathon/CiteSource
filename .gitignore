@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 .DS_Store
+.claude/
 inst/doc
 .httr-oauth
 CITESOURCE_V020_CHANGES.md

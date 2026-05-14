@@ -14,6 +14,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  eval = any(dir.exists(c("working_example_data", "benchmark_data", "new_benchmark_data", "topic_data", "valid_data", "new_stage_data"))),
   comment = "#>",
   warning = FALSE,
   fig.width = 8,
