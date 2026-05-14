@@ -59,7 +59,7 @@ imported_tbl <- tibble::tribble(
 
 raw_citations <- read_citations(metadata = imported_tbl, verbose = FALSE)
 #> Note: the following cite_label value(s) are not in the standard vocabulary (search / screened / final): benchmark. Phase-analysis functions expect these exact labels.
-#> Importing files ■■                                 3%
+#> Importing files ■■                                 4%
 ```
 
 ## Deduplicate and create data tables
