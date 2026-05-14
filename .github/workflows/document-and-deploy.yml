@@ -24,7 +24,7 @@ jobs:
       - name: Set up R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: devtools, roxygen2, remotes, rsconnect, pkgdown, ESHackathon/CiteSource@dev
+          extra-packages: devtools, roxygen2, remotes, rsconnect, pkgdown
 
       - name: Create documentation
         run: |
@@ -52,6 +52,7 @@ jobs:
           RENV_CONFIG_SNAPSHOT_VALIDATE: "false"
         run: |
           R -e "
+            renv::install('ESHackathon/CiteSource@dev');
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}});
             rsconnect::deployApp(
               appName = 'CiteSource_latest',
@@ -65,6 +66,7 @@ jobs:
           RENV_CONFIG_SNAPSHOT_VALIDATE: "false"
         run: |
           R -e "
+            renv::install('ESHackathon/CiteSource');
             rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}});
             rsconnect::deployApp(
               appName = 'CiteSource',
