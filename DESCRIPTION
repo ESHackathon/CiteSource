@@ -1,5 +1,5 @@
 Package: CiteSource
-Title: An R package for data-driven search strategy development and enhanced evidence synthesis reporting
+Title: An R Package for Data-Driven Search Strategy Development and Enhanced Evidence Synthesis Reporting
 Version: 0.2.0
 Date: 2026-05-11
 Authors@R: c(
@@ -22,13 +22,11 @@ Authors@R: c(
     person("Kaitlyn", "Hair", role = "cph", comment = "Author of included ASySD deduplication code"),
     person("CAMARADES Group", role = "cph", comment = "Authors of ASySD (github.com/camaradesuk/ASySD)")
   )
-Description: This package was developed in order to provide researchers the ability to
-             examine the utility and efficacy of literature resources and search
-             methodologies. The package provides users with the ability to deduplicate
-             references while maintaining customizable metadata. The resulting data
-             can be analyzed using predeveloped plots and tables, including a summary
-             table. Users are also able to export and reimport data in .ris, and csv.
-             files. The package includes a shiny application for interactive use.
+Description: CiteSource provides tools for data-driven search strategy development
+             and evidence synthesis reporting. Researchers can deduplicate references
+             while maintaining customizable metadata, analyze results using pre-built
+             plots and tables, and import or export data in .ris and .csv formats.
+             An interactive Shiny application is included for exploratory use.
 License: GPL (>= 3)
 URL: https://www.eshackathon.org/CiteSource
 BugReports: https://github.com/ESHackathon/CiteSource/issues
@@ -72,6 +70,6 @@ VignetteBuilder:
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends:
     R (>= 4.1.0)
