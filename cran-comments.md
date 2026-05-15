@@ -2,7 +2,9 @@
 
 0 errors | 0 warnings | 1 note
 
-Tested on Windows 11, R 4.5.0.
+Tested on:
+- Windows 11, R 4.5.0: 0 errors | 0 warnings | 1 note
+- Windows Server 2022, R-devel (r90050): 0 errors | 0 warnings | 1 note
 
 The single note is the standard CRAN first-submission notice and requires no action.
 
