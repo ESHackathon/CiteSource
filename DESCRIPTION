@@ -24,7 +24,7 @@ Authors@R: c(
   )
 Description: Tools for data-driven search strategy development and evidence
              synthesis reporting. Researchers can deduplicate references while
-             maintaining customizable metadata, analyze results using prebuilt
+             maintaining customizable metadata, analyze results using
              plots and tables, and import or export data in 'RIS' and 'CSV' formats.
              An interactive Shiny application is included for exploratory use.
 License: GPL (>= 3)
