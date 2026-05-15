@@ -19,7 +19,7 @@ allows users to make any manual corrections to tagging or deduplication. Note th
 this function only works on CSV files that were written with \code{export_csv(..., separate = NULL)}
 }
 \examples{
-\dontrun{
+\donttest{
 #example usage
 citations <- reimport_csv("path/to/citations.csv")
 }
