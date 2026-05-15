@@ -9,7 +9,7 @@
 #' @return A data frame containing the imported citation data if all required columns are present.
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' #example usage
 #' citations <- reimport_csv("path/to/citations.csv")
 #' }

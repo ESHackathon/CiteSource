@@ -3,7 +3,7 @@ Title: An R Package for Data-Driven Search Strategy Development and Enhanced Evi
 Version: 0.2.0
 Date: 2026-05-11
 Authors@R: c(
-    person("Trevor", "Riley", , "trevor.riley@noaa.gov", role = c("aut", "cre"),
+    person("Trevor", "Riley", , "tnriley@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6834-9802")),
     person("Kaitlyn", "Hair", , "kaitlyn.hair@ed.ac.uk", role = "aut",
            comment = c(ORCID = "0000-0003-0180-7343")),
@@ -24,8 +24,8 @@ Authors@R: c(
   )
 Description: Tools for data-driven search strategy development and evidence
              synthesis reporting. Researchers can deduplicate references while
-             maintaining customizable metadata, analyze results using pre-built
-             plots and tables, and import or export data in .ris and .csv formats.
+             maintaining customizable metadata, analyze results using prebuilt
+             plots and tables, and import or export data in 'RIS' and 'CSV' formats.
              An interactive Shiny application is included for exploratory use.
 License: GPL (>= 3)
 URL: https://www.eshackathon.org/CiteSource
