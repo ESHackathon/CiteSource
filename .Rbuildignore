@@ -1,4 +1,4 @@
-^\.claude$
+^\.claude
 ^renv$
 ^renv\.lock$
 ^.*\.Rproj$
