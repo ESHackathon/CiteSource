@@ -121,7 +121,7 @@ read_citations <- function(files = NULL,
   } else {
     ref_list <- purrr::map(files,
                            \(x) synthesisr_read_refs(x, tag_naming = tag_naming, select_fields = only_key_fields),
-                           .progress = list(total = length(files),
+                           .progress = list(total = as.numeric(length(files)),
                                             format = "Importing files {cli::pb_bar} {cli::pb_percent}")
     )
   }
