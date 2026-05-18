@@ -109,11 +109,22 @@ read_citations <- function(files = NULL,
   }
 
   # Need to import files separately to add origin, platform, and searches
-  ref_list <- purrr::map(files,
-                         \(x) synthesisr_read_refs(x,  tag_naming = tag_naming, select_fields = only_key_fields),
-                         .progress = list(  total = 100, 
+  is_shiny <- isTRUE(tryCatch(shiny::isRunning(), error = function(e) FALSE))
+
+  if (is_shiny) {
+    shiny::withProgress(message = "Importing files...", value = 0, {
+      ref_list <- purrr::imap(files, function(x, i) {
+        shiny::setProgress(value = i / length(files), detail = basename(x))
+        synthesisr_read_refs(x, tag_naming = tag_naming, select_fields = only_key_fields)
+      })
+    })
+  } else {
+    ref_list <- purrr::map(files,
+                           \(x) synthesisr_read_refs(x, tag_naming = tag_naming, select_fields = only_key_fields),
+                           .progress = list(total = length(files),
                                             format = "Importing files {cli::pb_bar} {cli::pb_percent}")
-  )
+    )
+  }
 
   # Drop empty citations
   ref_list <- lapply(
