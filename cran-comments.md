@@ -28,9 +28,12 @@ This is a resubmission addressing reviewer feedback:
 
 Tested on:
 - Windows 11, R 4.5.0: 0 errors | 0 warnings | 1 note
+- Windows Server 2022, R-devel (r90065 ucrt): 0 errors | 0 warnings | 1 note
 
-The single note is "unable to verify current time", a transient network
-issue on the checking machine unrelated to the package.
+The note on Windows 11 is "unable to verify current time", a transient
+network issue on the checking machine unrelated to the package.
+The note on Win-devel is the standard "New submission" CRAN feasibility
+notice and requires no action.
 
 ## Reverse dependencies
 
