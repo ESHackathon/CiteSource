@@ -34,6 +34,10 @@ RIS, check \code{names(CiteSource:::synthesisr_code_lookup)} and select any of t
 
 \item{verbose}{Should confirmation message be displayed?}
 }
+\value{
+A data frame containing the reimported citation data, with 'CiteSource' metadata columns
+(cite_source, cite_label, cite_string, duplicate_id, record_ids) restored from the 'RIS' fields.
+}
 \description{
 This function reimports a RIS file that was tagged and deduplicated by CiteSource.
 It allows to continue with further analyses without repeating that step, and also
@@ -49,8 +53,9 @@ can easily be combined.
 \examples{
 if (interactive()) {
   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-  export_ris(dedup_results$unique, "citations.ris")
-  unique_citations2 <- reimport_ris("citations.ris")
+  tmp <- tempfile(fileext = ".ris")
+  export_ris(dedup_results$unique, tmp)
+  unique_citations2 <- reimport_ris(tmp)
 }
 
 }

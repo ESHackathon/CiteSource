@@ -4,12 +4,7 @@
 \alias{export_csv}
 \title{Export deduplicated citations with source data as CSV file}
 \usage{
-export_csv(
-  unique_citations,
-  filename = "citesource_exported_citations.csv",
-  separate = NULL,
-  trim_abstracts = 32000
-)
+export_csv(unique_citations, filename, separate = NULL, trim_abstracts = 32000)
 }
 \arguments{
 \item{unique_citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
@@ -23,7 +18,7 @@ which cannot deal with more than 32,000 characters per field. Therefore, the def
 NULL to retain abstracts as they are.}
 }
 \value{
-The function saves the deduplicated citations as a CSV file to the specified location.
+No return value, called for side effects. Saves the deduplicated citations as a 'CSV' file to the specified location.
 }
 \description{
 This function saves deduplicated citations as a CSV file for further analysis and/or reporting.
@@ -36,6 +31,6 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_csv(dedup_results, "cite_sources.csv", separate = "cite_source")
+  export_csv(dedup_results, tempfile(fileext = ".csv"), separate = "cite_source")
 }
 }

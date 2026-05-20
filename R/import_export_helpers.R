@@ -797,7 +797,7 @@ write_refs <- function(
   } else { # i.e. logical
     if (file) {
       file_out <- TRUE
-      filename <- paste("synthesisr_bibliography", format, sep = ".")
+      filename <- file.path(tempdir(), paste("synthesisr_bibliography", format, sep = "."))
     } else {
       file_out <- FALSE
     }

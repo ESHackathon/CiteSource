@@ -10,7 +10,7 @@
 #' @param trim_abstracts Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel, 
 #' which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 #' NULL to retain abstracts as they are.
-#' @return The function saves the deduplicated citations as a CSV file to the specified location.
+#' @return No return value, called for side effects. Saves the deduplicated citations as a 'CSV' file to the specified location.
 #' @export
 #' @examples
 #' if (interactive()) {
@@ -18,10 +18,10 @@
 #'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 #'   examplecitations <- readRDS(examplecitations_path)
 #'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#'   export_csv(dedup_results, "cite_sources.csv", separate = "cite_source")
+#'   export_csv(dedup_results, tempfile(fileext = ".csv"), separate = "cite_source")
 #' }
 
-export_csv <- function(unique_citations, filename = "citesource_exported_citations.csv", separate = NULL, trim_abstracts = 32000) {
+export_csv <- function(unique_citations, filename, separate = NULL, trim_abstracts = 32000) {
   # Warn if the filename doesn't end with .csv
   if (tolower(tools::file_ext(filename)) != "csv") {
     warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
@@ -68,6 +68,7 @@ export_csv <- function(unique_citations, filename = "citesource_exported_citatio
 #' @param source_field Field in `citations` representing the source. Default is "DB".
 #' @param label_field Field in `citations` representing the label. Default is "C7".
 #' @param string_field Field in `citations` representing additional string information. Default is "C8".
+#' @return No return value, called for side effects. Saves the citations as a 'RIS' file to the specified location.
 #' @export
 #' @examples
 #' if (interactive()) {
@@ -75,17 +76,10 @@ export_csv <- function(unique_citations, filename = "citesource_exported_citatio
 #'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 #'   examplecitations <- readRDS(examplecitations_path)
 #'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#'   export_ris(
-#'    dedup_results$unique, 
-#'     "cite_sources.ris", 
-#'    user_mapping = list(
-#'     "DB" = "cite_source_include", 
-#'     "C7" = "cite_label_include"
-#'   )
-#'   )
+#'   export_ris(dedup_results$unique, tempfile(fileext = ".ris"))
 #' }
 
-export_ris <- function(citations, filename = "citations.ris", source_field = "DB", label_field = "C7", string_field = "C8") {
+export_ris <- function(citations, filename, source_field = "DB", label_field = "C7", string_field = "C8") {
 
   if (tolower(tools::file_ext(filename)) != "ris") warning("Function saves a RIS file, so filename should (usually) end in .ris. For now, name is used as provided.")
 
@@ -116,6 +110,7 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 #' @param citations Dataframe with unique citations, resulting from `dedup_citations()`
 #' @param filename Name (and path) of file, should end in .ris
 #' @param include Character. One or more of sources, labels or strings
+#' @return No return value, called for side effects. Saves deduplicated citations as a 'BibTeX' file to the specified location.
 #' @export
 #' @examples
 #' if (interactive()) {
@@ -123,10 +118,10 @@ export_ris <- function(citations, filename = "citations.ris", source_field = "DB
 #'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 #'   examplecitations <- readRDS(examplecitations_path)
 #'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-#'   export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
+#'   export_bib(dedup_results$unique, tempfile(fileext = ".bib"), include = "sources")
 #' }
 
-export_bib <- function(citations, filename = "citations.bib", include = c("sources", "labels", "strings")) {
+export_bib <- function(citations, filename, include = c("sources", "labels", "strings")) {
   if (tolower(tools::file_ext(filename)) != "bib") warning("Function saves a BibTex file, so filename should (usually) end in .bib. For now, name is used as provided.")
 
   include <- paste0("cite_", stringr::str_remove(include, "s$"))

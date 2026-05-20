@@ -198,6 +198,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 #' @param groups Variable to use as groups. Should be 'source', 'label' or 'string' - defaults to source.
 #' @inheritParams UpSetR::upset
 #' @inheritDotParams UpSetR::upset -sets.x.label -mainbar.y.label -order.by
+#' @return No return value, called for side effects. Renders an UpSet plot showing record overlap between sources to the current graphics device.
 #' @export
 #' @references Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.
 
@@ -253,6 +254,8 @@ cite_source <- cite_label <- type <- NULL
 #' @param facet_order Character. Order of facets. Any levels not specified will follow at the end.
 #' @param color_order Character. Order of values on the color scale.
 #' @param totals_in_legend Logical. Should totals be shown in legend (e.g. as Unique (N = 1234))
+#' @return A \code{ggplot2} object showing source contributions as a faceted bar chart. The object can
+#'   be further customized using \code{ggplot2} functions or saved with \code{\link[ggplot2]{ggsave}}.
 #' @export
 #' @examples
 #' data <- data.frame(

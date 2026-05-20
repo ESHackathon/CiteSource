@@ -9,9 +9,8 @@
 #' @return A data frame containing the imported citation data if all required columns are present.
 #' @export
 #' @examples
-#' \donttest{
-#' #example usage
-#' citations <- reimport_csv("path/to/citations.csv")
+#' if (interactive()) {
+#'   citations <- reimport_csv("path/to/citations.csv")
 #' }
 #'
 reimport_csv <- function(filename) {
@@ -55,12 +54,15 @@ reimport_csv <- function(filename) {
 #' be changed when using this function to reimport a file exported from CiteSource. If you import your own
 #' RIS, check `names(CiteSource:::synthesisr_code_lookup)` and select any of the options that start with `ris_`
 #' @param verbose Should confirmation message be displayed?
+#' @return A data frame containing the reimported citation data, with 'CiteSource' metadata columns
+#'   (cite_source, cite_label, cite_string, duplicate_id, record_ids) restored from the 'RIS' fields.
 #' @export
 #' @examples
 #' if (interactive()) {
 #'   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-#'   export_ris(dedup_results$unique, "citations.ris")
-#'   unique_citations2 <- reimport_ris("citations.ris")
+#'   tmp <- tempfile(fileext = ".ris")
+#'   export_ris(dedup_results$unique, tmp)
+#'   unique_citations2 <- reimport_ris(tmp)
 #' }
 #'
 reimport_ris <- function(filename = "citations.ris", 
