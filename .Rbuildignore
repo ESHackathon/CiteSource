@@ -19,3 +19,4 @@
 ^vignettes/topic_data$
 ^vignettes/valid_data$
 ^tests/shinytest$
+^CRAN-SUBMISSION$
