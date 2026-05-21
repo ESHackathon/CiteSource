@@ -541,7 +541,7 @@ generate_apa_reference <- function(authors, year, title, source, volume, issue, 
   
   # Extract last names and initials
   citations <- tibble::tibble(id, authors, year, title, source, volume, issue, doi, weblink) |>
-    dplyr::mutate(dplyr::across(c(dplyr::everything(), -.data$id), .fns = ~ as.character(.x) |> dplyr::na_if(""))) |>
+    dplyr::mutate(dplyr::across(-"id", .fns = ~ as.character(.x) |> dplyr::na_if(""))) |>
     dplyr::mutate(
       last_names = authors |> stringr::str_split(pattern = " and ") |> purrr::map(~ stringr::str_remove(.x, ",.*$")),
       initials = authors |> stringr::str_split(pattern = " and ") |> purrr::map(~{
