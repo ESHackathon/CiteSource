@@ -755,7 +755,22 @@ asys_dedup_citations_add_manual <- function(unique_citations, merge_citations = 
   unique_citations <- unique_citations |>
     dplyr::rename(record_id = duplicate_id)
 
-  res <- generate_dup_id(additional_pairs, unique_citations, keep_source, keep_label,
-                         post_auto_dedup = TRUE)
-  merge_metadata(res, extra_merge_fields)
+  # Only reprocess records actually involved in the new manual pairs.
+  # Unaffected records are already in their final merged state and can be
+  # passed through unchanged, avoiding an O(N) merge over the full dataset.
+  involved_ids <- unique(c(
+    as.character(additional_pairs$duplicate_id.x),
+    as.character(additional_pairs$duplicate_id.y)
+  ))
+
+  affected   <- unique_citations |> dplyr::filter(record_id %in% involved_ids)
+  unaffected <- unique_citations |>
+    dplyr::filter(!record_id %in% involved_ids) |>
+    dplyr::rename(duplicate_id = record_id)
+
+  res             <- generate_dup_id(additional_pairs, affected, keep_source, keep_label,
+                                     post_auto_dedup = TRUE)
+  merged_affected <- merge_metadata(res, extra_merge_fields)
+
+  dplyr::bind_rows(merged_affected, unaffected)
 }
