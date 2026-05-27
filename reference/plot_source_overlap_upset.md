@@ -100,6 +100,10 @@ plot_source_overlap_upset(
 
   :   Color of set size bar plot
 
+  `plot.title`
+
+  :   Title of UpSetR plot
+
   `point.size`
 
   :   Size of points in matrix plot
@@ -142,6 +146,10 @@ plot_source_overlap_upset(
   `number.angles`
 
   :   The angle of the numbers atop the intersection size bars
+
+  `number.colors`
+
+  :   The colors of the numbers atop the intersection size bars
 
   `group.by`
 
@@ -267,15 +275,15 @@ plot_source_overlap_upset(data)
 #> ℹ Please use tidy evaluation idioms with `aes()`.
 #> ℹ See also `vignette("ggplot2-in-packages")` for more information.
 #> ℹ The deprecated feature was likely used in the UpSetR package.
-#>   Please report the issue to the authors.
+#>   Please report the issue at <https://github.com/hms-dbmi/UpSetR/issues>.
 #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 #> ℹ Please use `linewidth` instead.
 #> ℹ The deprecated feature was likely used in the UpSetR package.
-#>   Please report the issue to the authors.
+#>   Please report the issue at <https://github.com/hms-dbmi/UpSetR/issues>.
 #> Warning: The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.
 #> ℹ Please use the `linewidth` argument instead.
 #> ℹ The deprecated feature was likely used in the UpSetR package.
-#>   Please report the issue to the authors.
+#>   Please report the issue at <https://github.com/hms-dbmi/UpSetR/issues>.
 
 
 # To start with the records shared among the greatest number of sources, use

@@ -57,7 +57,6 @@ other_data = 7:12
 )
 
 result <- calculate_phase_count(unique_citations, citations, "db_source")
-#> Warning: `calculate_phase_count()` is deprecated. Use `calculate_phase_records()` instead.
 result
 #>      Source Distinct Records screened final Precision Recall
 #> 1 Database1                2        1     1        50  33.33

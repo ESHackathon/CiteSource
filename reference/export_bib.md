@@ -22,7 +22,7 @@ export_bib(
 - citations:
 
   Dataframe with unique citations, resulting from
-  [`dedup_citations()`](https://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
+  [`dedup_citations()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations.md)
 
 - filename:
 

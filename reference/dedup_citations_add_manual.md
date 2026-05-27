@@ -1,6 +1,8 @@
-# Add manually identified duplicate pairs to a deduplicated dataset
+# Remove pairs with manual dedup - ASySD wrapper
 
-Add manually identified duplicate pairs to a deduplicated dataset
+This function deduplicates citation data. Note that duplicates are
+assumed to published in the same journal, so pre-prints and similar
+results will not be identified here.
 
 ## Usage
 
@@ -12,29 +14,25 @@ dedup_citations_add_manual(unique_citations, additional_pairs)
 
 - unique_citations:
 
-  Unique citations returned by
-  [`dedup_citations()`](https://www.eshackathon.org/CiteSource/reference/dedup_citations.md)
+  Unique citations post deduplication
 
 - additional_pairs:
 
-  Dataframe of manually confirmed duplicate pairs (a subset of the
-  `$manual_dedup` output). If a `result` column is present, only rows
-  where `result == "match"` are merged.
+  TRUE duplicate pairs
 
 ## Value
 
-Updated unique citations dataframe with manual duplicates merged.
+unique citations formatted for CiteSource
 
 ## Examples
 
 ``` r
 # Load example data from the package
-examplecitations_path <- system.file("extdata", "examplecitations.rds",
-                                      package = "CiteSource")
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate and retrieve manual pairs
-dedup_results <- dedup_citations(examplecitations, manual = TRUE)
+# Deduplicate citations
+dedup_results <- dedup_citations(examplecitations)
 #> formatting data...
 #> Warning: Search contains missing values for the record_id column. A record_id will be created using row numbers
 #> identifying potential duplicates...
@@ -43,6 +41,4 @@ dedup_results <- dedup_citations(examplecitations, manual = TRUE)
 #> 165 citations loaded...
 #> 67 duplicate citations removed...
 #> 98 unique citations remaining!
-# (user reviews dedup_results$manual_dedup and sets result == "match" for true dups)
-# final <- dedup_citations_add_manual(dedup_results$unique, dedup_results$manual_dedup)
 ```

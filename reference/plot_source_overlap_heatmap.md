@@ -12,9 +12,7 @@ plot_source_overlap_heatmap(
   facets = NULL,
   plot_type = c("counts", "percentages"),
   sort_sources = TRUE,
-  interactive = FALSE,
-  show_labels = "auto",
-  log_scale = FALSE
+  interactive = FALSE
 )
 ```
 
@@ -25,7 +23,7 @@ plot_source_overlap_heatmap(
   A tibble with one record per row, an id column and then one column per
   source indicating whether the record was found in that source (usually
   obtained from
-  [`compare_sources()`](https://www.eshackathon.org/CiteSource/reference/compare_sources.md))
+  [`compare_sources()`](https://eshackathon.github.io/CiteSource/reference/compare_sources.md))
 
 - cells:
 
@@ -51,17 +49,6 @@ plot_source_overlap_heatmap(
 
   Should returned plot be interactive and enable user to export records
   underlying each field?
-
-- show_labels:
-
-  Whether to show text labels in cells. `"auto"` (default) shows labels
-  when there are 10 or fewer sources; `TRUE` always shows them; `FALSE`
-  hides them.
-
-- log_scale:
-
-  Should the fill colour scale be log-transformed? Useful when counts
-  vary greatly across cells. Ignored when `plot_type = "percentages"`.
 
 ## Value
 

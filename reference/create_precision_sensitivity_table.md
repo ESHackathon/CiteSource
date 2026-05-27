@@ -35,6 +35,7 @@ explaining the metrics.
 ## Examples
 
 ``` r
+# Example usage with a sample dataset
 sample_data <- data.frame(
   Source = c("Source1", "Source2", "Total"),
   Distinct_Records = c(100, 150, 250),

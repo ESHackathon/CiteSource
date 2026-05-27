@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>An R package for data-driven search strategy development and enhanced evidence synthesis reporting • CiteSource</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="An R package for data-driven search strategy development and enhanced evidence synthesis reporting">
 <meta name="description" content="This package was developed in order to provide researchers the ability to examine the utility and efficacy of literature resources and search methodologies. The package provides users with the ability to deduplicate references while maintaining customizable metadata. The resulting data can be analyzed using predeveloped plots and tables, including a summary table. Users are also able to export and reimport data in .ris, and csv. files. The package includes a shiny application for interactive use.">
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,12 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/citesource_new_benchmark_testing.html">Benchmark Testing</a></li>
+<li><a class="dropdown-item" href="articles/citesource_working_example.html">Source Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="articles/citesource_benchmark_testing.html">Benchmark Testing</a></li>
+    <li><a class="dropdown-item" href="articles/citesource_new_benchmark_testing.html">New Benchmark Testing</a></li>
     <li><a class="dropdown-item" href="articles/citesource_vignette_db-pre-screen_validation.html">Assessing Usefulness of Databases for Evidence Synthesis</a></li>
     <li><a class="dropdown-item" href="articles/citesource_vignette_db-topic-coverage.html">Comparing Database Topic Coverage</a></li>
-    <li><a class="dropdown-item" href="articles/citesource_analysis_across_screening_phases.html">Source Analysis Across Screening Phases</a></li>
-    <li><a class="dropdown-item" href="articles/citesource_search_string_comparison.html">Comparing Search Strings</a></li>
+    <li><a class="dropdown-item" href="articles/citesource_analysis_across_screening_phases.html">Analysis Across Screening Phases</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -93,16 +94,7 @@
 <p><strong>Installation</strong></p>
 <p>Install CiteSource in R with remotes::install_github(“ESHackathon/CiteSource”)</p>
 <p><strong>Vignettes</strong></p>
-<p>Vignettes covering various use cases can be found on the <a href="https://www.eshackathon.org/CiteSource/articles">CiteSource web page</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="deploying-the-shiny-app">Deploying the Shiny App<a class="anchor" aria-label="anchor" href="#deploying-the-shiny-app"></a>
-</h2>
-<p>The bundled Shiny app (<code>inst/shiny-app/CiteSource/app.R</code>) supports optional Google Analytics. To enable it, set the <code>CITESOURCE_ENV</code> environment variable to the path of a local HTML file containing your GA tag before launching the app:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CITESOURCE_ENV <span class="op">=</span> <span class="st">"/path/to/ga_tag.html"</span><span class="op">)</span></span>
-<span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">runApp</a></span><span class="op">(</span><span class="st">"inst/shiny-app/CiteSource"</span><span class="op">)</span></span></code></pre></div>
-<p>When deploying to shinyapps.io or a Posit Connect server, add <code>CITESOURCE_ENV</code> as a server-side environment variable pointing to the deployed GA file. If the variable is unset or the file does not exist, the app runs without analytics.</p>
+<p>Vignettes covering various use cases can be found on the <a href="https://www.eshackathon.org/CiteSource/articles" class="external-link">CiteSource web page</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="feedback">Feedback<a class="anchor" aria-label="anchor" href="#feedback"></a>

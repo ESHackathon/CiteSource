@@ -1,8 +1,8 @@
-# Deduplicate citations
+# Deduplicate citations - ASySD wrapper
 
-Deduplicates citation data. Duplicates are assumed to be published in
-the same journal, so pre-prints vs. their published versions will not be
-merged.
+This function deduplicates citation data. Note that duplicates are
+assumed to published in the same journal, so pre-prints and similar
+results will not be identified here.
 
 ## Usage
 
@@ -18,29 +18,26 @@ dedup_citations(raw_citations, manual = FALSE, show_unknown_tags = FALSE)
 
 - manual:
 
-  logical. If TRUE, return the full result list including potential
-  pairs for manual review. Default is FALSE.
+  logical. If TRUE, manually specify pairs of duplicates to merge.
+  Default is FALSE.
 
 - show_unknown_tags:
 
-  When a label, source, or other merged field is missing, show it as
-  "unknown"? Default FALSE.
+  When a label, source, or other merged field is missing, do you want
+  this to show as "unknown"?
 
 ## Value
 
-When `manual = FALSE`: a dataframe of unique citations. When
-`manual = TRUE`: a list with `$unique` (unique citations) and
-`$manual_dedup` (potential pairs for review).
+unique citations formatted for CiteSource
 
 ## Examples
 
 ``` r
 # Load example data from the package
-examplecitations_path <- system.file("extdata", "examplecitations.rds",
-                                      package = "CiteSource")
+examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
 examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate citations
+# Deduplicate citations without manually specifying pairs and without showing unknown tags
 dedup_results <- dedup_citations(examplecitations)
 #> formatting data...
 #> Warning: Search contains missing values for the record_id column. A record_id will be created using row numbers
@@ -51,8 +48,12 @@ dedup_results <- dedup_citations(examplecitations)
 #> 67 duplicate citations removed...
 #> 98 unique citations remaining!
 
-# Return potential pairs for manual review
-dedup_results_manual <- dedup_citations(examplecitations, manual = TRUE)
+# Deduplicate citations with manual specification of pairs and showing unknown tags
+dedup_results_manual_unknown <- dedup_citations(
+  examplecitations, 
+  manual = TRUE, 
+  show_unknown_tags = TRUE
+  )
 #> formatting data...
 #> Warning: Search contains missing values for the record_id column. A record_id will be created using row numbers
 #> identifying potential duplicates...
