@@ -782,6 +782,19 @@ ui <- shiny::navbarPage("CiteSource",
                                         shiny::tags$i(class="fa fa-info-circle", style="margin-right:5px;"),
                                         "Only .ris and .csv can be re-imported into CiteSource."
                                       ),
+                                      shiny::tags$strong("CSV field selection", style="font-size:0.88em;"),
+                                      shiny::radioButtons(
+                                        "csv_fields_preset",
+                                        label = NULL,
+                                        choices = c(
+                                          "Full — all fields (reimportable into CiteSource)" = "full",
+                                          "Standard — bibliographic + provenance (for RELApp / screening tools)" = "standard",
+                                          "Custom — choose columns" = "custom"
+                                        ),
+                                        selected = "full"
+                                      ),
+                                      shiny::uiOutput("csv_custom_cols_ui"),
+                                      shiny::uiOutput("csv_reimport_warning"),
                                       shiny::downloadButton("downloadCsv", "CSV",
                                         style="margin-right:6px;margin-bottom:4px;"),
                                       shiny::downloadButton("downloadRis", "RIS",
@@ -2864,13 +2877,48 @@ server <- function(input, output, session) {
   #### Export tab ####
   
   # Downloadable bibtex ----
+  output$csv_custom_cols_ui <- shiny::renderUI({
+    shiny::req(input$csv_fields_preset == "custom")
+    shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    all_cols <- names(rv$latest_unique)
+    shiny::tagList(
+      shiny::tags$p("Select columns to include:", style = "font-size:0.85em;margin-bottom:4px;"),
+      shiny::checkboxGroupInput(
+        "csv_custom_cols",
+        label = NULL,
+        choices = all_cols,
+        selected = all_cols,
+        inline = FALSE
+      )
+    )
+  })
+
+  output$csv_reimport_warning <- shiny::renderUI({
+    preset <- input$csv_fields_preset
+    if (is.null(preset) || preset == "full") return(NULL)
+    shiny::div(
+      style = "font-size:0.82em;color:#856404;background:#fff8e1;padding:8px 12px;border-radius:4px;margin-bottom:10px;",
+      shiny::tags$i(class = "fa fa-exclamation-triangle", style = "margin-right:5px;"),
+      "This export cannot be reimported into CiteSource via reimport_csv()."
+    )
+  })
+
   output$downloadCsv <- shiny::downloadHandler(
     filename = function() {
       paste("data-", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
       if (nrow(rv$latest_unique) > 0) {
-        write.csv(rv$latest_unique, file)
+        preset <- input$csv_fields_preset
+        fields <- if (is.null(preset) || preset == "full") {
+          "full"
+        } else if (preset == "standard") {
+          "standard"
+        } else {
+          cols <- input$csv_custom_cols
+          if (is.null(cols) || length(cols) == 0) "full" else cols
+        }
+        export_csv(rv$latest_unique, file, fields = fields)
       } else {
         stop("No data to download!")
         shiny::req(FALSE)

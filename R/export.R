@@ -6,8 +6,13 @@
 #'
 #' @param unique_citations Dataframe with unique citations, resulting from `dedup_citations()`
 #' @param filename Name (and path) of file, should end in .csv
+#' @param fields Controls which columns are included. Use `"full"` (default) to export all columns
+#'   (required for reimport into CiteSource via `reimport_csv()`); `"standard"` to export core
+#'   bibliographic fields plus `cite_source`, `cite_label`, and `cite_string` (suitable for import
+#'   into RELApp or other screening tools); or a character vector of column names for a custom
+#'   selection. Note that exports other than `"full"` cannot be reimported into CiteSource.
 #' @param separate Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to facilitate further analysis.
-#' @param trim_abstracts Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel, 
+#' @param trim_abstracts Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel,
 #' which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 #' NULL to retain abstracts as they are.
 #' @return No return value, called for side effects. Saves the deduplicated citations as a 'CSV' file to the specified location.
@@ -19,14 +24,32 @@
 #'   examplecitations <- readRDS(examplecitations_path)
 #'   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
 #'   export_csv(dedup_results, tempfile(fileext = ".csv"), separate = "cite_source")
+#'   # Standard export for RELApp / screening tools (not reimportable into CiteSource):
+#'   export_csv(dedup_results, tempfile(fileext = ".csv"), fields = "standard")
 #' }
 
-export_csv <- function(unique_citations, filename, separate = NULL, trim_abstracts = 32000) {
+export_csv <- function(unique_citations, filename, fields = "full", separate = NULL, trim_abstracts = 32000) {
   # Warn if the filename doesn't end with .csv
   if (tolower(tools::file_ext(filename)) != "csv") {
     warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
   }
-  
+
+  # Apply field selection
+  if (!identical(fields, "full")) {
+    standard_fields <- c(
+      "title", "author", "year", "journal", "volume", "issue",
+      "pages", "doi", "url", "abstract", "keywords", "type",
+      "isbn", "issn", "cite_source", "cite_label", "cite_string"
+    )
+    selected_cols <- if (identical(fields, "standard")) standard_fields else fields
+    unique_citations <- unique_citations |> dplyr::select(dplyr::any_of(selected_cols))
+    required_cs <- c("cite_source", "cite_label", "cite_string", "duplicate_id", "record_ids")
+    if (!all(required_cs %in% names(unique_citations))) {
+      warning("Exported file will not be reimportable into CiteSource via reimport_csv(). ",
+              "Use fields = 'full' to retain all required CiteSource metadata.")
+    }
+  }
+
   if (!is.null(separate)) {
     separate <- match.arg(separate, choices = c("cite_source", "cite_label", "cite_string"), several.ok = TRUE)
 
