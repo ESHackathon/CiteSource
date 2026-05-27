@@ -4,12 +4,24 @@
 \alias{export_csv}
 \title{Export deduplicated citations with source data as CSV file}
 \usage{
-export_csv(unique_citations, filename, separate = NULL, trim_abstracts = 32000)
+export_csv(
+  unique_citations,
+  filename,
+  fields = "full",
+  separate = NULL,
+  trim_abstracts = 32000
+)
 }
 \arguments{
 \item{unique_citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
 
 \item{filename}{Name (and path) of file, should end in .csv}
+
+\item{fields}{Controls which columns are included. Use \code{"full"} (default) to export all columns
+(required for reimport into CiteSource via \code{reimport_csv()}); \code{"standard"} to export core
+bibliographic fields plus \code{cite_source}, \code{cite_label}, and \code{cite_string} (suitable for import
+into RELApp or other screening tools); or a character vector of column names for a custom
+selection. Note that exports other than \code{"full"} cannot be reimported into CiteSource.}
 
 \item{separate}{Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to facilitate further analysis.}
 
@@ -32,5 +44,7 @@ if (interactive()) {
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
   export_csv(dedup_results, tempfile(fileext = ".csv"), separate = "cite_source")
+  # Standard export for RELApp / screening tools (not reimportable into CiteSource):
+  export_csv(dedup_results, tempfile(fileext = ".csv"), fields = "standard")
 }
 }
