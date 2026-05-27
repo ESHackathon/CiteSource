@@ -769,6 +769,16 @@ ui <- shiny::navbarPage("CiteSource",
                               shiny::fluidRow(
                                 shiny::column(
                                   8,
+                                  shiny::wellPanel(
+                                    style="background:#f8f9fa;border:1px solid #dee2e6;",
+                                    shiny::h5("Cite CiteSource", style="margin-top:0;"),
+                                    shiny::p("If you use these results in a publication, please cite the software:"),
+                                    shiny::tags$code("Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026). CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting. Research Synthesis Methods. https://doi.org/10.1017/rsm.2026.10084"),
+                                    shiny::br(), shiny::br(),
+                                    shiny::a("View Publication",
+                                      href="https://doi.org/10.1017/rsm.2026.10084", target="_blank")
+                                  ),
+                                  shiny::br(),
                                   bslib::card(
                                     bslib::card_header(
                                       shiny::tags$i(class="fa fa-file-alt", style="margin-right:7px;"),
@@ -788,7 +798,7 @@ ui <- shiny::navbarPage("CiteSource",
                                         label = NULL,
                                         choices = c(
                                           "Full — all fields (reimportable into CiteSource)" = "full",
-                                          "Standard — bibliographic + provenance (for RELApp / screening tools)" = "standard",
+                                          "Standard — title, author, year, journal, volume, issue, pages, doi, url, abstract, keywords, type, isbn, issn, cite_source, cite_label, cite_string" = "standard",
                                           "Custom — choose columns" = "custom"
                                         ),
                                         selected = "full"
@@ -832,16 +842,6 @@ ui <- shiny::navbarPage("CiteSource",
                                       shiny::downloadButton("exportDetailedTable", "Detailed Record Table",
                                         style="margin-bottom:4px;")
                                     )
-                                  ),
-                                  shiny::br(),
-                                  shiny::wellPanel(
-                                    style="background:#f8f9fa;border:1px solid #dee2e6;",
-                                    shiny::h5("Cite CiteSource", style="margin-top:0;"),
-                                    shiny::p("If you use these results in a publication, please cite the software:"),
-                                    shiny::tags$code("Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026). CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting. Research Synthesis Methods. https://doi.org/10.1017/rsm.2026.10084"),
-                                    shiny::br(), shiny::br(),
-                                    shiny::a("View Publication",
-                                      href="https://doi.org/10.1017/rsm.2026.10084", target="_blank")
                                   )
                                 )
                               )
@@ -2880,13 +2880,20 @@ server <- function(input, output, session) {
   output$csv_custom_cols_ui <- shiny::renderUI({
     shiny::req(input$csv_fields_preset == "custom")
     shiny::req(is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0)
+    required_cs <- c("cite_source", "cite_label", "cite_string", "duplicate_id", "record_ids")
     all_cols <- names(rv$latest_unique)
+    col_labels <- setNames(
+      ifelse(all_cols %in% required_cs, paste0(all_cols, " *"), all_cols),
+      all_cols
+    )
     shiny::tagList(
       shiny::tags$p("Select columns to include:", style = "font-size:0.85em;margin-bottom:4px;"),
+      shiny::tags$p("* required for CiteSource reimport", style = "font-size:0.78em;color:#6c757d;margin-bottom:6px;"),
       shiny::checkboxGroupInput(
         "csv_custom_cols",
         label = NULL,
-        choices = all_cols,
+        choiceNames = as.list(col_labels),
+        choiceValues = as.list(all_cols),
         selected = all_cols,
         inline = FALSE
       )
