@@ -105,7 +105,7 @@ citations <- read_citations(metadata = metadata_tbl)
 #> Importing files ■■■■■                             14%
 #> Importing files ■■■■■■                            16%
 #> Importing files ■■■■■■                            18%
-#> Importing files ■■■■■■■                           21%
+#> Importing files ■■■■■■■                           20%
 #> Importing files ■■■■■■■■                          23%
 #> Importing files ■■■■■■■■■                         25%
 #> Import completed - with the following details:
