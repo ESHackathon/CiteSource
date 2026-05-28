@@ -810,6 +810,14 @@ ui <- shiny::navbarPage("CiteSource",
                                       shiny::downloadButton("downloadRis", "RIS",
                                         style="margin-right:6px;margin-bottom:4px;"),
                                       shiny::downloadButton("downloadBib", "BibTeX",
+                                        style="margin-bottom:4px;"),
+                                      shiny::tags$hr(style="margin:14px 0 10px 0;"),
+                                      shiny::tags$strong("Dedup provenance log",
+                                        style="font-size:0.88em;display:block;margin-bottom:4px;"),
+                                      shiny::p(
+                                        "CSV of every merged duplicate pair, flagged as automated or manual.",
+                                        style="color:#6c757d;font-size:0.82em;margin-bottom:8px;"),
+                                      shiny::downloadButton("downloadDedupLog", "Dedup Log (CSV)",
                                         style="margin-bottom:4px;")
                                     )
                                   ),
@@ -881,6 +889,7 @@ server <- function(input, output, session) {
   rv$latest_unique <- data.frame()#for reimported data
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
+  rv$auto_pairs    <- data.frame()#auto-merged pairs, for the dedup log
   rv$file_meta           <- list()  # Per-file metadata (source/label/string); keyed by file.datapath
   # Card view state
   rv$selected_pairs_card <- integer(0)
@@ -1392,7 +1401,9 @@ server <- function(input, output, session) {
     # Perform deduplication
     dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
     rv$pairs_to_check <- dedup_results$manual_dedup
-    rv$latest_unique <- dedup_results$unique
+    rv$latest_unique  <- dedup_results$unique
+    rv$auto_pairs     <- if (is.null(dedup_results$auto_pairs)) data.frame() else dedup_results$auto_pairs
+    rv$pairs_removed  <- data.frame()  # reset manual log on a fresh dedup run
     rv$n_unique <- count_unique(rv$latest_unique)  # Generate the n_unique data
     
     # Generate a summary message based on deduplication results
@@ -1683,7 +1694,8 @@ server <- function(input, output, session) {
   }
 
   build_field_with_preference <- function(field, val1, val2, comparison, is_record_a, pair_row_idx) {
-    selectable <- c("author","abstract","title","journal")
+    selectable <- c("author","abstract","title","journal",
+                    "year","pages","volume","doi","number")
     is_sel     <- field %in% selectable && comparison$status %in% c("different","missing")
     prefs      <- get_pair_preferences(pair_row_idx)
     cur_pref   <- prefs[[field]]
@@ -2892,8 +2904,8 @@ server <- function(input, output, session) {
       shiny::checkboxGroupInput(
         "csv_custom_cols",
         label = NULL,
-        choiceNames = as.list(col_labels),
-        choiceValues = as.list(all_cols),
+        choiceNames  = unname(as.list(col_labels)),
+        choiceValues = unname(as.list(all_cols)),
         selected = all_cols,
         inline = FALSE
       )
@@ -2947,6 +2959,31 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       export_ris(rv$latest_unique, file)
+    }
+  )
+
+  # ---- Dedup log: combined auto + manual pair provenance ----
+  dedup_log_data <- shiny::reactive({
+    auto   <- if (is.data.frame(rv$auto_pairs))   rv$auto_pairs   else data.frame()
+    manual <- if (is.data.frame(rv$pairs_removed)) rv$pairs_removed else data.frame()
+    CiteSource::dedup_log(
+      dedup_result           = list(auto_pairs = auto),
+      confirmed_manual_pairs = if (nrow(manual) > 0) manual else NULL
+    )
+  })
+
+  output$downloadDedupLog <- shiny::downloadHandler(
+    filename = function() paste0("dedup-log-", Sys.Date(), ".csv"),
+    content  = function(file) {
+      log_df <- dedup_log_data()
+      if (nrow(log_df) == 0) {
+        utils::write.csv(
+          data.frame(note = "No duplicate pairs were merged."),
+          file, row.names = FALSE
+        )
+      } else {
+        utils::write.csv(log_df, file, row.names = FALSE)
+      }
     }
   )
 
