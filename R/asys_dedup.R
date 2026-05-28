@@ -626,6 +626,8 @@ asys_dedup_citations <- function(raw_citations, manual_dedup = TRUE,
         res$unique <- raw_citations <- keep_one_unique_citation(matched_pairs_with_ids)
       }
 
+      res$auto_pairs <- true_pairs
+
       if (manual_dedup) {
         shiny::incProgress(0.8, message = "flagging potential pairs for manual dedup...")
         res$manual_dedup <- process_possible_pairs(
@@ -715,6 +717,8 @@ asys_dedup_citations <- function(raw_citations, manual_dedup = TRUE,
         res$unique <- keep_one_unique_citation(matched_pairs_with_ids)
       }
     })
+
+    res$auto_pairs <- true_pairs
 
     if (manual_dedup) {
       message("flagging potential pairs for manual dedup...")

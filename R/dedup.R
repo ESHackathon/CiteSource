@@ -16,8 +16,10 @@
 #' @param show_unknown_tags When a label, source, or other merged field is
 #'   missing, show it as "unknown"? Default FALSE.
 #' @return When `manual = FALSE`: a dataframe of unique citations. When
-#'   `manual = TRUE`: a list with `$unique` (unique citations) and
-#'   `$manual_dedup` (potential pairs for review).
+#'   `manual = TRUE`: a list with `$unique` (unique citations),
+#'   `$manual_dedup` (potential pairs for review), and `$auto_pairs`
+#'   (pairs that were merged automatically — feed to [dedup_log()] together
+#'   with confirmed manual pairs to build a full provenance log).
 #'
 #' @examples
 #' # Load example data from the package
@@ -68,6 +70,78 @@ dedup_citations <- function(raw_citations, manual = FALSE, show_unknown_tags = F
     dedup_results$unique <- dplyr::select(dedup_results$unique, -source, -label)
     return(dedup_results)
   }
+}
+
+
+#' Build a provenance log of all merged duplicate pairs
+#'
+#' Combines automatically merged pairs and user-confirmed manual pairs into a
+#' single tibble with a `method` column (`"auto"` / `"manual"`). Useful for
+#' reporting and auditing — e.g. as supplementary material for a systematic
+#' review.
+#'
+#' @export
+#' @param dedup_result List returned by `dedup_citations(manual = TRUE)`
+#'   (must contain `$auto_pairs`; optionally `$manual_dedup`).
+#' @param confirmed_manual_pairs Optional dataframe of manual pairs the user
+#'   confirmed as duplicates. Typically a subset of `dedup_result$manual_dedup`.
+#'   If a `result` column is present, only rows where `result == "match"` are
+#'   included.
+#' @return Tibble with columns `method`, `record_id1`, `record_id2`, and the
+#'   common bibliographic fields (`title1/2`, `author1/2`, `year1/2`,
+#'   `journal1/2`, `doi1/2`) when available.
+#'
+#' @examples
+#' examplecitations_path <- system.file("extdata", "examplecitations.rds",
+#'                                       package = "CiteSource")
+#' examplecitations <- readRDS(examplecitations_path)
+#' dedup_results <- dedup_citations(examplecitations, manual = TRUE)
+#' # Log of just the auto-merged pairs
+#' dedup_log(dedup_results)
+#' # Or include user-confirmed manual pairs
+#' # dedup_log(dedup_results, confirmed_manual_pairs = my_confirmed_pairs)
+dedup_log <- function(dedup_result, confirmed_manual_pairs = NULL) {
+
+  log_cols <- c("record_id1", "record_id2",
+                "title1", "title2", "author1", "author2",
+                "year1", "year2", "journal1", "journal2",
+                "doi1", "doi2")
+
+  pad_cols <- function(df) {
+    if (is.null(df) || nrow(df) == 0) {
+      out <- stats::setNames(
+        as.data.frame(matrix(NA_character_, nrow = 0, ncol = length(log_cols)),
+                      stringsAsFactors = FALSE),
+        log_cols
+      )
+      return(out)
+    }
+    missing <- setdiff(log_cols, names(df))
+    if (length(missing) > 0) df[missing] <- NA
+    df <- df[, log_cols, drop = FALSE]
+    # Coerce to character so auto-pairs (numeric year, etc.) and manual-pairs
+    # (character) can be bound together without type clashes.
+    for (col in log_cols) df[[col]] <- as.character(df[[col]])
+    df
+  }
+
+  auto <- pad_cols(dedup_result$auto_pairs)
+  if (nrow(auto) > 0) auto$method <- "auto"
+
+  manual <- confirmed_manual_pairs
+  if (!is.null(manual) && "result" %in% names(manual)) {
+    manual <- manual[manual$result == "match", , drop = FALSE]
+  }
+  if (!is.null(manual) && "record_id1" %in% names(manual)) {
+    manual <- pad_cols(manual)
+  } else {
+    manual <- pad_cols(NULL)
+  }
+  if (nrow(manual) > 0) manual$method <- "manual"
+
+  out <- dplyr::bind_rows(auto, manual)
+  if (nrow(out) > 0) out <- out[, c("method", log_cols), drop = FALSE]
+  tibble::as_tibble(out)
 }
 
 
