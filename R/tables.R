@@ -66,93 +66,126 @@ record_level_table <- function(citations, include = "sources", include_empty = T
     dplyr::select("duplicate_id", "citation", "reference", "html_reference") |>
     dplyr::left_join(sources, by = "duplicate_id")
   
-  indicator_presence <- as.character(indicator_presence)
-  indicator_absence <- as.character(indicator_absence)
-  
-  to_display <- citations |>
-    dplyr::select(-(1:4)) |>
-    dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(.x, indicator_presence, indicator_absence))) |>
-    dplyr::rename_with(~ paste0(.x, " ")) # Add space to keep column names unique
-  
-  citations <- dplyr::bind_cols(citations, to_display)
-  
+  indicator_cols <- names(citations)[-(1:4)]
+
+  headings <- purrr::map(include, function(type) {
+    type <- stringr::str_sub(type, 1, -2)
+    values <- indicator_cols |>
+      stringr::str_subset(glue::glue("^{type}__")) |>
+      stringr::str_remove(glue::glue("^{type}__"))
+    list(type = type |> stringr::str_to_title(), values = values)
+  }) |> purrr::transpose()
+
+  leaf_values <- unlist(headings$values)
+  leaf_types <- unlist(purrr::map2(
+    headings$type, lengths(headings$values),
+    ~ rep(.x, .y)
+  ))
+  is_dup <- duplicated(leaf_values) | duplicated(leaf_values, fromLast = TRUE)
+  leaf_labels <- ifelse(
+    is_dup,
+    paste0(leaf_values, " (", leaf_types, ")"),
+    leaf_values
+  )
+
+  indicators_bool <- citations |>
+    dplyr::select(dplyr::all_of(indicator_cols))
+
+  if (return[1] == "DT") {
+    indicator_presence <- as.character(indicator_presence)
+    indicator_absence <- as.character(indicator_absence)
+  }
+
+  to_display <- indicators_bool |>
+    dplyr::mutate(dplyr::across(
+      dplyr::everything(),
+      ~ ifelse(.x, indicator_presence, indicator_absence)
+    ))
+  names(to_display) <- leaf_labels
+
+  citations <- dplyr::bind_cols(
+    citations |> dplyr::select(1:4),
+    to_display
+  )
+
   if (return[1] == "DT") {
     if (!rlang::is_installed("DT")) {
       warning('DT can only be returned when the DT package is installed. Please run install.packages("DT")')
       return(citations)
     } else {
-      headings <- purrr::map(include, function(type) {
-        type <- stringr::str_sub(type, 1, -2)
-        values <- names(citations) |>
-          stringr::str_subset(glue::glue("^{type}__")) |>
-          stringr::str_remove(glue::glue("^{type}__"))
-        list(type = type |> stringr::str_to_title(), values = values)
-      }) |> purrr::transpose()
-      
-      sketch <- htmltools::tags$table(
-        class = "display",
-        htmltools::tags$thead(
-          htmltools::tags$tr(
-            htmltools::tags$th(rowspan = 2, colspan = 2, htmltools::HTML("&nbsp;")),
-            htmltools::tags$th(rowspan = 2, colspan = 2, "Citation"),
-            purrr::map2(headings$type, lengths(headings$values), ~ htmltools::tags$th(colspan = .y, .x))
+      n_ind <- ncol(to_display)
+      indicator_col_idx <- seq(3L, 2L + n_ind)
+      # Column names must be unique (duplicate "" breaks DT search/export).
+      dt_colnames <- c(" ", "Citation", ".html_reference", leaf_labels)
+
+      dt_data <- citations |>
+        dplyr::select(-"duplicate_id", -"reference") |>
+        (\(df) {
+          df <- as.data.frame(df, stringsAsFactors = FALSE)
+          df <- cbind(expand = "&oplus;", df)
+          colnames(df) <- dt_colnames
+          df
+        })()
+
+      DT::datatable(
+        dt_data,
+        rownames = FALSE,
+        escape = FALSE,
+        extensions = "Buttons",
+        options = list(
+          pageLength = 10,
+          lengthMenu = list(c(10, 25, 50, 100, -1), c('10', '25', '50', '100', 'All')),
+          columnDefs = list(
+            list(visible = FALSE, searchable = FALSE, targets = 2),
+            list(orderable = FALSE, className = "details-control", targets = 0),
+            list(width = "2em", targets = 0)
           ),
-          htmltools::tags$tr(
-            purrr::map(unlist(headings$values), ~ htmltools::tags$th(.x))
-          )
+          dom = "lBfrtip",
+          buttons =
+            list("print", list(
+              extend = "csv", filename = "CiteSource_record_summary",
+              text = "Download csv",
+              exportOptions = list(
+                columns = c(1, indicator_col_idx),
+                modifier = list(page = "all")
+              )
+            ))
         ),
-        htmltools::tags$tfoot(
-          htmltools::tags$td(colspan = 4 + length(unlist(headings$values)), htmltools::HTML("Click on the &oplus; to view the full reference"))
+        callback = DT::JS("
+            var refCol = 2;
+            table.column(0).nodes().to$().css({cursor: 'pointer'});
+            table.column(1).nodes().to$().css({cursor: 'pointer'});
+            var format = function(d) {
+              return '<div style=\"background-color:#eee; padding: .5em;\">' +
+                      d[refCol];
+            };
+            var toggleRow = function(tr) {
+              var row = table.row(tr);
+              var icon = $(tr).find('td').eq(0);
+              if (row.child.isShown()) {
+                row.child.hide();
+                icon.html('&oplus;');
+              } else {
+                row.child(format(row.data())).show();
+                icon.html('&CircleMinus;');
+              }
+            };
+            table.on('click', 'td.details-control', function() {
+              toggleRow($(this).closest('tr'));
+            });
+            table.on('click', 'tbody td', function() {
+              var idx = table.cell(this).index();
+              if (idx && idx.column === 1) toggleRow($(this).closest('tr'));
+            });"),
+        caption = htmltools::tags$caption(
+          style = "caption-side: bottom; text-align: left;",
+          "Click on the &oplus; to view the full reference"
         )
       )
-      
-      citations |>
-        dplyr::select(-"duplicate_id", -"reference") |>
-        (\(df) cbind(" " = "&oplus;", df))() |>
-        DT::datatable(
-          escape = FALSE,
-          extensions = "Buttons",
-          options = list(
-            pageLength = 10,
-            lengthMenu = list(c(10, 25, 50, 100, -1), c('10', '25', '50', '100', 'All')),
-            columnDefs = list(
-              list(visible = FALSE, targets = c(0, 3:(3 + ncol(to_display)))),
-              list(orderable = FALSE, className = "details-control", targets = 1)
-            ),
-            dom = "lBfrtip",
-            buttons =
-              list("print", list(
-                extend = "csv", filename = "CiteSource_record_summary",
-                text = "Download csv",
-                exportOptions = list(
-                  columns = c(0, 2:(3 + ncol(to_display))),
-                  modifier = list(page = "all")
-                )
-                
-              ))
-          ), container = sketch,
-          callback = DT::JS("
-              table.column(1).nodes().to$().css({cursor: 'pointer'});
-              var format = function(d) {
-                return '<div style=\"background-color:#eee; padding: .5em;\">' +
-                        d[3];
-              };
-              table.on('click', 'td.details-control', function() {
-                var td = $(this), row = table.row(td.closest('tr'));
-                if (row.child.isShown()) {
-                  row.child.hide();
-                  td.html('&oplus;');
-                } else {
-                  row.child(format(row.data())).show();
-                  td.html('&CircleMinus;');
-                }
-              });")
-        )
     }
   } else {
     citations |>
-      dplyr::select(1:3, dplyr::matches(" "), -"html_reference") |>
-      dplyr::rename_with(stringr::str_trim)
+      dplyr::select("duplicate_id", "citation", "reference", dplyr::all_of(leaf_labels))
   }
 }
 
