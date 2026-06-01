@@ -44,6 +44,7 @@ will be the specific intersections listed.}
     \item{\code{main.bar.color}}{Color of the main bar plot}
     \item{\code{mainbar.y.max}}{The maximum y value of the intersection size bar plot scale. May be useful when aligning multiple UpSet plots horizontally.}
     \item{\code{sets.bar.color}}{Color of set size bar plot}
+    \item{\code{plot.title}}{Title of UpSetR plot}
     \item{\code{point.size}}{Size of points in matrix plot}
     \item{\code{line.size}}{Width of lines in matrix plot}
     \item{\code{mb.ratio}}{Ratio between matrix plot and main bar plot (Keep in terms of hundredths)}
@@ -53,6 +54,7 @@ will be the specific intersections listed.}
     \item{\code{decreasing}}{How the variables in order.by should be ordered. "freq" is decreasing (greatest to least) and "degree" is increasing (least to greatest)}
     \item{\code{show.numbers}}{Show numbers of intersection sizes above bars}
     \item{\code{number.angles}}{The angle of the numbers atop the intersection size bars}
+    \item{\code{number.colors}}{The colors of the numbers atop the intersection size bars}
     \item{\code{group.by}}{How the data should be grouped ("degree" or "sets")}
     \item{\code{cutoff}}{The number of intersections from each set (to cut off at) when aggregating by sets}
     \item{\code{queries}}{Unified query of intersections, elements, and custom row functions. Entered as a list that contains a list of

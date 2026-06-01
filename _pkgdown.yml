@@ -1,4 +1,4 @@
-url: http://www.eshackathon.org/CiteSource/
+url: https://eshackathon.github.io/CiteSource/
 template:
   bootstrap: 5
 
@@ -12,4 +12,3 @@ articles:
   - citesource_vignette_db-pre-screen_validation
   - citesource_vignette_db-topic-coverage
   - citesource_analysis_across_screening_phases
-  
