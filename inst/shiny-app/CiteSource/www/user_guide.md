@@ -2,10 +2,7 @@
 
 <img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
 
-This guide walks through each step of the CiteSource workflow in the Shiny app. The progress bar at the top of the app shows where you are and lets you jump between steps once they're available.
-
-For R package documentation and vignettes, visit the [CiteSource website](https://www.eshackathon.org/CiteSource/articles/).
-
+> CiteSource has a number of applications. This guide walks users through the step-wise process of uploading, deduplicating and analyzing data within the shiny application. For step by step instructions for running CiteSource in R, [check out our vignettes](https://eshackathon.github.io/CiteSource/articles/).
 ---
 
 <a id="step-1"></a>
