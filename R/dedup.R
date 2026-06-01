@@ -239,9 +239,10 @@ dedup_citations_add_sources <- function(existing_citations, new_citations,
   # New records get fresh ids that cannot collide with any existing id. Base the
   # offset on the max of ALL underlying record_ids (duplicate_id is the cluster
   # minimum, so a new id keyed off it could otherwise reuse an existing id).
-  existing_ids <- c(as.character(ex$duplicate_id),
-                    unlist(strsplit(paste(ex$record_ids, collapse = ", "), ",\\s*")))
-  existing_ids <- existing_ids[!is.na(existing_ids) & !existing_ids %in% c("", "NA")]
+  existing_ids <- c(
+    as.character(ex$duplicate_id),
+    unlist(strsplit(as.character(ex$record_ids), ",\\s*"))
+  )
   max_id <- suppressWarnings(max(as.numeric(existing_ids), na.rm = TRUE))
 
   nw <- dplyr::mutate(new_citations, dplyr::across(dplyr::everything(), as.character))
