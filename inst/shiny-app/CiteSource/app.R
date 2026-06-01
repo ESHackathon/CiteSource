@@ -382,6 +382,8 @@ ui <- shiny::navbarPage("CiteSource",
                               br(),
                               shiny::h5("Step 3: Deduplicate"),
                               shiny::p("Click the button below to detect and remove duplicates automatically"),
+                              shiny::p("Already re-uploaded a deduplicated set? Add new citation files on the File upload tab, then click Find duplicates to merge them into the existing set.",
+                                       style = "font-size:0.82em;color:#6c757d;"),
                               
                               # Action button: identify duplicates in uploaded dataset
                               shinyWidgets::actionBttn(
@@ -900,6 +902,7 @@ server <- function(input, output, session) {
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
   rv$auto_pairs    <- data.frame()#auto-merged pairs, for the dedup log
+  rv$existing_dedup_present <- FALSE # TRUE when latest_unique is a reimported deduped set that new uploads should be merged INTO (Goal 2)
   rv$file_meta           <- list()  # Per-file metadata (source/label/string); keyed by file.datapath
   # Card view state
   rv$selected_pairs_card <- integer(0)
@@ -1218,6 +1221,7 @@ server <- function(input, output, session) {
       tryCatch({
         if (ext == "ris") {
           rv$latest_unique  <- reimport_ris(path)
+          rv$existing_dedup_present <- TRUE
           n_unique_imported <- nrow(rv$latest_unique)
         } else if (ext == "csv") {
           # Route by content: a candidate-pairs file has duplicate_id.x / .y;
@@ -1232,6 +1236,7 @@ server <- function(input, output, session) {
             n_candidates_imported <- nrow(cand)
           } else {
             rv$latest_unique  <- reimport_csv(path)
+            rv$existing_dedup_present <- TRUE
             n_unique_imported <- nrow(rv$latest_unique)
           }
         } else {
@@ -1411,11 +1416,15 @@ server <- function(input, output, session) {
   
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups, {
-    if (nrow(rv$upload_df) == 0) {
-      if (nrow(rv$latest_unique) > 0) {
-        show_toastr("Deduplication already complete",
-                    "You have reimported a dataset that has already been deduplicated. Further deduplication is not possible here.",
-                    type = "error")
+    has_new      <- is.data.frame(rv$upload_df) && nrow(rv$upload_df) > 0
+    has_existing <- isTRUE(rv$existing_dedup_present) &&
+                    is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+
+    if (!has_new) {
+      if (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0) {
+        show_toastr("Already deduplicated",
+                    "This set is already deduplicated. To add more sources, upload new citation files above, then click Find duplicates to merge them in.",
+                    type = "info")
       } else {
         show_toastr("Data needed", "Please import your citations first.", type = "error")
       }
@@ -1444,35 +1453,57 @@ server <- function(input, output, session) {
 
     # Assign unique IDs to avoid issues with manual deduplication
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
-    
-    # Perform deduplication
-    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
+
+    n_new <- nrow(rv$upload_df)  # capture before any clearing
+
+    # Perform deduplication. With a reimported deduplicated set present, merge
+    # the new uploads INTO it (Goal 2); otherwise deduplicate the uploads.
+    if (has_existing) {
+      dedup_results <- CiteSource::dedup_citations_add_sources(
+        rv$latest_unique, rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
+    } else {
+      dedup_results <- CiteSource::dedup_citations(
+        rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
+    }
     rv$pairs_to_check <- dedup_results$manual_dedup
     rv$latest_unique  <- dedup_results$unique
     rv$auto_pairs     <- if (is.null(dedup_results$auto_pairs)) data.frame() else dedup_results$auto_pairs
     rv$pairs_removed  <- data.frame()  # reset manual log on a fresh dedup run
     rv$n_unique <- count_unique(rv$latest_unique)  # Generate the n_unique data
-    
-    # Generate a summary message based on deduplication results
-    n_citations    <- nrow(rv$upload_df)
+
     n_unique_records <- nrow(rv$latest_unique)
-    n_duplicates_removed <- n_citations - n_unique_records
-    n_pairs_manual <- nrow(rv$pairs_to_check)
-
+    n_pairs_manual   <- nrow(rv$pairs_to_check)
     fmt <- function(x) format(x, big.mark = ",", scientific = FALSE)
-    message <- if (n_pairs_manual > 0) {
-      paste0("Total citations uploaded: ", fmt(n_citations), "\n",
-             "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
-             "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
-             n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
-    } else {
-      paste0("Total citations uploaded: ", fmt(n_citations), "\n",
-             "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
-             "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
-             "No potential duplicates for manual review. You can proceed to the visualization tab.")
-    }
 
-    show_toastr("Auto-deduplication complete", message, type = "success")
+    if (has_existing) {
+      # The combined set is now a standalone deduplicated set. Clear the uploads
+      # (and the upload form) so the same new records can't be added twice, and
+      # keep the merged set flagged as an existing set for further additions.
+      rv$df <- data.frame(); rv$upload_df <- data.frame(); rv$file_meta <- list()
+      rv$existing_dedup_present <- TRUE
+
+      review_msg <- if (n_pairs_manual > 0)
+        paste0(n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
+      else "No potential duplicates for manual review."
+      message <- paste0("Added ", fmt(n_new), " new citation(s) to the existing set.\n",
+                        "Unique citations after merge: ", fmt(n_unique_records), "\n\n", review_msg)
+      show_toastr("Sources added", message, type = "success")
+    } else {
+      rv$existing_dedup_present <- FALSE
+      n_duplicates_removed <- n_new - n_unique_records
+      message <- if (n_pairs_manual > 0) {
+        paste0("Total citations uploaded: ", fmt(n_new), "\n",
+               "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
+               "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
+               n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
+      } else {
+        paste0("Total citations uploaded: ", fmt(n_new), "\n",
+               "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
+               "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
+               "No potential duplicates for manual review. You can proceed to the visualization tab.")
+      }
+      show_toastr("Auto-deduplication complete", message, type = "success")
+    }
   })
 
   # ---- Post-dedup summary card ----

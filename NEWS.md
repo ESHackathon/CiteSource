@@ -6,6 +6,13 @@
 
 ## New features
 
+- Incremental deduplication: `dedup_citations_add_sources()` adds new raw
+  citations to a previously deduplicated set and deduplicates across both,
+  preserving prior automatic and manual merge decisions and the original
+  `record_ids` provenance. For the same data it yields the same unique set as
+  deduplicating everything from scratch. Exposed in the Shiny app — re-upload a
+  deduplicated set, add new citation files, and "Find duplicates" merges them
+  in. Works in `manual = TRUE` mode to surface new candidate pairs for review.
 - Deferred manual deduplication: run automatic dedup now and complete manual
   review later. `export_dedup_candidates()` / `reimport_dedup_candidates()`
   persist and restore the `$manual_dedup` candidate pairs, and `export_csv()`
