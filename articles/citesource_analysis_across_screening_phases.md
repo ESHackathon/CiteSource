@@ -129,7 +129,7 @@ imported_tbl <- tibble::tribble(
 
 dplyr::mutate(files = paste0(file_path, files))
 raw_citations <- read_citations(metadata = imported_tbl)
-#> Importing files ■■■                                6%
+#> Importing files ■■■                                5%
 #> Import completed - with the following details:
 #>                 file       cite_source cite_string cite_label citations
 #> 1        wos_278.ris               WoS        <NA>     search       278
