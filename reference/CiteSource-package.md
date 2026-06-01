@@ -10,7 +10,7 @@ different sources
 
 Useful links:
 
-- <https://www.eshackathon.org/CiteSource>
+- <https://eshackathon.github.io/CiteSource/>
 
 - Report bugs at <https://github.com/ESHackathon/CiteSource/issues>
 

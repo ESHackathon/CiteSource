@@ -32,12 +32,12 @@ Source:
 Riley T, Hair K, Wallrich L, Grainger M, Young S, Pritchard C, Haddaway
 N (2026). *CiteSource: An R package for data-driven search strategy
 development and enhanced evidence synthesis reporting*. R package
-version 0.1.1, <https://www.eshackathon.org/CiteSource>.
+version 0.1.1, <https://eshackathon.github.io/CiteSource/>.
 
     @Manual{,
       title = {CiteSource: An R package for data-driven search strategy development and enhanced evidence synthesis reporting},
       author = {Trevor Riley and Kaitlyn Hair and Lukas Wallrich and Matthew Grainger and Sarah Young and Chris Pritchard and Neal Haddaway},
       year = {2026},
       note = {R package version 0.1.1},
-      url = {https://www.eshackathon.org/CiteSource},
+      url = {https://eshackathon.github.io/CiteSource/},
     }

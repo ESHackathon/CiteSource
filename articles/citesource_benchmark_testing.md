@@ -100,9 +100,9 @@ dplyr::mutate(files = paste0(file_path, files))
 citations <- read_citations(metadata = metadata_tbl)
 #> Importing files ■■                                 3%
 #> Importing files ■■■                                5%
-#> Importing files ■■■                                8%
-#> Importing files ■■■■                              11%
-#> Importing files ■■■■■                             14%
+#> Importing files ■■■■                               9%
+#> Importing files ■■■■■                             12%
+#> Importing files ■■■■■                             15%
 #> Importing files ■■■■■■                            17%
 #> Importing files ■■■■■■■                           19%
 #> Importing files ■■■■■■■                           21%
