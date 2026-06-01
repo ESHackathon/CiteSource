@@ -84,4 +84,4 @@ CiteSource is built for anyone involved in evidence synthesis. It helps you:
 
 ---
 
-*CiteSource is available both as this interactive Shiny application and as a full R package with detailed vignettes. For more information on the R package, visit the [CiteSource Website](https://www.eshackathon.org/CiteSource/).*
+*CiteSource is available both as this interactive Shiny application and as a full R package with detailed vignettes. For more information on the R package, visit the [CiteSource Website](https://eshackathon.github.io/CiteSource/).*

@@ -2,7 +2,7 @@
 
 <img src="CS.gif" width="200" style="float: right; margin-left: 20px; margin-bottom: 10px;"/>
 
-> CiteSource has a number of applications. This guide walks users through the step-wise process of uploading, deduplicating and analyzing data > within the shiny application. For step by step instructions for running CiteSource in R, [check out our vignettes](https://www.eshackathon.org/CiteSource/articles/)
+> CiteSource has a number of applications. This guide walks users through the step-wise process of uploading, deduplicating and analyzing data > within the shiny application. For step by step instructions for running CiteSource in R, [check out our vignettes](https://eshackathon.github.io/CiteSource/articles/)
 ---
 
 ### Using CiteSource: Step-by-Step
