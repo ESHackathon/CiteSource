@@ -351,16 +351,19 @@ ui <- shiny::navbarPage("CiteSource",
                               # Sidebar layout ----
                               shiny::sidebarLayout(
                                 shiny::sidebarPanel( # Input: Select a file ----
-                                                     shiny::h5("Step 1: Upload your citation files"),
-                                                     shiny::fileInput("file", "",
+                                                     shiny::h5("Step 1: Upload citation files"),
+                                                     shiny::p("New search/database exports to deduplicate.",
+                                                              style = "font-size:0.8em;color:#6c757d;margin-top:-4px;margin-bottom:6px;"),
+                                                     shiny::fileInput("file", "Add new files (.ris, .bib, .txt)",
                                                                       multiple = TRUE,
                                                                       accept = c(".ris", ".txt", ".bib")
                                                      ),
                                                      shiny::hr(),
-                                                     shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
-                                                     shiny::p("You can also add a candidate-pairs CSV to resume manual deduplication.",
-                                                              style = "font-size:0.8em;color:#6c757d;margin-top:-6px;"),
-                                                     shiny::fileInput("file_reimport", "",
+                                                     shiny::h5("Re-upload a CiteSource export"),
+                                                     shiny::p(
+                                                       "A previously deduplicated set (.csv or .ris) to keep working with — view its sources below, add new files above to merge in, or finish manual review by also re-uploading a candidate-pairs .csv.",
+                                                       style = "font-size:0.8em;color:#6c757d;margin-top:-4px;margin-bottom:6px;"),
+                                                     shiny::fileInput("file_reimport", "Re-upload exported file(s)",
                                                                       multiple = TRUE,
                                                                       accept = c(".ris", ".csv")
                                                      )
