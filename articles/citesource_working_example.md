@@ -153,7 +153,6 @@ metadata_tbl <- tibble::tribble(
 
 dplyr::mutate(files = paste0(file_path, files))
 citations <- read_citations(metadata = metadata_tbl)
-#> Importing files ■■■                                5%
 #> Importing files ■■■                                6%
 #> Importing files ■■■                                8%
 #> Importing files ■■■■                               9%

@@ -79,7 +79,6 @@ dplyr::mutate(files = paste0(file_path, files))
 
 # Save the imported citations as raw_citations
 raw_citations <- read_citations(metadata = imported_tbl, verbose = FALSE)
-#> Importing files ■■■                                5%
 ```
 
 ## 4. Deduplicate & create data tables
