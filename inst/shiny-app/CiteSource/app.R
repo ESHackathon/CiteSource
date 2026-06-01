@@ -367,6 +367,7 @@ ui <- shiny::navbarPage("CiteSource",
                                 ),
                                 # Main panel for displaying outputs ----
                                 shiny::mainPanel(
+                                  shiny::uiOutput("reimport_summary"),
                                   shiny::uiOutput("metadata_form"),
                                   shiny::uiOutput("post_upload_guide")
                                 )
@@ -998,14 +999,86 @@ server <- function(input, output, session) {
       ),
       check.names = FALSE
     )
-  }, 
-  striped = TRUE, 
-  hover = TRUE, 
-  width = "100%", 
+  },
+  striped = TRUE,
+  hover = TRUE,
+  width = "100%",
   align = "l",
   sanitize.text.function = function(x) x # Allows the <strong> tags to work
   )
-  
+
+  # --- Re-imported deduplicated set: read-only source overview ---------------
+  # When a previously deduplicated/exported set is re-uploaded, show what is
+  # already in it (sources, and any labels/strings) so the user can see the
+  # existing content before adding more references. View only — this set is kept
+  # separate from the newly uploaded files and its tags cannot be edited here.
+  reimport_summary_data <- shiny::reactive({
+    shiny::req(isTRUE(rv$existing_dedup_present),
+               is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
+
+    # Count, per field value, the number of unique records that include it.
+    # Tokens are de-duplicated within each record so a record merged from
+    # several sources counts once per distinct source/label/string.
+    tally_field <- function(col, field_name) {
+      if (!col %in% names(rv$latest_unique)) return(NULL)
+      vals <- rv$latest_unique[[col]]
+      vals <- vals[!is.na(vals) & !vals %in% c("", "NA")]
+      if (length(vals) == 0) return(NULL)
+      toks <- unlist(lapply(strsplit(vals, ",\\s*"), function(t) unique(trimws(t))))
+      toks <- toks[toks != "" & toks != "NA"]
+      if (length(toks) == 0) return(NULL)
+      tbl <- sort(table(toks), decreasing = TRUE)
+      data.frame(Field = field_name, Value = names(tbl),
+                 Records = as.integer(tbl), check.names = FALSE,
+                 row.names = NULL, stringsAsFactors = FALSE)
+    }
+
+    out <- dplyr::bind_rows(
+      tally_field("cite_source", "Source"),
+      tally_field("cite_label",  "Label"),
+      tally_field("cite_string", "String")
+    )
+    if (is.null(out) || nrow(out) == 0) return(NULL)
+    out
+  })
+
+  output$reimport_summary <- shiny::renderUI({
+    summ <- reimport_summary_data()
+    if (is.null(summ)) return(NULL)
+
+    flag <- rv$latest_unique$manual_dedup_complete
+    reviewed <- length(flag) > 0 && as.character(flag[1]) %in% c("TRUE", "T", "1")
+
+    bslib::card(
+      bslib::card_header(
+        shiny::tags$i(class = "fa fa-database", style = "margin-right:7px;"),
+        "Re-imported deduplicated set"
+      ),
+      bslib::card_body(
+        shiny::p(
+          paste0(format(nrow(rv$latest_unique), big.mark = ","),
+                 " unique records re-imported",
+                 if (reviewed) " (manual deduplication marked complete)." else "."),
+          style = "color:#6c757d;font-size:0.88em;margin-bottom:4px;"
+        ),
+        shiny::p(
+          "View only — this set is kept separate from any new files you upload. Add new citation files on the left, then click Find duplicates to merge them in.",
+          style = "color:#6c757d;font-size:0.8em;margin-bottom:10px;"
+        ),
+        shiny::tableOutput("reimport_summary_tbl")
+      )
+    )
+  })
+
+  output$reimport_summary_tbl <- shiny::renderTable(
+    {
+      summ <- reimport_summary_data()
+      shiny::req(summ)
+      summ
+    },
+    striped = TRUE, hover = TRUE, width = "100%", align = "l"
+  )
+
   # --- Google Analytics Integration ---
   # Flag to ensure GA script is inserted only once per session
   #### Upload files tab section ------
