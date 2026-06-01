@@ -13,7 +13,7 @@ dedup_citations_add_sources(
 }
 \arguments{
 \item{existing_citations}{A previously deduplicated set (from
-\code{\link[=dedup_citations]{dedup_citations()}}, \code{\link[=reimport_csv]{reimport_csv()}} or \code{\link[=reimport_ris]{reimport_ris()}}) — must contain a
+\code{\link[=dedup_citations]{dedup_citations()}}, \code{\link[=reimport_csv]{reimport_csv()}} or \code{\link[=reimport_ris]{reimport_ris()}}) - must contain a
 \code{duplicate_id} column.}
 
 \item{new_citations}{New raw citations to add, as returned by
@@ -35,7 +35,7 @@ retains the original record IDs behind every merged record.
 \description{
 Adds further citations (e.g. an additional database search) to a set that was
 already deduplicated, and deduplicates the new records against both the
-existing set and each other — without discarding the work already done. Each
+existing set and each other - without discarding the work already done. Each
 existing unique record enters as a single row, so prior automatic and manual
 merge decisions are preserved; the new records are integrated and full
 provenance (the original \code{record_ids} behind every merged record) is carried

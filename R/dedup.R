@@ -18,7 +18,7 @@
 #' @return When `manual = FALSE`: a dataframe of unique citations. When
 #'   `manual = TRUE`: a list with `$unique` (unique citations),
 #'   `$manual_dedup` (potential pairs for review), and `$auto_pairs`
-#'   (pairs that were merged automatically — feed to [dedup_log()] together
+#'   (pairs that were merged automatically - feed to [dedup_log()] together
 #'   with confirmed manual pairs to build a full provenance log).
 #'
 #' @examples
@@ -77,7 +77,7 @@ dedup_citations <- function(raw_citations, manual = FALSE, show_unknown_tags = F
 #'
 #' Combines automatically merged pairs and user-confirmed manual pairs into a
 #' single tibble with a `method` column (`"auto"` / `"manual"`). Useful for
-#' reporting and auditing — e.g. as supplementary material for a systematic
+#' reporting and auditing - e.g. as supplementary material for a systematic
 #' review.
 #'
 #' @export
@@ -185,7 +185,7 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
 #'
 #' Adds further citations (e.g. an additional database search) to a set that was
 #' already deduplicated, and deduplicates the new records against both the
-#' existing set and each other — without discarding the work already done. Each
+#' existing set and each other - without discarding the work already done. Each
 #' existing unique record enters as a single row, so prior automatic and manual
 #' merge decisions are preserved; the new records are integrated and full
 #' provenance (the original `record_ids` behind every merged record) is carried
@@ -196,7 +196,7 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
 #'
 #' @export
 #' @param existing_citations A previously deduplicated set (from
-#'   [dedup_citations()], [reimport_csv()] or [reimport_ris()]) — must contain a
+#'   [dedup_citations()], [reimport_csv()] or [reimport_ris()]) - must contain a
 #'   `duplicate_id` column.
 #' @param new_citations New raw citations to add, as returned by
 #'   [read_citations()] (with `cite_source` / `cite_label` / `cite_string`).
@@ -221,7 +221,7 @@ dedup_citations_add_sources <- function(existing_citations, new_citations,
                                         manual = FALSE, show_unknown_tags = FALSE) {
 
   if (!"duplicate_id" %in% names(existing_citations)) {
-    stop("existing_citations must contain a `duplicate_id` column — pass a set ",
+    stop("existing_citations must contain a `duplicate_id` column - pass a set ",
          "returned by dedup_citations(), reimport_csv() or reimport_ris().")
   }
 
