@@ -28,7 +28,7 @@ Description: Tools for data-driven search strategy development and evidence
              plots and tables, and import or export data in 'RIS' and 'CSV' formats.
              An interactive 'shiny' application is included for exploratory use.
 License: GPL (>= 3)
-URL: https://www.eshackathon.org/CiteSource
+URL: https://eshackathon.github.io/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
 Imports:
     dplyr,

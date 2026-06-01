@@ -48,4 +48,4 @@ Riley, T., Young, S., Paxton, A., Wallrich, L., Hair, K., & Grainger, M. (2026).
 
 ---
 
-*CiteSource is also available as a full R package with detailed vignettes. Visit the [CiteSource website](https://www.eshackathon.org/CiteSource/) for more.*
+*CiteSource is available both as this interactive Shiny application and as a full R package with detailed vignettes. For more information on the R package, visit the [CiteSource Website](https://eshackathon.github.io/CiteSource/).*
