@@ -358,6 +358,8 @@ ui <- shiny::navbarPage("CiteSource",
                                                      ),
                                                      shiny::hr(),
                                                      shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
+                                                     shiny::p("You can also add a candidate-pairs CSV to resume manual deduplication.",
+                                                              style = "font-size:0.8em;color:#6c757d;margin-top:-6px;"),
                                                      shiny::fileInput("file_reimport", "",
                                                                       multiple = TRUE,
                                                                       accept = c(".ris", ".csv")
@@ -818,6 +820,14 @@ ui <- shiny::navbarPage("CiteSource",
                                         "CSV of every merged duplicate pair, flagged as automated or manual.",
                                         style="color:#6c757d;font-size:0.82em;margin-bottom:8px;"),
                                       shiny::downloadButton("downloadDedupLog", "Dedup Log (CSV)",
+                                        style="margin-bottom:4px;"),
+                                      shiny::tags$hr(style="margin:14px 0 10px 0;"),
+                                      shiny::tags$strong("Manual review candidates",
+                                        style="font-size:0.88em;display:block;margin-bottom:4px;"),
+                                      shiny::p(
+                                        "CSV of unresolved candidate pairs. Re-upload it together with the citations CSV to finish manual deduplication later.",
+                                        style="color:#6c757d;font-size:0.82em;margin-bottom:8px;"),
+                                      shiny::downloadButton("downloadCandidates", "Candidate Pairs (CSV)",
                                         style="margin-bottom:4px;")
                                     )
                                   ),
@@ -1194,22 +1204,59 @@ server <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$file_reimport, {
-    file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
-    
-    if (file_extension == "csv") {
-      rv$latest_unique <- reimport_csv(input$file_reimport$datapath)
-    } else if (file_extension == "ris") {
-      rv$latest_unique <- reimport_ris(input$file_reimport$datapath)
-    } else {
-      warning("Invalid file extension, needs to be .ris or .csv")
+    files <- input$file_reimport   # data frame: one row per file (multiple = TRUE)
+
+    n_unique_imported     <- 0L
+    n_candidates_imported <- 0L
+    errors <- character(0)
+
+    for (i in seq_len(nrow(files))) {
+      path <- files$datapath[i]
+      nm   <- files$name[i]
+      ext  <- tolower(tools::file_ext(nm))
+
+      tryCatch({
+        if (ext == "ris") {
+          rv$latest_unique  <- reimport_ris(path)
+          n_unique_imported <- nrow(rv$latest_unique)
+        } else if (ext == "csv") {
+          # Route by content: a candidate-pairs file has duplicate_id.x / .y;
+          # a deduplicated citation set has the cite_* / duplicate_id columns.
+          hdr <- names(utils::read.csv(path, nrows = 1, stringsAsFactors = FALSE))
+          if (all(c("duplicate_id.x", "duplicate_id.y") %in% hdr)) {
+            cand <- reimport_dedup_candidates(path)
+            # Drop the R-workflow `result` column: in the app the merge decision
+            # is the user's row selection, not result == "match".
+            cand$result <- NULL
+            rv$pairs_to_check     <- cand
+            n_candidates_imported <- nrow(cand)
+          } else {
+            rv$latest_unique  <- reimport_csv(path)
+            n_unique_imported <- nrow(rv$latest_unique)
+          }
+        } else {
+          errors <- c(errors, paste0(nm, " (unsupported type)"))
+        }
+      }, error = function(e) {
+        errors <<- c(errors, paste0(nm, ": ", conditionMessage(e)))
+      })
     }
-    
-    rv$n_unique <- count_unique(rv$latest_unique)
-    
-    show_toastr("Re-import successful",
-                paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
-                type = "success")
-    
+
+    if (n_unique_imported > 0) rv$n_unique <- count_unique(rv$latest_unique)
+
+    if (length(errors) > 0) {
+      show_toastr("Some files could not be re-imported",
+                  paste(errors, collapse = "; "), type = "error")
+    }
+    if (n_unique_imported > 0 || n_candidates_imported > 0) {
+      msg <- character(0)
+      if (n_unique_imported > 0)
+        msg <- c(msg, paste("Imported", n_unique_imported, "deduplicated citations."))
+      if (n_candidates_imported > 0)
+        msg <- c(msg, paste("Restored", n_candidates_imported,
+                            "candidate pair(s) — finish review on the Deduplicate tab."))
+      show_toastr("Re-import successful", paste(msg, collapse = " "), type = "success")
+    }
   })
   
   ## Update filters
@@ -2937,7 +2984,11 @@ server <- function(input, output, session) {
           cols <- input$csv_custom_cols
           if (is.null(cols) || length(cols) == 0) "full" else cols
         }
-        export_csv(rv$latest_unique, file, fields = fields)
+        # Flag the set as manually reviewed when no candidate pairs remain
+        # pending (UX guard, read back by reimport_csv()). Only written on full
+        # exports by export_csv().
+        export_csv(rv$latest_unique, file, fields = fields,
+                   manual_dedup_complete = (nrow(rv$pairs_to_check) == 0))
       } else {
         stop("No data to download!")
         shiny::req(FALSE)
@@ -2983,6 +3034,22 @@ server <- function(input, output, session) {
         )
       } else {
         utils::write.csv(log_df, file, row.names = FALSE)
+      }
+    }
+  )
+
+  # ---- Manual-review candidate pairs: export to resume review later ----
+  output$downloadCandidates <- shiny::downloadHandler(
+    filename = function() paste0("candidate-pairs-", Sys.Date(), ".csv"),
+    content  = function(file) {
+      pairs <- rv$pairs_to_check
+      if (!is.data.frame(pairs) || nrow(pairs) == 0) {
+        utils::write.csv(
+          data.frame(note = "No unresolved candidate pairs."),
+          file, row.names = FALSE
+        )
+      } else {
+        export_dedup_candidates(pairs, file)
       }
     }
   )

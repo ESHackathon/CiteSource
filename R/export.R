@@ -15,6 +15,12 @@
 #' @param trim_abstracts Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel,
 #' which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 #' NULL to retain abstracts as they are.
+#' @param manual_dedup_complete Logical. Records, in a `manual_dedup_complete`
+#'   column, whether manual deduplication has been completed for this set
+#'   (default `FALSE`). Set `TRUE` after confirming manual pairs with
+#'   [dedup_citations_add_manual()]. This flag is read back by [reimport_csv()]
+#'   and lets later steps know whether candidate pairs still need review. Only
+#'   written when `fields = "full"`.
 #' @return No return value, called for side effects. Saves the deduplicated citations as a 'CSV' file to the specified location.
 #' @export
 #' @examples
@@ -28,7 +34,7 @@
 #'   export_csv(dedup_results, tempfile(fileext = ".csv"), fields = "standard")
 #' }
 
-export_csv <- function(unique_citations, filename, fields = "full", separate = NULL, trim_abstracts = 32000) {
+export_csv <- function(unique_citations, filename, fields = "full", separate = NULL, trim_abstracts = 32000, manual_dedup_complete = FALSE) {
   # Warn if the filename doesn't end with .csv
   if (tolower(tools::file_ext(filename)) != "csv") {
     warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
@@ -78,7 +84,59 @@ export_csv <- function(unique_citations, filename, fields = "full", separate = N
       dplyr::select(-tidyselect::all_of(separate)) |>
       dplyr::bind_cols(separated)
   }
+
+  # Record manual-dedup status on reimportable (full) exports only, so that
+  # later steps (and the Shiny app) know whether manual review is still pending.
+  if (identical(fields, "full")) {
+    unique_citations$manual_dedup_complete <- isTRUE(manual_dedup_complete)
+  }
+
   utils::write.csv(unique_citations, filename, row.names = FALSE)
+}
+
+#' Export manual-review candidate pairs to a CSV file
+#'
+#' Saves the candidate duplicate pairs returned as the `$manual_dedup` element
+#' of `dedup_citations(manual = TRUE)` so that manual review can be completed
+#' later. Combine with [export_csv()] to defer manual deduplication: export the
+#' automatically deduplicated unique citations *and* these candidate pairs now,
+#' then re-import both later with [reimport_csv()] and
+#' [reimport_dedup_candidates()] to finish the review. Note that *existing files
+#' are overwritten without warning.*
+#'
+#' @param manual_dedup Data frame of candidate pairs, i.e. the `$manual_dedup`
+#'   element of `dedup_citations(manual = TRUE)`.
+#' @param filename Name (and path) of file, should end in .csv
+#' @return No return value, called for side effects. Saves the candidate pairs
+#'   as a 'CSV' file to the specified location.
+#' @export
+#' @seealso [reimport_dedup_candidates()], [dedup_citations_add_manual()]
+#' @examples
+#' if (interactive()) {
+#'   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+#'   examplecitations <- readRDS(examplecitations_path)
+#'   dedup_results <- dedup_citations(examplecitations, manual = TRUE)
+#'   export_dedup_candidates(dedup_results$manual_dedup, tempfile(fileext = ".csv"))
+#' }
+export_dedup_candidates <- function(manual_dedup, filename) {
+  if (tolower(tools::file_ext(filename)) != "csv") {
+    warning("Function saves a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
+  }
+
+  if (!all(c("duplicate_id.x", "duplicate_id.y") %in% names(manual_dedup))) {
+    stop(
+      "manual_dedup must contain duplicate_id.x and duplicate_id.y columns. ",
+      "Pass the $manual_dedup element of dedup_citations(manual = TRUE)."
+    )
+  }
+
+  # Seed an empty result column to prompt reviewers to mark confirmed duplicates
+  # (dedup_citations_add_manual() merges only rows where result == "match").
+  if (!"result" %in% names(manual_dedup)) {
+    manual_dedup$result <- ""
+  }
+
+  utils::write.csv(manual_dedup, filename, row.names = FALSE)
 }
 
 #' Export data frame to RIS file

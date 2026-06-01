@@ -17,8 +17,11 @@ reimport_csv <- function(filename) {
   # Warn if the filename doesn't end with .csv
   if (tolower(tools::file_ext(filename)) != "csv") warning("Function reads a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
 
-  # Read the CSV file
-  unique_citations_imported <- utils::read.csv(filename, stringsAsFactors = FALSE)
+  # Read the CSV file. All columns are read as character so the reimported data
+  # matches the (all-character) types produced by dedup_citations(). This keeps
+  # the reimport faithful and is required for re-deduplication / adding manual
+  # pairs via dedup_citations_add_manual(), which fails on mixed column types.
+  unique_citations_imported <- utils::read.csv(filename, stringsAsFactors = FALSE, colClasses = "character")
 
   # Check if the required columns are present
   if (!all(c("cite_source", "cite_label", "cite_string", "duplicate_id", "record_ids") %in% names(unique_citations_imported))) {
@@ -29,7 +32,54 @@ reimport_csv <- function(filename) {
     )
   }
 
+  # The manual_dedup_complete flag (written by export_csv) is left as character
+  # ("TRUE"/"FALSE") like every other column, so the reimported set can be passed
+  # through dedup_citations_add_manual() / re-deduplication without column-type
+  # clashes. Test it with e.g. `df$manual_dedup_complete[1] == "TRUE"`.
+
   unique_citations_imported
+}
+
+#' Reimport manual-review candidate pairs exported from CiteSource
+#'
+#' Reads a CSV of candidate duplicate pairs previously written by
+#' [export_dedup_candidates()] (i.e. the `$manual_dedup` element of
+#' `dedup_citations(manual = TRUE)`). This supports a deferred workflow: run
+#' automatic deduplication now, export both the unique citations and the
+#' candidate pairs, and complete the manual review later after re-importing.
+#'
+#' After review, set the `result` column to `"match"` for confirmed duplicates
+#' and pass the result, together with the reimported unique citations, to
+#' [dedup_citations_add_manual()].
+#'
+#' @param filename Name (and path) of the candidate-pairs CSV, should end in .csv
+#' @return A data frame of candidate pairs with `duplicate_id.x` / `duplicate_id.y`
+#'   read as character (matching the unique citations from [reimport_csv()]), ready
+#'   for review and [dedup_citations_add_manual()].
+#' @export
+#' @seealso [export_dedup_candidates()], [dedup_citations_add_manual()]
+#' @examples
+#' if (interactive()) {
+#'   candidates <- reimport_dedup_candidates("path/to/candidates.csv")
+#'   # mark confirmed duplicates, then merge into the reimported unique set
+#'   candidates$result <- ifelse(candidates$result == "match", "match", "no_match")
+#'   final <- dedup_citations_add_manual(reimport_csv("unique.csv"), candidates)
+#' }
+reimport_dedup_candidates <- function(filename) {
+  if (tolower(tools::file_ext(filename)) != "csv") {
+    warning("Function reads a CSV file, so filename should (usually) end in .csv. For now, name is used as provided.")
+  }
+
+  candidates <- utils::read.csv(filename, stringsAsFactors = FALSE, colClasses = "character")
+
+  if (!all(c("duplicate_id.x", "duplicate_id.y") %in% names(candidates))) {
+    stop(
+      "Columns duplicate_id.x and duplicate_id.y were not found in ", filename,
+      ". This function expects a candidate-pairs file written by export_dedup_candidates()."
+    )
+  }
+
+  candidates
 }
 
 #' Reimport a RIS-file exported from CiteSource

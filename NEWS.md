@@ -6,6 +6,17 @@
 
 ## New features
 
+- Deferred manual deduplication: run automatic dedup now and complete manual
+  review later. `export_dedup_candidates()` / `reimport_dedup_candidates()`
+  persist and restore the `$manual_dedup` candidate pairs, and `export_csv()`
+  gains a `manual_dedup_complete` flag (written as a column, read back by
+  `reimport_csv()`) so downstream steps know whether review is still pending.
+  Re-import, mark `result == "match"`, and merge with
+  `dedup_citations_add_manual()`.
+- `reimport_csv()` now reads all columns as character, matching the canonical
+  (all-character) types produced by `dedup_citations()`. This is required so a
+  reimported set can re-enter `dedup_citations_add_manual()` (and future
+  re-deduplication) without column-type clashes.
 - `read_citations()` now warns when `cite_label` values are outside the standard
   vocabulary (`search`, `screened`, `final`), since phase-analysis functions
   depend on those exact strings.
