@@ -23,7 +23,7 @@ common bibliographic fields (\code{title1/2}, \code{author1/2}, \code{year1/2},
 \description{
 Combines automatically merged pairs and user-confirmed manual pairs into a
 single tibble with a \code{method} column (\code{"auto"} / \code{"manual"}). Useful for
-reporting and auditing — e.g. as supplementary material for a systematic
+reporting and auditing - e.g. as supplementary material for a systematic
 review.
 }
 \examples{

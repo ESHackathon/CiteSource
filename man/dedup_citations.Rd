@@ -19,7 +19,7 @@ missing, show it as "unknown"? Default FALSE.}
 When \code{manual = FALSE}: a dataframe of unique citations. When
 \code{manual = TRUE}: a list with \verb{$unique} (unique citations),
 \verb{$manual_dedup} (potential pairs for review), and \verb{$auto_pairs}
-(pairs that were merged automatically — feed to \code{\link[=dedup_log]{dedup_log()}} together
+(pairs that were merged automatically - feed to \code{\link[=dedup_log]{dedup_log()}} together
 with confirmed manual pairs to build a full provenance log).
 }
 \description{

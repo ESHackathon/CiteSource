@@ -44,7 +44,7 @@ Once records are deduplicated, users are able to easily create plots and tables 
 
 **Exporting and Re-importing Data**
 
-Once records have been processed, users are able to export data in .csv, .ris, and .bib formats. Furthermore, users are able to reimport .csv and .ris files in order to recreate plots and tables.
+Once records have been processed, users are able to export data in .csv, .ris, and .bib formats. Furthermore, users are able to reimport .csv and .ris files in order to recreate plots and tables. Re-importing also lets a review grow over time: new database or search results can be added to a previously deduplicated set and deduplicated against it without starting over (`dedup_citations_add_sources()`), and automatic deduplication can be done now with manual review completed later by exporting and re-importing the candidate pairs (`export_dedup_candidates()` / `reimport_dedup_candidates()`).
 
 ## Getting Started
 **Installation**

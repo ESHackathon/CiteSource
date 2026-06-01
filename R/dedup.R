@@ -18,7 +18,7 @@
 #' @return When `manual = FALSE`: a dataframe of unique citations. When
 #'   `manual = TRUE`: a list with `$unique` (unique citations),
 #'   `$manual_dedup` (potential pairs for review), and `$auto_pairs`
-#'   (pairs that were merged automatically — feed to [dedup_log()] together
+#'   (pairs that were merged automatically - feed to [dedup_log()] together
 #'   with confirmed manual pairs to build a full provenance log).
 #'
 #' @examples
@@ -77,7 +77,7 @@ dedup_citations <- function(raw_citations, manual = FALSE, show_unknown_tags = F
 #'
 #' Combines automatically merged pairs and user-confirmed manual pairs into a
 #' single tibble with a `method` column (`"auto"` / `"manual"`). Useful for
-#' reporting and auditing — e.g. as supplementary material for a systematic
+#' reporting and auditing - e.g. as supplementary material for a systematic
 #' review.
 #'
 #' @export
@@ -178,6 +178,105 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
   dedup_results$cite_source <- dedup_results$source
   dedup_results$cite_label  <- dedup_results$label
   dplyr::select(dedup_results, -source, -label)
+}
+
+
+#' Add new citations to a previously deduplicated set and re-deduplicate
+#'
+#' Adds further citations (e.g. an additional database search) to a set that was
+#' already deduplicated, and deduplicates the new records against both the
+#' existing set and each other - without discarding the work already done. Each
+#' existing unique record enters as a single row, so prior automatic and manual
+#' merge decisions are preserved; the new records are integrated and full
+#' provenance (the original `record_ids` behind every merged record) is carried
+#' through.
+#'
+#' This is the incremental counterpart to running [dedup_citations()] on all
+#' sources from scratch and, for the same data, produces the same unique set.
+#'
+#' @export
+#' @param existing_citations A previously deduplicated set (from
+#'   [dedup_citations()], [reimport_csv()] or [reimport_ris()]) - must contain a
+#'   `duplicate_id` column.
+#' @param new_citations New raw citations to add, as returned by
+#'   [read_citations()] (with `cite_source` / `cite_label` / `cite_string`).
+#' @param manual logical. If TRUE, return the full result list including
+#'   `$manual_dedup` candidate pairs for review (see [dedup_citations()]).
+#'   Default FALSE.
+#' @param show_unknown_tags When a label, source, or other merged field is
+#'   missing, show it as "unknown"? Default FALSE.
+#' @return When `manual = FALSE`: a dataframe of unique citations across both
+#'   sets. When `manual = TRUE`: a list with `$unique`, `$manual_dedup` and
+#'   `$auto_pairs` (as in [dedup_citations()]). In both cases `record_ids`
+#'   retains the original record IDs behind every merged record.
+#' @seealso [dedup_citations()], [dedup_citations_add_manual()]
+#'
+#' @examples
+#' if (interactive()) {
+#'   existing <- dedup_citations(read_citations(old_files, cite_sources = old_srcs))
+#'   new_raw  <- read_citations(new_files, cite_sources = new_srcs)
+#'   combined <- dedup_citations_add_sources(existing, new_raw)
+#' }
+dedup_citations_add_sources <- function(existing_citations, new_citations,
+                                        manual = FALSE, show_unknown_tags = FALSE) {
+
+  if (!"duplicate_id" %in% names(existing_citations)) {
+    stop("existing_citations must contain a `duplicate_id` column - pass a set ",
+         "returned by dedup_citations(), reimport_csv() or reimport_ris().")
+  }
+
+  # Work in character throughout (the dedup engine's canonical type) so the two
+  # frames bind without column-type clashes.
+  ex <- dplyr::mutate(existing_citations, dplyr::across(dplyr::everything(), as.character))
+  if (!"record_ids" %in% names(ex)) ex$record_ids <- ex$duplicate_id
+
+  # Provenance lookup: existing duplicate_id -> its underlying original record_ids
+  prov <- stats::setNames(as.character(ex$record_ids), as.character(ex$duplicate_id))
+
+  # Each existing unique record enters as one input keyed by its duplicate_id
+  ex$record_id <- as.character(ex$duplicate_id)
+
+  # New records get fresh ids that cannot collide with any existing id. Base the
+  # offset on the max of ALL underlying record_ids (duplicate_id is the cluster
+  # minimum, so a new id keyed off it could otherwise reuse an existing id).
+  existing_ids <- c(
+    as.character(ex$duplicate_id),
+    unlist(strsplit(as.character(ex$record_ids), ",\\s*"))
+  )
+  max_id <- suppressWarnings(max(as.numeric(existing_ids), na.rm = TRUE))
+
+  nw <- dplyr::mutate(new_citations, dplyr::across(dplyr::everything(), as.character))
+  nw <- dplyr::select(nw, -dplyr::any_of(c("duplicate_id", "record_ids", "record_id")))
+  nw$record_id <- if (is.finite(max_id)) {
+    as.character(max_id + seq_len(nrow(nw)))
+  } else {
+    paste0("new_", seq_len(nrow(nw)))
+  }
+
+  # Drop the merged-set metadata that would otherwise trigger a record_id clash
+  # (format_rerun renames duplicate_id -> record_id) or be stale after re-dedup.
+  ex <- dplyr::select(ex, -dplyr::any_of(c("duplicate_id", "record_ids", "manual_dedup_complete")))
+
+  combined <- dplyr::bind_rows(ex, nw)
+
+  result <- dedup_citations(combined, manual = manual, show_unknown_tags = show_unknown_tags)
+
+  # Restore original provenance: expand existing-duplicate-id tokens in the
+  # rebuilt record_ids back to their underlying original record IDs.
+  unique_out <- if (manual) result$unique else result
+  unique_out$record_ids <- vapply(unique_out$record_ids, function(rids) {
+    toks <- trimws(strsplit(rids, ",\\s*")[[1]])
+    toks <- ifelse(toks %in% names(prov), prov[toks], toks)
+    toks <- unlist(strsplit(paste(toks, collapse = ", "), ",\\s*"))
+    paste(unique(trimws(toks[toks != ""])), collapse = ", ")
+  }, character(1), USE.NAMES = FALSE)
+
+  if (manual) {
+    result$unique <- unique_out
+    result
+  } else {
+    unique_out
+  }
 }
 
 

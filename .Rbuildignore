@@ -20,3 +20,6 @@
 ^vignettes/valid_data$
 ^tests/shinytest$
 ^CRAN-SUBMISSION$
+^CLAUDE\.md$
+^guide$
+^\.tmp.*$

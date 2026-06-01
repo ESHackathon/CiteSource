@@ -1,3 +1,41 @@
+# CiteSource 0.2.1
+
+## New features
+
+- Incremental deduplication: `dedup_citations_add_sources()` adds new citations
+  to a previously deduplicated set and deduplicates across both, preserving
+  prior automatic and manual merge decisions and the original `record_ids`
+  provenance. For the same data it yields the same unique set as deduplicating
+  everything from scratch. Exposed in the Shiny app — re-upload a deduplicated
+  set, add new citation files, and "Find duplicates" merges them in. Works in
+  `manual = TRUE` mode to surface new candidate pairs for review.
+- Deferred manual deduplication: run automatic dedup now and complete manual
+  review later. `export_dedup_candidates()` / `reimport_dedup_candidates()`
+  persist and restore the `$manual_dedup` candidate pairs, and `export_csv()`
+  gains a `manual_dedup_complete` flag (written as a column, read back by
+  `reimport_csv()`) so downstream steps know whether review is still pending.
+  Re-import, mark `result == "match"`, and merge with
+  `dedup_citations_add_manual()`.
+- Shiny app: re-importing a deduplicated set now shows a read-only source
+  overview (records per source, and per label/string) on the upload page so you
+  can see what is already in the set before adding more; the re-upload input
+  accepts a candidate-pairs CSV and several files at once.
+
+## Bug fixes
+
+- `reimport_csv()` now reads all columns as character, matching the canonical
+  (all-character) types produced by `dedup_citations()`. This is required so a
+  reimported set can re-enter `dedup_citations_add_manual()` (and incremental
+  re-deduplication) without column-type clashes.
+- Shiny app: the re-upload (re-import) input no longer errors when more than one
+  file is selected; each file is routed by content (deduplicated set vs.
+  candidate-pairs CSV vs. RIS).
+
+## Documentation
+
+- In-app User Guide and README updated to document incremental and deferred
+  deduplication; the file upload page labels were clarified.
+
 # CiteSource 0.2.0
 
 ## Breaking changes

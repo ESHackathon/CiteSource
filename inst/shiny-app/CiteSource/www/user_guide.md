@@ -26,7 +26,20 @@ You can upload files in multiple batches. Each new upload adds rows to the form 
 <details>
 <summary><strong>Re-importing previously processed CiteSource data</strong></summary>
 
-> If you have a `.ris` or `.csv` previously exported from CiteSource, use the **"Re-upload an .ris or .csv exported from CiteSource"** input below the main upload area. These files contain embedded `cite_source`, `cite_label`, and `cite_string` columns. Re-importing skips deduplication entirely and takes you directly to Visualise and Tables with your prior results.
+> If you have a `.ris` or `.csv` previously exported from CiteSource, use the **"Re-upload a CiteSource export"** input below the main upload area. These files carry embedded `cite_source`, `cite_label`, and `cite_string` columns, so they don't need to be re-deduplicated against themselves.
+>
+> When you re-import a deduplicated set, a read-only **"Re-imported deduplicated set"** card appears in the main panel showing the record count per source (and per label/string), so you can see what's already in the set before doing anything else. You can then:
+>
+> - **Go straight to Visualise and Tables** with your prior results, or
+> - **Add new sources** — upload new search files using the box above, then go to **Deduplicate → Find duplicates** to merge them into the existing set (see Step 2), or
+> - **Finish manual review later** — if you also re-upload the **candidate-pairs `.csv`** you exported earlier (see Step 6), the flagged pairs are restored to the Manual deduplication tab so you can complete the review (see Step 3).
+
+</details>
+
+<details>
+<summary><strong>Adding more sources to a finished review</strong></summary>
+
+> CiteSource lets you grow a review over time. Re-import a previously deduplicated set, upload the new database/search files, and run **Find duplicates** — the new records are deduplicated against both the existing set and each other, while the merges and manual decisions you already made are preserved. You do not have to start over.
 
 </details>
 
@@ -53,6 +66,13 @@ Once complete, a summary card shows:
 - A per-source record count breakdown
 - Whether any pairs were flagged for manual review
 
+<details>
+<summary><strong>Adding new sources to a re-imported set</strong></summary>
+
+> If you re-imported a previously deduplicated set (Step 1) and then uploaded new citation files, clicking **Find duplicates** merges the new records into the existing set rather than starting from scratch. Prior automatic and manual merge decisions are kept, full record provenance is preserved, and the result is the same as if every source had been deduplicated together. After the merge the upload form clears so the same files can't be added twice — upload another batch any time to keep growing the set.
+
+</details>
+
 ---
 
 <a id="step-3"></a>
@@ -74,6 +94,13 @@ The default **Card View** shows each potential pair side-by-side with color-code
 <summary><strong>Card navigation options</strong></summary>
 
 > The Options & Filters accordion also lets you filter cards by minimum similarity score and sort by highest or lowest similarity first. Use this to prioritize high-confidence pairs or to focus on borderline cases.
+
+</details>
+
+<details>
+<summary><strong>Finishing manual review later</strong></summary>
+
+> You don't have to complete manual review in one sitting. On the **Export** tab, download both the **Citations** file and the **Candidate Pairs (CSV)** (see Step 6). Later, re-upload the citations file *and* the candidate-pairs file together (Step 1); the flagged pairs reappear here so you can finish reviewing them. When you export again with no pairs left pending, the file is marked as having manual deduplication complete.
 
 </details>
 
@@ -133,7 +160,12 @@ Navigate to the **Tables** tab. Use the sidebar filters to select the subset of 
 
 Navigate to the **Export** tab. Three sections are available:
 
-**Citations** — download the full deduplicated dataset as `.csv`, `.ris`, or `.bib`. Provenance metadata (`cite_source`, `cite_label`, `cite_string`) is embedded in standard bibliographic fields (`.ris` uses C1, C2, C7, C8, DB). Only `.csv` and `.ris` can be re-imported into CiteSource later.
+**Citations** — download the full deduplicated dataset as `.csv`, `.ris`, or `.bib`. Provenance metadata (`cite_source`, `cite_label`, `cite_string`) is embedded in standard bibliographic fields (`.ris` uses C1, C2, C7, C8, DB). Only `.csv` and `.ris` can be re-imported into CiteSource later. The full `.csv` also records whether manual deduplication has been completed, so a re-imported set knows whether review is still pending.
+
+This section also provides two supporting downloads:
+
+- **Dedup Log (CSV)** — every merged duplicate pair, flagged as automated or manual. Useful as a supplementary file documenting your deduplication for a systematic review.
+- **Candidate Pairs (CSV)** — the pairs still flagged for manual review. Download this alongside the citations file if you want to pause and finish manual deduplication later (see Step 3).
 
 **Plots** — download any of the three visualizations as PNG files. Content reflects your current filter selections on the Visualise tab.
 

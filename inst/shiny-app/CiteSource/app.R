@@ -351,20 +351,26 @@ ui <- shiny::navbarPage("CiteSource",
                               # Sidebar layout ----
                               shiny::sidebarLayout(
                                 shiny::sidebarPanel( # Input: Select a file ----
-                                                     shiny::h5("Step 1: Upload your citation files"),
-                                                     shiny::fileInput("file", "",
+                                                     shiny::h5("Step 1: Upload citation files"),
+                                                     shiny::p("New search/database exports to deduplicate.",
+                                                              style = "font-size:0.8em;color:#6c757d;margin-top:-4px;margin-bottom:6px;"),
+                                                     shiny::fileInput("file", "Add new files (.ris, .bib, .txt)",
                                                                       multiple = TRUE,
                                                                       accept = c(".ris", ".txt", ".bib")
                                                      ),
                                                      shiny::hr(),
-                                                     shiny::h5("OR: Re-upload an .ris or .csv exported from CiteSource"),
-                                                     shiny::fileInput("file_reimport", "",
+                                                     shiny::h5("Re-upload a CiteSource export"),
+                                                     shiny::p(
+                                                       "A previously deduplicated set (.csv or .ris) to keep working with — view its sources below, add new files above to merge in, or finish manual review by also re-uploading a candidate-pairs .csv.",
+                                                       style = "font-size:0.8em;color:#6c757d;margin-top:-4px;margin-bottom:6px;"),
+                                                     shiny::fileInput("file_reimport", "Re-upload exported file(s)",
                                                                       multiple = TRUE,
                                                                       accept = c(".ris", ".csv")
                                                      )
                                 ),
                                 # Main panel for displaying outputs ----
                                 shiny::mainPanel(
+                                  shiny::uiOutput("reimport_summary"),
                                   shiny::uiOutput("metadata_form"),
                                   shiny::uiOutput("post_upload_guide")
                                 )
@@ -380,6 +386,8 @@ ui <- shiny::navbarPage("CiteSource",
                               br(),
                               shiny::h5("Step 3: Deduplicate"),
                               shiny::p("Click the button below to detect and remove duplicates automatically"),
+                              shiny::p("Already re-uploaded a deduplicated set? Add new citation files on the File upload tab, then click Find duplicates to merge them into the existing set.",
+                                       style = "font-size:0.82em;color:#6c757d;"),
                               
                               # Action button: identify duplicates in uploaded dataset
                               shinyWidgets::actionBttn(
@@ -818,6 +826,14 @@ ui <- shiny::navbarPage("CiteSource",
                                         "CSV of every merged duplicate pair, flagged as automated or manual.",
                                         style="color:#6c757d;font-size:0.82em;margin-bottom:8px;"),
                                       shiny::downloadButton("downloadDedupLog", "Dedup Log (CSV)",
+                                        style="margin-bottom:4px;"),
+                                      shiny::tags$hr(style="margin:14px 0 10px 0;"),
+                                      shiny::tags$strong("Manual review candidates",
+                                        style="font-size:0.88em;display:block;margin-bottom:4px;"),
+                                      shiny::p(
+                                        "CSV of unresolved candidate pairs. Re-upload it together with the citations CSV to finish manual deduplication later.",
+                                        style="color:#6c757d;font-size:0.82em;margin-bottom:8px;"),
+                                      shiny::downloadButton("downloadCandidates", "Candidate Pairs (CSV)",
                                         style="margin-bottom:4px;")
                                     )
                                   ),
@@ -890,6 +906,7 @@ server <- function(input, output, session) {
   rv$pairs_to_check <- data.frame()#for potential duplicates/manual dedup
   rv$pairs_removed <- data.frame()#for removed records
   rv$auto_pairs    <- data.frame()#auto-merged pairs, for the dedup log
+  rv$existing_dedup_present <- FALSE # TRUE when latest_unique is a reimported deduped set that new uploads should be merged INTO (Goal 2)
   rv$file_meta           <- list()  # Per-file metadata (source/label/string); keyed by file.datapath
   # Card view state
   rv$selected_pairs_card <- integer(0)
@@ -985,14 +1002,86 @@ server <- function(input, output, session) {
       ),
       check.names = FALSE
     )
-  }, 
-  striped = TRUE, 
-  hover = TRUE, 
-  width = "100%", 
+  },
+  striped = TRUE,
+  hover = TRUE,
+  width = "100%",
   align = "l",
   sanitize.text.function = function(x) x # Allows the <strong> tags to work
   )
-  
+
+  # --- Re-imported deduplicated set: read-only source overview ---------------
+  # When a previously deduplicated/exported set is re-uploaded, show what is
+  # already in it (sources, and any labels/strings) so the user can see the
+  # existing content before adding more references. View only — this set is kept
+  # separate from the newly uploaded files and its tags cannot be edited here.
+  reimport_summary_data <- shiny::reactive({
+    shiny::req(isTRUE(rv$existing_dedup_present),
+               is.data.frame(rv$latest_unique), nrow(rv$latest_unique) > 0)
+
+    # Count, per field value, the number of unique records that include it.
+    # Tokens are de-duplicated within each record so a record merged from
+    # several sources counts once per distinct source/label/string.
+    tally_field <- function(col, field_name) {
+      if (!col %in% names(rv$latest_unique)) return(NULL)
+      vals <- rv$latest_unique[[col]]
+      vals <- vals[!is.na(vals) & !vals %in% c("", "NA")]
+      if (length(vals) == 0) return(NULL)
+      toks <- unlist(lapply(strsplit(vals, ",\\s*"), function(t) unique(trimws(t))))
+      toks <- toks[toks != "" & toks != "NA"]
+      if (length(toks) == 0) return(NULL)
+      tbl <- sort(table(toks), decreasing = TRUE)
+      data.frame(Field = field_name, Value = names(tbl),
+                 Records = as.integer(tbl), check.names = FALSE,
+                 row.names = NULL, stringsAsFactors = FALSE)
+    }
+
+    out <- dplyr::bind_rows(
+      tally_field("cite_source", "Source"),
+      tally_field("cite_label",  "Label"),
+      tally_field("cite_string", "String")
+    )
+    if (is.null(out) || nrow(out) == 0) return(NULL)
+    out
+  })
+
+  output$reimport_summary <- shiny::renderUI({
+    summ <- reimport_summary_data()
+    if (is.null(summ)) return(NULL)
+
+    flag <- rv$latest_unique$manual_dedup_complete
+    reviewed <- length(flag) > 0 && as.character(flag[1]) %in% c("TRUE", "T", "1")
+
+    bslib::card(
+      bslib::card_header(
+        shiny::tags$i(class = "fa fa-database", style = "margin-right:7px;"),
+        "Re-imported deduplicated set"
+      ),
+      bslib::card_body(
+        shiny::p(
+          paste0(format(nrow(rv$latest_unique), big.mark = ","),
+                 " unique records re-imported",
+                 if (reviewed) " (manual deduplication marked complete)." else "."),
+          style = "color:#6c757d;font-size:0.88em;margin-bottom:4px;"
+        ),
+        shiny::p(
+          "View only — this set is kept separate from any new files you upload. Add new citation files on the left, then click Find duplicates to merge them in.",
+          style = "color:#6c757d;font-size:0.8em;margin-bottom:10px;"
+        ),
+        shiny::tableOutput("reimport_summary_tbl")
+      )
+    )
+  })
+
+  output$reimport_summary_tbl <- shiny::renderTable(
+    {
+      summ <- reimport_summary_data()
+      shiny::req(summ)
+      summ
+    },
+    striped = TRUE, hover = TRUE, width = "100%", align = "l"
+  )
+
   # --- Google Analytics Integration ---
   # Flag to ensure GA script is inserted only once per session
   #### Upload files tab section ------
@@ -1194,22 +1283,61 @@ server <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$file_reimport, {
-    file_extension <- tolower(tools::file_ext(input$file_reimport$datapath))
-    
-    if (file_extension == "csv") {
-      rv$latest_unique <- reimport_csv(input$file_reimport$datapath)
-    } else if (file_extension == "ris") {
-      rv$latest_unique <- reimport_ris(input$file_reimport$datapath)
-    } else {
-      warning("Invalid file extension, needs to be .ris or .csv")
+    files <- input$file_reimport   # data frame: one row per file (multiple = TRUE)
+
+    n_unique_imported     <- 0L
+    n_candidates_imported <- 0L
+    errors <- character(0)
+
+    for (i in seq_len(nrow(files))) {
+      path <- files$datapath[i]
+      nm   <- files$name[i]
+      ext  <- tolower(tools::file_ext(nm))
+
+      tryCatch({
+        if (ext == "ris") {
+          rv$latest_unique  <- reimport_ris(path)
+          rv$existing_dedup_present <- TRUE
+          n_unique_imported <- nrow(rv$latest_unique)
+        } else if (ext == "csv") {
+          # Route by content: a candidate-pairs file has duplicate_id.x / .y;
+          # a deduplicated citation set has the cite_* / duplicate_id columns.
+          hdr <- names(utils::read.csv(path, nrows = 1, stringsAsFactors = FALSE))
+          if (all(c("duplicate_id.x", "duplicate_id.y") %in% hdr)) {
+            cand <- reimport_dedup_candidates(path)
+            # Drop the R-workflow `result` column: in the app the merge decision
+            # is the user's row selection, not result == "match".
+            cand$result <- NULL
+            rv$pairs_to_check     <- cand
+            n_candidates_imported <- nrow(cand)
+          } else {
+            rv$latest_unique  <- reimport_csv(path)
+            rv$existing_dedup_present <- TRUE
+            n_unique_imported <- nrow(rv$latest_unique)
+          }
+        } else {
+          errors <- c(errors, paste0(nm, " (unsupported type)"))
+        }
+      }, error = function(e) {
+        errors <<- c(errors, paste0(nm, ": ", conditionMessage(e)))
+      })
     }
-    
-    rv$n_unique <- count_unique(rv$latest_unique)
-    
-    show_toastr("Re-import successful",
-                paste("Imported", nrow(rv$latest_unique), "citations. You can now proceed to visualisation and tables."),
-                type = "success")
-    
+
+    if (n_unique_imported > 0) rv$n_unique <- count_unique(rv$latest_unique)
+
+    if (length(errors) > 0) {
+      show_toastr("Some files could not be re-imported",
+                  paste(errors, collapse = "; "), type = "error")
+    }
+    if (n_unique_imported > 0 || n_candidates_imported > 0) {
+      msg <- character(0)
+      if (n_unique_imported > 0)
+        msg <- c(msg, paste("Imported", n_unique_imported, "deduplicated citations."))
+      if (n_candidates_imported > 0)
+        msg <- c(msg, paste("Restored", n_candidates_imported,
+                            "candidate pair(s) — finish review on the Deduplicate tab."))
+      show_toastr("Re-import successful", paste(msg, collapse = " "), type = "success")
+    }
   })
   
   ## Update filters
@@ -1364,11 +1492,15 @@ server <- function(input, output, session) {
   
   # when dedup button clicked, deduplicate
   shiny::observeEvent(input$identify_dups, {
-    if (nrow(rv$upload_df) == 0) {
-      if (nrow(rv$latest_unique) > 0) {
-        show_toastr("Deduplication already complete",
-                    "You have reimported a dataset that has already been deduplicated. Further deduplication is not possible here.",
-                    type = "error")
+    has_new      <- is.data.frame(rv$upload_df) && nrow(rv$upload_df) > 0
+    has_existing <- isTRUE(rv$existing_dedup_present) &&
+                    is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0
+
+    if (!has_new) {
+      if (is.data.frame(rv$latest_unique) && nrow(rv$latest_unique) > 0) {
+        show_toastr("Already deduplicated",
+                    "This set is already deduplicated. To add more sources, upload new citation files above, then click Find duplicates to merge them in.",
+                    type = "info")
       } else {
         show_toastr("Data needed", "Please import your citations first.", type = "error")
       }
@@ -1397,35 +1529,57 @@ server <- function(input, output, session) {
 
     # Assign unique IDs to avoid issues with manual deduplication
     rv$upload_df <- rv$upload_df %>% dplyr::mutate(record_id = as.character(1000 + dplyr::row_number()))
-    
-    # Perform deduplication
-    dedup_results <- CiteSource::dedup_citations(rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
+
+    n_new <- nrow(rv$upload_df)  # capture before any clearing
+
+    # Perform deduplication. With a reimported deduplicated set present, merge
+    # the new uploads INTO it (Goal 2); otherwise deduplicate the uploads.
+    if (has_existing) {
+      dedup_results <- CiteSource::dedup_citations_add_sources(
+        rv$latest_unique, rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
+    } else {
+      dedup_results <- CiteSource::dedup_citations(
+        rv$upload_df, manual = TRUE, show_unknown_tags = FALSE)
+    }
     rv$pairs_to_check <- dedup_results$manual_dedup
     rv$latest_unique  <- dedup_results$unique
     rv$auto_pairs     <- if (is.null(dedup_results$auto_pairs)) data.frame() else dedup_results$auto_pairs
     rv$pairs_removed  <- data.frame()  # reset manual log on a fresh dedup run
     rv$n_unique <- count_unique(rv$latest_unique)  # Generate the n_unique data
-    
-    # Generate a summary message based on deduplication results
-    n_citations    <- nrow(rv$upload_df)
+
     n_unique_records <- nrow(rv$latest_unique)
-    n_duplicates_removed <- n_citations - n_unique_records
-    n_pairs_manual <- nrow(rv$pairs_to_check)
-
+    n_pairs_manual   <- nrow(rv$pairs_to_check)
     fmt <- function(x) format(x, big.mark = ",", scientific = FALSE)
-    message <- if (n_pairs_manual > 0) {
-      paste0("Total citations uploaded: ", fmt(n_citations), "\n",
-             "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
-             "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
-             n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
-    } else {
-      paste0("Total citations uploaded: ", fmt(n_citations), "\n",
-             "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
-             "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
-             "No potential duplicates for manual review. You can proceed to the visualization tab.")
-    }
 
-    show_toastr("Auto-deduplication complete", message, type = "success")
+    if (has_existing) {
+      # The combined set is now a standalone deduplicated set. Clear the uploads
+      # (and the upload form) so the same new records can't be added twice, and
+      # keep the merged set flagged as an existing set for further additions.
+      rv$df <- data.frame(); rv$upload_df <- data.frame(); rv$file_meta <- list()
+      rv$existing_dedup_present <- TRUE
+
+      review_msg <- if (n_pairs_manual > 0)
+        paste0(n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
+      else "No potential duplicates for manual review."
+      message <- paste0("Added ", fmt(n_new), " new citation(s) to the existing set.\n",
+                        "Unique citations after merge: ", fmt(n_unique_records), "\n\n", review_msg)
+      show_toastr("Sources added", message, type = "success")
+    } else {
+      rv$existing_dedup_present <- FALSE
+      n_duplicates_removed <- n_new - n_unique_records
+      message <- if (n_pairs_manual > 0) {
+        paste0("Total citations uploaded: ", fmt(n_new), "\n",
+               "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
+               "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
+               n_pairs_manual, " potential duplicate pair(s) flagged for manual review.")
+      } else {
+        paste0("Total citations uploaded: ", fmt(n_new), "\n",
+               "Unique citations after deduplication: ", fmt(n_unique_records), "\n",
+               "Duplicates removed: ", fmt(n_duplicates_removed), "\n\n",
+               "No potential duplicates for manual review. You can proceed to the visualization tab.")
+      }
+      show_toastr("Auto-deduplication complete", message, type = "success")
+    }
   })
 
   # ---- Post-dedup summary card ----
@@ -2937,7 +3091,11 @@ server <- function(input, output, session) {
           cols <- input$csv_custom_cols
           if (is.null(cols) || length(cols) == 0) "full" else cols
         }
-        export_csv(rv$latest_unique, file, fields = fields)
+        # Flag the set as manually reviewed when no candidate pairs remain
+        # pending (UX guard, read back by reimport_csv()). Only written on full
+        # exports by export_csv().
+        export_csv(rv$latest_unique, file, fields = fields,
+                   manual_dedup_complete = (nrow(rv$pairs_to_check) == 0))
       } else {
         stop("No data to download!")
         shiny::req(FALSE)
@@ -2983,6 +3141,22 @@ server <- function(input, output, session) {
         )
       } else {
         utils::write.csv(log_df, file, row.names = FALSE)
+      }
+    }
+  )
+
+  # ---- Manual-review candidate pairs: export to resume review later ----
+  output$downloadCandidates <- shiny::downloadHandler(
+    filename = function() paste0("candidate-pairs-", Sys.Date(), ".csv"),
+    content  = function(file) {
+      pairs <- rv$pairs_to_check
+      if (!is.data.frame(pairs) || nrow(pairs) == 0) {
+        utils::write.csv(
+          data.frame(note = "No unresolved candidate pairs."),
+          file, row.names = FALSE
+        )
+      } else {
+        export_dedup_candidates(pairs, file)
       }
     }
   )
