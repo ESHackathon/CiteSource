@@ -56,7 +56,6 @@ Suggests:
     htmltools,
     jsonlite,
     knitr,
-    networkD3,
     plotly,
     progressr,
     rmarkdown,
