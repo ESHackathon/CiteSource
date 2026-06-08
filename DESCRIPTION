@@ -1,7 +1,7 @@
 Package: CiteSource
 Title: Data-Driven Search Strategy Development and Evidence Synthesis Reporting
 Version: 0.2.1
-Date: 2026-06-01
+Date: 2026-06-08
 Authors@R: c(
     person("Trevor", "Riley", , "tnriley@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6834-9802")),
@@ -22,11 +22,12 @@ Authors@R: c(
     person("Kaitlyn", "Hair", role = "cph", comment = "Author of included ASySD deduplication code"),
     person("CAMARADES Group", role = "cph", comment = "Authors of ASySD (github.com/camaradesuk/ASySD)")
   )
-Description: Tools for data-driven search strategy development and evidence
-             synthesis reporting. Researchers can deduplicate references while
-             maintaining customizable metadata, analyze results using
-             plots and tables, and import or export data in 'RIS' and 'CSV' formats.
-             An interactive 'shiny' application is included for exploratory use.
+Description: Deduplicates bibliographic citations from multiple sources while
+             preserving customizable metadata, supporting data-driven search
+             strategy development and evidence synthesis reporting. Search
+             results can be analyzed using plots and tables, and imported or
+             exported in 'RIS' and 'CSV' formats. An interactive 'shiny'
+             application is included for exploratory use.
 License: GPL (>= 3)
 URL: https://eshackathon.github.io/CiteSource/
 BugReports: https://github.com/ESHackathon/CiteSource/issues
