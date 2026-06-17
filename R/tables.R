@@ -763,15 +763,34 @@ create_detailed_record_table <- function(data) {
   data |>
     gt::gt(rowname_col = "Source") |>
     gt::tab_header(title = "Record Summary") |>
+    # Clearer, self-explanatory display labels (data column names are unchanged)
     gt::cols_label(
-      `Records Imported` = "Records Imported",
-      `Distinct Records` = "Distinct Records",
-      `Unique Records` = "Unique Records",
-      `Non-unique Records` = "Non-unique Records",
-      `Source Contribution %` = "Source Contribution %",
-      `Source Unique Contribution %` = "Source Unique Contribution %",
-      `Source Unique %` = "Source Unique %"
+      `Records Imported` = "Imported",
+      `Distinct Records` = "Distinct",
+      `Unique Records` = "Unique",
+      `Non-unique Records` = "Shared",
+      `Source Contribution %` = "% of All Distinct",
+      `Source Unique Contribution %` = "% of All Unique",
+      `Source Unique %` = "Unique Rate"
     ) |>
+    # Group related columns so structure is visible without reading footnotes
+    gt::tab_spanner(
+      label = "Records",
+      columns = c("Records Imported", "Distinct Records")
+    ) |>
+    gt::tab_spanner(
+      label = "Uniqueness",
+      columns = c("Unique Records", "Non-unique Records")
+    ) |>
+    gt::tab_spanner(
+      label = "Contribution to Total",
+      columns = c("Source Contribution %", "Source Unique Contribution %")
+    ) |>
+    gt::tab_spanner(
+      label = "Within-source Rate",
+      columns = c("Source Unique %")
+    ) |>
+    # Footnotes retained for precise definitions
     gt::tab_footnote(
       footnote = "Number of raw records imported from each database.",
       locations = gt::cells_column_labels(columns = "Records Imported")
@@ -797,13 +816,32 @@ create_detailed_record_table <- function(data) {
       locations = gt::cells_column_labels(columns = "Source Unique Contribution %")
     ) |>
     gt::tab_footnote(
-      footnote = "Percentage of records that were unique from each source.",
+      footnote = "Percentage of records from each source that were unique.",
       locations = gt::cells_column_labels(columns = "Source Unique %")
     ) |>
     gt::tab_footnote(
       footnote = "Total citations discovered (after internal and cross-source deduplication).",
       locations = gt::cells_body(columns = "Distinct Records", rows = "Total")
-    )
+    ) |>
+    # Make the Total row read as a summary, not just another source
+    gt::tab_style(
+      style = list(
+        gt::cell_text(weight = "bold"),
+        gt::cell_borders(sides = "top", weight = gt::px(2))
+      ),
+      locations = list(
+        gt::cells_body(rows = "Total"),
+        gt::cells_stub(rows = "Total")
+      )
+    ) |>
+    # Visually separate the percentage block from the count block
+    gt::tab_style(
+      style = gt::cell_text(style = "italic"),
+      locations = gt::cells_body(
+        columns = c("Source Contribution %", "Source Unique Contribution %", "Source Unique %")
+      )
+    ) |>
+    gt::cols_align(align = "right", columns = tidyselect::where(is.numeric))
 }
 
 
@@ -853,6 +891,21 @@ create_precision_sensitivity_table <- function(data) {
       Precision = "Precision",
       Recall = "Sensitivity/Recall"
     ) |>
+    # Group counts and performance metrics so the table reads in two blocks
+    gt::tab_spanner(
+      label = "Records",
+      columns = if (all_zero_screened) {
+        c("Distinct_Records", "final")
+      } else {
+        c("Distinct_Records", "screened", "final")
+      }
+    ) |>
+    gt::tab_spanner(
+      label = "Performance",
+      columns = c("Precision", "Recall")
+    ) |>
+    # Precision/Recall are stored on a 0-100 scale; show them as percentages
+    gt::fmt_number(columns = c("Precision", "Recall"), decimals = 1, pattern = "{x}%") |>
     gt::cols_align(align = "right", columns = c("final", "Precision", "Recall"))
 
   if (!all_zero_screened) {
@@ -897,5 +950,16 @@ create_precision_sensitivity_table <- function(data) {
     gt::tab_footnote(
       footnote = "Overall Precision = Number of final included citations / Total distinct records.",
       locations = gt::cells_body(columns = "Precision", rows = "Total")
+    ) |>
+    # Make the Total row read as a summary, not just another source
+    gt::tab_style(
+      style = list(
+        gt::cell_text(weight = "bold"),
+        gt::cell_borders(sides = "top", weight = gt::px(2))
+      ),
+      locations = list(
+        gt::cells_body(rows = "Total"),
+        gt::cells_stub(rows = "Total")
+      )
     )
 }

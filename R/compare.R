@@ -135,5 +135,16 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
 
   out <- purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
 
-  out |> dplyr::mutate(dplyr::across(dplyr::everything(), ~ tidyr::replace_na(.x, FALSE)))
+  out <- out |> dplyr::mutate(dplyr::across(dplyr::everything(), ~ tidyr::replace_na(.x, FALSE)))
+
+  if (include_references) {
+    out <- out |> dplyr::left_join(
+      unique_data |> dplyr::select(
+        -dplyr::all_of(setdiff(intersect(names(unique_data), names(out)), "duplicate_id"))
+      ),
+      by = "duplicate_id"
+    )
+  }
+
+  out
 }
