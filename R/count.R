@@ -531,7 +531,7 @@ calculate_detailed_records <- function(unique_citations, n_unique, labels_to_inc
     )
 
   total_records_imported <- sum(detailed_counts$`Records Imported`, na.rm = TRUE)
-  total_distinct_records <- nrow(unique_citations)
+  total_distinct_records <- dplyr::n_distinct(df_filtered$duplicate_id)
   total_unique_records <- sum(detailed_counts$`Unique Records`, na.rm = TRUE)
   total_nonunique_records <- sum(detailed_counts$`Non-unique Records`, na.rm = TRUE)
 
