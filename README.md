@@ -7,8 +7,9 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/CiteSource)](https://CRAN.R-project.org/package=CiteSource)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/CiteSource)](https://CRAN.R-project.org/package=CiteSource)
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen)](https://github.com/ESHackathon/CiteSource)
+[![Launch Shiny App](https://img.shields.io/badge/Launch-Shiny%20App-blue?logo=r)](https://litrev.shinyapps.io/CiteSource/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![DOI](https://img.shields.io/badge/DOI-10.1038/s41586--020--2649--2-blue)](https://doi.org/10.1017/rsm.2026.10084)
+[![DOI](https://img.shields.io/badge/DOI-10.1017/rsm.2026.10084-blue)](https://doi.org/10.1017/rsm.2026.10084)
 <!-- badges: end -->
 
 ## About the Package
@@ -51,7 +52,18 @@ Once records have been processed, users are able to export data in .csv, .ris, a
 ## Getting Started
 **Installation**
 
-Install CiteSource in R with remotes::install_github("ESHackathon/CiteSource")
+Install the released version of CiteSource from CRAN:
+
+```r
+install.packages("CiteSource")
+```
+
+Or install the development version from GitHub:
+
+```r
+# install.packages("remotes")
+remotes::install_github("ESHackathon/CiteSource")
+```
 
 **Vignettes**
 
