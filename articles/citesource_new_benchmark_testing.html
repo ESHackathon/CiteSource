@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>New Benchmark Testing • CiteSource</title>
+<title>Benchmark Testing • CiteSource</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="New Benchmark Testing">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Benchmark Testing">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,12 +33,11 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/citesource_working_example.html">Source Analysis Across Screening Phases</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_benchmark_testing.html">Benchmark Testing</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">New Benchmark Testing</a></li>
+<li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">Benchmark Testing</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-pre-screen_validation.html">Assessing Usefulness of Databases for Evidence Synthesis</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-topic-coverage.html">Comparing Database Topic Coverage</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Source Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_search_string_comparison.html">Comparing Search Strings</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,10 +65,10 @@
 <script src="citesource_new_benchmark_testing_files/crosstalk-1.2.2/js/crosstalk.min.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>New Benchmark Testing</h1>
+      <h1>Benchmark Testing</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2026-06-01</h4>
+            <h4 data-toc-skip class="date">2026-06-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/vignettes/citesource_new_benchmark_testing.Rmd" class="external-link"><code>vignettes/citesource_new_benchmark_testing.Rmd</code></a></small>
       <div class="d-none name"><code>citesource_new_benchmark_testing.Rmd</code></div>
@@ -81,44 +80,33 @@
 <h2 id="about-this-vignette">About this vignette<a class="anchor" aria-label="anchor" href="#about-this-vignette"></a>
 </h2>
 <p>When estimating the comprehensiveness of a search, researchers often
-compile a list of relevant studies and evaluate whether or not they are
-found using their search strategy. While benchmarking is an important
-step in testing the sensitivity of a search, this process can be time
-consuming if variations of a string are being tested.</p>
-<p>This vignette will provide an example of how CiteSource can be used
-to speed up the process of benchmarking especially when comparing
-variations of search strings or search strategies.</p>
+compile a list of relevant studies — benchmark studies — and evaluate
+whether their search strategy retrieves them. While benchmarking is an
+important step in testing search sensitivity, the process can be time
+consuming when multiple string variations are being compared.</p>
+<p>This vignette demonstrates how CiteSource can speed up benchmarking,
+particularly when comparing variations of search strings or search
+strategies. By tagging each set of results with source and label
+metadata, CiteSource lets you see at a glance which strings found which
+benchmark studies and where overlap occurs.</p>
 </div>
 <div class="section level2">
-<h2 id="install-and-loading-citesource">1. Install and loading CiteSource<a class="anchor" aria-label="anchor" href="#install-and-loading-citesource"></a>
+<h2 id="installation-and-setup">Installation and setup<a class="anchor" aria-label="anchor" href="#installation-and-setup"></a>
 </h2>
-<p>Use the following code to install CiteSource. Currently, CiteSource
-lives on GitHub, so you may need to first install the remotes
-package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Install the remotes packages to enable installation from GitHub</span></span>
-<span><span class="co">#install.packages("remotes")</span></span>
-<span><span class="co">#library(remotes)</span></span>
-<span></span>
-<span><span class="co">#Install CiteSource</span></span>
-<span><span class="co">#remotes::install_github("ESHackathon/CiteSource")</span></span>
-<span></span>
-<span><span class="co">#Load the CiteSource</span></span>
+<code class="sourceCode R"><span><span class="co">#install.packages("CiteSource")</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://eshackathon.github.io/CiteSource/">CiteSource</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="import-citation-files">2. Import citation files<a class="anchor" aria-label="anchor" href="#import-citation-files"></a>
+<h2 id="import-citation-files">Import citation files<a class="anchor" aria-label="anchor" href="#import-citation-files"></a>
 </h2>
-<p>Users can import multiple .ris or .bib files into CiteSource, which
-the user can label with source information such as database or platform.
-In this case we are uploading the results from five different strings,
-which were run in Web of Science.</p>
+<p>In this example we are comparing results from five different search
+strings, all run in Web of Science. Each string is tagged as a separate
+<code>cite_source</code>. The benchmark file is given its own source tag
+so it can be identified in the analysis.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Import citation files from a folder</span></span>
-<span><span class="va">file_path</span> <span class="op">&lt;-</span> <span class="st">"../vignettes/new_benchmark_data/"</span></span>
+<code class="sourceCode R"><span><span class="va">file_path</span> <span class="op">&lt;-</span> <span class="st">"../vignettes/new_benchmark_data/"</span></span>
 <span><span class="va">citation_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">file_path</span>, pattern <span class="op">=</span> <span class="st">"\\.ris"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Print citation_files to double check the order in which R imported the files.</span></span>
 <span><span class="va">citation_files</span></span>
 <span><span class="co">#&gt; [1] "../vignettes/new_benchmark_data//benchmark_15.ris"</span></span>
 <span><span class="co">#&gt; [2] "../vignettes/new_benchmark_data//search1_166.ris" </span></span>
@@ -128,79 +116,48 @@ which were run in Web of Science.</p>
 <span><span class="co">#&gt; [6] "../vignettes/new_benchmark_data//search5_495.ris"</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="assign-custom-metadata">3. Assign custom metadata<a class="anchor" aria-label="anchor" href="#assign-custom-metadata"></a>
+<h2 id="assign-custom-metadata">Assign custom metadata<a class="anchor" aria-label="anchor" href="#assign-custom-metadata"></a>
 </h2>
-<p>In this example the benchmark file takes an NA for cite_source while
-the search files are tagged with search 1, search 2, etc. The cite_label
-for these files is tagged as search, while the benchmark is used for the
-benchmark files. In further vignettes you will see how the label can be
-used for post screening and citations that were included in the final
-synthesis.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create a tibble that contains metadata about the citation files</span></span>
-<span><span class="va">imported_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
-<span>  <span class="op">~</span><span class="va">files</span>,            <span class="op">~</span><span class="va">cite_sources</span>,   <span class="op">~</span><span class="va">cite_labels</span>, </span>
-<span>  <span class="st">"benchmark_15.ris"</span>,   <span class="st">"benchmark"</span>,      <span class="st">"search"</span>,    </span>
-<span>  <span class="st">"search1_166.ris"</span>,    <span class="st">"search 1"</span>,       <span class="st">"search"</span>,    </span>
-<span>  <span class="st">"search2_278.ris"</span>,    <span class="st">"search 2"</span>,       <span class="st">"search"</span>,    </span>
-<span>  <span class="st">"search3_302.ris"</span>,    <span class="st">"search 3"</span>,       <span class="st">"search"</span>,     </span>
-<span>  <span class="st">"search4_460.ris"</span>,    <span class="st">"search 4"</span>,       <span class="st">"search"</span>,    </span>
-<span>  <span class="st">"search5_495.ris"</span>,    <span class="st">"search 5"</span>,       <span class="st">"search"</span></span>
-<span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span><span class="co"># Append the file path to each file name in the 'files' column</span></span>
-<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">imported_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
+<span>  <span class="op">~</span><span class="va">files</span>,              <span class="op">~</span><span class="va">cite_sources</span>,  <span class="op">~</span><span class="va">cite_labels</span>,</span>
+<span>  <span class="st">"benchmark_15.ris"</span>,  <span class="st">"benchmark"</span>,    <span class="st">"benchmark"</span>,</span>
+<span>  <span class="st">"search1_166.ris"</span>,   <span class="st">"search 1"</span>,     <span class="st">"search"</span>,</span>
+<span>  <span class="st">"search2_278.ris"</span>,   <span class="st">"search 2"</span>,     <span class="st">"search"</span>,</span>
+<span>  <span class="st">"search3_302.ris"</span>,   <span class="st">"search 3"</span>,     <span class="st">"search"</span>,</span>
+<span>  <span class="st">"search4_460.ris"</span>,   <span class="st">"search 4"</span>,     <span class="st">"search"</span>,</span>
+<span>  <span class="st">"search5_495.ris"</span>,   <span class="st">"search 5"</span>,     <span class="st">"search"</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Save the imported citations as raw_citations</span></span>
 <span><span class="va">raw_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_citations.html">read_citations</a></span><span class="op">(</span>metadata <span class="op">=</span> <span class="va">imported_tbl</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Importing files <span style="color: #00BB00;">■■■                             </span>   5%</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: the following cite_label value(s) are not in the standard vocabulary (search / screened / final): benchmark. Phase-analysis functions expect these exact labels.</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="deduplicate-create-data-tables">4. Deduplicate &amp; create data tables<a class="anchor" aria-label="anchor" href="#deduplicate-create-data-tables"></a>
+<h2 id="deduplicate-and-create-data-tables">Deduplicate and create data tables<a class="anchor" aria-label="anchor" href="#deduplicate-and-create-data-tables"></a>
 </h2>
-<p>CiteSource allows users to merge duplicates while maintaining
-information in the cite_source metadata field. Thus, information about
-the origin of the records is not lost in the deduplication process. The
-next few steps produce the dataframes that are used in subsequent plots
-and tables.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Deduplicating yields a dataframe. Each record has a duplicate_id which is unique, </span></span>
-<span><span class="co">#citations that were duplicated will retain each duplicate_id in the record_ids column.</span></span>
-<span><span class="co">#source and label tags from each duplicate will be merged as a list in their respective columns.</span></span>
-<span><span class="va">unique_citations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">raw_citations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Registered S3 method overwritten by 'synthesisr':</span></span>
-<span><span class="co">#&gt;   method                     from      </span></span>
-<span><span class="co">#&gt;   as.data.frame.bibliography CiteSource</span></span>
+<code class="sourceCode R"><span><span class="va">unique_citations</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">raw_citations</span><span class="op">)</span></span>
 <span><span class="co">#&gt; formatting data...</span></span>
 <span><span class="co">#&gt; identifying potential duplicates...</span></span>
 <span><span class="co">#&gt; identified duplicates!</span></span>
 <span><span class="co">#&gt; flagging potential pairs for manual dedup...</span></span>
-<span><span class="co">#&gt; Joining with `by = join_by(duplicate_id.x, duplicate_id.y)`</span></span>
 <span><span class="co">#&gt; 1716 citations loaded...</span></span>
 <span><span class="co">#&gt; 1217 duplicate citations removed...</span></span>
 <span><span class="co">#&gt; 499 unique citations remaining!</span></span>
-<span></span>
-<span><span class="co">#Count_unique yields another dataframe which is used in creation of plots and tables</span></span>
-<span><span class="va">n_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#For each unique citation, determine which sources were present</span></span>
+<span><span class="va">n_unique</span>          <span class="op">&lt;-</span> <span class="fu"><a href="../reference/count_unique.html">count_unique</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
 <span><span class="va">source_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_sources.html">compare_sources</a></span><span class="op">(</span><span class="va">unique_citations</span>, comp_type <span class="op">=</span> <span class="st">"sources"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="review-internal-duplication">5. Review internal duplication<a class="anchor" aria-label="anchor" href="#review-internal-duplication"></a>
+<h2 id="review-internal-duplication">Review internal duplication<a class="anchor" aria-label="anchor" href="#review-internal-duplication"></a>
 </h2>
-<p>Once we have imported, added custom metadata, and identified
-duplicates, it can be helpful to review the initial record count data to
-ensure everything looks okay. As a part of the deduplication process,
-duplicate records may have been identified within sources. The initial
-record table will provide you with a count of how many records were
-initially in each source file, and the count of distinct records that
-will vary if there were any duplicates identified within the source
-file.</p>
+<p>Before comparing strings, it is useful to confirm that internal
+deduplication ran as expected. The initial record table shows how many
+records were imported from each source and how many distinct records
+remained after duplicates within that source were removed.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Initial upload/post internal deduplication table creation</span></span>
-<span><span class="va">initial_records_search</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_initial_records.html">calculate_initial_records</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
-<span><span class="va">initial_record_table_search</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_initial_record_table.html">create_initial_record_table</a></span><span class="op">(</span><span class="va">initial_records_search</span><span class="op">)</span></span>
-<span><span class="va">initial_record_table_search</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">initial_records</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_initial_records.html">calculate_initial_records</a></span><span class="op">(</span><span class="va">unique_citations</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/create_initial_record_table.html">create_initial_record_table</a></span><span class="op">(</span><span class="va">initial_records</span><span class="op">)</span></span></code></pre></div>
 <div id="mwlefoodfi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#mwlefoodfi table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -714,124 +671,661 @@ file.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="compare-overlapp-with-an-upset-plot">6. Compare overlapp with an upset plot<a class="anchor" aria-label="anchor" href="#compare-overlapp-with-an-upset-plot"></a>
+<h2 id="compare-overlap-with-an-upset-plot">Compare overlap with an upset plot<a class="anchor" aria-label="anchor" href="#compare-overlap-with-an-upset-plot"></a>
 </h2>
-<p>An upset plot is useful for visualizing overlap across multiple
-sources and provides detail about the number of shared and unique
-records. Using this data we’ll outline a few potential uses when
-benchmarking testing a search.</p>
-<p>We have uploaded 15 benchmarking articles. Of these 15 articles, the
-upset plot shows us that all but 4 were found across the five searches.
-We can see the number of benchmarking articles that were discovered by
-each string as well as the number of articles that were shared between
-searches.</p>
+<p>An upset plot visualizes overlap across multiple sources and shows
+the number of shared and unique records for every combination of
+sources.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Generate a source comparison upset plot.</span></span>
-<span><span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_source_overlap_upset.html">plot_source_overlap_upset</a></span><span class="op">(</span><span class="va">source_comparison</span>, decreasing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Plotting a large number of groups. Consider reducing nset or sub-setting the data.</span></span></code></pre></div>
-<p><img src="citesource_new_benchmark_testing_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="An upset plot visualizing the overlap of benchmarking articles found across five search strategies. The plot highlights that nine articles were identified by all five searches, while four benchmarking articles were missed entirely. Additional columns show the number of articles shared across different combinations of search strategies." width="576"></p>
-<p>Looking at the first column, we see that 9 benchmarking articles were
-found across every search. One may hypothesize that the 157 citations
-that follow in the second column may have a high number of relevant
-articles due to the fact that they were also discovered across the five
-searches. If a researcher was interested in building a larger group of
-benchmarking articles, they may want to review these articles first.</p>
-<p>Looking at the plot we can see that search #4 and #5 have the largest
-number of results, at close to 500 each. Of these, 180 are unique to
-those two searches. We can also see that search #4 and #5 found two of
-the benchmarking articles that would not have been found otherwise.
-While a researcher may want to ensure that they capture the highest
-number of benchmarking articles, the addition of close to 200 articles
-more than search #2 and #3 may not be efficient when the result is only
-2 benchmarking articles. Instead of including this search in their final
-strategy, they may consider reviewing the two articles that were found
-by this search and work to adjust their other searches instead.</p>
-<p>Another decision in this case may be to drop search #2 and #3 as each
-of these strings do not contribute uniquely to the discovery of any
-benchmarking articles. While the data backs up this decision, there may
-also be more to consider. For example, if benchmarking articles are
-biased for any known reason, certain search strategies may be employed
-with an understanding that benchmarking data may not accurately reflect
-their potential contribution. (e.g. benchmarking articles were gathered
-from previous systematic reviews that focused on a specific geographic
-region and the current review is global in nature).</p>
-<p>Finally, as we’ll see in the next step, we can examine closely the
-four articles that weren’t found in any search approach. This will help
-us adjust our search to better capture relevant studies.</p>
+<p><img src="citesource_new_benchmark_testing_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="An upset plot visualizing the overlap of benchmarking articles found across five search strategies. Nine articles were identified by all five searches; four benchmarking articles were missed entirely." width="576"></p>
+<p>Of the 15 benchmark articles, all but 4 were found across the five
+searches. Looking at the plot, search 4 and search 5 have the largest
+result sets (close to 500 each) but contribute only 2 additional
+benchmark articles beyond what the other strings find. A researcher
+might weigh whether that additional coverage justifies the extra
+screening burden, or whether the energy is better spent refining the
+other strings to capture those 2 articles.</p>
+<p>Searches 2 and 3 do not contribute any unique benchmark articles.
+While the data may suggest dropping them, there are reasons to be
+cautious — benchmark sets can themselves be biased (e.g., drawn from
+prior reviews with a narrow geographic focus), so strings that add no
+benchmark hits may still contribute relevant literature not represented
+in the benchmark set.</p>
 </div>
 <div class="section level2">
-<h2 id="compare-overlapp-with-a-record-level-table">7. Compare overlapp with a record level table<a class="anchor" aria-label="anchor" href="#compare-overlapp-with-a-record-level-table"></a>
+<h2 id="review-benchmark-coverage-with-a-record-level-table">Review benchmark coverage with a record-level table<a class="anchor" aria-label="anchor" href="#review-benchmark-coverage-with-a-record-level-table"></a>
 </h2>
-<p>This record table is helpful in reviewing which citations were found
-across each database as well as quickly checking to see which
-benchmarking articles were not found in the search.</p>
+<p>The record-level table shows exactly which benchmark articles were
+found by which strings, making it easy to identify the 4 articles that
+no string captured.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unique_citations</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">cite_source</span>, <span class="st">"benchmark"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">unique_citations</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">cite_source</span>, <span class="st">"benchmark"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/record_level_table.html">record_level_table</a></span><span class="op">(</span>return <span class="op">=</span> <span class="st">"DT"</span><span class="op">)</span></span></code></pre></div>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"filter":"none","vertical":false,"class":"display","extensions":["Buttons"],"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],["&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;"],["Amjad et al. (2021)","Barros et al. (2023)","Dittrich & McCallum (2020)","Gao et al. (2023)","Gomez Isaza et al. (2022)","Groot et al. (2019)","Isaac et al. (2021)","Kochi et al. (2010)","Liu et al. (2015)","Mattioli et al. (2022)","Reid et al. (2016)","Sanderfoot et al. (2022)","Vukomanovic & Steelman (2019)","Wibbenmeyer et al. (2023)","Zhang et al. (2024)"],["Amjad, S., Chojecki, D., Osornio-Vargas, A. & Ospina, M. B. (2021). Wildfire exposure during pregnancy and the risk of adverse birth outcomes: a systematic review. <i>Environment International<\/i><i>, 156<\/i>. <a href=\"https://doi.org/10.1016/j.envint.2021.106644\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1016/j.envint.2021.106644<\/a>","Barros, B., Oliveira, M. & Morais, S. (2023). Continent-based systematic review of the short-term health impacts of wildfire emissions. <i>Journal Of Toxicology And Environmental Health, Part B<\/i><i>, 26<\/i>(7). ","Dittrich, R. & McCallum, S. (2020). How to measure the economic health cost of wildfires–A systematic review of the literature for northern America. <i>International Journal Of Wildland Fire<\/i><i>, 29<\/i>(11). <a href=\"https://doi.org/10.1071/WF19091\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1071/WF19091<\/a>","Gao, Y., Huang, W., Yu, P., Xu, R., Yang, Z., Gasevic, D., Ye, T., Guo, Y. & Li, S. (2023). Long-term impacts of non-occupational wildfire exposure on human health: A systematic review. <i>Environmental Pollution<\/i><i>, 320<\/i>. <a href=\"https://doi.org/10.1016/j.envpol.2023.121041\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1016/j.envpol.2023.121041<\/a>","Gomez Isaza, D. F., Cramp, R. L. & Franklin, C. E. (2022). Fire and rain: A systematic review of the impacts of wildfire and associated runoff on aquatic fauna. <i>Global Change Biology<\/i><i>, 28<\/i>(8). ","Groot, E., Caturay, A., Khan, Y. & Copes, R. (2019). A systematic review of the health impacts of occupational exposure to wildland fires. <i>International Journal Of Occupational Medicine And Environmental Health<\/i><i>, 32<\/i>(2). <a href=\"https://doi.org/10.13075/ijomeh.1896.01326\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.13075/ijomeh.1896.01326<\/a>","Isaac, F., Toukhsati, S. R., Di Benedetto, M. & Kennedy, G. A. (2021). A systematic review of the impact of wildfires on sleep disturbances. <i>International Journal Of Environmental Research And Public Health<\/i><i>, 18<\/i>(19). <a href=\"https://doi.org/10.3390/ijerph181910152\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.3390/ijerph181910152<\/a>","Kochi, I., Donovan, G. H., Champ, P. A. & Loomis, J. B. (2010). The economic cost of adverse health effects from wildfire-smoke exposure: a review. <i>International Journal Of Wildland Fire<\/i><i>, 19<\/i>(7). <a href=\"https://doi.org/10.1071/WF09077\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1071/WF09077<\/a>","Liu, J. C., Pereira, G., Uhl, S. A., Bravo, M. A. & Bell, M. L. (2015). A systematic review of the physical health impacts from non-occupational exposure to wildfire smoke. <i>Environmental Research<\/i><i>, 136<\/i>. <a href=\"https://doi.org/10.1016/j.envres.2014.10.015\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1016/j.envres.2014.10.015<\/a>","Mattioli, W., Ferrara, C., Lombardo, E., Barbati, A., Salvati, L. & Tomao, A. (2022). Estimating wildfire suppression costs: a systematic review. <i>International Forestry Review<\/i><i>, 24<\/i>(1). ","Reid, C. E., Brauer, M., Johnston, F. H., Jerrett, M., Balmes, J. R. & Elliott, C. T. (2016). Critical review of health impacts of wildfire smoke exposure. <i>Environmental Health Perspectives<\/i><i>, 124<\/i>(9). <a href=\"https://doi.org/10.1289/ehp.1409277\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1289/ehp.1409277<\/a>","Sanderfoot, O. V., Bassing, S. B., Brusa, J. L., Emmet, R. L., Gillman, S. J., Swift, K. & Gardner, B. (2022). A review of the effects of wildfire smoke on the health and behavior of wildlife. <i>Environmental Research Letters<\/i><i>, 16<\/i>(12). ","Vukomanovic, J. & Steelman, T. (2019). A systematic review of relationships between mountain wildfire and ecosystem services. <i>Landscape Ecology<\/i><i>, 34<\/i>(5). <a href=\"https://doi.org/10.1007/s10980-019-00832-9\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1007/s10980-019-00832-9<\/a>","Wibbenmeyer, M., Sloggy, M. R. & Sánchez, J. J. (2023). Economic Analysis of Wildfire Impacts to Water Quality: a Review. <i>Journal Of Forestry<\/i><i>, 121<\/i>(4). ","Zhang, Y., Tingting, Y., Huang, W., Yu, P., Chen, G., Xu, R., Song, J., Guo, Y. & Li, S. (2024). Health impacts of wildfire smoke on children and adolescents: a systematic review and meta-analysis. <i>Current Environmental Health Reports<\/i><i>, 11<\/i>(1). <a href=\"https://doi.org/10.1007/s40572-023-00420-9\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1007/s40572-023-00420-9<\/a>"],[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],[true,false,true,true,false,true,true,false,true,true,false,false,true,false,true],[true,false,true,true,false,true,true,false,true,true,false,false,true,false,true],[true,false,true,true,false,true,true,false,true,true,false,false,true,false,true],[true,false,true,true,false,true,true,true,true,true,true,false,true,false,true],[true,false,true,true,false,true,true,true,true,true,true,false,true,false,true],["&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#x2717;","&#10004;"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th rowspan=\"2\" colspan=\"2\">&nbsp;<\/th>\n      <th rowspan=\"2\" colspan=\"2\">Citation<\/th>\n      <th colspan=\"12\">Source<\/th>\n    <\/tr>\n    <tr>\n      <th>benchmark<\/th>\n      <th>search 1<\/th>\n      <th>search 2<\/th>\n      <th>search 3<\/th>\n      <th>search 4<\/th>\n      <th>search 5<\/th>\n      <th>benchmark <\/th>\n      <th>search 1 <\/th>\n      <th>search 2 <\/th>\n      <th>search 3 <\/th>\n      <th>search 4 <\/th>\n      <th>search 5 <\/th>\n    <\/tr>\n  <\/thead>\n  <tfoot>\n    <td colspan=\"16\">Click on the &oplus; to view the full reference<\/td>\n  <\/tfoot>\n<\/table>","options":{"pageLength":10,"lengthMenu":[[10,25,50,100,-1],["10","25","50","100","All"]],"columnDefs":[{"visible":false,"targets":[0,3,4,5,6,7,8,9]},{"orderable":false,"className":"details-control","targets":1},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":" ","targets":1},{"name":"citation","targets":2},{"name":"html_reference","targets":3},{"name":"source__benchmark","targets":4},{"name":"source__search 1","targets":5},{"name":"source__search 2","targets":6},{"name":"source__search 3","targets":7},{"name":"source__search 4","targets":8},{"name":"source__search 5","targets":9},{"name":"source__benchmark ","targets":10},{"name":"source__search 1 ","targets":11},{"name":"source__search 2 ","targets":12},{"name":"source__search 3 ","targets":13},{"name":"source__search 4 ","targets":14},{"name":"source__search 5 ","targets":15}],"dom":"lBfrtip","buttons":["print",{"extend":"csv","filename":"CiteSource_record_summary","text":"Download csv","exportOptions":{"columns":[0,2,3,4,5,6,7,8,9],"modifier":{"page":"all"}}}],"order":[],"autoWidth":false,"orderClasses":false},"callback":"function(table) {\n\n              table.column(1).nodes().to$().css({cursor: 'pointer'});\n              var format = function(d) {\n                return '<div style=\"background-color:#eee; padding: .5em;\">' +\n                        d[3];\n              };\n              table.on('click', 'td.details-control', function() {\n                var td = $(this), row = table.row(td.closest('tr'));\n                if (row.child.isShown()) {\n                  row.child.hide();\n                  td.html('&oplus;');\n                } else {\n                  row.child(format(row.data())).show();\n                  td.html('&CircleMinus;');\n                }\n              });\n}","selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":["callback"],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption style=\"caption-side: bottom; text-align: left;\">Click on the &amp;oplus; to view the full reference<\/caption>","data":[["&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;","&oplus;"],["Amjad et al. (2021)","Barros et al. (2023)","Dittrich & McCallum (2020)","Gao et al. (2023)","Gomez Isaza et al. (2022)","Groot et al. (2019)","Isaac et al. (2021)","Kochi et al. (2010)","Liu et al. (2015)","Mattioli et al. (2022)","Reid et al. (2016)","Sanderfoot et al. (2022)","Vukomanovic & Steelman (2019)","Wibbenmeyer et al. (2023)","Zhang et al. (2024)"],["Amjad, S., Chojecki, D., Osornio-Vargas, A. & Ospina, M. B. (2021). Wildfire exposure during pregnancy and the risk of adverse birth outcomes: a systematic review. <i>Environment International<\/i><i>, 156<\/i>. <a href=\"https://doi.org/10.1016/j.envint.2021.106644\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1016/j.envint.2021.106644<\/a>","Barros, B., Oliveira, M. & Morais, S. (2023). Continent-based systematic review of the short-term health impacts of wildfire emissions. <i>Journal Of Toxicology And Environmental Health, Part B<\/i><i>, 26<\/i>(7). ","Dittrich, R. & McCallum, S. (2020). How to measure the economic health cost of wildfires–A systematic review of the literature for northern America. <i>International Journal Of Wildland Fire<\/i><i>, 29<\/i>(11). <a href=\"https://doi.org/10.1071/WF19091\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1071/WF19091<\/a>","Gao, Y., Huang, W., Yu, P., Xu, R., Yang, Z., Gasevic, D., Ye, T., Guo, Y. & Li, S. (2023). Long-term impacts of non-occupational wildfire exposure on human health: A systematic review. <i>Environmental Pollution<\/i><i>, 320<\/i>. <a href=\"https://doi.org/10.1016/j.envpol.2023.121041\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1016/j.envpol.2023.121041<\/a>","Gomez Isaza, D. F., Cramp, R. L. & Franklin, C. E. (2022). Fire and rain: A systematic review of the impacts of wildfire and associated runoff on aquatic fauna. <i>Global Change Biology<\/i><i>, 28<\/i>(8). ","Groot, E., Caturay, A., Khan, Y. & Copes, R. (2019). A systematic review of the health impacts of occupational exposure to wildland fires. <i>International Journal Of Occupational Medicine And Environmental Health<\/i><i>, 32<\/i>(2). <a href=\"https://doi.org/10.13075/ijomeh.1896.01326\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.13075/ijomeh.1896.01326<\/a>","Isaac, F., Toukhsati, S. R., Di Benedetto, M. & Kennedy, G. A. (2021). A systematic review of the impact of wildfires on sleep disturbances. <i>International Journal Of Environmental Research And Public Health<\/i><i>, 18<\/i>(19). <a href=\"https://doi.org/10.3390/ijerph181910152\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.3390/ijerph181910152<\/a>","Kochi, I., Donovan, G. H., Champ, P. A. & Loomis, J. B. (2010). The economic cost of adverse health effects from wildfire-smoke exposure: a review. <i>International Journal Of Wildland Fire<\/i><i>, 19<\/i>(7). <a href=\"https://doi.org/10.1071/WF09077\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1071/WF09077<\/a>","Liu, J. C., Pereira, G., Uhl, S. A., Bravo, M. A. & Bell, M. L. (2015). A systematic review of the physical health impacts from non-occupational exposure to wildfire smoke. <i>Environmental Research<\/i><i>, 136<\/i>. <a href=\"https://doi.org/10.1016/j.envres.2014.10.015\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1016/j.envres.2014.10.015<\/a>","Mattioli, W., Ferrara, C., Lombardo, E., Barbati, A., Salvati, L. & Tomao, A. (2022). Estimating wildfire suppression costs: a systematic review. <i>International Forestry Review<\/i><i>, 24<\/i>(1). ","Reid, C. E., Brauer, M., Johnston, F. H., Jerrett, M., Balmes, J. R. & Elliott, C. T. (2016). Critical review of health impacts of wildfire smoke exposure. <i>Environmental Health Perspectives<\/i><i>, 124<\/i>(9). <a href=\"https://doi.org/10.1289/ehp.1409277\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1289/ehp.1409277<\/a>","Sanderfoot, O. V., Bassing, S. B., Brusa, J. L., Emmet, R. L., Gillman, S. J., Swift, K. & Gardner, B. (2022). A review of the effects of wildfire smoke on the health and behavior of wildlife. <i>Environmental Research Letters<\/i><i>, 16<\/i>(12). ","Vukomanovic, J. & Steelman, T. (2019). A systematic review of relationships between mountain wildfire and ecosystem services. <i>Landscape Ecology<\/i><i>, 34<\/i>(5). <a href=\"https://doi.org/10.1007/s10980-019-00832-9\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1007/s10980-019-00832-9<\/a>","Wibbenmeyer, M., Sloggy, M. R. & Sánchez, J. J. (2023). Economic Analysis of Wildfire Impacts to Water Quality: a Review. <i>Journal Of Forestry<\/i><i>, 121<\/i>(4). ","Zhang, Y., Tingting, Y., Huang, W., Yu, P., Chen, G., Xu, R., Song, J., Guo, Y. & Li, S. (2024). Health impacts of wildfire smoke on children and adolescents: a systematic review and meta-analysis. <i>Current Environmental Health Reports<\/i><i>, 11<\/i>(1). <a href=\"https://doi.org/10.1007/s40572-023-00420-9\" target=\"_blank\" rel=\"noopener noreferrer\">https://doi.org/10.1007/s40572-023-00420-9<\/a>"],["&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#x2717;","&#10004;"],["&#10004;","&#x2717;","&#10004;","&#10004;","&#x2717;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#10004;","&#x2717;","&#10004;","&#x2717;","&#10004;"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Citation<\/th>\n      <th>.html_reference<\/th>\n      <th>benchmark<\/th>\n      <th>search 1<\/th>\n      <th>search 2<\/th>\n      <th>search 3<\/th>\n      <th>search 4<\/th>\n      <th>search 5<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"lengthMenu":[[10,25,50,100,-1],["10","25","50","100","All"]],"columnDefs":[{"visible":false,"searchable":false,"targets":2},{"orderable":false,"className":"details-control","targets":0},{"width":"2em","targets":0},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Citation","targets":1},{"name":".html_reference","targets":2},{"name":"benchmark","targets":3},{"name":"search 1","targets":4},{"name":"search 2","targets":5},{"name":"search 3","targets":6},{"name":"search 4","targets":7},{"name":"search 5","targets":8}],"dom":"lBfrtip","buttons":["print",{"extend":"csv","filename":"CiteSource_record_summary","text":"Download csv","exportOptions":{"columns":[1,3,4,5,6,7,8],"modifier":{"page":"all"}}}],"order":[],"autoWidth":false,"orderClasses":false},"callback":"function(table) {\n\n            var refCol = 2;\n            table.column(0).nodes().to$().css({cursor: 'pointer'});\n            table.column(1).nodes().to$().css({cursor: 'pointer'});\n            var format = function(d) {\n              return '<div style=\"background-color:#eee; padding: .5em;\">' +\n                      d[refCol];\n            };\n            var toggleRow = function(tr) {\n              var row = table.row(tr);\n              var icon = $(tr).find('td').eq(0);\n              if (row.child.isShown()) {\n                row.child.hide();\n                icon.html('&oplus;');\n              } else {\n                row.child(format(row.data())).show();\n                icon.html('&CircleMinus;');\n              }\n            };\n            table.on('click', 'td.details-control', function() {\n              toggleRow($(this).closest('tr'));\n            });\n            table.on('click', 'tbody td', function() {\n              var idx = table.cell(this).index();\n              if (idx && idx.column === 1) toggleRow($(this).closest('tr'));\n            });\n}","selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":["callback"],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
-<h2 id="exporting-for-further-analysis">8. Exporting for further analysis<a class="anchor" aria-label="anchor" href="#exporting-for-further-analysis"></a>
+<h2 id="detailed-source-contribution-table">Detailed source contribution table<a class="anchor" aria-label="anchor" href="#detailed-source-contribution-table"></a>
 </h2>
-<p>We may want to export the deduplicated set of results for further
-analysis. CiteSource offers a set of export functions called
-<code>export_csv</code>, <code>export_ris</code> and
-<code>export_bib</code> that will save dataframes as a .csv file, .ris
-file or .bib file, respectively.</p>
-<p>You can then reimport .csv and .ris files to pick up a project or
-analysis without having to start from scratch, or after making manual
-adjustments (such as adding missing abstract data) to a file.</p>
-<div class="section level3">
-<h3 id="generate-a--csv-file">Generate a .csv file<a class="anchor" aria-label="anchor" href="#generate-a--csv-file"></a>
-</h3>
-<p>The separate argument can be used to create separate columns for
-cite_source, cite_label or cite_string to facilitate analysis. CSV files
-can be reimported into CiteSource in order to recreate all plots and
-tables.</p>
+<p>The detailed record table provides a statistical summary of each
+string’s contribution — records imported, distinct records after
+deduplication, unique records, non-unique records, and percentage
+contributions.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#export_csv(unique_citations, filename = "citesource_export.csv")</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">detailed_records</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_detailed_records.html">calculate_detailed_records</a></span><span class="op">(</span><span class="va">unique_citations</span>, <span class="va">n_unique</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/create_detailed_record_table.html">create_detailed_record_table</a></span><span class="op">(</span><span class="va">detailed_records</span><span class="op">)</span></span></code></pre></div>
+<div id="eexombwkke" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#eexombwkke table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#eexombwkke thead, #eexombwkke tbody, #eexombwkke tfoot, #eexombwkke tr, #eexombwkke td, #eexombwkke th {
+  border-style: none;
+}
+
+#eexombwkke p {
+  margin: 0;
+  padding: 0;
+}
+
+#eexombwkke .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#eexombwkke .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#eexombwkke .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#eexombwkke .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#eexombwkke .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eexombwkke .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eexombwkke .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eexombwkke .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#eexombwkke .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#eexombwkke .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#eexombwkke .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#eexombwkke .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#eexombwkke .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#eexombwkke .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#eexombwkke .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#eexombwkke .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#eexombwkke .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#eexombwkke .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#eexombwkke .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eexombwkke .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#eexombwkke .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#eexombwkke .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#eexombwkke .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eexombwkke .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#eexombwkke .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#eexombwkke .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eexombwkke .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eexombwkke .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#eexombwkke .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eexombwkke .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#eexombwkke .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eexombwkke .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eexombwkke .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eexombwkke .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eexombwkke .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eexombwkke .gt_left {
+  text-align: left;
+}
+
+#eexombwkke .gt_center {
+  text-align: center;
+}
+
+#eexombwkke .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#eexombwkke .gt_font_normal {
+  font-weight: normal;
+}
+
+#eexombwkke .gt_font_bold {
+  font-weight: bold;
+}
+
+#eexombwkke .gt_font_italic {
+  font-style: italic;
+}
+
+#eexombwkke .gt_super {
+  font-size: 65%;
+}
+
+#eexombwkke .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#eexombwkke .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#eexombwkke .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#eexombwkke .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#eexombwkke .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#eexombwkke .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#eexombwkke .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#eexombwkke .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#eexombwkke div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading">
+<td colspan="8" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Record Summary</td>
+    </tr>
+<tr class="gt_col_headings gt_spanner_row">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="a::stub"></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="Records">
+        <div class="gt_column_spanner">Records</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="Uniqueness">
+        <div class="gt_column_spanner">Uniqueness</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="Contribution to Total">
+        <div class="gt_column_spanner">Contribution to Total</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1" scope="col" id="Within-source Rate">
+        <div class="gt_column_spanner">Within-source Rate</div>
+      </th>
+    </tr>
+<tr class="gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Records-Imported">Imported<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span>
+</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Distinct-Records">Distinct<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span>
+</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Unique-Records">Unique<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span>
+</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Non-unique-Records">Shared<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>4</sup></span>
+</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Source-Contribution-%">% of All Distinct<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>5</sup></span>
+</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Source-Unique-Contribution-%">% of All Unique<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>6</sup></span>
+</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Source-Unique-%">Unique Rate<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>7</sup></span>
+</th>
+    </tr>
+</thead>
+<tbody class="gt_table_body">
+<tr>
+<th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">benchmark</th>
+<td headers="stub_1_1 Records Imported" class="gt_row gt_right">15</td>
+<td headers="stub_1_1 Distinct Records" class="gt_row gt_right">15</td>
+<td headers="stub_1_1 Unique Records" class="gt_row gt_right">0</td>
+<td headers="stub_1_1 Non-unique Records" class="gt_row gt_right">15</td>
+<td headers="stub_1_1 Source Contribution %" class="gt_row gt_right" style="font-style: italic;">0.9%</td>
+<td headers="stub_1_1 Source Unique Contribution %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+<td headers="stub_1_1 Source Unique %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+</tr>
+<tr>
+<th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">search 1</th>
+<td headers="stub_1_2 Records Imported" class="gt_row gt_right">166</td>
+<td headers="stub_1_2 Distinct Records" class="gt_row gt_right">166</td>
+<td headers="stub_1_2 Unique Records" class="gt_row gt_right">0</td>
+<td headers="stub_1_2 Non-unique Records" class="gt_row gt_right">166</td>
+<td headers="stub_1_2 Source Contribution %" class="gt_row gt_right" style="font-style: italic;">9.7%</td>
+<td headers="stub_1_2 Source Unique Contribution %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+<td headers="stub_1_2 Source Unique %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+</tr>
+<tr>
+<th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">search 2</th>
+<td headers="stub_1_3 Records Imported" class="gt_row gt_right">278</td>
+<td headers="stub_1_3 Distinct Records" class="gt_row gt_right">278</td>
+<td headers="stub_1_3 Unique Records" class="gt_row gt_right">0</td>
+<td headers="stub_1_3 Non-unique Records" class="gt_row gt_right">278</td>
+<td headers="stub_1_3 Source Contribution %" class="gt_row gt_right" style="font-style: italic;">16.2%</td>
+<td headers="stub_1_3 Source Unique Contribution %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+<td headers="stub_1_3 Source Unique %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+</tr>
+<tr>
+<th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">search 3</th>
+<td headers="stub_1_4 Records Imported" class="gt_row gt_right">302</td>
+<td headers="stub_1_4 Distinct Records" class="gt_row gt_right">302</td>
+<td headers="stub_1_4 Unique Records" class="gt_row gt_right">0</td>
+<td headers="stub_1_4 Non-unique Records" class="gt_row gt_right">302</td>
+<td headers="stub_1_4 Source Contribution %" class="gt_row gt_right" style="font-style: italic;">17.6%</td>
+<td headers="stub_1_4 Source Unique Contribution %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+<td headers="stub_1_4 Source Unique %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+</tr>
+<tr>
+<th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">search 4</th>
+<td headers="stub_1_5 Records Imported" class="gt_row gt_right">460</td>
+<td headers="stub_1_5 Distinct Records" class="gt_row gt_right">460</td>
+<td headers="stub_1_5 Unique Records" class="gt_row gt_right">0</td>
+<td headers="stub_1_5 Non-unique Records" class="gt_row gt_right">460</td>
+<td headers="stub_1_5 Source Contribution %" class="gt_row gt_right" style="font-style: italic;">26.8%</td>
+<td headers="stub_1_5 Source Unique Contribution %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+<td headers="stub_1_5 Source Unique %" class="gt_row gt_right" style="font-style: italic;">0.0%</td>
+</tr>
+<tr>
+<th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">search 5</th>
+<td headers="stub_1_6 Records Imported" class="gt_row gt_right">495</td>
+<td headers="stub_1_6 Distinct Records" class="gt_row gt_right">495</td>
+<td headers="stub_1_6 Unique Records" class="gt_row gt_right">11</td>
+<td headers="stub_1_6 Non-unique Records" class="gt_row gt_right">484</td>
+<td headers="stub_1_6 Source Contribution %" class="gt_row gt_right" style="font-style: italic;">28.8%</td>
+<td headers="stub_1_6 Source Unique Contribution %" class="gt_row gt_right" style="font-style: italic;">100.0%</td>
+<td headers="stub_1_6 Source Unique %" class="gt_row gt_right" style="font-style: italic;">2.2%</td>
+</tr>
+<tr>
+<th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub" style="font-weight: bold; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">Total</th>
+<td headers="stub_1_7 Records Imported" class="gt_row gt_right" style="font-weight: bold; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">1716</td>
+<td headers="stub_1_7 Distinct Records" class="gt_row gt_right" style="font-weight: bold; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>8</sup></span> 499</td>
+<td headers="stub_1_7 Unique Records" class="gt_row gt_right" style="font-weight: bold; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">11</td>
+<td headers="stub_1_7 Non-unique Records" class="gt_row gt_right" style="font-weight: bold; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">1705</td>
+<td headers="stub_1_7 Source Contribution %" class="gt_row gt_right" style="font-weight: bold; font-style: italic; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">NA</td>
+<td headers="stub_1_7 Source Unique Contribution %" class="gt_row gt_right" style="font-weight: bold; font-style: italic; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">NA</td>
+<td headers="stub_1_7 Source Unique %" class="gt_row gt_right" style="font-weight: bold; font-style: italic; border-top-width: 2px; border-top-style: solid; border-top-color: #000000;">NA</td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Number of raw records imported from each database.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>2</sup></span> Number of records after internal source deduplication.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>3</sup></span> Number of records not found in another source.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>4</sup></span> Number of records found in at least one other source.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>5</sup></span> Percent distinct records contributed to the total number of distinct records.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>6</sup></span> Percent of unique records contributed to the total unique records.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>7</sup></span> Percentage of records from each source that were unique.</td>
+    </tr>
+<tr class="gt_footnotes">
+<td class="gt_footnote" colspan="8">
+<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>8</sup></span> Total citations discovered (after internal and cross-source deduplication).</td>
+    </tr>
+</tfoot>
+</table>
 </div>
-<div class="section level3">
-<h3 id="generate-a--ris-file">Generate a .ris file<a class="anchor" aria-label="anchor" href="#generate-a--ris-file"></a>
-</h3>
-<p>Generate and .ris and indicate custom field location for cite_source,
-cite_label or cite_string. In this example, we’ll be using EndNote, so
-we put cite_sources in the DB field, which will appear as the “Name of
-Database” field in EndNote and cite_labels into C5, which will appear as
-the “Custom 5” metadata field in EndNote.</p>
+</div>
+<div class="section level2">
+<h2 id="exporting-for-further-analysis">Exporting for further analysis<a class="anchor" aria-label="anchor" href="#exporting-for-further-analysis"></a>
+</h2>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#export_ris(unique_citations, filename = "citesource_export.ris", source_field = "DB", label_field = "C5")</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="generate-a-bibtex-file">Generate a bibtex file<a class="anchor" aria-label="anchor" href="#generate-a-bibtex-file"></a>
-</h3>
-<p>Generate a bibtex file and include data from cite_source, cite_label
-or cite_string.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#export_bib(unique_citations, filename = "citesource_export.bib", include = c("sources", "labels", "strings"))</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="re-importing-citesource-a-citesource-exported-file">Re-importing CiteSource a CiteSource exported file<a class="anchor" aria-label="anchor" href="#re-importing-citesource-a-citesource-exported-file"></a>
-</h3>
-<p>In order to reimport a .csv or a .ris you can use the following. Here
-is an example of how you would re-import the file if it were on your
-desktop.</p>
-<p>When reimporting you can simply name the data ‘unique_citations’ as
-this is the primary dataframe that all other functions use. See the
-following example.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#reimpor the citaitons and name 'unique_citations'</span></span>
-<span><span class="co">#unique_citations &lt;-reimport_csv("citesource_export.csv")</span></span>
+<code class="sourceCode R"><span><span class="co"># Export deduplicated results as CSV, RIS, or BibTeX</span></span>
+<span><span class="co">#export_csv(unique_citations, filename = "citesource_benchmark_export.csv")</span></span>
+<span><span class="co">#export_ris(unique_citations, filename = "citesource_benchmark_export.ris", source_field = "DB", label_field = "C5")</span></span>
+<span><span class="co">#export_bib(unique_citations, filename = "citesource_benchmark_export.bib", include = c("sources", "labels", "strings"))</span></span>
 <span></span>
-<span><span class="co">#create other datasets required for visualizations</span></span>
+<span><span class="co"># Reimport a previously exported file</span></span>
+<span><span class="co">#unique_citations &lt;- reimport_csv("citesource_benchmark_export.csv")</span></span>
 <span><span class="co">#n_unique &lt;- count_unique(unique_citations)</span></span>
-<span><span class="co">#source_comparison &lt;- compare_sources(unique_citations, comp_type = "sources")</span></span>
-<span></span>
-<span></span>
-<span><span class="co">#citesource_working_example &lt;-reimport_ris("citesource_export.ris")</span></span></code></pre></div>
-</div>
+<span><span class="co">#source_comparison &lt;- compare_sources(unique_citations, comp_type = "sources")</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -47,35 +47,20 @@ create_detailed_record_table(data)
 A `gt` table object summarizing the detailed record counts for each
 citation source.
 
-## Details
-
-The function checks for the presence of all required columns in the
-input data frame. If any required columns are missing, the function
-stops and returns an error message specifying the missing columns. This
-ensures that the input data is correctly formatted before attempting to
-generate the table.
-
-The generated table includes a header and footnotes that provide
-additional context for each column, explaining the meaning of the data
-presented.
-
 ## Examples
 
 ``` r
-# Example usage with a sample dataset
 sample_data <- data.frame(
-  Source = c("Source1", "Source2", "Source3", "Total"),
-  `Records Imported` = c(100, 150, 250, 500),
-  `Distinct Records` = c(90, 140, 230, 460),
-  `Unique Records` = c(50, 70, 120, 240),
-  `Non-unique Records` = c(40, 70, 110, 220),
-  `Source Contribution %` = c("39.1%", "60.9%", "100%", "100%"),
-  `Source Unique Contribution %` = c("41.7%", "58.3%", "100%", "100%"),
-  `Source Unique %` = c("55.6%", "50%", "52.2%", "52.2%"),
+  Source = c("Source1", "Source2", "Total"),
+  `Records Imported` = c(100, 150, 250),
+  `Distinct Records` = c(90, 140, 230),
+  `Unique Records` = c(50, 70, 120),
+  `Non-unique Records` = c(40, 70, 110),
+  `Source Contribution %` = c("39.1%", "60.9%", "100%"),
+  `Source Unique Contribution %` = c("41.7%", "58.3%", "100%"),
+  `Source Unique %` = c("55.6%", "50%", "52.2%"),
   check.names = FALSE
 )
-
-# Create the detailed record table
 create_detailed_record_table(sample_data)
 
 

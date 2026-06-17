@@ -48,6 +48,7 @@ citations <- data.frame(
 
 # Use the synthetic data with the function
 result <- record_counts(unique_citations, citations, "db_source")
+#> Warning: `record_counts()` is deprecated. Use `calculate_initial_records()` instead.
 result
 #>       Source Records Imported Distinct Records
 #> 1 Database 1                9                4

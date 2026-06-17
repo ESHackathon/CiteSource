@@ -252,6 +252,11 @@ plot_source_overlap_upset(
 
   :   Increase the maximum of set size scale
 
+## Value
+
+No return value, called for side effects. Renders an UpSet plot showing
+record overlap between sources to the current graphics device.
+
 ## References
 
 Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package

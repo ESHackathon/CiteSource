@@ -11,7 +11,7 @@ Note that existing files are overwritten without warning."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,12 +22,11 @@ Note that existing files are overwritten without warning."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_working_example.html">Source Analysis Across Screening Phases</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_benchmark_testing.html">Benchmark Testing</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">New Benchmark Testing</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">Benchmark Testing</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-pre-screen_validation.html">Assessing Usefulness of Databases for Evidence Synthesis</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-topic-coverage.html">Comparing Database Topic Coverage</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Source Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_search_string_comparison.html">Comparing Search Strings</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -56,9 +55,11 @@ Note that <em>existing files are overwritten without warning.</em></p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">export_csv</span><span class="op">(</span></span>
 <span>  <span class="va">unique_citations</span>,</span>
-<span>  filename <span class="op">=</span> <span class="st">"citesource_exported_citations.csv"</span>,</span>
+<span>  <span class="va">filename</span>,</span>
+<span>  fields <span class="op">=</span> <span class="st">"full"</span>,</span>
 <span>  separate <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  trim_abstracts <span class="op">=</span> <span class="fl">32000</span></span>
+<span>  trim_abstracts <span class="op">=</span> <span class="fl">32000</span>,</span>
+<span>  manual_dedup_complete <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,6 +75,14 @@ Note that <em>existing files are overwritten without warning.</em></p>
 <dd><p>Name (and path) of file, should end in .csv</p></dd>
 
 
+<dt id="arg-fields">fields<a class="anchor" aria-label="anchor" href="#arg-fields"></a></dt>
+<dd><p>Controls which columns are included. Use <code>"full"</code> (default) to export all columns
+(required for reimport into CiteSource via <code><a href="reimport_csv.html">reimport_csv()</a></code>); <code>"standard"</code> to export core
+bibliographic fields plus <code>cite_source</code>, <code>cite_label</code>, and <code>cite_string</code> (suitable for import
+into RELApp or other screening tools); or a character vector of column names for a custom
+selection. Note that exports other than <code>"full"</code> cannot be reimported into CiteSource.</p></dd>
+
+
 <dt id="arg-separate">separate<a class="anchor" aria-label="anchor" href="#arg-separate"></a></dt>
 <dd><p>Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to facilitate further analysis.</p></dd>
 
@@ -83,10 +92,19 @@ Note that <em>existing files are overwritten without warning.</em></p>
 which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 NULL to retain abstracts as they are.</p></dd>
 
+
+<dt id="arg-manual-dedup-complete">manual_dedup_complete<a class="anchor" aria-label="anchor" href="#arg-manual-dedup-complete"></a></dt>
+<dd><p>Logical. Records, in a <code>manual_dedup_complete</code>
+column, whether manual deduplication has been completed for this set
+(default <code>FALSE</code>). Set <code>TRUE</code> after confirming manual pairs with
+<code><a href="dedup_citations_add_manual.html">dedup_citations_add_manual()</a></code>. This flag is read back by <code><a href="reimport_csv.html">reimport_csv()</a></code>
+and lets later steps know whether candidate pairs still need review. Only
+written when <code>fields = "full"</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The function saves the deduplicated citations as a CSV file to the specified location.</p>
+    <p>No return value, called for side effects. Saves the deduplicated citations as a 'CSV' file to the specified location.</p>
     </div>
 
     <div class="section level2">
@@ -96,7 +114,9 @@ NULL to retain abstracts as they are.</p></dd>
 <span class="r-in"><span>  <span class="va">examplecitations_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"examplecitations.rds"</span>, package <span class="op">=</span> <span class="st">"CiteSource"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">examplecitations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">examplecitations_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">examplecitations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu">export_csv</span><span class="op">(</span><span class="va">dedup_results</span>, <span class="st">"cite_sources.csv"</span>, separate <span class="op">=</span> <span class="st">"cite_source"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">export_csv</span><span class="op">(</span><span class="va">dedup_results</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".csv"</span><span class="op">)</span>, separate <span class="op">=</span> <span class="st">"cite_source"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Standard export for RELApp / screening tools (not reimportable into CiteSource):</span></span></span>
+<span class="r-in"><span>  <span class="fu">export_csv</span><span class="op">(</span><span class="va">dedup_results</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".csv"</span><span class="op">)</span>, fields <span class="op">=</span> <span class="st">"standard"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

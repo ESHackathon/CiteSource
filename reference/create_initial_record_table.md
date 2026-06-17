@@ -33,7 +33,6 @@ meaning of each column.
 ## Examples
 
 ``` r
-# Example usage with a sample dataset
 sample_data <- data.frame(
   Source = c("Source1", "Source2", "Source3"),
   Records_Imported = c(100, 150, 250),

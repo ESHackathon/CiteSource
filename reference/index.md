@@ -43,10 +43,17 @@
   : Count and Precision/Sensitivity Table
 
 - [`dedup_citations()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations.md)
-  : Deduplicate citations - ASySD wrapper
+  : Deduplicate citations
 
 - [`dedup_citations_add_manual()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_manual.md)
-  : Remove pairs with manual dedup - ASySD wrapper
+  : Add manually identified duplicate pairs to a deduplicated dataset
+
+- [`dedup_citations_add_sources()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_sources.md)
+  : Add new citations to a previously deduplicated set and
+  re-deduplicate
+
+- [`dedup_log()`](https://eshackathon.github.io/CiteSource/reference/dedup_log.md)
+  : Build a provenance log of all merged duplicate pairs
 
 - [`detect_parser()`](https://eshackathon.github.io/CiteSource/reference/detect_.md)
   [`detect_delimiter()`](https://eshackathon.github.io/CiteSource/reference/detect_.md)
@@ -59,6 +66,9 @@
 
 - [`export_csv()`](https://eshackathon.github.io/CiteSource/reference/export_csv.md)
   : Export deduplicated citations with source data as CSV file
+
+- [`export_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/export_dedup_candidates.md)
+  : Export manual-review candidate pairs to a CSV file
 
 - [`export_ris()`](https://eshackathon.github.io/CiteSource/reference/export_ris.md)
   : Export data frame to RIS file
@@ -82,9 +92,6 @@
 - [`plot_source_overlap_upset()`](https://eshackathon.github.io/CiteSource/reference/plot_source_overlap_upset.md)
   : Create an UpSetR upset plot showing the overlap between sources
 
-- [`precision_sensitivity_table()`](https://eshackathon.github.io/CiteSource/reference/precision_sensitivity_table.md)
-  : precision_sensitivity_table
-
 - [`read_citations()`](https://eshackathon.github.io/CiteSource/reference/read_citations.md)
   : Import citations from file
 
@@ -92,17 +99,14 @@
   : Record counts function Calculate and combine counts of distinct
   records and imported records for each database
 
-- [`record_counts_table()`](https://eshackathon.github.io/CiteSource/reference/record_counts_table.md)
-  : record_counts_table
-
 - [`record_level_table()`](https://eshackathon.github.io/CiteSource/reference/record_level_table.md)
   : Record-level table
 
-- [`record_summary_table()`](https://eshackathon.github.io/CiteSource/reference/record_summary_table.md)
-  : search_summary_table
-
 - [`reimport_csv()`](https://eshackathon.github.io/CiteSource/reference/reimport_csv.md)
   : Reimport a CSV-file exported from CiteSource
+
+- [`reimport_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/reimport_dedup_candidates.md)
+  : Reimport manual-review candidate pairs exported from CiteSource
 
 - [`reimport_ris()`](https://eshackathon.github.io/CiteSource/reference/reimport_ris.md)
   : Reimport a RIS-file exported from CiteSource

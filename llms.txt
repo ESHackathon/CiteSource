@@ -77,7 +77,16 @@ discovering benchmarking articles.
 
 Once records have been processed, users are able to export data in .csv,
 .ris, and .bib formats. Furthermore, users are able to reimport .csv and
-.ris files in order to recreate plots and tables.
+.ris files in order to recreate plots and tables. Re-importing also lets
+a review grow over time: new database or search results can be added to
+a previously deduplicated set and deduplicated against it without
+starting over
+([`dedup_citations_add_sources()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_sources.md)),
+and automatic deduplication can be done now with manual review completed
+later by exporting and re-importing the candidate pairs
+([`export_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/export_dedup_candidates.md)
+/
+[`reimport_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/reimport_dedup_candidates.md)).
 
 ## Getting Started
 
@@ -90,6 +99,24 @@ remotes::install_github(“ESHackathon/CiteSource”)
 
 Vignettes covering various use cases can be found on the [CiteSource web
 page](https://eshackathon.github.io/CiteSource/articles/).
+
+## Deploying the Shiny App
+
+The bundled Shiny app (`inst/shiny-app/CiteSource/app.R`) supports
+optional Google Analytics. To enable it, set the `CITESOURCE_ENV`
+environment variable to the path of a local HTML file containing your GA
+tag before launching the app:
+
+``` r
+
+Sys.setenv(CITESOURCE_ENV = "/path/to/ga_tag.html")
+shiny::runApp("inst/shiny-app/CiteSource")
+```
+
+When deploying to shinyapps.io or a Posit Connect server, add
+`CITESOURCE_ENV` as a server-side environment variable pointing to the
+deployed GA file. If the variable is unset or the file does not exist,
+the app runs without analytics.
 
 ## Feedback
 
@@ -144,10 +171,17 @@ use case.
   : Count and Precision/Sensitivity Table
 
 - [`dedup_citations()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations.md)
-  : Deduplicate citations - ASySD wrapper
+  : Deduplicate citations
 
 - [`dedup_citations_add_manual()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_manual.md)
-  : Remove pairs with manual dedup - ASySD wrapper
+  : Add manually identified duplicate pairs to a deduplicated dataset
+
+- [`dedup_citations_add_sources()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_sources.md)
+  : Add new citations to a previously deduplicated set and
+  re-deduplicate
+
+- [`dedup_log()`](https://eshackathon.github.io/CiteSource/reference/dedup_log.md)
+  : Build a provenance log of all merged duplicate pairs
 
 - [`detect_parser()`](https://eshackathon.github.io/CiteSource/reference/detect_.md)
   [`detect_delimiter()`](https://eshackathon.github.io/CiteSource/reference/detect_.md)
@@ -160,6 +194,9 @@ use case.
 
 - [`export_csv()`](https://eshackathon.github.io/CiteSource/reference/export_csv.md)
   : Export deduplicated citations with source data as CSV file
+
+- [`export_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/export_dedup_candidates.md)
+  : Export manual-review candidate pairs to a CSV file
 
 - [`export_ris()`](https://eshackathon.github.io/CiteSource/reference/export_ris.md)
   : Export data frame to RIS file
@@ -183,9 +220,6 @@ use case.
 - [`plot_source_overlap_upset()`](https://eshackathon.github.io/CiteSource/reference/plot_source_overlap_upset.md)
   : Create an UpSetR upset plot showing the overlap between sources
 
-- [`precision_sensitivity_table()`](https://eshackathon.github.io/CiteSource/reference/precision_sensitivity_table.md)
-  : precision_sensitivity_table
-
 - [`read_citations()`](https://eshackathon.github.io/CiteSource/reference/read_citations.md)
   : Import citations from file
 
@@ -193,17 +227,14 @@ use case.
   : Record counts function Calculate and combine counts of distinct
   records and imported records for each database
 
-- [`record_counts_table()`](https://eshackathon.github.io/CiteSource/reference/record_counts_table.md)
-  : record_counts_table
-
 - [`record_level_table()`](https://eshackathon.github.io/CiteSource/reference/record_level_table.md)
   : Record-level table
 
-- [`record_summary_table()`](https://eshackathon.github.io/CiteSource/reference/record_summary_table.md)
-  : search_summary_table
-
 - [`reimport_csv()`](https://eshackathon.github.io/CiteSource/reference/reimport_csv.md)
   : Reimport a CSV-file exported from CiteSource
+
+- [`reimport_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/reimport_dedup_candidates.md)
+  : Reimport manual-review candidate pairs exported from CiteSource
 
 - [`reimport_ris()`](https://eshackathon.github.io/CiteSource/reference/reimport_ris.md)
   : Reimport a RIS-file exported from CiteSource
@@ -226,15 +257,13 @@ use case.
 
 ### Vignettes
 
-- [Source Analysis Across Screening
-  Phases](https://eshackathon.github.io/CiteSource/articles/citesource_working_example.md):
 - [Benchmark
-  Testing](https://eshackathon.github.io/CiteSource/articles/citesource_benchmark_testing.md):
-- [New Benchmark
   Testing](https://eshackathon.github.io/CiteSource/articles/citesource_new_benchmark_testing.md):
 - [Assessing Usefulness of Databases for Evidence
   Synthesis](https://eshackathon.github.io/CiteSource/articles/citesource_vignette_db-pre-screen_validation.md):
 - [Comparing Database Topic
   Coverage](https://eshackathon.github.io/CiteSource/articles/citesource_vignette_db-topic-coverage.md):
-- [Analysis Across Screening
+- [Source Analysis Across Screening
   Phases](https://eshackathon.github.io/CiteSource/articles/citesource_analysis_across_screening_phases.md):
+- [Comparing Search
+  Strings](https://eshackathon.github.io/CiteSource/articles/citesource_search_string_comparison.md):

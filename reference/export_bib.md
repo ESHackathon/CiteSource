@@ -10,11 +10,7 @@ warning.*
 ## Usage
 
 ``` r
-export_bib(
-  citations,
-  filename = "citations.bib",
-  include = c("sources", "labels", "strings")
-)
+export_bib(citations, filename, include = c("sources", "labels", "strings"))
 ```
 
 ## Arguments
@@ -32,6 +28,11 @@ export_bib(
 
   Character. One or more of sources, labels or strings
 
+## Value
+
+No return value, called for side effects. Saves deduplicated citations
+as a 'BibTeX' file to the specified location.
+
 ## Examples
 
 ``` r
@@ -40,6 +41,6 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
+  export_bib(dedup_results$unique, tempfile(fileext = ".bib"), include = "sources")
 }
 ```

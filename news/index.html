@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,12 +18,11 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_working_example.html">Source Analysis Across Screening Phases</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_benchmark_testing.html">Benchmark Testing</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">New Benchmark Testing</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">Benchmark Testing</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-pre-screen_validation.html">Assessing Usefulness of Databases for Evidence Synthesis</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-topic-coverage.html">Comparing Database Topic Coverage</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Source Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_search_string_comparison.html">Comparing Search Strings</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -41,6 +40,113 @@
       <small>Source: <a href="https://github.com/ESHackathon/CiteSource/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="citesource-100">CiteSource 1.0.0<a class="anchor" aria-label="anchor" href="#citesource-100"></a></h2>
+<p>First stable release, following acceptance on CRAN.</p>
+<div class="section level3">
+<h3 id="bug-fixes-1-0-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-0"></a></h3>
+<ul><li>
+<code><a href="../reference/compare_sources.html">compare_sources()</a></code> now honors <code>include_references</code>: when <code>TRUE</code>, the bibliographic columns are joined back onto the source/label/string indicator matrix, matching the behavior of <code><a href="../reference/count_unique.html">count_unique()</a></code>. Previously the argument was silently ignored and only indicator columns were returned.</li>
+<li>
+<code><a href="../reference/calculate_detailed_records.html">calculate_detailed_records()</a></code>: the Total row’s <code>Distinct Records</code> now respects <code>labels_to_include</code>. It previously used the unfiltered input, making the Total inconsistent with the filtered per-source rows and overstating distinct records when labels were restricted.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-1-0-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-0"></a></h3>
+<ul><li>
+<code><a href="../reference/create_detailed_record_table.html">create_detailed_record_table()</a></code> and <code><a href="../reference/create_precision_sensitivity_table.html">create_precision_sensitivity_table()</a></code> redesigned for readability: related columns are grouped under spanner headers, the contribution/uniqueness percentages have clearer labels, Precision and Recall are formatted as percentages, and the Total row is visually distinguished as a summary.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="citesource-021">CiteSource 0.2.1<a class="anchor" aria-label="anchor" href="#citesource-021"></a></h2><p class="text-muted">CRAN release: 2026-06-16</p>
+<div class="section level3">
+<h3 id="new-features-0-2-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-1"></a></h3>
+<ul><li>Incremental deduplication: <code><a href="../reference/dedup_citations_add_sources.html">dedup_citations_add_sources()</a></code> adds new citations to a previously deduplicated set and deduplicates across both, preserving prior automatic and manual merge decisions and the original <code>record_ids</code> provenance. For the same data it yields the same unique set as deduplicating everything from scratch. Exposed in the Shiny app — re-upload a deduplicated set, add new citation files, and “Find duplicates” merges them in. Works in <code>manual = TRUE</code> mode to surface new candidate pairs for review.</li>
+<li>Deferred manual deduplication: run automatic dedup now and complete manual review later. <code><a href="../reference/export_dedup_candidates.html">export_dedup_candidates()</a></code> / <code><a href="../reference/reimport_dedup_candidates.html">reimport_dedup_candidates()</a></code> persist and restore the <code>$manual_dedup</code> candidate pairs, and <code><a href="../reference/export_csv.html">export_csv()</a></code> gains a <code>manual_dedup_complete</code> flag (written as a column, read back by <code><a href="../reference/reimport_csv.html">reimport_csv()</a></code>) so downstream steps know whether review is still pending. Re-import, mark <code>result == "match"</code>, and merge with <code><a href="../reference/dedup_citations_add_manual.html">dedup_citations_add_manual()</a></code>.</li>
+<li>Shiny app: re-importing a deduplicated set now shows a read-only source overview (records per source, and per label/string) on the upload page so you can see what is already in the set before adding more; the re-upload input accepts a candidate-pairs CSV and several files at once.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-1"></a></h3>
+<ul><li>
+<code><a href="../reference/reimport_csv.html">reimport_csv()</a></code> now reads all columns as character, matching the canonical (all-character) types produced by <code><a href="../reference/dedup_citations.html">dedup_citations()</a></code>. This is required so a reimported set can re-enter <code><a href="../reference/dedup_citations_add_manual.html">dedup_citations_add_manual()</a></code> (and incremental re-deduplication) without column-type clashes.</li>
+<li>Shiny app: the re-upload (re-import) input no longer errors when more than one file is selected; each file is routed by content (deduplicated set vs. candidate-pairs CSV vs. RIS).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-1"></a></h3>
+<ul><li>In-app User Guide and README updated to document incremental and deferred deduplication; the file upload page labels were clarified.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="citesource-020">CiteSource 0.2.0<a class="anchor" aria-label="anchor" href="#citesource-020"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-2-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-2-0"></a></h3>
+<ul><li>Requires R &gt;= 4.1.0 (native pipe and <code>across()</code> syntax used throughout).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/read_citations.html">read_citations()</a></code> now warns when <code>cite_label</code> values are outside the standard vocabulary (<code>search</code>, <code>screened</code>, <code>final</code>), since phase-analysis functions depend on those exact strings.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/calculate_phase_records.html">calculate_phase_records()</a></code>: <code>n_distinct()</code> called as a terminal pipe no longer throws an error; fixed by replacing with <code>summarise() |&gt; pull()</code>.</li>
+<li>
+<code><a href="../reference/calculate_initial_records.html">calculate_initial_records()</a></code> / <code><a href="../reference/calculate_detailed_records.html">calculate_detailed_records()</a></code>: separator regex in <code>separate_rows()</code> changed from <code>","</code> to <code>",\\s*"</code> so sources with spaces after commas are split correctly.</li>
+<li>
+<code>generate_apa_reference()</code>: NA DOI values no longer cause an error in <code>str_detect()</code>; handled with <code>case_when(is.na(doi) ~ NA_character_, ...)</code>.</li>
+<li>Shiny app — <code>summaryPrecTab</code>: <code>n_unique</code> was referenced without the <code>rv$</code> prefix, causing a scope error; fixed.</li>
+<li>Shiny app — <code>manual_dedup_dt</code>: <code>columnDefs</code> <code>targets</code> now computed as 0-based integer indices rather than column name strings, matching the DT API.</li>
+<li>
+<code><a href="../reference/count_unique.html">count_unique()</a></code> / <code><a href="../reference/compare_sources.html">compare_sources()</a></code>: added <code>!is.na()</code> guard alongside <code>!= ""</code> so NA values in <code>cite_source</code>, <code>cite_label</code>, <code>cite_string</code> no longer cause filter or pivot errors.</li>
+<li>Shiny app — <code>rv$pairs_to_check[,1:36]</code> subsetting removed; full data frame passed directly.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="performance-0-2-0">Performance<a class="anchor" aria-label="anchor" href="#performance-0-2-0"></a></h3>
+<ul><li>
+<code>generate_apa_citation()</code> and <code>generate_apa_reference()</code>: all <code>rowwise()</code> calls replaced with <code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">purrr::map2_chr()</a></code> and <code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">purrr::pmap_chr()</a></code>, avoiding per-row dplyr group overhead.</li>
+<li>Shiny app: <code><a href="../reference/compare_sources.html">compare_sources()</a></code> is now computed once in a shared reactive and consumed by both the heatmap and upset plot, halving the work on each render.</li>
+<li>Shiny app: multi-value column filtering replaced from per-row <code>sapply</code> + <code>str_split</code> to vectorized <code>strsplit</code> + <code>vapply</code> via a file-scope helper <code>.filter_multivalue_col</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="cran--dependency-changes-0-2-0">CRAN / dependency changes<a class="anchor" aria-label="anchor" href="#cran--dependency-changes-0-2-0"></a></h3>
+<ul><li>ASySD deduplication functions vendored directly into <code>R/asys_dedup.R</code> (GPL-3, with attribution to CAMARADES / Kaitlyn Hair); the GitHub-only <code>ASySD</code> package is no longer a dependency.</li>
+<li>
+<code>Remotes:</code> field removed from DESCRIPTION.</li>
+<li>New imports: <code>cli</code>, <code>igraph</code>, <code>parallelly</code>, <code>RecordLinkage</code>, <code>utf8</code>.</li>
+<li>Removed from imports: <code>ASySD</code>, <code>plogr</code>.</li>
+<li>Added to Suggests: <code>bslib</code>.</li>
+<li>
+<code>.onLoad</code> side effects removed; <code>shiny.maxRequestSize</code> is no longer set at package load time.</li>
+<li>
+<code>%&gt;%</code> re-export removed; use the native <code>|&gt;</code> pipe.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecations-0-2-0">Deprecations<a class="anchor" aria-label="anchor" href="#deprecations-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/record_counts.html">record_counts()</a></code> → <code><a href="../reference/calculate_initial_records.html">calculate_initial_records()</a></code>
+</li>
+<li>
+<code><a href="../reference/calculate_record_counts.html">calculate_record_counts()</a></code> → <code><a href="../reference/calculate_detailed_records.html">calculate_detailed_records()</a></code>
+</li>
+<li>
+<code><a href="../reference/calculate_phase_count.html">calculate_phase_count()</a></code> → <code><a href="../reference/calculate_phase_records.html">calculate_phase_records()</a></code>
+</li>
+<li>
+<code>record_counts_table()</code> → <code><a href="../reference/create_initial_record_table.html">create_initial_record_table()</a></code>
+</li>
+<li>
+<code>record_summary_table()</code> → <code>create_summary_record_table()</code>
+</li>
+<li>
+<code>precision_sensitivity_table()</code> → <code>create_phase_record_table()</code>
+</li>
+</ul><p>All deprecated functions remain callable with a <code><a href="https://rdrr.io/r/base/Deprecated.html" class="external-link">.Deprecated()</a></code> warning pointing to their replacements.</p>
+</div>
+<div class="section level3">
+<h3 id="internal-0-2-0">Internal<a class="anchor" aria-label="anchor" href="#internal-0-2-0"></a></h3>
+<ul><li>Google Analytics injection simplified: URL-path reactive detection replaced by a file-scope <code>CITESOURCE_ENV</code> environment variable check evaluated once at app startup.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.1" id="citesource-001">CiteSource 0.0.1<a class="anchor" aria-label="anchor" href="#citesource-001"></a></h2>
 <ul><li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>

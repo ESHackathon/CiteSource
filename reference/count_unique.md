@@ -33,9 +33,6 @@ examplecitations <- readRDS(examplecitations_path)
 
 # Deduplicate citations
 dedup_results <- dedup_citations(examplecitations)
-#> Registered S3 method overwritten by 'synthesisr':
-#>   method                     from      
-#>   as.data.frame.bibliography CiteSource
 #> formatting data...
 #> Warning: Search contains missing values for the record_id column. A record_id will be created using row numbers
 #> identifying potential duplicates...
@@ -49,7 +46,7 @@ dedup_results <- dedup_citations(examplecitations)
 count_unique(dedup_results)
 #> # A tibble: 166 × 7
 #>    duplicate_id cite_source cite_label cite_string record_ids       unique type 
-#>    <chr>        <chr>       <chr>      <lgl>       <chr>            <lgl>  <fct>
+#>    <chr>        <chr>       <chr>      <chr>       <chr>            <lgl>  <fct>
 #>  1 1001         DIM         search     NA          1001             TRUE   uniq…
 #>  2 1002         WoS         search     NA          1002, 1081       FALSE  dupl…
 #>  3 1002         DIM         search     NA          1002, 1081       FALSE  dupl…

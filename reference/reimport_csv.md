@@ -27,8 +27,7 @@ columns are present.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-#example usage
-citations <- reimport_csv("path/to/citations.csv")
-} # }
+if (interactive()) {
+  citations <- reimport_csv("path/to/citations.csv")
+}
 ```

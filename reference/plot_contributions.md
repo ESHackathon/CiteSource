@@ -64,6 +64,12 @@ plot_contributions(
 
   Logical. Should totals be shown in legend (e.g. as Unique (N = 1234))
 
+## Value
+
+A `ggplot2` object showing source contributions as a faceted bar chart.
+The object can be further customized using `ggplot2` functions or saved
+with [`ggsave`](https://ggplot2.tidyverse.org/reference/ggsave.html).
+
 ## Examples
 
 ``` r

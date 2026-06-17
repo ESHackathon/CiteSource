@@ -9,7 +9,7 @@ warning.*
 ``` r
 export_ris(
   citations,
-  filename = "citations.ris",
+  filename,
   source_field = "DB",
   label_field = "C7",
   string_field = "C8"
@@ -39,6 +39,11 @@ export_ris(
   Field in `citations` representing additional string information.
   Default is "C8".
 
+## Value
+
+No return value, called for side effects. Saves the citations as a 'RIS'
+file to the specified location.
+
 ## Examples
 
 ``` r
@@ -47,13 +52,6 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_ris(
-   dedup_results$unique, 
-    "cite_sources.ris", 
-   user_mapping = list(
-    "DB" = "cite_source_include", 
-    "C7" = "cite_label_include"
-  )
-  )
+  export_ris(dedup_results$unique, tempfile(fileext = ".ris"))
 }
 ```

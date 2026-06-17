@@ -17,7 +17,7 @@ after the import."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">CiteSource</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,12 +28,11 @@ after the import."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_working_example.html">Source Analysis Across Screening Phases</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_benchmark_testing.html">Benchmark Testing</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">New Benchmark Testing</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/citesource_new_benchmark_testing.html">Benchmark Testing</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-pre-screen_validation.html">Assessing Usefulness of Databases for Evidence Synthesis</a></li>
     <li><a class="dropdown-item" href="../articles/citesource_vignette_db-topic-coverage.html">Comparing Database Topic Coverage</a></li>
-    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_analysis_across_screening_phases.html">Source Analysis Across Screening Phases</a></li>
+    <li><a class="dropdown-item" href="../articles/citesource_search_string_comparison.html">Comparing Search Strings</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -114,6 +113,11 @@ RIS, check <code>names(CiteSource:::synthesisr_code_lookup)</code> and select an
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A data frame containing the reimported citation data, with 'CiteSource' metadata columns
+(cite_source, cite_label, cite_string, duplicate_id, record_ids) restored from the 'RIS' fields.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Note that this functions defaults' are based on those in <code><a href="export_ris.html">export_ris()</a></code> so that these functions
 can easily be combined.</p>
@@ -123,8 +127,9 @@ can easily be combined.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">dedup_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="dedup_citations.html">dedup_citations</a></span><span class="op">(</span><span class="va">citations</span>, merge_citations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="export_ris.html">export_ris</a></span><span class="op">(</span><span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span>, <span class="st">"citations.ris"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">unique_citations2</span> <span class="op">&lt;-</span> <span class="fu">reimport_ris</span><span class="op">(</span><span class="st">"citations.ris"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".ris"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="export_ris.html">export_ris</a></span><span class="op">(</span><span class="va">dedup_results</span><span class="op">$</span><span class="va">unique</span>, <span class="va">tmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">unique_citations2</span> <span class="op">&lt;-</span> <span class="fu">reimport_ris</span><span class="op">(</span><span class="va">tmp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

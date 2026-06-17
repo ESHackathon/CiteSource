@@ -77,7 +77,16 @@ discovering benchmarking articles.
 
 Once records have been processed, users are able to export data in .csv,
 .ris, and .bib formats. Furthermore, users are able to reimport .csv and
-.ris files in order to recreate plots and tables.
+.ris files in order to recreate plots and tables. Re-importing also lets
+a review grow over time: new database or search results can be added to
+a previously deduplicated set and deduplicated against it without
+starting over
+([`dedup_citations_add_sources()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_sources.md)),
+and automatic deduplication can be done now with manual review completed
+later by exporting and re-importing the candidate pairs
+([`export_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/export_dedup_candidates.md)
+/
+[`reimport_dedup_candidates()`](https://eshackathon.github.io/CiteSource/reference/reimport_dedup_candidates.md)).
 
 ## Getting Started
 
@@ -90,6 +99,24 @@ remotes::install_github(“ESHackathon/CiteSource”)
 
 Vignettes covering various use cases can be found on the [CiteSource web
 page](https://eshackathon.github.io/CiteSource/articles/).
+
+## Deploying the Shiny App
+
+The bundled Shiny app (`inst/shiny-app/CiteSource/app.R`) supports
+optional Google Analytics. To enable it, set the `CITESOURCE_ENV`
+environment variable to the path of a local HTML file containing your GA
+tag before launching the app:
+
+``` r
+
+Sys.setenv(CITESOURCE_ENV = "/path/to/ga_tag.html")
+shiny::runApp("inst/shiny-app/CiteSource")
+```
+
+When deploying to shinyapps.io or a Posit Connect server, add
+`CITESOURCE_ENV` as a server-side environment variable pointing to the
+deployed GA file. If the variable is unset or the file does not exist,
+the app runs without analytics.
 
 ## Feedback
 

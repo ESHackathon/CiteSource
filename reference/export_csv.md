@@ -10,9 +10,11 @@ files are overwritten without warning.*
 ``` r
 export_csv(
   unique_citations,
-  filename = "citesource_exported_citations.csv",
+  filename,
+  fields = "full",
   separate = NULL,
-  trim_abstracts = 32000
+  trim_abstracts = 32000,
+  manual_dedup_complete = FALSE
 )
 ```
 
@@ -26,6 +28,17 @@ export_csv(
 - filename:
 
   Name (and path) of file, should end in .csv
+
+- fields:
+
+  Controls which columns are included. Use `"full"` (default) to export
+  all columns (required for reimport into CiteSource via
+  [`reimport_csv()`](https://eshackathon.github.io/CiteSource/reference/reimport_csv.md));
+  `"standard"` to export core bibliographic fields plus `cite_source`,
+  `cite_label`, and `cite_string` (suitable for import into RELApp or
+  other screening tools); or a character vector of column names for a
+  custom selection. Note that exports other than `"full"` cannot be
+  reimported into CiteSource.
 
 - separate:
 
@@ -42,10 +55,21 @@ export_csv(
   characters. Set a lower number to reduce file size, or NULL to retain
   abstracts as they are.
 
+- manual_dedup_complete:
+
+  Logical. Records, in a `manual_dedup_complete` column, whether manual
+  deduplication has been completed for this set (default `FALSE`). Set
+  `TRUE` after confirming manual pairs with
+  [`dedup_citations_add_manual()`](https://eshackathon.github.io/CiteSource/reference/dedup_citations_add_manual.md).
+  This flag is read back by
+  [`reimport_csv()`](https://eshackathon.github.io/CiteSource/reference/reimport_csv.md)
+  and lets later steps know whether candidate pairs still need review.
+  Only written when `fields = "full"`.
+
 ## Value
 
-The function saves the deduplicated citations as a CSV file to the
-specified location.
+No return value, called for side effects. Saves the deduplicated
+citations as a 'CSV' file to the specified location.
 
 ## Examples
 
@@ -55,6 +79,8 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_csv(dedup_results, "cite_sources.csv", separate = "cite_source")
+  export_csv(dedup_results, tempfile(fileext = ".csv"), separate = "cite_source")
+  # Standard export for RELApp / screening tools (not reimportable into CiteSource):
+  export_csv(dedup_results, tempfile(fileext = ".csv"), fields = "standard")
 }
 ```

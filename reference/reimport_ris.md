@@ -69,6 +69,12 @@ reimport_ris(
 
   Should confirmation message be displayed?
 
+## Value
+
+A data frame containing the reimported citation data, with 'CiteSource'
+metadata columns (cite_source, cite_label, cite_string, duplicate_id,
+record_ids) restored from the 'RIS' fields.
+
 ## Details
 
 Note that this functions defaults' are based on those in
@@ -80,7 +86,8 @@ so that these functions can easily be combined.
 ``` r
 if (interactive()) {
   dedup_results <- dedup_citations(citations, merge_citations = TRUE)
-  export_ris(dedup_results$unique, "citations.ris")
-  unique_citations2 <- reimport_ris("citations.ris")
+  tmp <- tempfile(fileext = ".ris")
+  export_ris(dedup_results$unique, tmp)
+  unique_citations2 <- reimport_ris(tmp)
 }
 ```
