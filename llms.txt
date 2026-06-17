@@ -92,8 +92,20 @@ later by exporting and re-importing the candidate pairs
 
 **Installation**
 
-Install CiteSource in R with
-remotes::install_github(“ESHackathon/CiteSource”)
+Install the released version of CiteSource from CRAN:
+
+``` r
+
+install.packages("CiteSource")
+```
+
+Or install the development version from GitHub:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("ESHackathon/CiteSource")
+```
 
 **Vignettes**
 
