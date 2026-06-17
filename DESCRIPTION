@@ -1,7 +1,7 @@
 Package: CiteSource
 Title: Data-Driven Search Strategy Development and Evidence Synthesis Reporting
-Version: 0.2.1
-Date: 2026-06-08
+Version: 1.0.0
+Date: 2026-06-17
 Authors@R: c(
     person("Trevor", "Riley", , "tnriley@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6834-9802")),

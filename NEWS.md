@@ -1,3 +1,26 @@
+# CiteSource 1.0.0
+
+First stable release, following acceptance on CRAN.
+
+## Bug fixes
+
+- `compare_sources()` now honors `include_references`: when `TRUE`, the
+  bibliographic columns are joined back onto the source/label/string indicator
+  matrix, matching the behavior of `count_unique()`. Previously the argument was
+  silently ignored and only indicator columns were returned.
+- `calculate_detailed_records()`: the Total row's `Distinct Records` now respects
+  `labels_to_include`. It previously used the unfiltered input, making the Total
+  inconsistent with the filtered per-source rows and overstating distinct records
+  when labels were restricted.
+
+## Improvements
+
+- `create_detailed_record_table()` and `create_precision_sensitivity_table()`
+  redesigned for readability: related columns are grouped under spanner headers,
+  the contribution/uniqueness percentages have clearer labels, Precision and
+  Recall are formatted as percentages, and the Total row is visually
+  distinguished as a summary.
+
 # CiteSource 0.2.1
 
 ## New features
