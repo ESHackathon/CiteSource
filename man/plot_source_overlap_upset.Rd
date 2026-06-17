@@ -84,6 +84,9 @@ in the following format: c(intersection size title, intersection size tick label
     \item{\code{set_size.scale_max}}{Increase the maximum of set size scale}
   }}
 }
+\value{
+No return value, called for side effects. Renders an UpSet plot showing record overlap between sources to the current graphics device.
+}
 \description{
 Show records found in specific sets of sources to identify the unique contribution
 of each source and of any subsets

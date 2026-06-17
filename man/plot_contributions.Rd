@@ -35,6 +35,10 @@ plot_contributions(
 
 \item{totals_in_legend}{Logical. Should totals be shown in legend (e.g. as Unique (N = 1234))}
 }
+\value{
+A \code{ggplot2} object showing source contributions as a faceted bar chart. The object can
+be further customized using \code{ggplot2} functions or saved with \code{\link[ggplot2]{ggsave}}.
+}
 \description{
 Create a faceted plot that shows unique contributions and duplicated records across
 two metadata dimensions. Most typical use-case might be to show the contributions of each source

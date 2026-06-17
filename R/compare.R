@@ -15,33 +15,29 @@
 #' count_unique(dedup_results)
 
 count_unique <- function(unique_data, include_references = FALSE) {
-  # Start a pipeline with the input data
-  out <- unique_data %>%
-    # Filter out rows where 'cite_source' is empty
-    dplyr::filter(!.data$cite_source == "") %>%
-    # Select specific columns
-    dplyr::select(.data$duplicate_id, .data$cite_source, .data$cite_label, .data$cite_string, tidyselect::any_of("record_ids")) %>%
-    # Separate rows by 'cite_source', 'cite_label', and 'cite_string'
-    tidyr::separate_rows(.data$cite_source, convert = TRUE, sep = ", ") %>%
-    tidyr::separate_rows(.data$cite_label, convert = TRUE, sep = ", ") %>%
-    tidyr::separate_rows(.data$cite_string, convert = TRUE, sep = ", ") %>%
-    # Group by 'duplicate_id'
-    dplyr::group_by(.data$duplicate_id) %>%
-    # Add 'unique' and 'type' columns
+  out <- unique_data |>
+    dplyr::filter(!is.na(.data$cite_source) & .data$cite_source != "") |>
+    dplyr::select(.data$duplicate_id, .data$cite_source, .data$cite_label, .data$cite_string,
+                  tidyselect::any_of("record_ids")) |>
+    tidyr::separate_rows(.data$cite_source, sep = ", ") |>
+    tidyr::separate_rows(.data$cite_label, sep = ", ") |>
+    tidyr::separate_rows(.data$cite_string, sep = ", ") |>
+    dplyr::group_by(.data$duplicate_id) |>
     dplyr::mutate(
-      unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),  # 'unique' is TRUE if 'cite_source' is unique
-      type = ifelse(.data$unique, "unique", "duplicated") %>% factor(levels = c("unique", "duplicated"))  # 'type' is 'unique' if 'unique' is TRUE, 'duplicated' otherwise
-    ) %>%
-    # Ungroup the data
-    dplyr::ungroup() %>%
-    # Remove duplicate rows
+      unique = ifelse(length(unique(.data$cite_source)) == 1, TRUE, FALSE),
+      type   = ifelse(.data$unique, "unique", "duplicated") |> factor(levels = c("unique", "duplicated"))
+    ) |>
+    dplyr::ungroup() |>
     unique()
 
-  # If 'include_references' is TRUE, join 'out' with 'unique_data' on 'duplicate_id'
-  if (include_references == TRUE) {
-    out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
+  if (include_references) {
+    out |> dplyr::left_join(
+      unique_data |> dplyr::select(
+        -dplyr::all_of(setdiff(intersect(names(unique_data), names(out)), "duplicate_id"))
+      ),
+      by = "duplicate_id"
+    )
   } else {
-    # Otherwise, return 'out' as is
     out
   }
 }
@@ -61,58 +57,63 @@ count_unique <- function(unique_data, include_references = FALSE) {
 #'
 #'   # Deduplicate citations and compare sources
 #'   dedup_results <- dedup_citations(examplecitations)
-#'   compare_sources(unique_citations, comp_type = "sources")
+#'   compare_sources(dedup_results, comp_type = "sources")
 #' }
 
+compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"),
+                            include_references = FALSE) {
 
-compare_sources <- function(unique_data, comp_type = c("sources", "strings", "labels"), include_references = FALSE) {
-  
-  out <- list(unique_data %>% dplyr::select("duplicate_id"))
+  out <- list(unique_data |> dplyr::select("duplicate_id"))
 
   if ("sources" %in% comp_type) {
-    source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")) %>%
-      dplyr::filter(!cite_source == "") %>%
-      tidyr::separate_rows(.data$cite_source, sep = ", ", convert = TRUE) %>%
-      unique() %>%
+    source_comparison <- unique_data |>
+      dplyr::select(.data$duplicate_id, .data$cite_source, tidyselect::any_of("record_ids")) |>
+      dplyr::filter(!is.na(.data$cite_source) & .data$cite_source != "") |>
+      tidyr::separate_rows(.data$cite_source, sep = ", ") |>
+      unique() |>
       tidyr::pivot_wider(
-        id_cols = .data$duplicate_id, names_prefix = "source__", names_from = .data$cite_source, values_from = .data$cite_source,
-        values_fn = function(x) TRUE,
+        id_cols     = .data$duplicate_id,
+        names_prefix = "source__",
+        names_from  = .data$cite_source,
+        values_from = .data$cite_source,
+        values_fn   = function(x) TRUE,
         values_fill = FALSE
       )
-
     out <- c(out, list(source_comparison))
   }
 
   if ("strings" %in% comp_type) {
-    source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_string, tidyselect::any_of("record_ids")) %>%
-      dplyr::filter(!.data$cite_string == "") %>%
-      tidyr::separate_rows(.data$cite_string, sep = ", ", convert = TRUE) %>%
-      unique() %>%
+    source_comparison <- unique_data |>
+      dplyr::select(.data$duplicate_id, .data$cite_string, tidyselect::any_of("record_ids")) |>
+      dplyr::filter(!is.na(.data$cite_string) & .data$cite_string != "") |>
+      tidyr::separate_rows(.data$cite_string, sep = ", ") |>
+      unique() |>
       tidyr::pivot_wider(
-        id_cols = .data$duplicate_id, names_prefix = "string__", names_from = .data$cite_string, values_from = .data$cite_string,
-        values_fn = function(x) TRUE,
+        id_cols     = .data$duplicate_id,
+        names_prefix = "string__",
+        names_from  = .data$cite_string,
+        values_from = .data$cite_string,
+        values_fn   = function(x) TRUE,
         values_fill = FALSE
       )
-
     out <- c(out, list(source_comparison))
   }
 
   if ("labels" %in% comp_type) {
-    source_comparison <- unique_data %>%
-      dplyr::select(.data$duplicate_id, .data$cite_label, tidyselect::any_of("record_ids")) %>%
-      dplyr::filter(!cite_label == "") %>%
-      tidyr::separate_rows(.data$cite_label, sep = ", ", convert = TRUE) %>%
-      unique() %>%
+    source_comparison <- unique_data |>
+      dplyr::select(.data$duplicate_id, .data$cite_label, tidyselect::any_of("record_ids")) |>
+      dplyr::filter(!is.na(.data$cite_label) & .data$cite_label != "") |>
+      tidyr::separate_rows(.data$cite_label, sep = ", ") |>
+      unique() |>
       tidyr::pivot_wider(
-        id_cols = .data$duplicate_id, names_prefix = "label__", names_from = .data$cite_label,
+        id_cols     = .data$duplicate_id,
+        names_prefix = "label__",
+        names_from  = .data$cite_label,
         values_from = .data$cite_label,
-        values_fn = function(x) TRUE,
+        values_fn   = function(x) TRUE,
         values_fill = FALSE
       )
     out <- c(out, list(source_comparison))
-
 
     if (any(stringr::str_detect(names(source_comparison), "[Ss]earch"))) {
       search_stage <- stringr::str_subset(names(source_comparison), "[Ss]earch")
@@ -132,16 +133,18 @@ compare_sources <- function(unique_data, comp_type = c("sources", "strings", "la
 
   if (length(out) == 0) stop('comp_type must be one or more of "sources", "strings" or "labels"')
 
-  
   out <- purrr::reduce(out, dplyr::left_join, by = "duplicate_id")
 
-  # Deals with entries missing source or label
-  out <- out %>% dplyr::mutate(dplyr::across(dplyr::everything(), ~tidyr::replace_na(.x, FALSE)))
-    
-  if (include_references == TRUE) {
-    out %>% dplyr::left_join(unique_data %>% dplyr::select(-dplyr::all_of(setdiff(intersect(names(.), names(out)), "duplicate_id"))), by = "duplicate_id")
-  } else {
-    out
-  }
-}
+  out <- out |> dplyr::mutate(dplyr::across(dplyr::everything(), ~ tidyr::replace_na(.x, FALSE)))
 
+  if (include_references) {
+    out <- out |> dplyr::left_join(
+      unique_data |> dplyr::select(
+        -dplyr::all_of(setdiff(intersect(names(unique_data), names(out)), "duplicate_id"))
+      ),
+      by = "duplicate_id"
+    )
+  }
+
+  out
+}

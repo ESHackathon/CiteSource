@@ -1,0 +1,186 @@
+---
+title: "Source Analysis Across Screening Phases"
+
+author: ""
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Source Analysis Across Screening Phases}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = any(dir.exists(c("working_example_data", "benchmark_data", "new_benchmark_data", "topic_data", "valid_data", "new_stage_data"))),
+  comment = "#>",
+  fig.width = 10,
+  fig.height = 10,
+  warning = FALSE
+)
+```
+
+## About this vignette
+
+This vignette demonstrates how CiteSource can assess the impact of sources and methods across an evidence synthesis project — from initial searching through to final inclusion.
+
+A reliable systematic search requires multiple resources to minimize the risk of missing relevant studies. Beyond traditional databases, supplementary methods such as hand searching, citation chasing, and grey literature searching are commonly employed. But how much is each source actually contributing? Which databases are finding the studies that ultimately matter? CiteSource can help answer these questions by tracking where each record came from and following it through each stage of screening.
+
+The data in this vignette is based on a mock systematic review on the health, environmental, and economic impacts of wildfires.
+
+If you have questions or feedback, visit the [CiteSource discussion board](https://github.com/ESHackathon/CiteSource/discussions/100) on GitHub.
+
+## 1. Installation and setup
+
+```{r, results = FALSE, message=FALSE}
+#install.packages("CiteSource")
+library(CiteSource)
+```
+
+## 2. Import citation files
+
+Start by importing your `.ris` or `.bib` files. CiteSource works with files exported directly from any database or resource.
+
+```{r}
+file_path <- "../vignettes/new_stage_data/"
+citation_files <- list.files(path = file_path, pattern = "\\.ris", full.names = TRUE)
+citation_files
+```
+
+## 3. Assign custom metadata
+
+CiteSource provides three custom metadata fields: `cite_source`, `cite_label`, and `cite_string`.
+
+`cite_source` identifies the database or method that produced each file. The two screening files (records included after title/abstract screening and after full-text screening) are assigned `cite_source = NA` since they do not represent a database search — they are subsets of records that passed screening.
+
+`cite_label` tracks the phase each file belongs to: `"search"` for initial search results, `"screened"` for records included after title/abstract screening, and `"final"` for records included after full-text screening.
+
+```{r}
+imported_tbl <- tibble::tribble(
+  ~files,                ~cite_sources,       ~cite_labels,
+  "wos_278.ris",         "WoS",               "search",
+  "medline_84.ris",      "Medline",           "search",
+  "econlit_3.ris",       "EconLit",           "search",
+  "Dimensions_246.ris",  "Dimensions",        "search",
+  "lens_343.ris",        "Lens.org",          "search",
+  "envindex_100.ris",    "Environment Index", "search",
+  "screened_128.ris",    NA,                  "screened",
+  "final_24.ris",        NA,                  "final"
+) |>
+  dplyr::mutate(files = paste0(file_path, files))
+
+raw_citations <- read_citations(metadata = imported_tbl)
+```
+
+## 4. Deduplicate and create data tables
+
+CiteSource uses the ASySD algorithm to identify and merge duplicate records, preserving the `cite_source`, `cite_label`, and `cite_string` fields from each duplicate. Note that pre-prints and similar records will not be identified as duplicates of their published counterparts.
+
+```{r}
+unique_citations  <- dedup_citations(raw_citations)
+n_unique          <- count_unique(unique_citations)
+source_comparison <- compare_sources(unique_citations, comp_type = "sources")
+```
+
+## 5. Review internal duplication
+
+Before comparing sources it is helpful to confirm that internal deduplication ran as expected. The initial record table shows how many records were imported from each source and how many distinct records remained after within-source duplicates were removed.
+
+In this case, Lens.org had 343 records in the original file but only 340 distinct records after internal deduplication. Medline shows 84 for both, meaning no within-source duplicates were found.
+
+```{r}
+initial_records <- calculate_initial_records(unique_citations, "search")
+create_initial_record_table(initial_records)
+```
+
+## 6. Analyze overlap across sources
+
+### Heatmaps
+
+The count heatmap is organized by source in order of record count, with the source total at the top of each column. Cell values show the number of records that overlapped between each pair of sources. Of the 340 records from Lens.org, 212 were also found in Dimensions and 146 were found in Web of Science. Of the 100 records from Environment Index, 82 were also found in Lens.org.
+
+The percentage heatmap expresses those same overlaps as proportions. The 82 records shared between Environment Index and Lens.org represent 82% of Environment Index's records, but only 24% of Lens.org's records.
+
+```{r}
+plot_source_overlap_heatmap(source_comparison)
+plot_source_overlap_heatmap(source_comparison, plot_type = "percentages")
+```
+
+### Upset plot
+
+The upset plot shows overlap across all source combinations simultaneously. EconLit had only three results, but two of those were unique to that source. The single non-unique EconLit record was found in both Lens.org and Web of Science. Lens.org and Web of Science contributed the most unique records overall, and Dimensions and Lens.org had the greatest pairwise overlap, with 63 shared records not found in any other source.
+
+```{r}
+plot_source_overlap_upset(source_comparison, decreasing = c(TRUE, TRUE))
+```
+
+## 7. Analyze records across screening phases
+
+By including the `cite_label` data, we can now track each source's records through screening. The contributions plot shows unique (green) and shared (red) record counts from each source at each phase — search, screened, and final.
+
+Despite Lens.org and Web of Science contributing the highest numbers of unique records at the search stage, each contributed only a single unique citation to the final included set.
+
+```{r}
+plot_contributions(n_unique,
+  center    = TRUE,
+  bar_order = c("search", "screened", "final")
+)
+```
+
+## 8. Analyze data with tables
+
+### Detailed record table
+
+The detailed record table builds on the initial record table by adding unique and non-unique counts and three percentage columns.
+
+- **Source Contribution %** — each source's share of the total distinct records after cross-source deduplication
+- **Source Unique Contribution %** — each source's share of the total unique records
+- **Source Unique %** — the proportion of each source's distinct records that were unique
+
+For example, Lens.org had 340 distinct records out of 1,051 total before deduplication (32.4% contribution). Of those, 121 were unique — 45.8% of all unique records across the search.
+
+```{r}
+detailed_counts <- calculate_detailed_records(unique_citations, n_unique, "search")
+create_detailed_record_table(detailed_counts)
+```
+
+### Precision and sensitivity table
+
+The precision/sensitivity table incorporates the screening phase data to calculate two metrics for each source:
+
+**Precision** = Final records from source / Distinct records from source
+
+**Sensitivity** = Final records from source / Total final records across all sources
+
+Of the 340 records from Lens.org, 100 were included after title/abstract screening and 16 after full-text screening. This gives Lens.org a precision of 4.7% and a sensitivity of 66.7% — meaning it contributed the majority of the final included set despite a low precision rate.
+
+```{r}
+phase_counts <- calculate_phase_records(unique_citations, n_unique, "cite_source")
+create_precision_sensitivity_table(phase_counts)
+```
+
+## 9. Record-level table
+
+The record-level table lets you inspect which individual final-included citations came from which sources — useful for verifying coverage and for reporting in supplementary materials.
+
+```{r}
+unique_citations |>
+  dplyr::filter(stringr::str_detect(cite_label, "final")) |>
+  record_level_table(return = "DT")
+```
+
+## 10. Exporting for further analysis
+
+CiteSource can export deduplicated results as CSV, RIS, or BibTeX files, and reimport them to resume analysis later without repeating the deduplication step.
+
+```{r}
+#export_csv(unique_citations, filename = "citesource_export_phases.csv")
+#export_ris(unique_citations, filename = "citesource_export_phases.ris", source_field = "DB", label_field = "C5")
+#export_bib(unique_citations, filename = "citesource_export_phases.bib", include = c("sources", "labels", "strings"))
+
+# Reimport a previously exported file
+#unique_citations <- reimport_csv("citesource_export_phases.csv")
+#unique_citations <- reimport_ris("citesource_export_phases.ris")
+```

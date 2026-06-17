@@ -95,12 +95,36 @@ read_citations <- function(files = NULL,
     stop("',' must not be used in cite_source, cite_labels or cite_strings (or filenames if these are not specified)")
   }
 
+  if (!is.null(cite_labels)) {
+    known_labels <- c("search", "screened", "final")
+    unknown_labels <- setdiff(unique(cite_labels), known_labels)
+    if (length(unknown_labels) > 0) {
+      message(
+        "Note: the following cite_label value(s) are not in the standard vocabulary ",
+        "(search / screened / final): ",
+        paste(unknown_labels, collapse = ", "), ". ",
+        "Phase-analysis functions expect these exact labels."
+      )
+    }
+  }
+
   # Need to import files separately to add origin, platform, and searches
-  ref_list <- purrr::map(files,
-                         \(x) synthesisr_read_refs(x,  tag_naming = tag_naming, select_fields = only_key_fields),
-                         .progress = list(  total = 100, 
+  is_shiny <- isTRUE(tryCatch(shiny::isRunning(), error = function(e) FALSE))
+
+  if (is_shiny) {
+    shiny::withProgress(message = "Importing files...", value = 0, {
+      ref_list <- purrr::imap(files, function(x, i) {
+        shiny::setProgress(value = i / length(files), detail = basename(x))
+        synthesisr_read_refs(x, tag_naming = tag_naming, select_fields = only_key_fields)
+      })
+    })
+  } else {
+    ref_list <- purrr::map(files,
+                           \(x) synthesisr_read_refs(x, tag_naming = tag_naming, select_fields = only_key_fields),
+                           .progress = list(total = as.numeric(length(files)),
                                             format = "Importing files {cli::pb_bar} {cli::pb_percent}")
-  )
+    )
+  }
 
   # Drop empty citations
   ref_list <- lapply(
@@ -137,8 +161,8 @@ read_citations <- function(files = NULL,
     message(paste0(utils::capture.output(report), collapse = "\n"))
   }
 
-  ref_list %>%
-    purrr::map(tibble::as_tibble) %>%
+  ref_list |>
+    purrr::map(tibble::as_tibble) |>
     purrr::reduce(dplyr::bind_rows)
   
 }

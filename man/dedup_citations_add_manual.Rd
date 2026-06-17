@@ -2,28 +2,31 @@
 % Please edit documentation in R/dedup.R
 \name{dedup_citations_add_manual}
 \alias{dedup_citations_add_manual}
-\title{Remove pairs with manual dedup - ASySD wrapper}
+\title{Add manually identified duplicate pairs to a deduplicated dataset}
 \usage{
 dedup_citations_add_manual(unique_citations, additional_pairs)
 }
 \arguments{
-\item{unique_citations}{Unique citations post deduplication}
+\item{unique_citations}{Unique citations returned by \code{\link[=dedup_citations]{dedup_citations()}}}
 
-\item{additional_pairs}{TRUE duplicate pairs}
+\item{additional_pairs}{Dataframe of manually confirmed duplicate pairs
+(a subset of the \verb{$manual_dedup} output). If a \code{result} column is present,
+only rows where \code{result == "match"} are merged.}
 }
 \value{
-unique citations formatted for CiteSource
+Updated unique citations dataframe with manual duplicates merged.
 }
 \description{
-This function deduplicates citation data. Note that duplicates are assumed to published
-in the same journal, so pre-prints and similar results will not be identified here.
+Add manually identified duplicate pairs to a deduplicated dataset
 }
 \examples{
 # Load example data from the package
-examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
+examplecitations_path <- system.file("extdata", "examplecitations.rds",
+                                      package = "CiteSource")
 examplecitations <- readRDS(examplecitations_path)
 
-# Deduplicate citations
-dedup_results <- dedup_citations(examplecitations)
-
+# Deduplicate and retrieve manual pairs
+dedup_results <- dedup_citations(examplecitations, manual = TRUE)
+# (user reviews dedup_results$manual_dedup and sets result == "match" for true dups)
+# final <- dedup_citations_add_manual(dedup_results$unique, dedup_results$manual_dedup)
 }

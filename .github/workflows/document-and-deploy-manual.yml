@@ -84,7 +84,7 @@ jobs:
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
       
       - name: Deploy to GitHub pages 🚀
-        if: ${{ github.ref_name }} == 'main' || ${{ github.ref_name }} == 'master'
+        if: ${{ github.ref_name == 'main' || github.ref_name == 'master' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: true

@@ -4,11 +4,7 @@
 \alias{export_bib}
 \title{Export deduplicated citations to .bib file}
 \usage{
-export_bib(
-  citations,
-  filename = "citations.bib",
-  include = c("sources", "labels", "strings")
-)
+export_bib(citations, filename, include = c("sources", "labels", "strings"))
 }
 \arguments{
 \item{citations}{Dataframe with unique citations, resulting from \code{dedup_citations()}}
@@ -16,6 +12,9 @@ export_bib(
 \item{filename}{Name (and path) of file, should end in .ris}
 
 \item{include}{Character. One or more of sources, labels or strings}
+}
+\value{
+No return value, called for side effects. Saves deduplicated citations as a 'BibTeX' file to the specified location.
 }
 \description{
 This function saves deduplicated citations as a BibTex file with sources, labels and strings
@@ -29,6 +28,6 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_bib(dedup_results$unique, "cite_sources.bib", include = "sources")
+  export_bib(dedup_results$unique, tempfile(fileext = ".bib"), include = "sources")
 }
 }

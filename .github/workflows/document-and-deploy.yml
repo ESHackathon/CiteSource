@@ -24,7 +24,7 @@ jobs:
       - name: Set up R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: devtools, plogr, roxygen2, remotes, rsconnect, pkgdown
+          extra-packages: devtools, roxygen2, remotes, rsconnect, pkgdown
 
       - name: Create documentation
         run: |
@@ -36,7 +36,7 @@ jobs:
             roxygen2::roxygenise();
             try(devtools::build_manual())
           "
-        
+
       - name: commit
         run: |
           git config --local user.email "actions@github.com"
@@ -44,7 +44,7 @@ jobs:
           git add -f man/\* NAMESPACE
           git commit -m 'Documentation' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
-    
+
       - name: Deploy latest from dev
         if: github.ref == 'refs/heads/dev'
         env:
@@ -52,12 +52,12 @@ jobs:
           RENV_CONFIG_SNAPSHOT_VALIDATE: "false"
         run: |
           R -e "
-            remotes::install_github('ESHackathon/CiteSource', force = TRUE);
-            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
+            renv::install('ESHackathon/CiteSource@dev');
+            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}});
             rsconnect::deployApp(
               appName = 'CiteSource_latest',
               appDir = './inst/shiny-app/CiteSource',
-              forceUpdate = TRUE)"   
+              forceUpdate = TRUE)"
 
       - name: Deploy stable version from main
         if: github.ref == 'refs/heads/main'
@@ -66,25 +66,25 @@ jobs:
           RENV_CONFIG_SNAPSHOT_VALIDATE: "false"
         run: |
           R -e "
-            remotes::install_github('ESHackathon/CiteSource', force = TRUE);
-            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}}); 
+            renv::install('ESHackathon/CiteSource');
+            rsconnect::setAccountInfo(name=${{secrets.SHINY_LUKAS_ACCOUNT}}, token=${{secrets.SHINY_LUKAS_TOKEN}}, secret=${{secrets.SHINY_LUKAS_SECRET}});
             rsconnect::deployApp(
               appName = 'CiteSource',
               appDir = './inst/shiny-app/CiteSource',
-              forceUpdate = TRUE)"   
+              forceUpdate = TRUE)"
 
       - name: Create pkgdown
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           R -e "
-            if (!require(CiteSource)) remotes::install_github('ESHackathon/CiteSource', force = TRUE);
+            devtools::install(dependencies = FALSE, upgrade = FALSE);
             pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
-      
+
       - name: Deploy to GitHub pages 🚀
-        if: ${{ github.ref_name }} == 'main'
+        if: ${{ github.ref_name == 'main' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: true
           branch: gh-pages
-          folder: docs      
+          folder: docs

@@ -152,7 +152,7 @@ read_ref <- function(
     }
     
     if (!is.null(select_fields)) {
-      df <- df %>% dplyr::select(dplyr::any_of(select_fields))
+      df <- df |> dplyr::select(dplyr::any_of(select_fields))
     }
     return(df)
   } else {
@@ -797,7 +797,7 @@ write_refs <- function(
   } else { # i.e. logical
     if (file) {
       file_out <- TRUE
-      filename <- paste("synthesisr_bibliography", format, sep = ".")
+      filename <- file.path(tempdir(), paste("synthesisr_bibliography", format, sep = "."))
     } else {
       file_out <- FALSE
     }
@@ -1154,7 +1154,7 @@ as.data.frame.bibliography <- function(x, ...) {
   })
   
   x_list <- lapply(x, \(a) {
-    a[lengths(a) > 1] <-  a[lengths(a) > 1] %>% purrr::map(\(x) paste0(x, collapse = " and "))
+    a[lengths(a) > 1] <-  a[lengths(a) > 1] |> purrr::map(\(x) paste0(x, collapse = " and "))
     return(
       as.data.frame(
         a,

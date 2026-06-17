@@ -6,9 +6,11 @@
 \usage{
 export_csv(
   unique_citations,
-  filename = "citesource_exported_citations.csv",
+  filename,
+  fields = "full",
   separate = NULL,
-  trim_abstracts = 32000
+  trim_abstracts = 32000,
+  manual_dedup_complete = FALSE
 )
 }
 \arguments{
@@ -16,14 +18,27 @@ export_csv(
 
 \item{filename}{Name (and path) of file, should end in .csv}
 
+\item{fields}{Controls which columns are included. Use \code{"full"} (default) to export all columns
+(required for reimport into CiteSource via \code{reimport_csv()}); \code{"standard"} to export core
+bibliographic fields plus \code{cite_source}, \code{cite_label}, and \code{cite_string} (suitable for import
+into RELApp or other screening tools); or a character vector of column names for a custom
+selection. Note that exports other than \code{"full"} cannot be reimported into CiteSource.}
+
 \item{separate}{Character vector indicating which (if any) of cite_source, cite_string and cite_label should be split into separate columns to facilitate further analysis.}
 
 \item{trim_abstracts}{Some databases may return full-text that is misidentified as an abstract. This inflates file size and may lead to issues with Excel,
 which cannot deal with more than 32,000 characters per field. Therefore, the default is to trim very long abstracts to 32,000 characters. Set a lower number to reduce file size, or
 NULL to retain abstracts as they are.}
+
+\item{manual_dedup_complete}{Logical. Records, in a \code{manual_dedup_complete}
+column, whether manual deduplication has been completed for this set
+(default \code{FALSE}). Set \code{TRUE} after confirming manual pairs with
+\code{\link[=dedup_citations_add_manual]{dedup_citations_add_manual()}}. This flag is read back by \code{\link[=reimport_csv]{reimport_csv()}}
+and lets later steps know whether candidate pairs still need review. Only
+written when \code{fields = "full"}.}
 }
 \value{
-The function saves the deduplicated citations as a CSV file to the specified location.
+No return value, called for side effects. Saves the deduplicated citations as a 'CSV' file to the specified location.
 }
 \description{
 This function saves deduplicated citations as a CSV file for further analysis and/or reporting.
@@ -36,6 +51,8 @@ if (interactive()) {
   examplecitations_path <- system.file("extdata", "examplecitations.rds", package = "CiteSource")
   examplecitations <- readRDS(examplecitations_path)
   dedup_results <- dedup_citations(examplecitations, merge_citations = TRUE)
-  export_csv(dedup_results, "cite_sources.csv", separate = "cite_source")
+  export_csv(dedup_results, tempfile(fileext = ".csv"), separate = "cite_source")
+  # Standard export for RELApp / screening tools (not reimportable into CiteSource):
+  export_csv(dedup_results, tempfile(fileext = ".csv"), fields = "standard")
 }
 }

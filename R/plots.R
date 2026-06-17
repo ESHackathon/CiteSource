@@ -13,6 +13,10 @@
 #' contained? If FALSE, order of data is retained.
 #' @param interactive Should returned plot be interactive and enable user to export
 #' records underlying each field?
+#' @param show_labels Whether to show text labels in cells. `"auto"` (default) shows
+#' labels when there are 10 or fewer sources; `TRUE` always shows them; `FALSE` hides them.
+#' @param log_scale Should the fill colour scale be log-transformed? Useful when counts
+#' vary greatly across cells. Ignored when `plot_type = "percentages"`.
 #' @return The requested plot as a either a `ggplot2` object (when interactive = FALSE), which can then be
 #' further formatted or saved using [ggplot2::ggsave()], or a `plotly` object when `interactive = TRUE`
 #' @export
@@ -29,45 +33,49 @@
 #' plot_source_overlap_heatmap(data)
 #' plot_source_overlap_heatmap(data, plot_type = "percentages")
 #'
-plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, plot_type = c("counts", "percentages"), sort_sources = TRUE, interactive = FALSE) {
+plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, plot_type = c("counts", "percentages"), sort_sources = TRUE, interactive = FALSE, show_labels = "auto", log_scale = FALSE) {
   plot_type <- plot_type[1]
   if (!plot_type %in% c("counts", "percentages")) {
     stop("plot_type must be counts or percentages")
   }
   
-  data <- data %>% dplyr::select(tidyselect::vars_select_helpers$where(is.logical))
+  data <- data |> dplyr::select(tidyselect::vars_select_helpers$where(is.logical))
 
   if (sort_sources) {
-    source_sizes <- data %>%
-      dplyr::select(tidyselect::matches(paste0(cells, "__"))) %>%
+    source_sizes <- data |>
+      dplyr::select(tidyselect::matches(paste0(cells, "__"))) |>
       colSums()
-    names(source_sizes) <- data %>%
-      dplyr::select(tidyselect::matches(paste0(cells, "__"))) %>%
+    names(source_sizes) <- data |>
+      dplyr::select(tidyselect::matches(paste0(cells, "__"))) |>
       colnames()
     source_sizes <- sort(source_sizes)
     sources_order <- names(source_sizes)
   } else {
-    sources_order <- data %>%
-      dplyr::select(tidyselect::matches(paste0(cells, "__"))) %>%
+    sources_order <- data |>
+      dplyr::select(tidyselect::matches(paste0(cells, "__"))) |>
       colnames()
   }
 
+  n_sources <- length(sources_order)
+  show_text <- if (identical(show_labels, "auto")) n_sources <= 10 else isTRUE(as.logical(show_labels))
+  fill_trans <- if (log_scale && plot_type != "percentages") "log1p" else "identity"
+
   if (!is.null(facets)) {
-    data <- data %>%
-      tidyr::pivot_longer(tidyselect::matches(paste0(facets, "__")), names_to = "facet") %>%
-      dplyr::mutate(facet = stringr::str_remove(.data$facet, paste0(facets, "__"))) %>%
-      dplyr::filter(.data$value == TRUE) %>%
-      split(.$facet)
+    data <- data |>
+      tidyr::pivot_longer(tidyselect::matches(paste0(facets, "__")), names_to = "facet") |>
+      dplyr::mutate(facet = stringr::str_remove(.data$facet, paste0(facets, "__"))) |>
+      dplyr::filter(.data$value == TRUE) |>
+      (\(x) split(x, x$facet))()
   } else {
     data$facet <- "1"
     data <- list(data)
   }
 
   data <- purrr::map(data, function(df) {
-    df <- df %>% dplyr::select(dplyr::all_of(sources_order))
+    df <- df |> dplyr::select(dplyr::all_of(sources_order))
     purrr::map_dfr(names(df), function(source) {
-      df[df[source] == 1, ] %>% colSums()
-    }) %>% dplyr::select(dplyr::all_of(names(df)))
+      df[df[source] == 1, ] |> colSums()
+    }) |> dplyr::select(dplyr::all_of(names(df)))
   })
 
 
@@ -83,14 +91,14 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
     data[["DB1"]] <- rep(sources_order, length(unique(data$facet)))
 
-    sources_order <- sources_order %>% stringr::str_remove(paste0(cells, "__"))
+    sources_order <- sources_order |> stringr::str_remove(paste0(cells, "__"))
 
-    data <- data %>%
-      tidyr::pivot_longer(tidyselect::matches(paste0(cells, "__")), names_to = "DB2", values_to = "records") %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("DB"), ~ stringr::str_remove(.x, paste0(cells, "__")))) %>%
+    data <- data |>
+      tidyr::pivot_longer(tidyselect::matches(paste0(cells, "__")), names_to = "DB2", values_to = "records") |>
+      dplyr::mutate(dplyr::across(dplyr::starts_with("DB"), ~ stringr::str_remove(.x, paste0(cells, "__")))) |>
       ggplot2::remove_missing(na.rm = TRUE)
 
-    p <- data %>%
+    p <- data |>
       ggplot2::ggplot(ggplot2::aes(.data$DB1, .data$DB2, fill = .data$records)) +
       ggplot2::theme_minimal()
 
@@ -103,32 +111,33 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
           strip.background = ggplot2::element_rect(
             color = "black", fill = "darkgrey"
           )
-        ) + ggplot2::scale_fill_gradient(low = "white")
+        ) + ggplot2::scale_fill_gradient(low = "white", trans = fill_trans)
       # Removed legends here because they do not appear in correct order - maybe worth fixing in the future
       facets <- unique(data$facet)
 
       for (i in seq_along(facets)) {
-        p <- p + ggnewscale::new_scale_fill() + ggplot2::geom_tile(ggplot2::aes(fill = .data$records), data = data %>% dplyr::filter(.data$facet == facets[i])) +
+        p <- p + ggnewscale::new_scale_fill() + ggplot2::geom_tile(ggplot2::aes(fill = .data$records), data = data |> dplyr::filter(.data$facet == facets[i])) +
 
-          ggplot2::scale_fill_gradient(low = "white")
+          ggplot2::scale_fill_gradient(low = "white", trans = fill_trans)
       }
     } else {
       p <- p +
         ggplot2::geom_tile() +
-        ggplot2::scale_fill_gradient(low = "white")
+        ggplot2::scale_fill_gradient(low = "white", trans = fill_trans)
     }
 
-    p +
-      ggplot2::geom_text(ggplot2::aes(label = .data$records)) +
+    p <- p +
       ggplot2::scale_x_discrete(limits = rev(sources_order), guide = ggplot2::guide_axis(angle = 45)) +
       ggplot2::scale_y_discrete(limits = sources_order) +
       ggplot2::labs(x = "", y = "", fill = "Records")
+    if (show_text) p <- p + ggplot2::geom_text(ggplot2::aes(label = .data$records))
+    p
   } else if (plot_type == "percentages") {
     data <- purrr::map(data, function(df) {
       diag <- diag(as.matrix(df))
       df <- df / diag
-      subs <- diag(nrow = nrow(df)) %>%
-        as.logical() %>%
+      subs <- diag(nrow = nrow(df)) |>
+        as.logical() |>
         matrix(nrow = nrow(df))
       df[subs] <- diag
       df
@@ -138,7 +147,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 
     data[["DB1"]] <- rep(sources_order, length(unique(data$facet)))
 
-    sources_order <- sources_order %>% stringr::str_remove(paste0(cells, "__"))
+    sources_order <- sources_order |> stringr::str_remove(paste0(cells, "__"))
 
     fmt_pct <- function(x) {
       out <- round(x, 2) * 100
@@ -148,13 +157,12 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       out
     }
 
-    p <- data %>%
-      tidyr::pivot_longer(tidyselect::matches(paste0(cells, "__")), names_to = "DB2", values_to = "shares") %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("DB"), ~ stringr::str_remove(.x, paste0(cells, "__")))) %>%
+    p <- data |>
+      tidyr::pivot_longer(tidyselect::matches(paste0(cells, "__")), names_to = "DB2", values_to = "shares") |>
+      dplyr::mutate(dplyr::across(dplyr::starts_with("DB"), ~ stringr::str_remove(.x, paste0(cells, "__")))) |>
       ggplot2::ggplot(ggplot2::aes(.data$DB1, .data$DB2, fill = .data$shares)) +
       ggplot2::geom_tile(height = .9) +
       ggplot2::scale_fill_gradient(low = "white", labels = scales::percent, limits = c(0, 1)) +
-      ggplot2::geom_text(ggplot2::aes(label = fmt_pct(.data$shares), fill = NULL)) +
       ggplot2::labs(
         x = "", y = "", fill = "Overlap",
         caption = "Note: Percentages indicate share of records in row also found in column,
@@ -163,6 +171,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
       ggplot2::scale_x_discrete(limits = rev(sources_order), guide = ggplot2::guide_axis(angle = 45)) +
       ggplot2::scale_y_discrete(limits = sources_order) +
       ggplot2::theme_light()
+    if (show_text) p <- p + ggplot2::geom_text(ggplot2::aes(label = fmt_pct(.data$shares), fill = NULL))
 
 
 
@@ -189,6 +198,7 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 #' @param groups Variable to use as groups. Should be 'source', 'label' or 'string' - defaults to source.
 #' @inheritParams UpSetR::upset
 #' @inheritDotParams UpSetR::upset -sets.x.label -mainbar.y.label -order.by
+#' @return No return value, called for side effects. Renders an UpSet plot showing record overlap between sources to the current graphics device.
 #' @export
 #' @references Conway, J. R., Lex, A., & Gehlenborg, N. (2017). UpSetR: an R package for the visualization of intersecting sets and their properties. Bioinformatics.
 
@@ -210,8 +220,8 @@ plot_source_overlap_heatmap <- function(data, cells = "source", facets = NULL, p
 #'
 plot_source_overlap_upset <- function(data, groups = "source", nsets = NULL, sets.x.label = "Number of records",
                                       mainbar.y.label = "Overlapping record count", order.by = c("freq", "degree"), ...) {
-  data <- data %>%
-    dplyr::select(tidyselect::matches(paste0(groups, "__"))) %>%
+  data <- data |>
+    dplyr::select(tidyselect::matches(paste0(groups, "__"))) |>
     dplyr::rename_with(~ stringr::str_remove(.x, paste0(groups, "__")))
 
   if (is.null(nsets)) {
@@ -220,9 +230,9 @@ plot_source_overlap_upset <- function(data, groups = "source", nsets = NULL, set
 
   if (nsets > 5) message("Plotting a large number of groups. Consider reducing nset or sub-setting the data.")
 
-  data %>%
-    data.frame() %>%
-    dplyr::transmute(dplyr::across(tidyselect::vars_select_helpers$where(is.logical), as.numeric)) %>%
+  data |>
+    data.frame() |>
+    dplyr::transmute(dplyr::across(tidyselect::vars_select_helpers$where(is.logical), as.numeric)) |>
     UpSetR::upset(nsets = nsets, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label, ...)
 }
 
@@ -244,6 +254,8 @@ cite_source <- cite_label <- type <- NULL
 #' @param facet_order Character. Order of facets. Any levels not specified will follow at the end.
 #' @param color_order Character. Order of values on the color scale.
 #' @param totals_in_legend Logical. Should totals be shown in legend (e.g. as Unique (N = 1234))
+#' @return A \code{ggplot2} object showing source contributions as a faceted bar chart. The object can
+#'   be further customized using \code{ggplot2} functions or saved with \code{\link[ggplot2]{ggsave}}.
 #' @export
 #' @examples
 #' data <- data.frame(
@@ -273,17 +285,17 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
 
 
   if (!(length(color_order) == 1 && color_order == "keep")) {
-    data <- data %>%
+    data <- data |>
       dplyr::mutate(dplyr::across(!!color, ~ forcats::fct_relevel(.x, color_order)))
   }
 
   if (!(length(bar_order) == 1 && bar_order == "keep")) {
-    data <- data %>%
+    data <- data |>
       dplyr::mutate(dplyr::across(!!bars, ~ forcats::fct_relevel(.x, bar_order)))
   }
 
   if (!(length(facet_order) == 1 && facet_order == "keep")) {
-    data <- data %>%
+    data <- data |>
       dplyr::mutate(dplyr::across(!!facets, ~ forcats::fct_relevel(.x, facet_order)))
   }
 
@@ -294,12 +306,12 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
 
     if (!rlang::quo_is_null(facets)) p <- p + ggplot2::facet_grid(cols = ggplot2::vars(!!facets))
   } else {
-    vals <- levels(data %>% dplyr::select(!!color) %>% dplyr::pull() %>% forcats::as_factor())
+    vals <- levels(data |> dplyr::select(!!color) |> dplyr::pull() |> forcats::as_factor())
 
     if (length(vals) != 2) stop("center is only implemented for two colors, call the function with center = FALSE")
 
-    data_sum <- data %>%
-      dplyr::group_by(!!bars, !!facets, !!color) %>%
+    data_sum <- data |>
+      dplyr::group_by(!!bars, !!facets, !!color) |>
       dplyr::summarise(n = dplyr::n())
 
     data_sum$labelpos <- ifelse(data_sum$type == vals[1],
@@ -307,8 +319,8 @@ plot_contributions <- function(data, facets = cite_source, bars = cite_label, co
     ) # add label positions for geom_text
 
     p <- ggplot2::ggplot(data, ggplot2::aes(!!bars, fill = !!color)) +
-      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") +
-      ggplot2::geom_bar(data = data_sum %>% dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
+      ggplot2::geom_bar(data = data_sum |> dplyr::filter(!!color != vals[1]), ggplot2::aes(y = -.data$n), stat = "identity") +
+      ggplot2::geom_bar(data = data_sum |> dplyr::filter(!!color == vals[1]), ggplot2::aes(y = .data$n), stat = "identity") +
       ggplot2::labs(y = "Citations") +
       ggplot2::scale_y_continuous(labels = abs) +
       ggplot2::guides(x = ggplot2::guide_axis(angle = 45), fill = ggplot2::guide_legend(reverse = TRUE)) +

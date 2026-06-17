@@ -1,3 +1,4 @@
+^\.claude
 ^renv$
 ^renv\.lock$
 ^.*\.Rproj$
@@ -8,4 +9,17 @@
 ^_pkgdown.yml$
 ^cran-comments\.md$
 ^\.httr-oauth$
-^docs$
+^CITATION\.cff$
+^REQUIREMENTS.*$
+^vignettes/working_example_data$
+^vignettes/benchmark_data$
+^vignettes/vignette_exports$
+^vignettes/new_stage_data$
+^vignettes/new_benchmark_data$
+^vignettes/topic_data$
+^vignettes/valid_data$
+^tests/shinytest$
+^CRAN-SUBMISSION$
+^CLAUDE\.md$
+^guide$
+^\.tmp.*$
