@@ -23,3 +23,4 @@
 ^CLAUDE\.md$
 ^guide$
 ^\.tmp.*$
+^comms$

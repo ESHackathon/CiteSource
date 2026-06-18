@@ -1,4 +1,5 @@
-# Run CI for R using https://eddelbuettel.github.io/r-ci/
+# R CMD check using r-lib/actions (Posit Public Package Manager binaries).
+# See https://github.com/r-lib/actions/tree/v2/examples#standard-ci-workflow
 
 name: R-CMD-Check
 
@@ -6,42 +7,42 @@ on:
   workflow_run:
     workflows: ["document-and-deploy"]
     branches: [main]
-    types: 
+    types:
       - completed
-  workflow_dispatch:    
+  workflow_dispatch:
 
 env:
   _R_CHECK_FORCE_SUGGESTS_: "false"
 
 jobs:
   R-CMD-check:
+    runs-on: ${{ matrix.os }}
+
     strategy:
+      fail-fast: false
       matrix:
         include:
           - {os: macOS-latest}
           - {os: ubuntu-latest}
 
-    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Setup
-        uses: eddelbuettel/github-actions/r-ci-setup@master
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
 
-      - name: Bootstrap
-        run: ./run.sh bootstrap
-
-      - name: Install rcmdcheck
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          R -e "
-            install.packages(c('rcmdcheck', 'devtools'));
-            devtools::install_local()
-          "
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
 
       - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
