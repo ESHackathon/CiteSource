@@ -161,10 +161,24 @@ read_citations <- function(files = NULL,
     message(paste0(utils::capture.output(report), collapse = "\n"))
   }
 
-  ref_list |>
+  combined <- ref_list |>
     purrr::map(tibble::as_tibble) |>
     purrr::reduce(dplyr::bind_rows)
-  
+
+  # Standardise the document-type column name. RIS files map the `TY` tag to
+  # `source_type` (via synthesisr_code_lookup), whereas BibTeX imports produce
+  # `type`. Coalesce both into a single canonical `type` column so document type
+  # is handled consistently through dedup and export.
+  if ("source_type" %in% names(combined)) {
+    if ("type" %in% names(combined)) {
+      combined$type <- dplyr::coalesce(combined$type, combined$source_type)
+    } else {
+      combined$type <- combined$source_type
+    }
+    combined$source_type <- NULL
+  }
+
+  combined
 }
 
 

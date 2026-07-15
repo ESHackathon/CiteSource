@@ -23,7 +23,8 @@ order_citations <- function(raw_citations, extra_merge_fields = NULL) {
     dplyr::arrange(abstract, year) |>
     dplyr::mutate(dplyr::across(where(is.character), utf8::utf8_encode)) |>
     dplyr::select(author, title, year, journal, abstract, doi, number, pages,
-                  volume, isbn, record_id, label, source, {{ extra_merge_fields }})
+                  volume, isbn, record_id, label, source, {{ extra_merge_fields }},
+                  dplyr::any_of("type"))
 }
 
 #' @noRd
@@ -406,7 +407,9 @@ process_possible_pairs <- function(maybe_pairs, ordered_citations,
       label1     = ordered_citations$label[id1],
       label2     = ordered_citations$label[id2],
       source1    = ordered_citations$source[id1],
-      source2    = ordered_citations$source[id2]
+      source2    = ordered_citations$source[id2],
+      type1      = if ("type" %in% names(ordered_citations)) ordered_citations$type[id1] else NA_character_,
+      type2      = if ("type" %in% names(ordered_citations)) ordered_citations$type[id2] else NA_character_
     )
 
   if (!is.null(extra_merge_fields)) {
@@ -422,6 +425,7 @@ process_possible_pairs <- function(maybe_pairs, ordered_citations,
         volume1, volume2, volume, journal1, journal2, journal,
         isbn, isbn1, isbn2, doi1, doi2, doi,
         record_id1, record_id2, label1, label2, source1, source2,
+        dplyr::any_of(c("type1", "type2")),
         dplyr::starts_with(paste0(extra_merge_fields))
       )
   } else {
@@ -432,8 +436,16 @@ process_possible_pairs <- function(maybe_pairs, ordered_citations,
         number1, number2, number, pages1, pages2, pages,
         volume1, volume2, volume, journal1, journal2, journal,
         isbn, isbn1, isbn2, doi1, doi2, doi,
-        record_id1, record_id2, label1, label2, source1, source2
+        record_id1, record_id2, label1, label2, source1, source2,
+        dplyr::any_of(c("type1", "type2"))
       )
+  }
+
+  # Seed an editable column so users can choose which document type to keep for
+  # a confirmed manual pair (honored by dedup_citations_add_manual()). When left
+  # blank, the "shared type, else GEN" rule is applied on merge.
+  if (all(c("type1", "type2") %in% names(maybe_pairs))) {
+    maybe_pairs$type_keep <- rep("", nrow(maybe_pairs))
   }
 
   ids <- matched_pairs_with_ids |>
@@ -527,6 +539,9 @@ merge_metadata <- function(matched_pairs_with_ids, extra_merge_fields) {
   }
 
   merge_fields <- c("record_ids", "label", "source", extra_merge_fields)
+  # Preserve every document type in the cluster (joined) so callers can apply
+  # the "shared type, else GEN" rule after merging.
+  if ("type" %in% names(matched_pairs_with_ids)) merge_fields <- c(merge_fields, "type")
 
   paste_unless_blank_or_na <- function(x) {
     if (all(is.na(x)))  return(NA)

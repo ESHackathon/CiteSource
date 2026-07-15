@@ -1992,7 +1992,7 @@ server <- function(input, output, session) {
     similarity   <- pair$similarity_score
     sim_class    <- if (similarity >= 80) "dedup-similarity-high" else
                     if (similarity >= 50) "dedup-similarity-medium" else "dedup-similarity-low"
-    fields_show  <- c("title","author","year","journal","doi","pages","volume","abstract","source","label")
+    fields_show  <- c("title","author","year","journal","doi","pages","volume","abstract","source","label","type")
     pair_row_idx <- if ("original_row_index" %in% names(pair)) pair$original_row_index else rv$current_pair_index
     is_selected  <- isTRUE(pair_row_idx %in% rv$selected_pairs_card)
 
@@ -2069,7 +2069,7 @@ server <- function(input, output, session) {
     selected_cols <- input$manual_dedup_cols
     
     # Define the desired base order
-    core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string")
+    core_col_order <- c("author", "title", "year", "journal", "abstract","doi", "pages","volume","number","source","label","string","type")
     # Create the desired interleaved order of columns to select
     
     desired_table_order <- character(0)

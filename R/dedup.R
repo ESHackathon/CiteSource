@@ -63,13 +63,41 @@ dedup_citations <- function(raw_citations, manual = FALSE, show_unknown_tags = F
     unique_post_dedup$cite_source <- unique_post_dedup$source
     unique_post_dedup$cite_label  <- unique_post_dedup$label
     unique_post_dedup <- dplyr::select(unique_post_dedup, -source, -label)
+    unique_post_dedup <- resolve_type_column(unique_post_dedup)
     return(unique_post_dedup)
   } else {
     dedup_results$unique$cite_source <- dedup_results$unique$source
     dedup_results$unique$cite_label  <- dedup_results$unique$label
     dedup_results$unique <- dplyr::select(dedup_results$unique, -source, -label)
+    dedup_results$unique <- resolve_type_column(dedup_results$unique)
     return(dedup_results)
   }
+}
+
+
+#' Resolve merged document types to a single value per record
+#'
+#' Applies the auto-deduplication rule: if every merged record in a cluster
+#' shares the same document type (compared case-insensitively and trimmed) that
+#' type is kept; otherwise the generic RIS type `"GEN"` is used. `merge_metadata()`
+#' joins the individual types with ", ", so this operates on that joined string.
+#' @noRd
+resolve_type <- function(x) {
+  vapply(x, function(t) {
+    if (is.na(t)) return(NA_character_)
+    parts <- trimws(unlist(strsplit(as.character(t), ",")))
+    parts <- parts[!is.na(parts) & parts != "" & toupper(parts) != "NA"]
+    if (length(parts) == 0) return(NA_character_)
+    if (length(unique(toupper(parts))) == 1) return(parts[[1]])
+    "GEN"
+  }, character(1), USE.NAMES = FALSE)
+}
+
+#' Apply `resolve_type()` to the `type` column of a citations dataframe (if any)
+#' @noRd
+resolve_type_column <- function(citations) {
+  if ("type" %in% names(citations)) citations$type <- resolve_type(citations$type)
+  citations
 }
 
 
@@ -169,6 +197,24 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
   unique_citations$source <- unique_citations$cite_source
   unique_citations$label  <- unique_citations$cite_label
 
+  # Honor a user-provided `type_keep` on confirmed pairs: set the document type
+  # of the involved records so that merging yields the chosen value. Pairs
+  # without a `type_keep` fall back to the "shared type, else GEN" rule applied
+  # by resolve_type_column() below.
+  if ("type_keep" %in% names(additional_pairs) && "type" %in% names(unique_citations) &&
+      all(c("duplicate_id.x", "duplicate_id.y") %in% names(additional_pairs))) {
+    ap <- additional_pairs
+    if ("result" %in% names(ap)) ap <- ap[ap$result == "match", , drop = FALSE]
+    dup_ids <- as.character(unique_citations$duplicate_id)
+    for (i in seq_len(nrow(ap))) {
+      tk <- ap$type_keep[i]
+      if (!is.na(tk) && nzchar(tk)) {
+        ids <- c(as.character(ap$duplicate_id.x[i]), as.character(ap$duplicate_id.y[i]))
+        unique_citations$type[dup_ids %in% ids] <- tk
+      }
+    }
+  }
+
   dedup_results <- asys_dedup_citations_add_manual(
     unique_citations,
     additional_pairs   = additional_pairs,
@@ -177,7 +223,8 @@ dedup_citations_add_manual <- function(unique_citations, additional_pairs) {
 
   dedup_results$cite_source <- dedup_results$source
   dedup_results$cite_label  <- dedup_results$label
-  dplyr::select(dedup_results, -source, -label)
+  dedup_results <- dplyr::select(dedup_results, -source, -label)
+  resolve_type_column(dedup_results)
 }
 
 

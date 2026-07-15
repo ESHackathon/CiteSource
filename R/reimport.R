@@ -138,7 +138,8 @@ reimport_ris <- function(filename = "citations.ris",
     string_field, "cite_string", TRUE,
     label_field, "cite_label", TRUE,
     duplicate_id_field, "duplicate_id", TRUE,
-    record_id_field, "record_ids", TRUE
+    record_id_field, "record_ids", TRUE,
+    "TY", "type", TRUE
   )
 
   names(custom_codes)[3] <- tag_naming

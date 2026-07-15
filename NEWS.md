@@ -15,6 +15,15 @@ First stable release, following acceptance on CRAN.
 
 ## Improvements
 
+- Document type is now maintained end-to-end. On import the RIS `TY` tag and
+  BibTeX entry type are standardised into a single `type` column (retained by
+  default). During automatic deduplication a merged record keeps the shared
+  document type when all merged records agree, otherwise it is set to `"GEN"`.
+  Manual-review candidate pairs expose `type1`/`type2` and an editable
+  `type_keep` column that `dedup_citations_add_manual()` honors (in the Shiny
+  app, use the per-field "Use This" control). `type` is exported as the CSV
+  `type` column and the RIS `TY` tag, and round-trips through `reimport_csv()`
+  and `reimport_ris()`.
 - `create_detailed_record_table()` and `create_precision_sensitivity_table()`
   redesigned for readability: related columns are grouped under spanner headers,
   the contribution/uniqueness percentages have clearer labels, Precision and
